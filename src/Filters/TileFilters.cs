@@ -10,11 +10,11 @@ namespace PrepareLanding.Filters
 {
     public class TileFilterBiomes : TileFilter
     {
-        public override string SubjectThingDef => "Biomes";
-
         public TileFilterBiomes(string attachedProperty, FilterHeaviness heaviness) : base(attachedProperty, heaviness)
         {
         }
+
+        public override string SubjectThingDef => "Biomes";
 
         public override void Filter(PrepareLandingUserData userData, List<int> inputList)
         {
@@ -37,12 +37,12 @@ namespace PrepareLanding.Filters
 
     public class TileFilterHilliness : TileFilter
     {
-        public override string SubjectThingDef => "Terrains";
-
         public TileFilterHilliness(string attachedProperty, FilterHeaviness heaviness) : base(attachedProperty,
             heaviness)
         {
         }
+
+        public override string SubjectThingDef => "Terrains";
 
         public override void Filter(PrepareLandingUserData userData, List<int> inputList)
         {
@@ -65,11 +65,11 @@ namespace PrepareLanding.Filters
 
     public class TileFilterRoads : TileFilter
     {
-        public override string SubjectThingDef => "Roads";
-
         public TileFilterRoads(string attachedProperty, FilterHeaviness heaviness) : base(attachedProperty, heaviness)
         {
         }
+
+        public override string SubjectThingDef => "Roads";
 
         public override void Filter(PrepareLandingUserData userData, List<int> inputList)
         {
@@ -91,11 +91,11 @@ namespace PrepareLanding.Filters
 
     public class TileFilterStones : TileFilter
     {
-        public override string SubjectThingDef => "Stones";
-
         public TileFilterStones(string attachedProperty, FilterHeaviness heaviness) : base(attachedProperty, heaviness)
         {
         }
+
+        public override string SubjectThingDef => "Stones";
 
         public override void Filter(PrepareLandingUserData userData, List<int> inputList)
         {
@@ -437,7 +437,6 @@ namespace PrepareLanding.Filters
 
         public override void Filter(PrepareLandingUserData userData, List<int> inputList)
         {
-
             base.Filter(userData, inputList);
 
             if (!userData.AverageTemperature.Use)
@@ -464,7 +463,6 @@ namespace PrepareLanding.Filters
 
         public override void Filter(PrepareLandingUserData userData, List<int> inputList)
         {
-
             base.Filter(userData, inputList);
 
             if (!userData.WinterTemperature.Use)
@@ -494,7 +492,6 @@ namespace PrepareLanding.Filters
 
         public override void Filter(PrepareLandingUserData userData, List<int> inputList)
         {
-
             base.Filter(userData, inputList);
 
             if (!userData.SummerTemperature.Use)
