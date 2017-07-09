@@ -21,21 +21,26 @@ namespace PrepareLanding.Extensions
             return !thisEnumerable.Except(other).Any();
         }
 
-        public static bool IsSubsetInOrder<T>(this List<T> thisList, List<T> other)
+        public static bool IsSubsetInOrder<T>(this List<T> subsetList, List<T> containingList)
         {
-            if (!IsSubset(thisList, other))
+            if (!IsSubset(subsetList, containingList))
                 return false;
 
-            var otherIndex = other.IndexOf(thisList[0]);
+            var otherIndex = containingList.IndexOf(subsetList[0]);
 
-            /*
-            for (var i = 0; i < thisList.Count; i++)
-            {
-                
-                if (Comparer<T>.Default.Compare(other[i + otherIndex], thisList[i]) != 0)
-                    return false;
-            }*/
-            return !thisList.Where((t, i) => Comparer<T>.Default.Compare(other[i + otherIndex], t) != 0).Any();
+            return !subsetList.Where((t, i) => Comparer<T>.Default.Compare(containingList[i + otherIndex], t) != 0).Any();
+        }
+
+        public static bool IsSubsetInOrderSamePos<T>(this List<T> subsetList, List<T> containingList)
+        {
+            if (subsetList.Count > containingList.Count)
+                return false;
+
+            if (!subsetList.IsSubset(containingList))
+                return false;
+
+            //return !subsetList.Where((t, i) => t != containingList[i]).Any();
+            return !subsetList.Where((t, i) => Comparer<T>.Default.Compare(t, containingList[i]) != 0).Any(); 
         }
     }
 }

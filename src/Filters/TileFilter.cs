@@ -168,7 +168,7 @@ namespace PrepareLanding.Filters
                         var containingList = subset == tileStones ? orderedStoneDefsOn : tileStones;
 
                         // check if the subset list has the same stone types at the same position in the containing list.
-                        if (IsSubsetInOrderSamePos(subset, containingList))
+                        if (subset.IsSubsetInOrderSamePos(containingList))
                             _filteredTiles.Add(tileId);
                     }
                     // maximum must-have stone types
