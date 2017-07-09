@@ -22,7 +22,7 @@ namespace PrepareLanding.Filters
 
             var chosenBiome = userData.ChosenBiome;
 
-            // a null biome means any biomes, so return all tiles
+            // a null biome means any biomes, so that means all tiles match
             if (chosenBiome == null)
             {
                 _filteredTiles.AddRange(inputList);
@@ -50,7 +50,7 @@ namespace PrepareLanding.Filters
 
             var chosenHilliness = userData.ChosenHilliness;
 
-            // an undefined hilliness means 'any' type of hilliness, so all tile match
+            // an undefined hilliness means 'any' type of hilliness, so all tiles match
             if (chosenHilliness == Hilliness.Undefined)
             {
                 _filteredTiles.AddRange(inputList);
