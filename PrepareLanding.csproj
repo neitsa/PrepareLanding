@@ -64,6 +64,7 @@
     <Compile Include="src\Extensions\StringExtensions.cs" />
     <Compile Include="src\Filters\ITileFilter.cs" />
     <Compile Include="src\Filters\TileFilter.cs" />
+    <Compile Include="src\Filters\TileFilters.cs" />
     <Compile Include="src\Gui\RichText.cs" />
     <Compile Include="src\Extensions\TileExtensions.cs" />
     <Compile Include="src\Extensions\TwelfthExtensions.cs" />
