@@ -162,7 +162,7 @@ namespace PrepareLanding
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset All"))
                 foreach (var roadDefEntry in selectedRoadDefs)
-                    roadDefEntry.Value.State = MultiCheckboxState.Off;
+                    roadDefEntry.Value.State = MultiCheckboxState.Partial;
 
             var scrollViewHeight = selectedRoadDefs.Count * DefaultElementHeight;
             var inLs = ListingStandard.BeginScrollView(5 * DefaultElementHeight, scrollViewHeight,
@@ -207,7 +207,7 @@ namespace PrepareLanding
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset All"))
                 foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.Off;
+                    riverDefEntry.Value.State = MultiCheckboxState.Partial;
 
             var inLs = ListingStandard.BeginScrollView(4 * DefaultElementHeight,
                 selectedRiverDefs.Count * DefaultElementHeight, ref _scrollPosRiverSelection);
