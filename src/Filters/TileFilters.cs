@@ -84,23 +84,36 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
+            // get a  list of roadDefs that *must not* be present
             var roadDefs = UserData.SelectedRoadDefs;
-            foreach (var entry in roadDefs)
+            var unwantedRoadDefs = (from entry in roadDefs where entry.Value.State == MultiCheckboxState.Off select entry.Key).ToList();
+
+            // from the input list, get only tiles that have roads (of any type)
+            var tilesWithRoads = TilesWithRoads(inputList);
+
+            foreach (var tileId in tilesWithRoads)
             {
-                var currentRoadDef = entry.Key;
+                // for all road type in the current tile
+                var visibleRoads = Find.World.grid[tileId].VisibleRoads;
+                foreach (var roadLink in visibleRoads)
+                {
+                    // do not add the current tile if the current tile road is in the unwanted list
+                    if (unwantedRoadDefs.Contains(roadLink.road))
+                        break;
 
-                if (entry.Value.State != MultiCheckboxState.Off)
-                    foreach (var tileId in inputList)
-                    {
-                        // must be in the tiles with roads
-                        if (!PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Contains(tileId))
-                            continue;
-
-                        foreach (var roadLink in Find.World.grid[tileId].VisibleRoads)
-                            if (roadLink.road == currentRoadDef)
-                                _filteredTiles.Add(tileId);
-                    }
+                    _filteredTiles.Add(tileId);
+                }
             }
+        }
+
+        /// <summary>
+        /// Given a list of tiles, returns only tiles that have at least a road (of any type).
+        /// </summary>
+        /// <param name="inputList">A list of tiles from which to only get tiles with roads.</param>
+        /// <returns>A <see cref="IEnumerable{T}"/> containing the tiles ids that have at least one type of road.</returns>
+        public static IEnumerable<int> TilesWithRoads(List<int> inputList)
+        {
+            return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRoad);
         }
     }
 
