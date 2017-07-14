@@ -24,9 +24,7 @@ namespace PrepareLanding.Extensions
                 return result;
             }
             if (sum < 1.0f) //TODO: check with an epsilon
-            {
                 divisors.Add(1.0f - sum);
-            }
 
             var originalWidth = r.width;
             var previousWidth = 0f;
@@ -44,24 +42,26 @@ namespace PrepareLanding.Extensions
         }
 
         /// <summary>
-        /// Given a containing <see cref="Rect"/> return of list of Rect so all of the Rects in the list are spaced evenly from the center of the containing Rect.
+        ///     Given a containing <see cref="Rect" /> return of list of Rect so all of the Rects in the list are spaced evenly
+        ///     from the center of the containing Rect.
         /// </summary>
-        /// <param name="r">The containing <see cref="Rect"/>.</param>
-        /// <param name="y">The height (in <see cref="r"/>) at which the items are to be placed.</param>
+        /// <param name="r">The containing <see cref="Rect" />.</param>
+        /// <param name="y">The height (in <see cref="r" />) at which the items are to be placed.</param>
         /// <param name="numItems">Number of items to draw.</param>
         /// <param name="itemWidth">The width of a single item.</param>
         /// <param name="itemHeight">The height of a single item.</param>
         /// <param name="spaceBetweenItems">The width of the space between each of the items.</param>
         /// <param name="isMinimized">Indicated whether or not the current containing window is resized to a lesser Rect.</param>
-        /// <returns>A list of <see cref="Rect"/>.</returns>
-        public static List<Rect> SpaceEvenlyFromCenter(this Rect r, float y, uint numItems, float itemWidth, float itemHeight, float spaceBetweenItems, bool isMinimized = false)
+        /// <returns>A list of <see cref="Rect" />.</returns>
+        public static List<Rect> SpaceEvenlyFromCenter(this Rect r, float y, uint numItems, float itemWidth,
+            float itemHeight, float spaceBetweenItems, bool isMinimized = false)
         {
             var result = new List<Rect>();
             if (numItems == 0)
                 return result;
 
             // total width required for all items and the space between them
-            var totalWidth = (numItems * itemWidth) + ((numItems - 1) * spaceBetweenItems);
+            var totalWidth = numItems * itemWidth + (numItems - 1) * spaceBetweenItems;
 
             // total width required by all items can't be greater than the given Rect: output error message, return empty list
             if (totalWidth > r.width && !isMinimized)

@@ -9,13 +9,16 @@ namespace PrepareLanding
 {
     public class FilterInfo : INotifyPropertyChanged
     {
-
         private StringBuilder _stringBuilder;
 
         public FilterInfo()
         {
             _stringBuilder = new StringBuilder();
         }
+
+        public string Text => _stringBuilder.ToString();
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void Append(string text)
         {
@@ -31,10 +34,11 @@ namespace PrepareLanding
 
         public void AppendErrorMessage(string text, bool rimWorldAlertMessage = true, bool sendToLog = false)
         {
-            if(rimWorldAlertMessage)
-                Messages.Message("An error occurred. Please see the Info tab for a description.", MessageSound.RejectInput);
+            if (rimWorldAlertMessage)
+                Messages.Message("An error occurred. Please see the Info tab for a description.",
+                    MessageSound.RejectInput);
 
-            if(sendToLog)
+            if (sendToLog)
                 Log.Message($"[PrepareLanding] {text}");
 
             var errorText = RichText.Bold(RichText.Color(text, Color.red));
@@ -74,10 +78,6 @@ namespace PrepareLanding
             _stringBuilder = new StringBuilder();
             OnPropertyChanged(nameof(Text));
         }
-
-        public string Text => _stringBuilder.ToString();
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName)

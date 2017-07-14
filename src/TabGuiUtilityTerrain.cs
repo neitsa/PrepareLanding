@@ -21,7 +21,8 @@ namespace PrepareLanding
 
         private ThingDef _selectedStoneDef;
 
-        public TabGuiUtilityTerrain(PrepareLandingUserData userData, float columnSizePercent = 0.25f) : base(columnSizePercent)
+        public TabGuiUtilityTerrain(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+            base(columnSizePercent)
         {
             _userData = userData;
         }
@@ -31,28 +32,28 @@ namespace PrepareLanding
 
 
         /// <summary>
-        /// The name of the tab (that is actually displayed at its top).
+        ///     The name of the tab (that is actually displayed at its top).
         /// </summary>
         public override string Name => "Terrain";
 
         /// <summary>
-        /// Draw the actual content of this window.
+        ///     Draw the actual content of this window.
         /// </summary>
-        /// <param name="inRect">The <see cref="Rect"/> inside which to draw.</param>
+        /// <param name="inRect">The <see cref="Rect" /> inside which to draw.</param>
         public override void Draw(Rect inRect)
         {
             Begin(inRect);
-                DrawBiomeTypesSelection();
-                DrawHillinessTypeSelection();
-                DrawRoadTypesSelection();
-                DrawRiverTypesSelection();
+            DrawBiomeTypesSelection();
+            DrawHillinessTypeSelection();
+            DrawRoadTypesSelection();
+            DrawRiverTypesSelection();
             NewColumn();
-                DrawMovementTime();
-                DrawStoneTypesSelection();
+            DrawMovementTime();
+            DrawStoneTypesSelection();
             NewColumn();
-                DrawCoastalSelection();
-                DrawElevationSelection();
-                DrawTimeZoneSelection();
+            DrawCoastalSelection();
+            DrawElevationSelection();
+            DrawTimeZoneSelection();
             End();
         }
 
@@ -139,7 +140,8 @@ namespace PrepareLanding
                     if (hillinessValue != Hilliness.Undefined)
                         label = hillinessValue.GetLabelCap();
 
-                    var menuOption = new FloatMenuOption(label, delegate { _userData.ChosenHilliness = hillinessValue; });
+                    var menuOption = new FloatMenuOption(label,
+                        delegate { _userData.ChosenHilliness = hillinessValue; });
                     floatMenuOptions.Add(menuOption);
                 }
 
@@ -148,7 +150,9 @@ namespace PrepareLanding
             }
 
             // note: RimWorld logs an error when .GetLabelCap() is used on Hilliness.Undefined
-            var rightLabel = _userData.ChosenHilliness != Hilliness.Undefined ? _userData.ChosenHilliness.GetLabelCap() : "Any";
+            var rightLabel = _userData.ChosenHilliness != Hilliness.Undefined
+                ? _userData.ChosenHilliness.GetLabelCap()
+                : "Any";
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
@@ -281,7 +285,8 @@ namespace PrepareLanding
 
             var maxHeight = InRect.height - ListingStandard.CurHeight;
             var height = Mathf.Min(selectedStoneDefs.Count * DefaultElementHeight, maxHeight);
-            var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count * DefaultElementHeight, ref _scrollPosStoneSelection);
+            var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count * DefaultElementHeight,
+                ref _scrollPosStoneSelection);
 
             foreach (var currentOrderedStoneDef in orderedStoneDefs)
             {
@@ -335,7 +340,7 @@ namespace PrepareLanding
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _userData.ChosenCoastalTileState;
             Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile:", ref tmpCheckState);
-            
+
             _userData.ChosenCoastalTileState = tmpCheckState;
         }
 

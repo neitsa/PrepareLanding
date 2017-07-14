@@ -7,15 +7,14 @@ namespace PrepareLanding.Gui.World
 {
     public class HighlightedTile
     {
-        private enum AlphaRampDirection
-        {
-            AlphaRampUp,
-            AlphaRampDown
-        }
+        private const float TickAlphaQuantum = 1f / 90f;
 
         private static readonly List<Vector3> TmpVerts = new List<Vector3>();
 
         private static readonly List<int> TmpIndices = new List<int>();
+
+        private float _alpha;
+        private AlphaRampDirection _alphaRampDirection = AlphaRampDirection.AlphaRampDown;
 
         private Mesh _mesh;
 
@@ -26,10 +25,6 @@ namespace PrepareLanding.Gui.World
         public string DisplayString;
 
         public int Tile;
-
-        private float _alpha;
-        private const float TickAlphaQuantum = 1f / 90f;
-        private AlphaRampDirection _alphaRampDirection = AlphaRampDirection.AlphaRampDown;
 
         public HighlightedTile(int tile, float colorPct = 0f, string text = null)
         {
@@ -77,7 +72,7 @@ namespace PrepareLanding.Gui.World
             // do not draw tiles that are not visible, this should help on very large planets
             if (!VisibleForCamera)
                 return;
-            
+
             // if no tile mesh, build it
             if (_mesh == null)
             {
@@ -127,7 +122,6 @@ namespace PrepareLanding.Gui.World
             var rect = new Rect(screenPos.x - 20f, screenPos.y - 20f, 40f, 40f);
             if (DisplayString != null)
                 Verse.Widgets.Label(rect, DisplayString);
-
         }
 
         protected virtual void TileBreath(Material material)
@@ -147,10 +141,16 @@ namespace PrepareLanding.Gui.World
             matColor.a = _alpha;
             material.color = matColor;
 
-            if(_alphaRampDirection == AlphaRampDirection.AlphaRampDown)
+            if (_alphaRampDirection == AlphaRampDirection.AlphaRampDown)
                 _alpha -= TickAlphaQuantum;
             else
                 _alpha += TickAlphaQuantum;
+        }
+
+        private enum AlphaRampDirection
+        {
+            AlphaRampUp,
+            AlphaRampDown
         }
     }
 }

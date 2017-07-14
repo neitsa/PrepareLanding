@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using JetBrains.Annotations;
@@ -121,6 +120,10 @@ namespace PrepareLanding
             }
         }
 
+        public bool IsCorrectRange => Comparer<T>.Default.Compare(_min, _max) <= 0;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public bool InRange(T value)
         {
             if (!_use)
@@ -132,12 +135,8 @@ namespace PrepareLanding
             var lte = Comparer<T>.Default.Compare(value, _min);
             var gte = Comparer<T>.Default.Compare(value, _max);
 
-            return (lte >= 0 && gte <= 0);
+            return lte >= 0 && gte <= 0;
         }
-
-        public bool IsCorrectRange => Comparer<T>.Default.Compare(_min, _max) <= 0;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName)
@@ -148,9 +147,9 @@ namespace PrepareLanding
 
     public class MinMaxFromRestrictedListItem<T> : INotifyPropertyChanged where T : struct
     {
-        private T _min;
-        private T _max;
         private readonly List<T> _options;
+        private T _max;
+        private T _min;
         private bool _use;
 
         public MinMaxFromRestrictedListItem(List<T> options, T min = default(T), T max = default(T))

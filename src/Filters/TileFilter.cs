@@ -9,6 +9,14 @@ namespace PrepareLanding.Filters
 
         protected PrepareLandingUserData UserData;
 
+        protected TileFilter(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness)
+        {
+            UserData = userData;
+            AttachedProperty = attachedProperty;
+            Heaviness = heaviness;
+            FilterAction = Filter;
+        }
+
         public abstract string SubjectThingDef { get; }
 
         public abstract bool IsFilterActive { get; }
@@ -22,14 +30,6 @@ namespace PrepareLanding.Filters
         public Action<List<int>> FilterAction { get; }
 
         public FilterHeaviness Heaviness { get; }
-
-        protected TileFilter(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness)
-        {
-            UserData = userData;
-            AttachedProperty = attachedProperty;
-            Heaviness = heaviness;
-            FilterAction = Filter;
-        }
 
         public virtual void Filter(List<int> inputList)
         {

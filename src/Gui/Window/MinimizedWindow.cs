@@ -10,8 +10,6 @@ namespace PrepareLanding.Gui.Window
 
         private readonly Verse.Window _parentWindow;
 
-        public bool Closed { get; private set; }
-
         public MinimizedWindow(Verse.Window parentWindow, string windowLabel = null)
         {
             _parentWindow = parentWindow;
@@ -33,6 +31,8 @@ namespace PrepareLanding.Gui.Window
             // unless visible, consider it closed by default
             Closed = true;
         }
+
+        public bool Closed { get; private set; }
 
         public override Vector2 InitialSize => new Vector2(160f, 80f);
 

@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using PrepareLanding.Filters;
-using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
@@ -19,9 +18,8 @@ namespace PrepareLanding
         private readonly List<int> _matchingTileIds = new List<int>();
         private readonly List<ITileFilter> _sortedFilters = new List<ITileFilter>();
         private readonly PrepareLandingUserData _userData;
-        public ReadOnlyCollection<int> AllTilesWithRoad;
         public ReadOnlyCollection<int> AllTilesWithRiver;
-        public FilterInfo FilterInfo { get; } = new FilterInfo();
+        public ReadOnlyCollection<int> AllTilesWithRoad;
 
 
         public WorldTileFilter(PrepareLandingUserData userData)
@@ -54,15 +52,18 @@ namespace PrepareLanding
                 },
                 {
                     nameof(_userData.CurrentMovementTime),
-                    new TileFilterCurrentMovementTimes(_userData, nameof(_userData.CurrentMovementTime), FilterHeaviness.Heavy)
+                    new TileFilterCurrentMovementTimes(_userData, nameof(_userData.CurrentMovementTime),
+                        FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.WinterMovementTime),
-                    new TileFilterWinterMovementTimes(_userData, nameof(_userData.WinterMovementTime), FilterHeaviness.Heavy)
+                    new TileFilterWinterMovementTimes(_userData, nameof(_userData.WinterMovementTime),
+                        FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.SummerMovementTime),
-                    new TileFilterSummerMovementTimes(_userData, nameof(_userData.SummerMovementTime), FilterHeaviness.Heavy)
+                    new TileFilterSummerMovementTimes(_userData, nameof(_userData.SummerMovementTime),
+                        FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.SelectedStoneDefs),
@@ -70,7 +71,8 @@ namespace PrepareLanding
                 },
                 {
                     nameof(_userData.ChosenCoastalTileState),
-                    new TileFilterCoastalTiles(_userData, nameof(_userData.ChosenCoastalTileState), FilterHeaviness.Light)
+                    new TileFilterCoastalTiles(_userData, nameof(_userData.ChosenCoastalTileState),
+                        FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.Elevation),
@@ -83,15 +85,18 @@ namespace PrepareLanding
                 /* temperature */
                 {
                     nameof(_userData.AverageTemperature),
-                    new TileFilterAverageTemperatures(_userData, nameof(_userData.AverageTemperature), FilterHeaviness.Heavy)
+                    new TileFilterAverageTemperatures(_userData, nameof(_userData.AverageTemperature),
+                        FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.WinterTemperature),
-                    new TileFilterWinterTemperatures(_userData, nameof(_userData.WinterTemperature), FilterHeaviness.Heavy)
+                    new TileFilterWinterTemperatures(_userData, nameof(_userData.WinterTemperature),
+                        FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.SummerTemperature),
-                    new TileFilterSummerTemperatures(_userData, nameof(_userData.SummerTemperature), FilterHeaviness.Heavy)
+                    new TileFilterSummerTemperatures(_userData, nameof(_userData.SummerTemperature),
+                        FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.GrowingPeriod),
@@ -116,6 +121,8 @@ namespace PrepareLanding
             _sortedFilters.AddRange(mediumFilters);
             _sortedFilters.AddRange(heavyFilters);
         }
+
+        public FilterInfo FilterInfo { get; } = new FilterInfo();
 
         public ReadOnlyCollection<int> AllValidTilesReadOnly => _allValidTileIds.AsReadOnly();
 
@@ -162,7 +169,8 @@ namespace PrepareLanding
                 _allValidTileIds.Add(i);
             }
 
-            FilterInfo.AppendMessage($"Prefilter: {_allValidTileIds.Count} tiles remain after filter ({Find.WorldGrid.tiles.Count - _allValidTileIds.Count} removed).");
+            FilterInfo.AppendMessage(
+                $"Prefilter: {_allValidTileIds.Count} tiles remain after filter ({Find.WorldGrid.tiles.Count - _allValidTileIds.Count} removed).");
 
 
             // get all tiles with at least one river
@@ -208,7 +216,7 @@ namespace PrepareLanding
             var result = new List<int>();
             var firstUnionDone = false;
 
-            for(var i = 0; i < _sortedFilters.Count; i++)
+            for (var i = 0; i < _sortedFilters.Count; i++)
             {
                 // get the filter
                 var filter = _sortedFilters[i];
@@ -227,14 +235,14 @@ namespace PrepareLanding
                 var filteredTiles = filter.FilteredTiles;
                 if (filteredTiles.Count == 0 && filter.IsFilterActive)
                 {
-                    FilterInfo.AppendErrorMessage($"{filter.RunningDescription}: this filter results in 0 matching tiles.", sendToLog: true);
+                    FilterInfo.AppendErrorMessage(
+                        $"{filter.RunningDescription}: this filter results in 0 matching tiles.", sendToLog: true);
                     return;
                 }
 
                 if (filteredTiles.Count == _allValidTileIds.Count)
-                {
-                    FilterInfo.AppendWarningMessage($"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
-                }
+                    FilterInfo.AppendWarningMessage(
+                        $"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
 
                 if (!firstUnionDone)
                 {
@@ -256,7 +264,6 @@ namespace PrepareLanding
 
             // highlight filtered tiles
             PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
-
         }
 
         private bool FilterPreCheck()

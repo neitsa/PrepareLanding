@@ -18,17 +18,6 @@ namespace PrepareLanding.Gui.Tab
 
         protected float ColumnSizePercent;
 
-        public abstract string Id { get; }
-
-        public abstract string Name { get;  }
-
-        public TabRecord TabRecord { get; set; }
-
-        public Listing_Standard ListingStandard { get; protected set; }
-        public Rect InRect { get; protected set; }
-
-        public abstract void Draw(Rect inRect);
-
         protected TabGuiUtility(float columnSizePercent)
         {
             if (!(Math.Abs(columnSizePercent) < float.Epsilon) && !(columnSizePercent >= 1.0f))
@@ -36,6 +25,17 @@ namespace PrepareLanding.Gui.Tab
 
             ListingStandard = new Listing_Standard();
         }
+
+        public abstract string Id { get; }
+
+        public abstract string Name { get; }
+
+        public TabRecord TabRecord { get; set; }
+
+        public Listing_Standard ListingStandard { get; protected set; }
+        public Rect InRect { get; protected set; }
+
+        public abstract void Draw(Rect inRect);
 
         public void Begin(Rect inRect)
         {
@@ -58,7 +58,8 @@ namespace PrepareLanding.Gui.Tab
             ListingStandard.NewColumn();
         }
 
-        protected virtual void DrawEntryHeader(string entryLabel, bool useStartingGap = true, bool useFollowingGap = false, Color? backgroundColor = null)
+        protected virtual void DrawEntryHeader(string entryLabel, bool useStartingGap = true,
+            bool useFollowingGap = false, Color? backgroundColor = null)
         {
             if (useStartingGap)
                 ListingStandard.Gap(DefaultGapHeight);
@@ -68,7 +69,7 @@ namespace PrepareLanding.Gui.Tab
             r.height = textHeight;
 
             var bgColor = backgroundColor.GetValueOrDefault(MenuSectionBgFillColor);
-            if(backgroundColor != null)
+            if (backgroundColor != null)
                 bgColor.a = 0.20f;
 
             Verse.Widgets.DrawBoxSolid(r, bgColor);
@@ -81,7 +82,8 @@ namespace PrepareLanding.Gui.Tab
                 ListingStandard.Gap(DefaultGapHeight);
         }
 
-        protected virtual void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label, float min = 0f, float max = 1E+09f)
+        protected virtual void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label,
+            float min = 0f, float max = 1E+09f)
             where T : struct
         {
             var tmpCheckedOn = numericItem.Use;
@@ -104,6 +106,5 @@ namespace PrepareLanding.Gui.Tab
             numericItem.Max = maxValue;
             numericItem.MaxString = maxValueString;
         }
-
     }
 }

@@ -5,9 +5,8 @@ namespace PrepareLanding.Gui.Window
 {
     public abstract class MinimizableWindow : Verse.Window
     {
-        protected MinimizedWindow MinimizedWindow;
-
         private bool _mainWindowClosed;
+        protected MinimizedWindow MinimizedWindow;
 
         protected MinimizableWindow()
         {

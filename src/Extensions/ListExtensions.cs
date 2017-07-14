@@ -28,7 +28,8 @@ namespace PrepareLanding.Extensions
 
             var otherIndex = containingList.IndexOf(subsetList[0]);
 
-            return !subsetList.Where((t, i) => Comparer<T>.Default.Compare(containingList[i + otherIndex], t) != 0).Any();
+            return !subsetList.Where((t, i) => Comparer<T>.Default.Compare(containingList[i + otherIndex], t) != 0)
+                .Any();
         }
 
         public static bool IsSubsetInOrderSamePos<T>(this List<T> subsetList, List<T> containingList)
@@ -42,10 +43,8 @@ namespace PrepareLanding.Extensions
             //return !subsetList.Where((t, i) => Comparer<T>.Default.Compare(t, containingList[i]) != 0).Any(); 
             var count = subsetList.Count;
             for (var i = 0; i < count; i++)
-            {
                 if (!EqualityComparer<T>.Default.Equals(subsetList[i], containingList[i]))
                     return false;
-            }
 
             return true;
         }

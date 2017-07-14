@@ -3,11 +3,10 @@
 namespace PrepareLanding.Gui
 {
     /// <summary>
-    /// Extensions for <see cref="Verse.Text"/> class.
+    ///     Extensions for <see cref="Verse.Text" /> class.
     /// </summary>
     public static class RichText
     {
-
         public static string Bold(string text)
         {
             return $"<b>{text}</b>";

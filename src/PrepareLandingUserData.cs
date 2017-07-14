@@ -16,19 +16,19 @@ namespace PrepareLanding
         private bool _allowUnimplementedBiomes;
 
         private List<BiomeDef> _biomeDefs;
+
+        private MultiCheckboxState _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
         private BiomeDef _chosenBiome;
-        private Hilliness _chosenHilliness;
         private MultiCheckboxState _chosenCoastalTileState = MultiCheckboxState.Partial;
+        private Hilliness _chosenHilliness;
         private List<Hilliness> _hillinesses;
         private List<RiverDef> _riverDefs;
         private List<RoadDef> _roadDefs;
         private List<ThingDef> _stoneDefs;
 
-        private MultiCheckboxState _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
-
 
         /// <summary>
-        /// Class constructor. Called once (when the mod is loaded) 
+        ///     Class constructor. Called once (when the mod is loaded)
         /// </summary>
         public PrepareLandingUserData()
         {
@@ -103,7 +103,7 @@ namespace PrepareLanding
 
         /* options */
 
-            public bool AllowLiveFiltering { get; set; }
+        public bool AllowLiveFiltering { get; set; }
 
 
         /* terrain data */
@@ -176,7 +176,8 @@ namespace PrepareLanding
             InitUsableMinMaxNumericItem(SummerTemperature, nameof(SummerTemperature));
 
             var twelfthList = Enum.GetValues(typeof(Twelfth)).Cast<Twelfth>().ToList();
-            GrowingPeriod  = new MinMaxFromRestrictedListItem<Twelfth>(twelfthList, Twelfth.Undefined, Twelfth.Undefined);
+            GrowingPeriod =
+                new MinMaxFromRestrictedListItem<Twelfth>(twelfthList, Twelfth.Undefined, Twelfth.Undefined);
             GrowingPeriod.PropertyChanged += delegate { OnPropertyChanged(nameof(GrowingPeriod)); };
 
             InitUsableMinMaxNumericItem(RainFall, nameof(RainFall));

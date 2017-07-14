@@ -1,9 +1,10 @@
 ﻿using System;
 using Harmony;
+using RimWorld;
 
 namespace PrepareLanding.Patches
 {
-    [HarmonyPatch(typeof(RimWorld.WorldInterface), "WorldInterfaceOnGUI")]
+    [HarmonyPatch(typeof(WorldInterface), "WorldInterfaceOnGUI")]
     public static class PatchWorldInterfaceOnGui
     {
         public static event Action OnWorldInterfaceOnGui = delegate { };
@@ -15,7 +16,7 @@ namespace PrepareLanding.Patches
         }
     }
 
-    [HarmonyPatch(typeof(RimWorld.WorldInterface), "WorldInterfaceUpdate")]
+    [HarmonyPatch(typeof(WorldInterface), "WorldInterfaceUpdate")]
     public static class PatchWorldInterfaceUpdate
     {
         public static event Action OnWorldInterfaceUpdate = delegate { };

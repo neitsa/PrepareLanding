@@ -6,13 +6,13 @@ namespace PrepareLanding
 {
     public class TabGuiUtilityOptions : TabGuiUtility
     {
-        private bool _allowLiveFiltering;
-        private bool _showDebugTileId;
-        private bool _bypassMaxHighlightedTiles;
-
         private readonly PrepareLandingUserData _userData;
+        private bool _allowLiveFiltering;
+        private bool _bypassMaxHighlightedTiles;
+        private bool _showDebugTileId;
 
-        public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) : base(columnSizePercent)
+        public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+            base(columnSizePercent)
         {
             _userData = userData;
         }
@@ -28,7 +28,7 @@ namespace PrepareLanding
         public override void Draw(Rect inRect)
         {
             Begin(inRect);
-                DrawOptions();
+            DrawOptions();
             End();
         }
 
@@ -36,7 +36,8 @@ namespace PrepareLanding
         {
             //TODO: reset all filters to their default state
 
-            ListingStandard.CheckboxLabeled("Allow Live Filtering", ref _allowLiveFiltering, "Allow filtering without pressing the \"Filter\" button.");
+            ListingStandard.CheckboxLabeled("Allow Live Filtering", ref _allowLiveFiltering,
+                "Allow filtering without pressing the \"Filter\" button.");
             _userData.AllowLiveFiltering = _allowLiveFiltering;
 
             //TODO: allow unimplemented biomes
@@ -46,10 +47,12 @@ namespace PrepareLanding
             //TODO: allow saving / reading the set of currently applied filters
 
             // allow to show the debug tile ID on the highlighted tile (instead of 'X')
-            ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref _showDebugTileId, "Show the Debug Tile ID (instead of 'X') for the highlighted tiles.");
+            ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref _showDebugTileId,
+                "Show the Debug Tile ID (instead of 'X') for the highlighted tiles.");
             PrepareLanding.Instance.TileHighlighter.ShowDebugTileId = _showDebugTileId;
 
-            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref _bypassMaxHighlightedTiles, $"Allow to highlight more than {TileHighlighter.MaxHighlightedTiles} tiles.");
+            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref _bypassMaxHighlightedTiles,
+                $"Allow to highlight more than {TileHighlighter.MaxHighlightedTiles} tiles.");
             PrepareLanding.Instance.TileHighlighter.BypassMaxHighlightedTiles = _bypassMaxHighlightedTiles;
         }
     }

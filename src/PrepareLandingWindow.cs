@@ -13,9 +13,9 @@ namespace PrepareLanding
     {
         private readonly Vector2 _bottomButtonSize = new Vector2(160f, 30f);
 
-        private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
-
         private readonly TabGuiUtilityController _tabController = new TabGuiUtilityController();
+
+        private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
 
         public PrepareLandingWindow(PrepareLandingUserData userData)
         {
@@ -66,7 +66,7 @@ namespace PrepareLanding
             base.PostClose();
 
             // when the window is closed and it's not minimized, disable all highlighted tiles
-            if(!Minimized)
+            if (!Minimized)
                 PrepareLanding.Instance.TileHighlighter?.RemoveAllTiles();
         }
 
@@ -79,7 +79,7 @@ namespace PrepareLanding
                 _bottomButtonSize.y, 10f);
             if (buttonsRect.Count != numButtons)
             {
-                //TODO log error
+                Log.ErrorOnce($"[PrepareLanding] Couldn't not get enough room for {numButtons} (in PrepareLandingWindow.DoBottomsButtons)", 0x1237cafe);
                 return;
             }
 

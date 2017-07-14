@@ -12,11 +12,19 @@ namespace PrepareLanding.Gui.World
 
         private const float MaxDistToCameraToDisplayLabel = 39f;
 
-        private readonly List<HighlightedTile> _highlightedTiles = new List<HighlightedTile>();
-
         private readonly Material _defaultMaterial = new Material(WorldMaterials.SelectedTile);
 
+        private readonly List<HighlightedTile> _highlightedTiles = new List<HighlightedTile>();
+
         private Color _materialColor = Color.green;
+
+        public TileHighlighter()
+        {
+            PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
+            PrepareLanding.Instance.OnWorldInterfaceUpdate += HighlightedTileDrawerUpdate;
+
+            _defaultMaterial.color = TileColor;
+        }
 
         public Color TileColor
         {
@@ -32,14 +40,6 @@ namespace PrepareLanding.Gui.World
 
         public bool BypassMaxHighlightedTiles { get; set; }
 
-        public TileHighlighter()
-        {
-            PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
-            PrepareLanding.Instance.OnWorldInterfaceUpdate += HighlightedTileDrawerUpdate;
-
-            _defaultMaterial.color = TileColor;
-        }
-
         internal void HighlightTile(int tile, float colorPct = 0f, string text = null)
         {
             var highlightedTile = new HighlightedTile(tile, colorPct, text);
@@ -51,14 +51,13 @@ namespace PrepareLanding.Gui.World
             // do not highlight too many tiles (otherwise the slow down is noticeable)
             if (!BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage($"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                    $"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
                 return;
             }
 
             foreach (var tileId in tileList)
-            {
                 HighlightTile(tileId, _defaultMaterial, ShowDebugTileId ? tileId.ToString() : "X");
-            }
         }
 
         public void HighlightTile(int tile, Material mat, string text = null)
@@ -76,9 +75,7 @@ namespace PrepareLanding.Gui.World
         {
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < _highlightedTiles.Count; i++)
-            {
                 _highlightedTiles[i].Draw();
-            }
         }
 
         protected void HighlightedTileDrawerOnGui()
@@ -86,18 +83,17 @@ namespace PrepareLanding.Gui.World
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleCenter;
             GUI.color = new Color(1f, 1f, 1f, 0.5f);
+
             foreach (var tile in _highlightedTiles)
-            {
                 if (tile.DistanceToCamera <= MaxDistToCameraToDisplayLabel)
-                {
                     tile.OnGui();
-                }
-            }
+
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
         }
 
         #region IDisposable Support
+
         private bool _disposedValue; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -124,6 +120,7 @@ namespace PrepareLanding.Gui.World
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
         }
+
         #endregion
     }
 }

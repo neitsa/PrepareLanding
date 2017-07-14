@@ -8,7 +8,8 @@ using Verse.Sound;
 namespace PrepareLanding.Patches
 {
     /// <summary>
-    /// This class is used in replacement of the RimWorld.Page_SelectLandingSite. We patch GetFirstConfigPage() to use our class rather than the RimWorld one.
+    ///     This class is used in replacement of the RimWorld.Page_SelectLandingSite. We patch GetFirstConfigPage() to use our
+    ///     class rather than the RimWorld one.
     /// </summary>
     public class SelectLandingSite : Page_SelectLandingSite
     {
@@ -32,41 +33,40 @@ namespace PrepareLanding.Patches
         }
 
         /// <summary>
-        /// This is a rip of the DoCustomButtons() function in RimWorld.Page_SelectLandingSite with a new button.
+        ///     This is a rip of the DoCustomButtons() function in RimWorld.Page_SelectLandingSite with a new button.
         /// </summary>
         public void DoCustomButtons()
         {
             // HACK : changed the number of buttons from '5 : 4' to '6 : 5' as we add a button
-            var num = (!TutorSystem.TutorialMode) ? 6 : 5;
+            var num = !TutorSystem.TutorialMode ? 6 : 5;
             int num2;
             if (num >= 4 && UI.screenWidth < 1340f)
-            {
                 num2 = 2;
-            }
             else
-            {
                 num2 = 1;
-            }
-            var num3 = Mathf.CeilToInt(num / (float)num2);
+            var num3 = Mathf.CeilToInt(num / (float) num2);
             var num4 = BottomButSize.x * num3 + 10f * (num3 + 1);
             var num5 = num2 * BottomButSize.y + 10f * (num2 + 1);
             var rect = new Rect((UI.screenWidth - num4) / 2f, UI.screenHeight - num5 - 4f, num4, num5);
             if (Find.WindowStack.IsOpen<WorldInspectPane>() && rect.x < InspectPaneUtility.PaneSize.x + 4f)
-            {
                 rect.x = InspectPaneUtility.PaneSize.x + 4f;
-            }
             Widgets.DrawWindowBackground(rect);
             var num6 = rect.xMin + 10f;
             var num7 = rect.yMin + 10f;
             Text.Font = GameFont.Small;
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Back".Translate()) && CanDoBack())
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Back".Translate()) &&
+                CanDoBack())
             {
                 /* ADDED CODE */
+
                 #region INSERTED_CODE
+
                 // make sure the prepare landing window (or its minimized window) is closed when we go back
                 if (Find.WindowStack.IsOpen<PrepareLandingWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
                     PrepareLanding.Instance.MainWindow.ForceClose();
+
                 #endregion
+
                 /* END ADDED CODE*/
 
                 DoBack();
@@ -75,12 +75,11 @@ namespace PrepareLanding.Patches
             if (!TutorSystem.TutorialMode)
             {
                 if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Advanced".Translate()))
-                {
                     Find.WindowStack.Add(new Dialog_AdvancedGameConfig(Find.WorldInterface.SelectedTile));
-                }
                 num6 += BottomButSize.x + 10f;
             }
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "SelectRandomSite".Translate()))
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y),
+                "SelectRandomSite".Translate()))
             {
                 SoundDefOf.Click.PlayOneShotOnCamera();
                 Find.WorldInterface.SelectedTile = TileFinder.RandomStartingTile();
@@ -92,10 +91,9 @@ namespace PrepareLanding.Patches
                 num6 = rect.xMin + 10f;
                 num7 += BottomButSize.y + 10f;
             }
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "WorldFactionsTab".Translate()))
-            {
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y),
+                "WorldFactionsTab".Translate()))
                 Find.WindowStack.Add(new Dialog_FactionDuringLanding());
-            }
             num6 += BottomButSize.x + 10f;
 
             /* inserted button code */
@@ -116,7 +114,7 @@ namespace PrepareLanding.Patches
                 else
                 {
                     // just maximize it if it minimized
-                    if(PrepareLanding.Instance.MainWindow.Minimized)
+                    if (PrepareLanding.Instance.MainWindow.Minimized)
                         PrepareLanding.Instance.MainWindow.Maximize();
                 }
             }
@@ -126,10 +124,9 @@ namespace PrepareLanding.Patches
 
             /* end of inserted code */
 
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()) && CanDoNext())
-            {
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()) &&
+                CanDoNext())
                 DoNext();
-            }
             //num6 += BottomButSize.x + 10f;
             GenUI.AbsorbClicksInRect(rect);
         }

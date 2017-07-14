@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using PrepareLanding.Extensions;
+﻿using PrepareLanding.Extensions;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -18,13 +17,11 @@ namespace PrepareLanding.Gui
         public static void CheckBoxLabeledMulti(Rect rect, string label, ref MultiCheckboxState state,
             bool disabled = false)
         {
-            TextAnchor anchor = Text.Anchor;
+            var anchor = Text.Anchor;
             Text.Anchor = TextAnchor.MiddleLeft;
             Verse.Widgets.Label(rect, label);
 
             if (!disabled && Verse.Widgets.ButtonInvisible(rect))
-            {
-                // proceed to next state: On -> Partial -> Off -> On ...
                 switch (state)
                 {
                     case MultiCheckboxState.On:
@@ -39,7 +36,6 @@ namespace PrepareLanding.Gui
                         state = MultiCheckboxState.On;
                         break;
                 }
-            }
 
             var vector2 = Vector2.zero;
             vector2.x = rect.x + rect.width - 24f;
@@ -49,13 +45,13 @@ namespace PrepareLanding.Gui
             Text.Anchor = anchor;
         }
 
-        public static void CheckBoxMultiDraw(float x, float y, MultiCheckboxState state, bool disabled, float size = 24f)
+        public static void CheckBoxMultiDraw(float x, float y, MultiCheckboxState state, bool disabled,
+            float size = 24f)
         {
             var color = GUI.color;
             if (disabled)
-            {
                 GUI.color = InactiveColor;
-            }
+
             Texture2D image;
             switch (state)
             {
@@ -79,42 +75,35 @@ namespace PrepareLanding.Gui
             var position = new Rect(x, y, size, size);
             GUI.DrawTexture(position, image);
             if (disabled)
-            {
                 GUI.color = color;
-            }
         }
 
-        public static bool CheckBoxLabeledSelectableMulti(Rect rect, string label, ref bool selected, ref MultiCheckboxState state, bool disabled = false)
+        public static bool CheckBoxLabeledSelectableMulti(Rect rect, string label, ref bool selected,
+            ref MultiCheckboxState state, bool disabled = false)
         {
             if (selected)
-            {
                 Verse.Widgets.DrawHighlight(rect);
-            }
             Verse.Widgets.Label(rect, label);
-            bool flag = selected;
-            Rect butRect = rect;
+            var flag = selected;
+            var butRect = rect;
             butRect.width -= 24f;
             if (!selected && Verse.Widgets.ButtonInvisible(butRect))
             {
                 SoundDefOf.TickTiny.PlayOneShotOnCamera();
                 selected = true;
             }
-            Color color = GUI.color;
+            var color = GUI.color;
             GUI.color = Color.white;
             CheckBoxMultiDraw(rect.xMax - 24f, rect.y, state, false);
             GUI.color = color;
-            Rect butRect2 = new Rect(rect.xMax - 24f, rect.y, 24f, 24f);
+            var butRect2 = new Rect(rect.xMax - 24f, rect.y, 24f, 24f);
             if (Verse.Widgets.ButtonInvisible(butRect2))
             {
                 var nextState = state.NextState();
                 if (nextState == MultiCheckboxState.Off || state == MultiCheckboxState.Partial)
-                {
                     SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
-                }
                 else
-                {
                     SoundDefOf.CheckboxTurnedOff.PlayOneShotOnCamera();
-                }
 
                 state = nextState;
             }
@@ -138,113 +127,96 @@ namespace PrepareLanding.Gui
 
         #region TEXTFIELDNUMERIC
 
-        public static void TextFieldNumericLabeled<T>(Rect rect, string label, ref T val, ref string buffer, float min = 0f, float max = 1E+09f, bool useAnchor = true) where T : struct
+        public static void TextFieldNumericLabeled<T>(Rect rect, string label, ref T val, ref string buffer,
+            float min = 0f, float max = 1E+09f, bool useAnchor = true) where T : struct
         {
-            Rect rect2 = rect.LeftHalf().Rounded();
-            Rect rect3 = rect.RightHalf().Rounded();
+            var rect2 = rect.LeftHalf().Rounded();
+            var rect3 = rect.RightHalf().Rounded();
 
             var anchor = Text.Anchor;
-            if(useAnchor)
+            if (useAnchor)
                 Text.Anchor = TextAnchor.MiddleRight;
 
             Verse.Widgets.Label(rect2, label);
 
-            if(useAnchor)
+            if (useAnchor)
                 Text.Anchor = anchor;
 
-            TextFieldNumeric<T>(rect3, ref val, ref buffer, min, max);
+            TextFieldNumeric(rect3, ref val, ref buffer, min, max);
         }
 
-        public static void TextFieldNumeric<T>(Rect rect, ref T val, ref string buffer, float min = 0f, float max = 1E+09f) where T : struct
+        public static void TextFieldNumeric<T>(Rect rect, ref T val, ref string buffer, float min = 0f,
+            float max = 1E+09f) where T : struct
         {
             if (buffer == null)
-            {
                 buffer = val.ToString();
-            }
-            string text = "TextField" + rect.y.ToString("F0") + rect.x.ToString("F0");
+            var text = "TextField" + rect.y.ToString("F0") + rect.x.ToString("F0");
             GUI.SetNextControlName(text);
-            string text2 = GUI.TextField(rect, buffer, Text.CurTextFieldStyle);
+            var text2 = GUI.TextField(rect, buffer, Text.CurTextFieldStyle);
             if (GUI.GetNameOfFocusedControl() != text)
             {
-                ResolveParseNow<T>(buffer, ref val, ref buffer, min, max, true);
+                ResolveParseNow(buffer, ref val, ref buffer, min, max, true);
             }
-            else if (text2 != buffer && IsPartiallyOrFullyTypedNumber<T>(ref val, text2, min, max))
+            else if (text2 != buffer && IsPartiallyOrFullyTypedNumber(ref val, text2, min, max))
             {
                 buffer = text2;
                 if (text2.IsFullyTypedNumber<T>())
-                {
-                    ResolveParseNow<T>(text2, ref val, ref buffer, min, max, false);
-                }
+                    ResolveParseNow(text2, ref val, ref buffer, min, max, false);
             }
         }
 
         private static bool IsPartiallyOrFullyTypedNumber<T>(ref T val, string s, float min, float max)
         {
             if (s == string.Empty)
-            {
                 return true;
-            }
             if (s[0] == '-' && min >= 0f)
-            {
                 return false;
-            }
             if (s.Length > 1 && s[s.Length - 1] == '-')
-            {
                 return false;
-            }
             if (s == "00")
-            {
                 return false;
-            }
             if (s.Length > 12)
-            {
                 return false;
-            }
             if (typeof(T) == typeof(float))
             {
-                int num = s.CharacterCount('.');
+                var num = s.CharacterCount('.');
                 if (num <= 1 && s.ContainsOnlyCharacters("-.0123456789"))
-                {
                     return true;
-                }
             }
             return s.IsFullyTypedNumber<T>();
         }
 
-        private static void ResolveParseNow<T>(string edited, ref T val, ref string buffer, float min, float max, bool force)
+        private static void ResolveParseNow<T>(string edited, ref T val, ref string buffer, float min, float max,
+            bool force)
         {
             if (typeof(T) == typeof(int))
             {
                 if (edited.NullOrEmpty())
                 {
-                    ResetValue<T>(edited, ref val, ref buffer, min, max);
+                    ResetValue(edited, ref val, ref buffer, min, max);
                     return;
                 }
                 int num;
                 if (int.TryParse(edited, out num))
                 {
-                    val = (T)((object)Mathf.RoundToInt(Mathf.Clamp((float)num, min, max)));
-                    buffer = ToStringTypedIn<T>(val);
+                    val = (T) (object) Mathf.RoundToInt(Mathf.Clamp(num, min, max));
+                    buffer = ToStringTypedIn(val);
                     return;
                 }
                 if (force)
-                {
-                    ResetValue<T>(edited, ref val, ref buffer, min, max);
-                }
+                    ResetValue(edited, ref val, ref buffer, min, max);
             }
             else if (typeof(T) == typeof(float))
             {
                 float value;
                 if (float.TryParse(edited, out value))
                 {
-                    val = (T)((object)Mathf.Clamp(value, min, max));
-                    buffer = ToStringTypedIn<T>(val);
+                    val = (T) (object) Mathf.Clamp(value, min, max);
+                    buffer = ToStringTypedIn(val);
                     return;
                 }
                 if (force)
-                {
-                    ResetValue<T>(edited, ref val, ref buffer, min, max);
-                }
+                    ResetValue(edited, ref val, ref buffer, min, max);
             }
             else
             {
@@ -256,22 +228,16 @@ namespace PrepareLanding.Gui
         {
             val = default(T);
             if (min > 0f)
-            {
-                val = (T)((object)Mathf.RoundToInt(min));
-            }
+                val = (T) (object) Mathf.RoundToInt(min);
             if (max < 0f)
-            {
-                val = (T)((object)Mathf.RoundToInt(max));
-            }
-            buffer = ToStringTypedIn<T>(val);
+                val = (T) (object) Mathf.RoundToInt(max);
+            buffer = ToStringTypedIn(val);
         }
 
         private static string ToStringTypedIn<T>(T val)
         {
             if (typeof(T) == typeof(float))
-            {
-                return ((float)((object)val)).ToString("0.##########");
-            }
+                return ((float) (object) val).ToString("0.##########");
             return val.ToString();
         }
 

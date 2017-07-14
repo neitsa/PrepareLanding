@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace PrepareLanding.Filters
 {
     public enum FilterHeaviness
@@ -25,8 +24,8 @@ namespace PrepareLanding.Filters
 
         List<int> FilteredTiles { get; }
 
-        void Filter(List<int> inputList);
-
         bool IsFilterActive { get; }
+
+        void Filter(List<int> inputList);
     }
 }

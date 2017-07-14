@@ -10,17 +10,15 @@ namespace PrepareLanding
 {
     public class TabGuiUtilityInfo : TabGuiUtility
     {
+        private readonly GUIStyle _style;
         //private readonly PrepareLandingUserData _userData;
 
         private Vector2 _scrollPosWorldInfo;
 
         private string _worldInfo;
 
-        private readonly GUIStyle _style;
-
-        public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
-
-        public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) : base(columnSizePercent)
+        public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+            base(columnSizePercent)
         {
             //_userData = userData;
 
@@ -32,6 +30,8 @@ namespace PrepareLanding
             };
         }
 
+        public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
+
         public override string Id => "WorldInfo";
 
         public override string Name => "World Info";
@@ -41,16 +41,20 @@ namespace PrepareLanding
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Planet Name: {Find.World.info.name}");
             stringBuilder.AppendLine($"{"PlanetSeed".Translate()}: {Find.World.info.seedString}");
-            stringBuilder.AppendLine($"{"PlanetCoverageShort".Translate()}: {Find.World.info.planetCoverage.ToStringPercent()}");
+            stringBuilder.AppendLine(
+                $"{"PlanetCoverageShort".Translate()}: {Find.World.info.planetCoverage.ToStringPercent()}");
             stringBuilder.AppendLine($"Total Tiles: {Find.World.grid.TilesCount}");
             if (PrepareLanding.Instance.TileFilter != null)
             {
                 if (PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly != null)
-                    stringBuilder.AppendLine($"Settleable Tiles: {PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly.Count}");
-                if(PrepareLanding.Instance.TileFilter.AllTilesWithRiver != null)
-                    stringBuilder.AppendLine($"Tiles with Rivers: {PrepareLanding.Instance.TileFilter.AllTilesWithRiver.Count}");
+                    stringBuilder.AppendLine(
+                        $"Settleable Tiles: {PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly.Count}");
+                if (PrepareLanding.Instance.TileFilter.AllTilesWithRiver != null)
+                    stringBuilder.AppendLine(
+                        $"Tiles with Rivers: {PrepareLanding.Instance.TileFilter.AllTilesWithRiver.Count}");
                 if (PrepareLanding.Instance.TileFilter.AllTilesWithRoad != null)
-                    stringBuilder.AppendLine($"Tiles with Roads: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
+                    stringBuilder.AppendLine(
+                        $"Tiles with Roads: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
 
                 var allValidTiles = PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly?.ToList();
                 if (allValidTiles != null)
@@ -71,9 +75,9 @@ namespace PrepareLanding
         public override void Draw(Rect inRect)
         {
             Begin(inRect);
-                DrawWorldInfo();
+            DrawWorldInfo();
             NewColumn();
-                DrawFilterInfo();
+            DrawFilterInfo();
             End();
         }
 
@@ -90,7 +94,7 @@ namespace PrepareLanding
 
             var innerLs = ListingStandard.BeginScrollView(maxHeight, scrollHeight, ref _scrollPosWorldInfo);
 
-            Verse.Widgets.Label(innerLs.GetRect(maxHeight), WorldInfo);
+            Widgets.Label(innerLs.GetRect(maxHeight), WorldInfo);
 
             ListingStandard.EndScrollView(innerLs);
 

@@ -11,7 +11,8 @@ namespace PrepareLanding
     {
         private readonly PrepareLandingUserData _userData;
 
-        public TabGuiUtilityTemperature(PrepareLandingUserData userData, float columnSizePercent = 0.25f) : base(columnSizePercent)
+        public TabGuiUtilityTemperature(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+            base(columnSizePercent)
         {
             _userData = userData;
         }
@@ -39,9 +40,12 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Temperatures (Celsius)");
 
-            DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature", TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
-            DrawUsableMinMaxNumericField(_userData.WinterTemperature, "Winter Temperature", TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
-            DrawUsableMinMaxNumericField(_userData.SummerTemperature, "Summer Temperature", TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature",
+                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            DrawUsableMinMaxNumericField(_userData.WinterTemperature, "Winter Temperature",
+                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            DrawUsableMinMaxNumericField(_userData.SummerTemperature, "Summer Temperature",
+                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
         }
 
         protected void DrawGrowingPeriodSelection()
