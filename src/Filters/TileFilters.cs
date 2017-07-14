@@ -236,22 +236,29 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            foreach (var selectedRiverDef in UserData.SelectedRiverDefs)
+            // get a  list of roadDefs that *must not* be present
+            var riverDefs = UserData.SelectedRiverDefs;
+            var unwantedRiverDefs = (from entry in riverDefs where entry.Value.State == MultiCheckboxState.Off select entry.Key).ToList();
+
+            // from the input list, get only tiles that have roads (of any type)
+            var tilesWithRivers = TilesWithRiver(inputList);
+
+            foreach (var tileId in tilesWithRivers)
             {
-                if (selectedRiverDef.Value.State != MultiCheckboxState.On &&
-                    selectedRiverDef.Value.State != MultiCheckboxState.Partial)
+                // note : even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
+                var riverLink = Find.World.grid[tileId].VisibleRivers.MaxBy(riverlink => riverlink.river.degradeThreshold);
+
+                // check that the river is not in the unwanted list, if it is, then just continue
+                if(unwantedRiverDefs.Contains(riverLink.river))
                     continue;
 
-                foreach (var tileId in inputList)
-                {
-                    // note : even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
-                    var riverLink = Find.World.grid[tileId].VisibleRivers
-                        .MaxBy(riverlink => riverlink.river.degradeThreshold);
-
-                    if (riverLink.river == selectedRiverDef.Key)
-                        _filteredTiles.Add(tileId);
-                }
+                _filteredTiles.Add(tileId);
             }
+        }
+
+        public static IEnumerable<int> TilesWithRiver(List<int> inputList)
+        {
+            return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRiver);
         }
     }
 
