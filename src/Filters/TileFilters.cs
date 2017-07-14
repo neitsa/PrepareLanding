@@ -267,15 +267,13 @@ namespace PrepareLanding.Filters
         }
     }
 
-    public class TileFilterCurrentMovementTimes : TileFilter
+    public abstract class TileFilterMovementTime : TileFilter
     {
-        public TileFilterCurrentMovementTimes(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        protected TileFilterMovementTime(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override string SubjectThingDef => "Current Movement Times";
-
-        public override bool IsFilterActive => UserData.CurrentMovementTime.Use;
+        protected abstract float YearPct(int tileId);
 
         public override void Filter(List<int> inputList)
         {
@@ -284,6 +282,20 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
+            // e.g userData.CurrentMovementTime, UserData.SummerMovementTime or UserData.WinterMovementTime
+            var movementTime = (UsableMinMaxNumericItem<float>)UserData.GetType().GetProperty(AttachedProperty)?.GetValue(UserData, null);
+            if (movementTime == null)
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage("MovementTime is null in TileFilterMovementTime.Filter.", sendToLog: true);
+                return;
+            }
+
+            if (!movementTime.IsCorrectRange)
+            {
+                var message = $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {movementTime.Min} <= {movementTime.Max}).";
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                return;
+            }
 
             var tileIdsCount = inputList.Count;
             for (var i = 0; i < tileIdsCount; i++)
@@ -294,11 +306,13 @@ namespace PrepareLanding.Filters
                 if (Find.World.Impassable(tileId))
                     continue;
 
-                FilterMovementTime(tileId, -1f, UserData.CurrentMovementTime, _filteredTiles);
+                var yearPct = YearPct(tileId);
+
+                FilterMovementTime(tileId, yearPct, movementTime, _filteredTiles);
             }
         }
 
-        public static void FilterMovementTime(int tileId, float yearPct, UsableMinMaxNumericItem<float> item,
+        protected static void FilterMovementTime(int tileId, float yearPct, UsableMinMaxNumericItem<float> item,
             List<int> resultList)
         {
             var ticks = Mathf.Min(GenDate.TicksPerHour + WorldPathGrid.CalculatedCostAt(tileId, false, yearPct),
@@ -320,42 +334,37 @@ namespace PrepareLanding.Filters
         }
     }
 
-    public class TileFilterWinterMovementTimes : TileFilter
+    public class TileFilterCurrentMovementTimes : TileFilterMovementTime
+    {
+        public TileFilterCurrentMovementTimes(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override string SubjectThingDef => "Current Movement Times";
+        public override bool IsFilterActive => UserData.CurrentMovementTime.Use;
+        protected override float YearPct(int tileId)
+        {
+            return -1;
+        }
+    }
+
+    public class TileFilterWinterMovementTimes : TileFilterMovementTime
     {
         public TileFilterWinterMovementTimes(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
         public override string SubjectThingDef => "Winter Movement Times";
-
         public override bool IsFilterActive => UserData.WinterMovementTime.Use;
-
-        public override void Filter(List<int> inputList)
+        protected override float YearPct(int tileId)
         {
-            base.Filter(inputList);
-
-            if (!IsFilterActive)
-                return;
-
-            var tileIdsCount = inputList.Count;
-            for (var i = 0; i < tileIdsCount; i++)
-            {
-                var tileId = inputList[i];
-
-                // must be passable
-                if (Find.World.Impassable(tileId))
-                    continue;
-
-                var y = Find.WorldGrid.LongLatOf(tileId).y;
-                var yearPct = Season.Winter.GetMiddleYearPct(y);
-
-                TileFilterCurrentMovementTimes.FilterMovementTime(tileId, yearPct, UserData.WinterMovementTime,
-                    _filteredTiles);
-            }
+            var y = Find.WorldGrid.LongLatOf(tileId).y;
+            var yearPct = Season.Winter.GetMiddleYearPct(y);
+            return yearPct;
         }
     }
 
-    public class TileFilterSummerMovementTimes : TileFilter
+    public class TileFilterSummerMovementTimes : TileFilterMovementTime
     {
         public TileFilterSummerMovementTimes(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
@@ -365,28 +374,11 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.SummerMovementTime.Use;
 
-        public override void Filter(List<int> inputList)
+        protected override float YearPct(int tileId)
         {
-            base.Filter(inputList);
-
-            if (!IsFilterActive)
-                return;
-
-            var tileIdsCount = inputList.Count;
-            for (var i = 0; i < tileIdsCount; i++)
-            {
-                var tileId = inputList[i];
-
-                // must be passable
-                if (Find.World.Impassable(tileId))
-                    continue;
-
-                var y = Find.WorldGrid.LongLatOf(tileId).y;
-                var yearPct = Season.Summer.GetMiddleYearPct(y);
-
-                TileFilterCurrentMovementTimes.FilterMovementTime(tileId, yearPct, UserData.SummerMovementTime,
-                    _filteredTiles);
-            }
+            var y = Find.WorldGrid.LongLatOf(tileId).y;
+            var yearPct = Season.Summer.GetMiddleYearPct(y);
+            return yearPct;
         }
     }
 

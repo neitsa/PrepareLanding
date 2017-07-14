@@ -42,6 +42,4 @@ namespace PrepareLanding.Filters
             _filteredTiles.Clear();
         }
     }
-
-
 }
