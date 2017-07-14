@@ -17,37 +17,54 @@ namespace PrepareLanding
             _stringBuilder = new StringBuilder();
         }
 
-        public void Append(string text)
+        private void Append(string text)
         {
             _stringBuilder.Append(text);
             OnPropertyChanged(nameof(Text));
         }
 
-        public void AppendLine(string text)
+        private void AppendLine(string text)
         {
             _stringBuilder.AppendLine(text);
             OnPropertyChanged(nameof(Text));
         }
 
-        public void AppendErrorMessage(string text, bool rimWorldAlertMessage = true)
+        public void AppendErrorMessage(string text, bool rimWorldAlertMessage = true, bool sendToLog = false)
         {
             if(rimWorldAlertMessage)
                 Messages.Message("An error occurred. Please see the Info tab for a description.", MessageSound.RejectInput);
+
+            if(sendToLog)
+                Log.Message($"[PrepareLanding] {text}");
 
             var errorText = RichText.Bold(RichText.Color(text, Color.red));
             AppendLine(errorText);
         }
 
-        public void AppendWarningMessage(string text)
+        public void AppendWarningMessage(string text, bool sendToLog = false)
         {
+            if (sendToLog)
+                Log.Message($"[PrepareLanding] {text}");
+
             var warningText = RichText.Bold(RichText.Color(text, Color.yellow));
             AppendLine(warningText);
         }
 
-        public void AppendSuccessMessage(string text)
+        public void AppendSuccessMessage(string text, bool sendToLog = false)
         {
+            if (sendToLog)
+                Log.Message($"[PrepareLanding] {text}");
+
             var successText = RichText.Bold(RichText.Color(text, Color.green));
             AppendLine(successText);
+        }
+
+        public void AppendMessage(string text, bool sendToLog = false)
+        {
+            if (sendToLog)
+                Log.Message($"[PrepareLanding] {text}");
+
+            AppendLine(text);
         }
 
         public void Clear()
