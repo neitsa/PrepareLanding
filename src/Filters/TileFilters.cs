@@ -33,6 +33,11 @@ namespace PrepareLanding.Filters
                 if (Find.World.grid[tileId].biome == chosenBiome)
                     _filteredTiles.Add(tileId);
         }
+
+        public static int NumberOfTilesByBiome(BiomeDef biome, List<int> inputList)
+        {
+            return inputList.Count(tileId => Find.World.grid[tileId].biome == biome);
+        }
     }
 
     public class TileFilterHilliness : TileFilter
@@ -338,7 +343,7 @@ namespace PrepareLanding.Filters
                 var tileId = inputList[i];
 
                 // must be passable
-                if (!Find.World.Impassable(tileId))
+                if (Find.World.Impassable(tileId))
                     continue;
 
                 var y = Find.WorldGrid.LongLatOf(tileId).y;
@@ -373,7 +378,7 @@ namespace PrepareLanding.Filters
                 var tileId = inputList[i];
 
                 // must be passable
-                if (!Find.World.Impassable(tileId))
+                if (Find.World.Impassable(tileId))
                     continue;
 
                 var y = Find.WorldGrid.LongLatOf(tileId).y;
