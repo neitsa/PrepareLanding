@@ -13,9 +13,9 @@ namespace PrepareLanding
     {
         private readonly Vector2 _bottomButtonSize = new Vector2(160f, 30f);
 
-        private readonly TabGuiUtilityController _tabController = new TabGuiUtilityController();
-
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
+
+        public TabGuiUtilityController Controller { get; } = new TabGuiUtilityController();
 
         public PrepareLandingWindow(PrepareLandingUserData userData)
         {
@@ -38,8 +38,8 @@ namespace PrepareLanding
             _tabGuiUtilities.Add(tabGuiUtilityInfo);
             _tabGuiUtilities.Add(tabGuiUtilityOptions);
 
-            _tabController.Clear();
-            _tabController.AddTabRange(_tabGuiUtilities);
+            Controller.Clear();
+            Controller.AddTabRange(_tabGuiUtilities);
         }
 
         protected override float Margin => 0f;
@@ -52,11 +52,11 @@ namespace PrepareLanding
             inRect.yMin += 72f;
             Widgets.DrawMenuSection(inRect);
 
-            _tabController.DrawTabs(inRect);
+            Controller.DrawTabs(inRect);
 
             inRect = inRect.ContractedBy(17f);
 
-            _tabController.DrawSelectedTab(inRect);
+            Controller.DrawSelectedTab(inRect);
 
             DoBottomsButtons(inRect);
         }

@@ -35,8 +35,12 @@ namespace PrepareLanding
         public void AppendErrorMessage(string text, bool rimWorldAlertMessage = true, bool sendToLog = false)
         {
             if (rimWorldAlertMessage)
-                Messages.Message("An error occurred. Please see the Info tab for a description.",
+            {
+                var tab = PrepareLanding.Instance.MainWindow.Controller.TabById("WorldInfo");
+                var tabName = tab == null ? "World Info" : tab.Name;
+                Messages.Message($"An error occurred. Please see the \"{tabName}\" tab for an error description.",
                     MessageSound.RejectInput);
+            }
 
             if (sendToLog)
                 Log.Message($"[PrepareLanding] {text}");
