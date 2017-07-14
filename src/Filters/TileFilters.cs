@@ -42,7 +42,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterHilliness : TileFilter
     {
-        public TileFilterHilliness(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterHilliness(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -67,7 +68,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterRoads : TileFilter
     {
-        public TileFilterRoads(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterRoads(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -91,7 +93,9 @@ namespace PrepareLanding.Filters
 
             // get a  list of roadDefs that *must not* be present
             var roadDefs = UserData.SelectedRoadDefs;
-            var unwantedRoadDefs = (from entry in roadDefs where entry.Value.State == MultiCheckboxState.Off select entry.Key).ToList();
+            var unwantedRoadDefs = (from entry in roadDefs
+                where entry.Value.State == MultiCheckboxState.Off
+                select entry.Key).ToList();
 
             // from the input list, get only tiles that have roads (of any type)
             var tilesWithRoads = TilesWithRoads(inputList);
@@ -112,10 +116,10 @@ namespace PrepareLanding.Filters
         }
 
         /// <summary>
-        /// Given a list of tiles, returns only tiles that have at least a road (of any type).
+        ///     Given a list of tiles, returns only tiles that have at least a road (of any type).
         /// </summary>
         /// <param name="inputList">A list of tiles from which to only get tiles with roads.</param>
-        /// <returns>A <see cref="IEnumerable{T}"/> containing the tiles ids that have at least one type of road.</returns>
+        /// <returns>A <see cref="IEnumerable{T}" /> containing the tiles ids that have at least one type of road.</returns>
         public static IEnumerable<int> TilesWithRoads(List<int> inputList)
         {
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRoad);
@@ -124,7 +128,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterStones : TileFilter
     {
-        public TileFilterStones(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterStones(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -219,7 +224,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterRivers : TileFilter
     {
-        public TileFilterRivers(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterRivers(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -243,7 +249,9 @@ namespace PrepareLanding.Filters
 
             // get a  list of roadDefs that *must not* be present
             var riverDefs = UserData.SelectedRiverDefs;
-            var unwantedRiverDefs = (from entry in riverDefs where entry.Value.State == MultiCheckboxState.Off select entry.Key).ToList();
+            var unwantedRiverDefs = (from entry in riverDefs
+                where entry.Value.State == MultiCheckboxState.Off
+                select entry.Key).ToList();
 
             // from the input list, get only tiles that have roads (of any type)
             var tilesWithRivers = TilesWithRiver(inputList);
@@ -251,10 +259,11 @@ namespace PrepareLanding.Filters
             foreach (var tileId in tilesWithRivers)
             {
                 // note : even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
-                var riverLink = Find.World.grid[tileId].VisibleRivers.MaxBy(riverlink => riverlink.river.degradeThreshold);
+                var riverLink = Find.World.grid[tileId].VisibleRivers
+                    .MaxBy(riverlink => riverlink.river.degradeThreshold);
 
                 // check that the river is not in the unwanted list, if it is, then just continue
-                if(unwantedRiverDefs.Contains(riverLink.river))
+                if (unwantedRiverDefs.Contains(riverLink.river))
                     continue;
 
                 _filteredTiles.Add(tileId);
@@ -269,7 +278,8 @@ namespace PrepareLanding.Filters
 
     public abstract class TileFilterMovementTime : TileFilter
     {
-        protected TileFilterMovementTime(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        protected TileFilterMovementTime(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -283,16 +293,19 @@ namespace PrepareLanding.Filters
                 return;
 
             // e.g userData.CurrentMovementTime, UserData.SummerMovementTime or UserData.WinterMovementTime
-            var movementTime = (UsableMinMaxNumericItem<float>)UserData.GetType().GetProperty(AttachedProperty)?.GetValue(UserData, null);
+            var movementTime = (UsableMinMaxNumericItem<float>) UserData.GetType().GetProperty(AttachedProperty)
+                ?.GetValue(UserData, null);
             if (movementTime == null)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage("MovementTime is null in TileFilterMovementTime.Filter.", sendToLog: true);
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                    "MovementTime is null in TileFilterMovementTime.Filter.", sendToLog: true);
                 return;
             }
 
             if (!movementTime.IsCorrectRange)
             {
-                var message = $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {movementTime.Min} <= {movementTime.Max}).";
+                var message =
+                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {movementTime.Min} <= {movementTime.Max}).";
                 PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
                 return;
             }
@@ -336,12 +349,14 @@ namespace PrepareLanding.Filters
 
     public class TileFilterCurrentMovementTimes : TileFilterMovementTime
     {
-        public TileFilterCurrentMovementTimes(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterCurrentMovementTimes(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
         public override string SubjectThingDef => "Current Movement Times";
         public override bool IsFilterActive => UserData.CurrentMovementTime.Use;
+
         protected override float YearPct(int tileId)
         {
             return -1;
@@ -350,12 +365,14 @@ namespace PrepareLanding.Filters
 
     public class TileFilterWinterMovementTimes : TileFilterMovementTime
     {
-        public TileFilterWinterMovementTimes(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterWinterMovementTimes(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
         public override string SubjectThingDef => "Winter Movement Times";
         public override bool IsFilterActive => UserData.WinterMovementTime.Use;
+
         protected override float YearPct(int tileId)
         {
             var y = Find.WorldGrid.LongLatOf(tileId).y;
@@ -366,7 +383,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterSummerMovementTimes : TileFilterMovementTime
     {
-        public TileFilterSummerMovementTimes(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterSummerMovementTimes(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -384,7 +402,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterCoastalTiles : TileFilter
     {
-        public TileFilterCoastalTiles(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterCoastalTiles(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -440,7 +459,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterElevations : TileFilter
     {
-        public TileFilterElevations(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterElevations(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -467,7 +487,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterTimeZones : TileFilter
     {
-        public TileFilterTimeZones(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterTimeZones(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -494,7 +515,8 @@ namespace PrepareLanding.Filters
 
     public abstract class TileFilterTemperatures : TileFilter
     {
-        protected TileFilterTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        protected TileFilterTemperatures(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -508,16 +530,19 @@ namespace PrepareLanding.Filters
                 return;
 
             // e.g UserData.AverageTemperature, UserData.SummerTemperature or UserData.WinterTemperature
-            var temperatureItem = (UsableMinMaxNumericItem<float>)UserData.GetType().GetProperty(AttachedProperty)?.GetValue(UserData, null);
+            var temperatureItem = (UsableMinMaxNumericItem<float>) UserData.GetType().GetProperty(AttachedProperty)
+                ?.GetValue(UserData, null);
             if (temperatureItem == null)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage("TemperatureItem is null in TileFilterTemperatures.Filter.", sendToLog: true);
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                    "TemperatureItem is null in TileFilterTemperatures.Filter.", sendToLog: true);
                 return;
             }
 
             if (!temperatureItem.IsCorrectRange)
             {
-                var message = $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {temperatureItem.Min} <= {temperatureItem.Max}).";
+                var message =
+                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {temperatureItem.Min} <= {temperatureItem.Max}).";
                 PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
                 return;
             }
@@ -534,7 +559,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterAverageTemperatures : TileFilterTemperatures
     {
-        public TileFilterAverageTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterAverageTemperatures(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -551,7 +577,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterWinterTemperatures : TileFilterTemperatures
     {
-        public TileFilterWinterTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterWinterTemperatures(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -563,7 +590,8 @@ namespace PrepareLanding.Filters
         {
             var y = Find.WorldGrid.LongLatOf(tileId).y;
 
-            var celsiusTemp = GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Winter.GetMiddleTwelfth(y));
+            var celsiusTemp =
+                GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Winter.GetMiddleTwelfth(y));
 
             return celsiusTemp;
         }
@@ -572,20 +600,21 @@ namespace PrepareLanding.Filters
 
     public class TileFilterSummerTemperatures : TileFilterTemperatures
     {
+        public TileFilterSummerTemperatures(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
         public override string SubjectThingDef => "Summer Temperatures";
 
         public override bool IsFilterActive => UserData.SummerTemperature.Use;
-
-
-        public TileFilterSummerTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
-        {
-        }
 
         protected override float TemperatureForTile(int tileId)
         {
             var y = Find.WorldGrid.LongLatOf(tileId).y;
 
-            var celsiusTemp = GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Summer.GetMiddleTwelfth(y));
+            var celsiusTemp =
+                GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Summer.GetMiddleTwelfth(y));
 
             return celsiusTemp;
         }
@@ -593,7 +622,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterGrowingPeriods : TileFilter
     {
-        public TileFilterGrowingPeriods(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterGrowingPeriods(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -634,7 +664,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterRainFalls : TileFilter
     {
-        public TileFilterRainFalls(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterRainFalls(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
@@ -661,7 +692,8 @@ namespace PrepareLanding.Filters
 
     public class TileFilterAnimalsCanGrazeNow : TileFilter
     {
-        public TileFilterAnimalsCanGrazeNow(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterAnimalsCanGrazeNow(PrepareLandingUserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
