@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using PrepareLanding.Filters;
+using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
@@ -201,7 +202,7 @@ namespace PrepareLanding
             ClearMatchingTiles();
 
             // remove all previously highlighted tiles on the world map
-            PrepareLanding.Instance.TileDrawer.RemoveAllTiles();
+            PrepareLanding.Instance.TileHighlighter.RemoveAllTiles();
 
             // filter tiles
             var result = new List<int>();
@@ -254,7 +255,7 @@ namespace PrepareLanding
             FilterInfo.AppendMessage($"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
 
             // highlight filtered tiles
-            PrepareLanding.Instance.TileDrawer.HighlightTileList(_matchingTileIds);
+            PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
 
         }
 

@@ -6,7 +6,7 @@ using Verse;
 
 namespace PrepareLanding.Gui.World
 {
-    public class HighlightedTileDrawer : IDisposable
+    public class TileHighlighter : IDisposable
     {
         public const int MaxHighlightedTiles = 10000;
 
@@ -32,7 +32,7 @@ namespace PrepareLanding.Gui.World
 
         public bool BypassMaxHighlightedTiles { get; set; }
 
-        public HighlightedTileDrawer()
+        public TileHighlighter()
         {
             PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
             PrepareLanding.Instance.OnWorldInterfaceUpdate += HighlightedTileDrawerUpdate;

@@ -76,7 +76,7 @@
     <Compile Include="src\Gui\Window\MinimizableWindow.cs" />
     <Compile Include="src\Gui\Window\MinimizedWindow.cs" />
     <Compile Include="src\Gui\World\HighlightedTile.cs" />
-    <Compile Include="src\Gui\World\HighlightedTileDrawer.cs" />
+    <Compile Include="src\Gui\World\TileHighlighter.cs" />
     <Compile Include="src\MonoController.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />

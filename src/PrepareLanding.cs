@@ -25,7 +25,7 @@ namespace PrepareLanding
 
         public WorldTileFilter TileFilter { get; private set; }
 
-        public  HighlightedTileDrawer TileDrawer { get; private set; }
+        public  TileHighlighter TileHighlighter { get; private set; }
 
         public PrepareLandingWindow MainWindow { get; set; }
 
@@ -67,7 +67,7 @@ namespace PrepareLanding
             UserData = new PrepareLandingUserData();
 
             // note: constructor should be called after the above events have been set
-            TileDrawer = new HighlightedTileDrawer();
+            TileHighlighter = new TileHighlighter();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace PrepareLanding
         public void OnGenerateWorld()
         {
             // disable all tiles that are currently highlighted
-            TileDrawer.RemoveAllTiles();
+            TileHighlighter.RemoveAllTiles();
 
             // new tile filter
             TileFilter = new WorldTileFilter(UserData);

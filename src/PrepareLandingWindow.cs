@@ -67,7 +67,7 @@ namespace PrepareLanding
 
             // when the window is closed and it's not minimized, disable all highlighted tiles
             if(!Minimized)
-                PrepareLanding.Instance.TileDrawer?.RemoveAllTiles();
+                PrepareLanding.Instance.TileHighlighter?.RemoveAllTiles();
         }
 
         protected void DoBottomsButtons(Rect inRect)
