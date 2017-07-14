@@ -475,6 +475,14 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
+            if (!UserData.Elevation.IsCorrectRange)
+            {
+                var message =
+                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.Elevation.Min} <= {UserData.Elevation.Max}).";
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                return;
+            }
+
             foreach (var tileId in inputList)
             {
                 var tile = Find.World.grid[tileId];
@@ -503,6 +511,14 @@ namespace PrepareLanding.Filters
 
             if (!IsFilterActive)
                 return;
+
+            if (!UserData.TimeZone.IsCorrectRange)
+            {
+                var message =
+                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.TimeZone.Min} <= {UserData.TimeZone.Max}).";
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                return;
+            }
 
             foreach (var tileId in inputList)
             {
@@ -638,10 +654,15 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            // TODO send problems to GUI tab
             if (!UserData.GrowingPeriod.Max.IsEqualOrGreaterGrowingPeriod(UserData.GrowingPeriod.Min))
-                Messages.Message("Minimum growing period can't be greater than maximum growing period",
-                    MessageSound.RejectInput);
+            {
+                var minGrowingDays = UserData.GrowingPeriod.Min.ToGrowingDays();
+                var maxGrowingDays = UserData.GrowingPeriod.Max.ToGrowingDays();
+                var message =
+                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {minGrowingDays} days <= {maxGrowingDays} days).";
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                return;
+            }
 
             foreach (var tileId in inputList)
             {
@@ -679,6 +700,14 @@ namespace PrepareLanding.Filters
 
             if (!IsFilterActive)
                 return;
+
+            if (!UserData.RainFall.IsCorrectRange)
+            {
+                var message =
+                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.RainFall.Min} <= {UserData.RainFall.Max}).";
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                return;
+            }
 
             foreach (var tileId in inputList)
             {
