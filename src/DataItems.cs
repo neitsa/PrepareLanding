@@ -126,11 +126,16 @@ namespace PrepareLanding
             if (!_use)
                 return false;
 
+            if (!IsCorrectRange)
+                return false;
+
             var lte = Comparer<T>.Default.Compare(value, _min);
             var gte = Comparer<T>.Default.Compare(value, _max);
 
             return (lte >= 0 && gte <= 0);
         }
+
+        public bool IsCorrectRange => Comparer<T>.Default.Compare(_min, _max) <= 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
