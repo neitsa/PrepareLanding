@@ -21,6 +21,8 @@ namespace PrepareLanding
         private readonly PrepareLandingUserData _userData;
         private List<int> _allTilesWithRivers;
         private List<int> _allTilesWithRoads;
+        public ReadOnlyCollection<int> AllTilesWithRoad;
+
 
         public WorldTileFilter(PrepareLandingUserData userData)
         {
@@ -36,72 +38,72 @@ namespace PrepareLanding
                 /* terrain */
                 {
                     nameof(_userData.ChosenBiome),
-                    new TileFilterBiomes(nameof(_userData.ChosenBiome), FilterHeaviness.Light)
+                    new TileFilterBiomes(_userData, nameof(_userData.ChosenBiome), FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.ChosenHilliness),
-                    new TileFilterHilliness(nameof(_userData.ChosenHilliness), FilterHeaviness.Light)
+                    new TileFilterHilliness(_userData, nameof(_userData.ChosenHilliness), FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.SelectedRoadDefs),
-                    new TileFilterRoads(nameof(_userData.SelectedRoadDefs), FilterHeaviness.Light)
+                    new TileFilterRoads(_userData, nameof(_userData.SelectedRoadDefs), FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.SelectedRiverDefs),
-                    new TileFilterRivers(nameof(_userData.SelectedRiverDefs), FilterHeaviness.Light)
+                    new TileFilterRivers(_userData, nameof(_userData.SelectedRiverDefs), FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.CurrentMovementTime),
-                    new TileFilterCurrentMovementTimes(nameof(_userData.CurrentMovementTime), FilterHeaviness.Heavy)
+                    new TileFilterCurrentMovementTimes(_userData, nameof(_userData.CurrentMovementTime), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.WinterMovementTime),
-                    new TileFilterWinterMovementTimes(nameof(_userData.WinterMovementTime), FilterHeaviness.Heavy)
+                    new TileFilterWinterMovementTimes(_userData, nameof(_userData.WinterMovementTime), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.SummerMovementTime),
-                    new TileFilterSummerMovementTimes(nameof(_userData.SummerMovementTime), FilterHeaviness.Heavy)
+                    new TileFilterSummerMovementTimes(_userData, nameof(_userData.SummerMovementTime), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.SelectedStoneDefs),
-                    new TileFilterStones(nameof(_userData.SelectedStoneDefs), FilterHeaviness.Heavy)
+                    new TileFilterStones(_userData, nameof(_userData.SelectedStoneDefs), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.ChosenCoastalTileState),
-                    new TileFilterCoastalTiles(nameof(_userData.ChosenCoastalTileState), FilterHeaviness.Light)
+                    new TileFilterCoastalTiles(_userData, nameof(_userData.ChosenCoastalTileState), FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.Elevation),
-                    new TileFilterElevations(nameof(_userData.Elevation), FilterHeaviness.Heavy)
+                    new TileFilterElevations(_userData, nameof(_userData.Elevation), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.TimeZone),
-                    new TileFilterTimeZones(nameof(_userData.TimeZone), FilterHeaviness.Medium)
+                    new TileFilterTimeZones(_userData, nameof(_userData.TimeZone), FilterHeaviness.Medium)
                 }, //TODO: check heaviness
                 /* temperature */
                 {
                     nameof(_userData.AverageTemperature),
-                    new TileFilterAverageTemperatures(nameof(_userData.AverageTemperature), FilterHeaviness.Heavy)
+                    new TileFilterAverageTemperatures(_userData, nameof(_userData.AverageTemperature), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.WinterTemperature),
-                    new TileFilterWinterTemperatures(nameof(_userData.WinterTemperature), FilterHeaviness.Heavy)
+                    new TileFilterWinterTemperatures(_userData, nameof(_userData.WinterTemperature), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.SummerTemperature),
-                    new TileFilterSummerTemperatures(nameof(_userData.SummerTemperature), FilterHeaviness.Heavy)
+                    new TileFilterSummerTemperatures(_userData, nameof(_userData.SummerTemperature), FilterHeaviness.Heavy)
                 },
                 {
                     nameof(_userData.GrowingPeriod),
-                    new TileFilterGrowingPeriods(nameof(_userData.GrowingPeriod), FilterHeaviness.Heavy)
+                    new TileFilterGrowingPeriods(_userData, nameof(_userData.GrowingPeriod), FilterHeaviness.Heavy)
                 }, // TODO check heaviness
                 {
                     nameof(_userData.RainFall),
-                    new TileFilterRainFalls(nameof(_userData.RainFall), FilterHeaviness.Medium)
+                    new TileFilterRainFalls(_userData, nameof(_userData.RainFall), FilterHeaviness.Medium)
                 }, //TODO check heaviness
                 {
                     nameof(_userData.ChosenAnimalsCanGrazeNowState),
-                    new TileFilterAnimalsCanGrazeNow(nameof(_userData.ChosenAnimalsCanGrazeNowState),
+                    new TileFilterAnimalsCanGrazeNow(_userData, nameof(_userData.ChosenAnimalsCanGrazeNowState),
                         FilterHeaviness.Heavy)
                 } //TODO check heaviness
             };
@@ -160,24 +162,36 @@ namespace PrepareLanding
                 _allValidTileIds.Add(i);
             }
 
-            Log.Message(
-                $"[PrepareLanding] Prefilter: {_allValidTileIds.Count} tiles remain after filter ({Find.WorldGrid.tiles.Count - _allValidTileIds.Count} removed).");
+            _filterInfo.AppendMessage($"Prefilter: {_allValidTileIds.Count} tiles remain after filter ({Find.WorldGrid.tiles.Count - _allValidTileIds.Count} removed).");
 
 
             // get all tiles with at least one river
             _allTilesWithRivers = _allValidTileIds.FindAll(
                 tileId => Find.World.grid[tileId].VisibleRivers != null &&
                           Find.World.grid[tileId].VisibleRivers.Count != 0);
-            Log.Message($"[PrepareLanding] Prefilter: {_allTilesWithRivers.Count} tiles with at least one river.");
+            _filterInfo.AppendMessage($"Prefilter: {_allTilesWithRivers.Count} tiles with at least one river.");
 
             // get all tiles with at least one road
             _allTilesWithRoads =
                 _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].VisibleRoads != null &&
                                                    Find.World.grid[tileId].VisibleRoads.Count != 0);
-            Log.Message($"[PrepareLanding] Prefilter: {_allTilesWithRoads.Count} tiles with at least one road.");
+
+            AllTilesWithRoad = new ReadOnlyCollection<int>(_allTilesWithRoads);
+            _filterInfo.AppendMessage($"Prefilter: {_allTilesWithRoads.Count} tiles with at least one road.");
         }
 
         public void Filter()
+        {
+            // check if live filtering is allowed or not:
+            //  - If it's allowed we filter directly.
+            //  - If it's not allowed, we filter everything on a queued long event.
+            if (PrepareLanding.Instance.UserData.AllowLiveFiltering)
+                FilterTiles();
+            else
+                LongEventHandler.QueueLongEvent(FilterTiles, "[PrepareLanding] Filtering World Tiles", true, null);
+        }
+
+        public void FilterTiles()
         {
             // do a preventive check before filtering anything
             if (!FilterPreCheck())
@@ -195,36 +209,53 @@ namespace PrepareLanding
 
             for(var i = 0; i < _sortedFilters.Count; i++)
             {
-                var currentList = i == 0 ? _allValidTileIds : result;
-
+                // get the filter
                 var filter = _sortedFilters[i];
-                
+
+                // only use an active filter
+                if (!filter.IsFilterActive)
+                    continue;
+
+                // use all valid tiles until we have a first result
+                var currentList = firstUnionDone ? result : _allValidTileIds;
+
                 // do the actual filtering
-                filter.FilterAction(_userData, currentList);
+                filter.FilterAction(currentList);
 
                 // check if anything was filtered
                 var filteredTiles = filter.FilteredTiles;
-                if (filteredTiles.Count == 0 || filteredTiles.Count == _allValidTileIds.Count)
-                    continue;
+                if (filteredTiles.Count == 0 && filter.IsFilterActive)
+                {
+                    _filterInfo.AppendErrorMessage($"{filter.RunningDescription}: this filter results in 0 matching tiles.", sendToLog: true);
+                    return;
+                }
+
+                if (filteredTiles.Count == _allValidTileIds.Count)
+                {
+                    _filterInfo.AppendWarningMessage($"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
+                }
 
                 if (!firstUnionDone)
                 {
                     result = filteredTiles.Union(result).ToList();
                     firstUnionDone = true;
-                    continue;
+                }
+                else
+                {
+                    result = filteredTiles.Intersect(result).ToList();
                 }
 
-                result = filteredTiles.Intersect(result).ToList();
+                _filterInfo.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
             }
-
 
             // all results into one list
             _matchingTileIds.AddRange(result);
 
+            _filterInfo.AppendMessage($"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
+
             // highlight filtered tiles
             PrepareLanding.Instance.TileDrawer.HighlightTileList(_matchingTileIds);
 
-            Log.Message($"Matching Tiles: {_matchingTileIds.Count}");
         }
 
         private bool FilterPreCheck()
@@ -235,6 +266,7 @@ namespace PrepareLanding
             var filteredBiomes = _allFilters[nameof(_userData.ChosenBiome)].FilteredTiles;
             var filteredHilliness = _allFilters[nameof(_userData.ChosenHilliness)].FilteredTiles;
 
+            // advise user that filtering all tiles without preselected biomes or hilliness is not advised (on world coverage >= 50%)
             if (Find.World.info.planetCoverage >= 0.5f)
                 if (filteredBiomes.Count == 0 || filteredHilliness.Count == 0 ||
                     filteredBiomes.Count == _allValidTileIds.Count || filteredHilliness.Count == _allValidTileIds.Count)
@@ -263,7 +295,7 @@ namespace PrepareLanding
             }
 
             // call the filter
-            tileFilter.FilterAction(_userData, _allValidTileIds);
+            tileFilter.FilterAction(_allValidTileIds);
         }
 
         #region PREDICATES
