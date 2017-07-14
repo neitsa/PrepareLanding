@@ -492,7 +492,47 @@ namespace PrepareLanding.Filters
         }
     }
 
-    public class TileFilterAverageTemperatures : TileFilter
+    public abstract class TileFilterTemperatures : TileFilter
+    {
+        protected TileFilterTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        protected abstract float TemperatureForTile(int tileId);
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            // e.g UserData.AverageTemperature, UserData.SummerTemperature or UserData.WinterTemperature
+            var temperatureItem = (UsableMinMaxNumericItem<float>)UserData.GetType().GetProperty(AttachedProperty)?.GetValue(UserData, null);
+            if (temperatureItem == null)
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage("TemperatureItem is null in TileFilterTemperatures.Filter.", sendToLog: true);
+                return;
+            }
+
+            if (!temperatureItem.IsCorrectRange)
+            {
+                var message = $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {temperatureItem.Min} <= {temperatureItem.Max}).";
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                return;
+            }
+
+            foreach (var tileId in inputList)
+            {
+                var tileTemp = TemperatureForTile(tileId);
+
+                if (temperatureItem.InRange(tileTemp))
+                    _filteredTiles.Add(tileId);
+            }
+        }
+    }
+
+    public class TileFilterAverageTemperatures : TileFilterTemperatures
     {
         public TileFilterAverageTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
@@ -502,24 +542,14 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.AverageTemperature.Use;
 
-        public override void Filter(List<int> inputList)
+        protected override float TemperatureForTile(int tileId)
         {
-            base.Filter(inputList);
-
-            if (!IsFilterActive)
-                return;
-
-            foreach (var tileId in inputList)
-            {
-                var tile = Find.World.grid[tileId];
-
-                if (UserData.AverageTemperature.InRange(tile.temperature))
-                    _filteredTiles.Add(tileId);
-            }
+            var tile = Find.World.grid[tileId];
+            return tile.temperature;
         }
     }
 
-    public class TileFilterWinterTemperatures : TileFilter
+    public class TileFilterWinterTemperatures : TileFilterTemperatures
     {
         public TileFilterWinterTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
@@ -529,53 +559,35 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.WinterTemperature.Use;
 
-        public override void Filter(List<int> inputList)
+        protected override float TemperatureForTile(int tileId)
         {
-            base.Filter(inputList);
+            var y = Find.WorldGrid.LongLatOf(tileId).y;
 
-            if (!IsFilterActive)
-                return;
+            var celsiusTemp = GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Winter.GetMiddleTwelfth(y));
 
-            foreach (var tileId in inputList)
-            {
-                var y = Find.WorldGrid.LongLatOf(tileId).y;
-
-                var celsiusTemp =
-                    GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Winter.GetMiddleTwelfth(y));
-
-                if (UserData.WinterTemperature.InRange(celsiusTemp))
-                    _filteredTiles.Add(tileId);
-            }
+            return celsiusTemp;
         }
     }
 
-    public class TileFilterSummerTemperatures : TileFilter
-    {
-        public TileFilterSummerTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
-        {
-        }
 
+    public class TileFilterSummerTemperatures : TileFilterTemperatures
+    {
         public override string SubjectThingDef => "Summer Temperatures";
 
         public override bool IsFilterActive => UserData.SummerTemperature.Use;
 
-        public override void Filter(List<int> inputList)
+
+        public TileFilterSummerTemperatures(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
-            base.Filter(inputList);
+        }
 
-            if (!IsFilterActive)
-                return;
+        protected override float TemperatureForTile(int tileId)
+        {
+            var y = Find.WorldGrid.LongLatOf(tileId).y;
 
-            foreach (var tileId in inputList)
-            {
-                var y = Find.WorldGrid.LongLatOf(tileId).y;
+            var celsiusTemp = GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Summer.GetMiddleTwelfth(y));
 
-                var celsiusTemp =
-                    GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Summer.GetMiddleTwelfth(y));
-
-                if (UserData.SummerTemperature.InRange(celsiusTemp))
-                    _filteredTiles.Add(tileId);
-            }
+            return celsiusTemp;
         }
     }
 
