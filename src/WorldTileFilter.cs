@@ -19,9 +19,8 @@ namespace PrepareLanding
         private readonly List<int> _matchingTileIds = new List<int>();
         private readonly List<ITileFilter> _sortedFilters = new List<ITileFilter>();
         private readonly PrepareLandingUserData _userData;
-        private List<int> _allTilesWithRivers;
-        private List<int> _allTilesWithRoads;
         public ReadOnlyCollection<int> AllTilesWithRoad;
+        public ReadOnlyCollection<int> AllTilesWithRiver;
 
 
         public WorldTileFilter(PrepareLandingUserData userData)
@@ -166,18 +165,19 @@ namespace PrepareLanding
 
 
             // get all tiles with at least one river
-            _allTilesWithRivers = _allValidTileIds.FindAll(
+            var allTilesWithRivers = _allValidTileIds.FindAll(
                 tileId => Find.World.grid[tileId].VisibleRivers != null &&
                           Find.World.grid[tileId].VisibleRivers.Count != 0);
-            _filterInfo.AppendMessage($"Prefilter: {_allTilesWithRivers.Count} tiles with at least one river.");
+            AllTilesWithRiver = new ReadOnlyCollection<int>(allTilesWithRivers);
+            _filterInfo.AppendMessage($"Prefilter: {allTilesWithRivers.Count} tiles with at least one river.");
 
             // get all tiles with at least one road
-            _allTilesWithRoads =
+            var allTilesWithRoads =
                 _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].VisibleRoads != null &&
                                                    Find.World.grid[tileId].VisibleRoads.Count != 0);
 
-            AllTilesWithRoad = new ReadOnlyCollection<int>(_allTilesWithRoads);
-            _filterInfo.AppendMessage($"Prefilter: {_allTilesWithRoads.Count} tiles with at least one road.");
+            AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
+            _filterInfo.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
         }
 
         public void Filter()
