@@ -39,8 +39,15 @@ namespace PrepareLanding.Extensions
             if (!subsetList.IsSubset(containingList))
                 return false;
 
-            //return !subsetList.Where((t, i) => t != containingList[i]).Any();
-            return !subsetList.Where((t, i) => Comparer<T>.Default.Compare(t, containingList[i]) != 0).Any(); 
+            //return !subsetList.Where((t, i) => Comparer<T>.Default.Compare(t, containingList[i]) != 0).Any(); 
+            var count = subsetList.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (!EqualityComparer<T>.Default.Equals(subsetList[i], containingList[i]))
+                    return false;
+            }
+
+            return true;
         }
     }
 }
