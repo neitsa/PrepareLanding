@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using PrepareLanding.Extensions;
 using PrepareLanding.Gui.Tab;
 using UnityEngine;
@@ -40,9 +39,9 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Temperatures (Celsius)");
 
-            DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature");
-            DrawUsableMinMaxNumericField(_userData.WinterTemperature, "Winter Temperature");
-            DrawUsableMinMaxNumericField(_userData.SummerTemperature, "Summer Temperature");
+            DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature", TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            DrawUsableMinMaxNumericField(_userData.WinterTemperature, "Winter Temperature", TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            DrawUsableMinMaxNumericField(_userData.SummerTemperature, "Summer Temperature", TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
         }
 
         protected void DrawGrowingPeriodSelection()
