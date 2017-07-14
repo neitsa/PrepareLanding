@@ -1,4 +1,5 @@
 ﻿using PrepareLanding.Gui.Tab;
+using PrepareLanding.Gui.World;
 using UnityEngine;
 
 namespace PrepareLanding
@@ -7,6 +8,7 @@ namespace PrepareLanding
     {
         private bool _allowLiveFiltering;
         private bool _showDebugTileId;
+        private bool _bypassMaxHighlightedTiles;
 
         private readonly PrepareLandingUserData _userData;
 
@@ -46,6 +48,9 @@ namespace PrepareLanding
             // allow to show the debug tile ID on the highlighted tile (instead of 'X')
             ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref _showDebugTileId, "Show the Debug Tile ID (instead of 'X') for the highlighted tiles.");
             PrepareLanding.Instance.TileDrawer.ShowDebugTileId = _showDebugTileId;
+
+            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref _bypassMaxHighlightedTiles, $"Allow to highlight more than {HighlightedTileDrawer.MaxHighlightedTiles} tiles.");
+            PrepareLanding.Instance.TileDrawer.BypassMaxHighlightedTiles = _bypassMaxHighlightedTiles;
         }
     }
 }

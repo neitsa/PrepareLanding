@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PrepareLanding.Extensions;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
@@ -9,6 +8,8 @@ namespace PrepareLanding.Gui.World
 {
     public class HighlightedTileDrawer : IDisposable
     {
+        public const int MaxHighlightedTiles = 10000;
+
         private const float MaxDistToCameraToDisplayLabel = 39f;
 
         private readonly List<HighlightedTile> _highlightedTiles = new List<HighlightedTile>();
@@ -29,6 +30,8 @@ namespace PrepareLanding.Gui.World
 
         public bool ShowDebugTileId { get; set; }
 
+        public bool BypassMaxHighlightedTiles { get; set; }
+
         public HighlightedTileDrawer()
         {
             PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
@@ -45,6 +48,13 @@ namespace PrepareLanding.Gui.World
 
         public void HighlightTileList(List<int> tileList)
         {
+            // do not highlight too many tiles (otherwise the slow down is noticeable)
+            if (!BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage($"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
+                return;
+            }
+
             foreach (var tileId in tileList)
             {
                 HighlightTile(tileId, _defaultMaterial, ShowDebugTileId ? tileId.ToString() : "X");
