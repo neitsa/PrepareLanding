@@ -19,12 +19,14 @@ namespace PrepareLanding.Filters
 
         string AttachedProperty { get; }
 
-        Action<PrepareLandingUserData, List<int>> FilterAction { get; }
+        Action<List<int>> FilterAction { get; }
 
         FilterHeaviness Heaviness { get; }
 
         List<int> FilteredTiles { get; }
 
-        void Filter(PrepareLandingUserData userData, List<int> inputList);
+        void Filter(List<int> inputList);
+
+        bool IsFilterActive { get; }
     }
 }
