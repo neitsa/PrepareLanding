@@ -126,8 +126,8 @@ namespace PrepareLanding
             if (!_use)
                 return false;
 
-            var lte = Comparer<T>.Default.Compare(_min, value);
-            var gte = Comparer<T>.Default.Compare(_max, value);
+            var lte = Comparer<T>.Default.Compare(value, _min);
+            var gte = Comparer<T>.Default.Compare(value, _max);
 
             return (lte >= 0 && gte <= 0);
         }
