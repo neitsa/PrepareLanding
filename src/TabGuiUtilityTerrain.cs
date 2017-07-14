@@ -243,7 +243,7 @@ namespace PrepareLanding
 
         protected void DrawMovementTime()
         {
-            DrawEntryHeader("Movement Times [hours]", false);
+            DrawEntryHeader("Movement Times (hours)", false);
 
             DrawUsableMinMaxNumericField(_userData.CurrentMovementTime, "Current Movement Time");
             DrawUsableMinMaxNumericField(_userData.SummerMovementTime, "Summer Movement Time");
@@ -252,9 +252,11 @@ namespace PrepareLanding
 
         protected void DrawElevationSelection()
         {
-            DrawEntryHeader("Elevation [meters]");
+            DrawEntryHeader("Elevation (meters)");
 
-            DrawUsableMinMaxNumericField(_userData.Elevation, "Elevation");
+            // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
+            // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
+            DrawUsableMinMaxNumericField(_userData.Elevation, "Elevation", -500f, 5000f);
         }
 
         protected virtual void DrawStoneTypesSelection()
@@ -287,7 +289,7 @@ namespace PrepareLanding
 
                 if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out threeStateItem))
                 {
-                    Log.Message("a stoneDef wasn't found in selectedStoneDefs");
+                    Log.Message("A stoneDef wasn't found in selectedStoneDefs");
                     continue;
                 }
 
