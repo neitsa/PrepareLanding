@@ -13,13 +13,6 @@ namespace PrepareLanding
     {
         private readonly Vector2 _bottomButtonSize = new Vector2(160f, 30f);
 
-        private readonly PrepareLandingUserData _userData;
-
-        private TabGuiUtilityTemperature _tabGuiUtilityTemperature;
-        private TabGuiUtilityTerrain _tabGuiUtilityTerrain;
-        private TabGuiUtilityInfo _tabGuiUtilityInfo;
-        private TabGuiUtilityOptions _tabGuiUtilityOptions;
-
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
 
         private readonly TabGuiUtilityController _tabController = new TabGuiUtilityController();
@@ -31,32 +24,28 @@ namespace PrepareLanding
             optionalTitle = "Prepare Landing";
             MinimizedWindow.WindowLabel = optionalTitle;
 
-            _userData = userData;
+            /* 
+             * GUI utilities (tabs)
+             */
+            var tabGuiUtilityTerrain = new TabGuiUtilityTerrain(userData, 0.30f);
+            var tabGuiUtilityTemperature = new TabGuiUtilityTemperature(userData, 0.30f);
+            var tabGuiUtilityInfo = new TabGuiUtilityInfo(userData, 0.48f);
+            var tabGuiUtilityOptions = new TabGuiUtilityOptions(userData, 0.30f);
+
+            _tabGuiUtilities.Clear();
+            _tabGuiUtilities.Add(tabGuiUtilityTerrain);
+            _tabGuiUtilities.Add(tabGuiUtilityTemperature);
+            _tabGuiUtilities.Add(tabGuiUtilityInfo);
+            _tabGuiUtilities.Add(tabGuiUtilityOptions);
+
+            _tabController.Clear();
+            _tabController.AddTabRange(_tabGuiUtilities);
         }
 
         protected override float Margin => 0f;
 
         public override Vector2 InitialSize => new Vector2(1024f, 768f);
 
-        public override void PreOpen()
-        {
-            base.PreOpen();
-
-            /* 
-             * GUI utilities 
-             */
-            _tabGuiUtilityTerrain = new TabGuiUtilityTerrain(_userData, 0.30f);
-            _tabGuiUtilityTemperature = new TabGuiUtilityTemperature(_userData, 0.30f);
-            _tabGuiUtilityInfo = new TabGuiUtilityInfo(_userData, 0.48f);
-            _tabGuiUtilityOptions = new TabGuiUtilityOptions(_userData, 0.30f);
-
-            _tabGuiUtilities.Add(_tabGuiUtilityTerrain);
-            _tabGuiUtilities.Add(_tabGuiUtilityTemperature);
-            _tabGuiUtilities.Add(_tabGuiUtilityInfo);
-            _tabGuiUtilities.Add(_tabGuiUtilityOptions);
-
-            _tabController.AddTabRange(_tabGuiUtilities);
-        }
 
         public override void DoWindowContents(Rect inRect)
         {
