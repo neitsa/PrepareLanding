@@ -53,11 +53,11 @@ namespace PrepareLanding.Extensions
         /// <param name="spaceBetweenItems">The width of the space between each of the items.</param>
         /// <param name="isMinimized">Indicated whether or not the current containing window is resized to a lesser Rect.</param>
         /// <returns>A list of <see cref="Rect" />.</returns>
-        public static List<Rect> SpaceEvenlyFromCenter(this Rect r, float y, uint numItems, float itemWidth,
+        public static List<Rect> SpaceEvenlyFromCenter(this Rect r, float y, int numItems, float itemWidth,
             float itemHeight, float spaceBetweenItems, bool isMinimized = false)
         {
             var result = new List<Rect>();
-            if (numItems == 0)
+            if (numItems <= 0)
                 return result;
 
             // total width required for all items and the space between them
