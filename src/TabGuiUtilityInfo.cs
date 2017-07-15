@@ -105,6 +105,13 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Filter Info", backgroundColor: Color.yellow);
 
+            if (ListingStandard.ButtonText("Clear Info"))
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfo.Clear();
+            }
+
+            ListingStandard.Gap();
+
             var text = PrepareLanding.Instance.TileFilter.FilterInfoText;
             if (text.NullOrEmpty())
                 return;
