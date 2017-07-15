@@ -6,6 +6,7 @@ using System.Linq;
 using PrepareLanding.Extensions;
 using PrepareLanding.Filters;
 using RimWorld.Planet;
+using UnityEngine;
 using Verse;
 
 namespace PrepareLanding
@@ -21,6 +22,8 @@ namespace PrepareLanding
         private readonly PrepareLandingUserData _userData;
         public ReadOnlyCollection<int> AllTilesWithRiver;
         public ReadOnlyCollection<int> AllTilesWithRoad;
+
+        public ReadOnlyCollection<int> AllMatchingTiles => _matchingTileIds.AsReadOnly();
 
 
         public WorldTileFilter(PrepareLandingUserData userData)
@@ -131,7 +134,7 @@ namespace PrepareLanding
 
         public event Action OnFilterInfoTextChanged = delegate { };
 
-        public int Count()
+        public int TilesCount()
         {
             return _matchingTileIds.Count;
         }
@@ -214,7 +217,7 @@ namespace PrepareLanding
             PrepareLanding.Instance.TileHighlighter.RemoveAllTiles();
 
             var separator = "-".Repeat(40);
-            FilterInfo.AppendMessage($"{separator}\nNew Filtering\n{separator}");
+            FilterInfo.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
 
             // filter tiles
             var result = new List<int>();
