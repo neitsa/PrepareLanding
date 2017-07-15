@@ -33,16 +33,12 @@ namespace PrepareLanding
             /* 
              * GUI utilities (tabs)
              */
-            var tabGuiUtilityTerrain = new TabGuiUtilityTerrain(userData, 0.30f);
-            var tabGuiUtilityTemperature = new TabGuiUtilityTemperature(userData, 0.30f);
-            var tabGuiUtilityInfo = new TabGuiUtilityInfo(userData, 0.48f);
-            var tabGuiUtilityOptions = new TabGuiUtilityOptions(userData, 0.30f);
-
             _tabGuiUtilities.Clear();
-            _tabGuiUtilities.Add(tabGuiUtilityTerrain);
-            _tabGuiUtilities.Add(tabGuiUtilityTemperature);
-            _tabGuiUtilities.Add(tabGuiUtilityInfo);
-            _tabGuiUtilities.Add(tabGuiUtilityOptions);
+            _tabGuiUtilities.Add(new TabGuiUtilityTerrain(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabGuiUtilityTemperature(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabGuiUtilityFilteredTiles(0.48f));
+            _tabGuiUtilities.Add(new TabGuiUtilityInfo(userData, 0.48f));
+            _tabGuiUtilities.Add(new TabGuiUtilityOptions(userData, 0.30f));
 
             TabController.Clear();
             TabController.AddTabRange(_tabGuiUtilities);
