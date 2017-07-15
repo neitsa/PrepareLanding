@@ -54,7 +54,7 @@ namespace PrepareLanding
             if (sendToLog)
                 Log.Message($"[PrepareLanding] {text}");
 
-            var warningText = RichText.Bold(RichText.Color(text, Color.yellow));
+            var warningText = RichText.Bold(RichText.Color(text, ColorLibrary.Orange));
             AppendLine(warningText);
         }
 
