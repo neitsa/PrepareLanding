@@ -91,26 +91,41 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            // get a  list of roadDefs that *must not* be present
             var roadDefs = UserData.SelectedRoadDefs;
+
+            // get a list of roadDefs that *must not* be present
             var unwantedRoadDefs = (from entry in roadDefs
                 where entry.Value.State == MultiCheckboxState.Off
                 select entry.Key).ToList();
 
-            // from the input list, get only tiles that have roads (of any type)
-            var tilesWithRoads = TilesWithRoads(inputList);
+            // get a list of roadDefs that *must* be present
+            var wantedRoadDefs = (from entry in roadDefs
+                where entry.Value.State == MultiCheckboxState.On
+                select entry.Key).ToList();
 
-            foreach (var tileId in tilesWithRoads)
+            foreach (var tileId in inputList)
             {
-                // for all road type in the current tile
-                var visibleRoads = Find.World.grid[tileId].VisibleRoads;
-                foreach (var roadLink in visibleRoads)
+                var tile = Find.World.grid[tileId];
+                var tileHasRoad = TileHasRoad(tile);
+                if (tileHasRoad)
                 {
-                    // do not add the current tile if the current tile road is in the unwanted list
-                    if (unwantedRoadDefs.Contains(roadLink.road))
-                        break;
+                    var tileRoadDefs = tile.VisibleRoads.Select(roadlink => roadlink.road).ToList();
 
+                    // check that any of the road in the tile is *not* in the unwanted list, if it is, then just continue
+                    if (unwantedRoadDefs.Select(r => r).Intersect(tileRoadDefs).Any())
+                        continue;
+
+                    // otherwise add the tile (if the road type is MultiCheckboxState.On or MultiCheckboxState.Partial)
                     _filteredTiles.Add(tileId);
+                }
+                else //tile has no roads
+                {
+                    //tile has no roads
+                    //  if user wants a specific road: do nothing
+                    //  if user doesn't absolutely want a specific road type, add the tile 
+                    //    (works for MultiCheckboxState.Off and MultiCheckboxState.Partial)
+                    if (wantedRoadDefs.Count == 0)
+                        _filteredTiles.Add(tileId);
                 }
             }
         }
@@ -123,6 +138,11 @@ namespace PrepareLanding.Filters
         public static IEnumerable<int> TilesWithRoads(List<int> inputList)
         {
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRoad);
+        }
+
+        public bool TileHasRoad(Tile tile)
+        {
+            return tile.VisibleRoads != null && tile.VisibleRoads.Count != 0;
         }
     }
 
@@ -173,14 +193,16 @@ namespace PrepareLanding.Filters
             // the game doesn't select more than 3 stone types per tile
             if (orderedStoneDefsOnCount > 3)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage($"Cannot select more than 3 stone types (selected: {orderedStoneDefsOnCount}).");
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                    $"Cannot select more than 3 stone types (selected: {orderedStoneDefsOnCount}).");
                 return;
             }
 
             // the game use 2 to 3 types of stone per tile, so we must have at least 2 chosen types of stones 
             if (orderedStoneDefsOnPartial.Count < 2)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage($"At least 2 types of stone types must be in ON or PARTIAL state (selected: {orderedStoneDefsOnPartial.Count}).");
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                    $"At least 2 types of stone types must be in ON or PARTIAL state (selected: {orderedStoneDefsOnPartial.Count}).");
                 return;
             }
 
@@ -253,32 +275,55 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            // get a  list of roadDefs that *must not* be present
             var riverDefs = UserData.SelectedRiverDefs;
+
+            // get a list of riverDefs that *must not* be present
             var unwantedRiverDefs = (from entry in riverDefs
                 where entry.Value.State == MultiCheckboxState.Off
                 select entry.Key).ToList();
 
-            // from the input list, get only tiles that have roads (of any type)
-            var tilesWithRivers = TilesWithRiver(inputList);
+            // get a list of riverDefs that *must* be present
+            var wantedRiverDefs = (from entry in riverDefs
+                where entry.Value.State == MultiCheckboxState.On
+                select entry.Key).ToList();
 
-            foreach (var tileId in tilesWithRivers)
+            foreach (var tileId in inputList)
             {
-                // note : even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
-                var riverLink = Find.World.grid[tileId].VisibleRivers
-                    .MaxBy(riverlink => riverlink.river.degradeThreshold);
+                var tileHasRiver = TileHasRiver(tileId);
+                if (tileHasRiver)
+                {
+                    // note: even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
+                    var riverLink = Find.World.grid[tileId].VisibleRivers
+                        .MaxBy(riverlink => riverlink.river.degradeThreshold);
 
-                // check that the river is not in the unwanted list, if it is, then just continue
-                if (unwantedRiverDefs.Contains(riverLink.river))
-                    continue;
+                    // check that the river is not in the unwanted list, if it is, then just continue
+                    if (unwantedRiverDefs.Contains(riverLink.river))
+                        continue;
 
-                _filteredTiles.Add(tileId);
+                    // add the tile if the river type is MultiCheckboxState.On or MultiCheckboxState.Partial
+                    _filteredTiles.Add(tileId);
+                }
+                else //tile has no rivers
+                {
+                    //tile has no river
+                    //  if user wants a river: do nothing
+                    //  if user doesn't absolutely want a specific river type, add the tile 
+                    //    (works for MultiCheckboxState.Off and MultiCheckboxState.Partial)
+                    if (wantedRiverDefs.Count == 0)
+                        _filteredTiles.Add(tileId);
+                }
             }
         }
 
         public static IEnumerable<int> TilesWithRiver(List<int> inputList)
         {
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRiver);
+        }
+
+        public static bool TileHasRiver(int tileId)
+        {
+            var tile = Find.World.grid[tileId];
+            return tile.VisibleRivers != null && tile.VisibleRivers.Count != 0;
         }
     }
 
