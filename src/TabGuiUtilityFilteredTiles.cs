@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using PrepareLanding.Extensions;
 using PrepareLanding.Gui.Tab;
-using PrepareLanding.Gui.Window;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -49,11 +47,6 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Filtered Tiles", backgroundColor: Color.yellow);
 
-            if (ListingStandard.ButtonText("Clear Filtered Tiles"))
-            {
-                PrepareLanding.Instance.TileFilter.ClearMatchingTiles();
-            }
-
             // default line height
             const float gapLineHeight = 4f;
             // default visual element height
@@ -76,6 +69,9 @@ namespace PrepareLanding
 
                 // reset starting display index
                 _tileDisplayIndexStart = 0;
+
+                // reset selected index
+                _selectedTileIndex = -1;
 
                 // don't go further as there are no tile content to draw
                 return;

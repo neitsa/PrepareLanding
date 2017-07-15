@@ -175,6 +175,9 @@ namespace PrepareLanding
                 // reset starting display index
                 _tileDisplayIndexStart = 0;
 
+                // reset selected index
+                _selectedTileIndex = -1;
+
                 // don't go further as there are no tile content to draw
                 return;
             }
