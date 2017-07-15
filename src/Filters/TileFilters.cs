@@ -172,11 +172,17 @@ namespace PrepareLanding.Filters
 
             // the game doesn't select more than 3 stone types per tile
             if (orderedStoneDefsOnCount > 3)
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage($"Cannot select more than 3 stone types (selected: {orderedStoneDefsOnCount}).");
                 return;
+            }
 
             // the game use 2 to 3 types of stone per tile, so we must have at least 2 chosen types of stones 
             if (orderedStoneDefsOnPartial.Count < 2)
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage($"At least 2 types of stone types must be in ON or PARTIAL state (selected: {orderedStoneDefsOnPartial.Count}).");
                 return;
+            }
 
             foreach (var tileId in inputList)
             {
