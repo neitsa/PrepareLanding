@@ -166,15 +166,15 @@ namespace PrepareLanding
 
         protected void DrawSelectedTileInfo()
         {
-
             DrawEntryHeader("Selected Tile Info", backgroundColor: Color.yellow);
 
-            if (_selectedTileIndex < 0)
+            var matchingTiles = PrepareLanding.Instance.TileFilter.AllMatchingTiles;
+
+            if (_selectedTileIndex < 0 || _selectedTileIndex >= matchingTiles.Count)
                 return;
 
             ListingStandard.verticalSpacing = 0f;
 
-            var matchingTiles = PrepareLanding.Instance.TileFilter.AllMatchingTiles;
             var selTileId = matchingTiles[_selectedTileIndex];
             var selTile = Find.World.grid[selTileId];
 
@@ -191,7 +191,7 @@ namespace PrepareLanding
             if (selTile.VisibleRoads != null)
             {
                 ListingStandard.LabelDouble("Road".Translate(), GenText.ToCommaList((from roadlink in selTile.VisibleRoads
-                    select roadlink.road.label).Distinct<string>()).CapitalizeFirst());
+                    select roadlink.road.label).Distinct()).CapitalizeFirst());
             }
             if (selTile.VisibleRivers != null)
             {
