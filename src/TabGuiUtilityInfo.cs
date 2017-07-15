@@ -59,12 +59,12 @@ namespace PrepareLanding
                 var allValidTiles = PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly?.ToList();
                 if (allValidTiles != null)
                 {
-                    stringBuilder.AppendLine("Biomes:");
+                    stringBuilder.AppendLine("Biomes: (number of tiles)");
                     var biomes = PrepareLanding.Instance.UserData.BiomeDefs;
                     foreach (var biome in biomes)
                     {
                         var count = TileFilterBiomes.NumberOfTilesByBiome(biome, allValidTiles);
-                        stringBuilder.AppendLine($"\t{biome.LabelCap} ➠ number of tiles: {count}");
+                        stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
                     }
                 }
             }
