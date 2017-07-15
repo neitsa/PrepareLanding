@@ -193,7 +193,7 @@ namespace PrepareLanding.Filters
             // the game doesn't select more than 3 stone types per tile
             if (orderedStoneDefsOnCount > 3)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     $"Cannot select more than 3 stone types (selected: {orderedStoneDefsOnCount}).");
                 return;
             }
@@ -201,7 +201,7 @@ namespace PrepareLanding.Filters
             // the game use 2 to 3 types of stone per tile, so we must have at least 2 chosen types of stones 
             if (orderedStoneDefsOnPartial.Count < 2)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     $"At least 2 types of stone types must be in ON or PARTIAL state (selected: {orderedStoneDefsOnPartial.Count}).");
                 return;
             }
@@ -348,7 +348,7 @@ namespace PrepareLanding.Filters
                 ?.GetValue(UserData, null);
             if (movementTime == null)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     "MovementTime is null in TileFilterMovementTime.Filter.", sendToLog: true);
                 return;
             }
@@ -357,7 +357,7 @@ namespace PrepareLanding.Filters
             {
                 var message =
                     $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {movementTime.Min} <= {movementTime.Max}).";
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
 
@@ -530,7 +530,7 @@ namespace PrepareLanding.Filters
             {
                 var message =
                     $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.Elevation.Min} <= {UserData.Elevation.Max}).";
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
 
@@ -567,7 +567,7 @@ namespace PrepareLanding.Filters
             {
                 var message =
                     $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.TimeZone.Min} <= {UserData.TimeZone.Max}).";
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
 
@@ -601,7 +601,7 @@ namespace PrepareLanding.Filters
                 ?.GetValue(UserData, null);
             if (temperatureItem == null)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     "TemperatureItem is null in TileFilterTemperatures.Filter.", sendToLog: true);
                 return;
             }
@@ -610,7 +610,7 @@ namespace PrepareLanding.Filters
             {
                 var message =
                     $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {temperatureItem.Min} <= {temperatureItem.Max}).";
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
 
@@ -711,7 +711,7 @@ namespace PrepareLanding.Filters
                 var maxGrowingDays = UserData.GrowingPeriod.Max.ToGrowingDays();
                 var message =
                     $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {minGrowingDays} days <= {maxGrowingDays} days).";
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
 
@@ -756,7 +756,7 @@ namespace PrepareLanding.Filters
             {
                 var message =
                     $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.RainFall.Min} <= {UserData.RainFall.Max}).";
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(message);
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
 

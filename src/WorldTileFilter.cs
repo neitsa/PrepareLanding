@@ -33,7 +33,7 @@ namespace PrepareLanding
 
             PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
 
-            FilterInfo.PropertyChanged += FilterInfoChanged;
+            FilterInfoLogger.PropertyChanged += FilterInfoChanged;
 
             _allFilters = new Dictionary<string, ITileFilter>
             {
@@ -126,11 +126,11 @@ namespace PrepareLanding
             _sortedFilters.AddRange(heavyFilters);
         }
 
-        public FilterInfo FilterInfo { get; } = new FilterInfo();
+        public FilterInfoLogger FilterInfoLogger { get; } = new FilterInfoLogger();
 
         public ReadOnlyCollection<int> AllValidTilesReadOnly => _allValidTileIds.AsReadOnly();
 
-        public string FilterInfoText => FilterInfo.Text;
+        public string FilterInfoText => FilterInfoLogger.Text;
 
         public event Action OnFilterInfoTextChanged = delegate { };
 
@@ -173,7 +173,7 @@ namespace PrepareLanding
                 _allValidTileIds.Add(i);
             }
 
-            FilterInfo.AppendMessage(
+            FilterInfoLogger.AppendMessage(
                 $"Prefilter: {_allValidTileIds.Count} tiles remain after filter ({Find.WorldGrid.tiles.Count - _allValidTileIds.Count} removed).");
 
 
@@ -182,7 +182,7 @@ namespace PrepareLanding
                 tileId => Find.World.grid[tileId].VisibleRivers != null &&
                           Find.World.grid[tileId].VisibleRivers.Count != 0);
             AllTilesWithRiver = new ReadOnlyCollection<int>(allTilesWithRivers);
-            FilterInfo.AppendMessage($"Prefilter: {allTilesWithRivers.Count} tiles with at least one river.");
+            FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRivers.Count} tiles with at least one river.");
 
             // get all tiles with at least one road
             var allTilesWithRoads =
@@ -190,7 +190,7 @@ namespace PrepareLanding
                                                    Find.World.grid[tileId].VisibleRoads.Count != 0);
 
             AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
-            FilterInfo.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
+            FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
         }
 
         public void Filter()
@@ -217,7 +217,7 @@ namespace PrepareLanding
             PrepareLanding.Instance.TileHighlighter.RemoveAllTiles();
 
             var separator = "-".Repeat(40);
-            FilterInfo.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
+            FilterInfoLogger.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
 
             // filter tiles
             var result = new List<int>();
@@ -242,13 +242,13 @@ namespace PrepareLanding
                 var filteredTiles = filter.FilteredTiles;
                 if (filteredTiles.Count == 0 && filter.IsFilterActive)
                 {
-                    FilterInfo.AppendErrorMessage(
+                    FilterInfoLogger.AppendErrorMessage(
                         $"{filter.RunningDescription}: this filter results in 0 matching tiles.", sendToLog: true);
                     return;
                 }
 
                 if (filteredTiles.Count == _allValidTileIds.Count)
-                    FilterInfo.AppendWarningMessage(
+                    FilterInfoLogger.AppendWarningMessage(
                         $"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
 
                 if (!firstUnionDone)
@@ -261,16 +261,16 @@ namespace PrepareLanding
                     result = filteredTiles.Intersect(result).ToList();
                 }
 
-                FilterInfo.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
+                FilterInfoLogger.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
             }
 
             // all results into one list
             _matchingTileIds.AddRange(result);
 
             if(_matchingTileIds.Count == 0)
-                FilterInfo.AppendErrorMessage("No tile matches the given filter(s).", sendToLog: true);
+                FilterInfoLogger.AppendErrorMessage("No tile matches the given filter(s).", sendToLog: true);
             else
-                FilterInfo.AppendSuccessMessage($"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
+                FilterInfoLogger.AppendSuccessMessage($"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
 
 
             // highlight filtered tiles
@@ -281,7 +281,7 @@ namespace PrepareLanding
         {
             if (_userData.AreAllFieldsInDefaultSate())
             {
-                FilterInfo.AppendErrorMessage("All filters are in their default state, please select at least one filter.");
+                FilterInfoLogger.AppendErrorMessage("All filters are in their default state, please select at least one filter.");
                 return false;
             }
 
@@ -294,7 +294,7 @@ namespace PrepareLanding
                 if (filteredBiomes.Count == 0 || filteredHilliness.Count == 0 ||
                     filteredBiomes.Count == _allValidTileIds.Count || filteredHilliness.Count == _allValidTileIds.Count)
                 {
-                    FilterInfo.AppendErrorMessage(
+                    FilterInfoLogger.AppendErrorMessage(
                         "No biome and no terrain selected for Planet coverage >= 50%\n\tPlease select a biome and a terrain first.");
                     return false;
                 }

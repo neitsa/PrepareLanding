@@ -51,7 +51,7 @@ namespace PrepareLanding.Gui.World
             // do not highlight too many tiles (otherwise the slow down is noticeable)
             if (!BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.AppendErrorMessage(
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     $"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
                 return;
             }

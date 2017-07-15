@@ -7,11 +7,11 @@ using Verse;
 
 namespace PrepareLanding
 {
-    public class FilterInfo : INotifyPropertyChanged
+    public class FilterInfoLogger : INotifyPropertyChanged
     {
         private StringBuilder _stringBuilder;
 
-        public FilterInfo()
+        public FilterInfoLogger()
         {
             _stringBuilder = new StringBuilder();
         }

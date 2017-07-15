@@ -69,7 +69,7 @@
     <Compile Include="src\Gui\RichText.cs" />
     <Compile Include="src\Extensions\TileExtensions.cs" />
     <Compile Include="src\Extensions\TwelfthExtensions.cs" />
-    <Compile Include="src\FilterInfo.cs" />
+    <Compile Include="src\FilterInfoLogger.cs" />
     <Compile Include="src\Gui\Tab\ITabGuiUtility.cs" />
     <Compile Include="src\Gui\Tab\TabGuiUtility.cs" />
     <Compile Include="src\Gui\Tab\TabGuiUtilityController.cs" />

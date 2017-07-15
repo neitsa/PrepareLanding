@@ -107,7 +107,7 @@ namespace PrepareLanding
 
             if (ListingStandard.ButtonText("Clear Info"))
             {
-                PrepareLanding.Instance.TileFilter.FilterInfo.Clear();
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.Clear();
             }
 
             ListingStandard.Gap();
