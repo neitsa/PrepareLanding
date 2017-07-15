@@ -67,10 +67,13 @@ namespace PrepareLanding
             AppendLine(successText);
         }
 
-        public void AppendMessage(string text, bool sendToLog = false)
+        public void AppendMessage(string text, bool sendToLog = false, Color? textColor = null)
         {
             if (sendToLog)
                 Log.Message($"[PrepareLanding] {text}");
+
+            if (textColor != null)
+                text = RichText.Color(text, (Color)textColor);
 
             AppendLine(text);
         }
