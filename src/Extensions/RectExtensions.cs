@@ -91,5 +91,10 @@ namespace PrepareLanding.Extensions
 
             return result;
         }
+
+        public static Rect ContractedByButLeft(this Rect rect, float margin)
+        {
+            return new Rect(rect.x, rect.y + margin, rect.width - margin, rect.height - margin * 2f);
+        }
     }
 }
