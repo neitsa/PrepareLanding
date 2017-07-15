@@ -63,7 +63,10 @@ namespace PrepareLanding.Patches
 
                 // make sure the prepare landing window (or its minimized window) is closed when we go back
                 if (Find.WindowStack.IsOpen<PrepareLandingWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
-                    PrepareLanding.Instance.MainWindow.ForceClose();
+                {
+                    if(PrepareLanding.Instance.MainWindow != null)
+                        PrepareLanding.Instance.MainWindow.ForceClose();
+                }
 
                 #endregion
 
@@ -127,6 +130,7 @@ namespace PrepareLanding.Patches
             if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()) &&
                 CanDoNext())
                 DoNext();
+
             //num6 += BottomButSize.x + 10f;
             GenUI.AbsorbClicksInRect(rect);
         }
