@@ -11,11 +11,13 @@ namespace PrepareLanding
 {
     public class PrepareLandingWindow : MinimizableWindow
     {
-        private readonly Vector2 _bottomButtonSize = new Vector2(160f, 30f);
+        private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
+
+        private readonly float _gapBetweenButtons = 10f;
 
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
 
-        public TabGuiUtilityController Controller { get; } = new TabGuiUtilityController();
+        public TabGuiUtilityController TabController { get; } = new TabGuiUtilityController();
 
         public PrepareLandingWindow(PrepareLandingUserData userData)
         {
@@ -38,8 +40,8 @@ namespace PrepareLanding
             _tabGuiUtilities.Add(tabGuiUtilityInfo);
             _tabGuiUtilities.Add(tabGuiUtilityOptions);
 
-            Controller.Clear();
-            Controller.AddTabRange(_tabGuiUtilities);
+            TabController.Clear();
+            TabController.AddTabRange(_tabGuiUtilities);
         }
 
         protected override float Margin => 0f;
@@ -52,11 +54,11 @@ namespace PrepareLanding
             inRect.yMin += 72f;
             Widgets.DrawMenuSection(inRect);
 
-            Controller.DrawTabs(inRect);
+            TabController.DrawTabs(inRect);
 
             inRect = inRect.ContractedBy(17f);
 
-            Controller.DrawSelectedTab(inRect);
+            TabController.DrawSelectedTab(inRect);
 
             DoBottomsButtons(inRect);
         }
@@ -76,7 +78,7 @@ namespace PrepareLanding
             var buttonsY = windowRect.height - 55f;
 
             var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
-                _bottomButtonSize.y, 10f);
+                _bottomButtonSize.y, _gapBetweenButtons);
             if (buttonsRect.Count != numButtons)
             {
                 Log.ErrorOnce($"[PrepareLanding] Couldn't not get enough room for {numButtons} (in PrepareLandingWindow.DoBottomsButtons)", 0x1237cafe);
@@ -86,7 +88,6 @@ namespace PrepareLanding
             if (Widgets.ButtonText(buttonsRect[0], "Filter"))
             {
                 SoundDefOf.TickLow.PlayOneShotOnCamera();
-                Log.Message("[PrepareLanding] Pressed Filter button");
                 PrepareLanding.Instance.TileFilter.Filter();
             }
 
