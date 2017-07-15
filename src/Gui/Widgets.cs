@@ -111,7 +111,6 @@ namespace PrepareLanding.Gui
             return selected && !flag;
         }
 
-
         public static bool MinimizeButtonFor(Rect rectToMinimize, bool hasCloseButton)
         {
             const float buttonWidthAndHeight = 18f;
