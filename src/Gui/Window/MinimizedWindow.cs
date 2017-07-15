@@ -56,7 +56,7 @@ namespace PrepareLanding.Gui.Window
             // set up column size
             _listingStandard.ColumnWidth = inRect.width;
 
-            // begin Rect position
+            // begin drawing
             _listingStandard.Begin(rect);
 
             // get a Rect for the next label (without actually 'allocating' it in the Listing_Standard)
@@ -65,36 +65,41 @@ namespace PrepareLanding.Gui.Window
             var labelRect = nextRect.LeftPart(0.9f);
             var buttonRect = nextRect.RightPart(0.1f);
 
+            // add 'title' for the minimized window
             _listingStandard.GetRect(30f);
             GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
             Verse.Widgets.Label(labelRect, WindowLabel);
             GenUI.ResetLabelAlign();
 
+            // add 'maximize' button
             if (Verse.Widgets.ButtonText(buttonRect, "▲"))
                 Close();
 
             TooltipHandler.TipRegion(buttonRect, "Maximize Window");
 
-            _listingStandard.GapLine();
+            // make some space before eventual content
+            _listingStandard.GapLine(6f);
 
+            // subscribers can add new content to the minimized window.
             AddMinimizedWindowContent?.Invoke(_listingStandard, inRect);
 
             // check if the height changed (meaning new content was added)
             if (Math.Abs(windowRect.height - InitialSize.y) > 1f && !_minimizedWindowHasAddedContent)
             {
-                // recalculate position
+                // recalculate y position
                 windowRect.y = (UI.screenHeight - windowRect.height) / 2;
 
                 // do it only once
                 _minimizedWindowHasAddedContent = true;
             }
 
+            // end drawing
             _listingStandard.End();
         }
 
         protected override void SetInitialSizeAndPosition()
         {
-            // on the bottom left of the screen but above the other utilities
+            // reposition on the bottom left of the screen but above the other utilities
             windowRect = new Rect(UI.screenWidth - InitialSize.x - 40f, UI.screenHeight - InitialSize.y - 80f,
                 InitialSize.x, InitialSize.y);
             windowRect = windowRect.Rounded();
