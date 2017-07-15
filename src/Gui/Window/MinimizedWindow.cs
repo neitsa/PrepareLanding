@@ -1,4 +1,5 @@
 ﻿using System;
+using PrepareLanding.Extensions;
 using UnityEngine;
 using Verse;
 
@@ -6,9 +7,13 @@ namespace PrepareLanding.Gui.Window
 {
     public class MinimizedWindow : Verse.Window
     {
-        private const float MaximizeButtonWidth = 15f;
-
         private readonly Verse.Window _parentWindow;
+
+        private readonly Listing_Standard _listingStandard;
+
+        private bool _minimizedWindowHasAddedContent;
+
+        public event Action<Listing_Standard, Rect> AddMinimizedWindowContent;
 
         public MinimizedWindow(Verse.Window parentWindow, string windowLabel = null)
         {
@@ -30,11 +35,13 @@ namespace PrepareLanding.Gui.Window
 
             // unless visible, consider it closed by default
             Closed = true;
+
+            _listingStandard = new Listing_Standard();
         }
 
         public bool Closed { get; private set; }
 
-        public override Vector2 InitialSize => new Vector2(160f, 80f);
+        public override Vector2 InitialSize => new Vector2(180f, 80f);
 
         protected override float Margin => 5f;
 
@@ -46,19 +53,43 @@ namespace PrepareLanding.Gui.Window
         {
             var rect = inRect;
 
-            rect.width = InitialSize.x - Margin * 2 - MaximizeButtonWidth - 5f;
-            rect.height = 30;
-            rect.y = (InitialSize.y - Margin - rect.height) / 2f;
+            // set up column size
+            _listingStandard.ColumnWidth = inRect.width;
 
-            Verse.Widgets.Label(rect, WindowLabel);
+            // begin Rect position
+            _listingStandard.Begin(rect);
 
-            var buttonRect = rect;
-            buttonRect.x += rect.width + 5f;
-            buttonRect.width = MaximizeButtonWidth;
-            if (Verse.Widgets.ButtonText(buttonRect, "▲", true, true))
+            // get a Rect for the next label (without actually 'allocating' it in the Listing_Standard)
+            var nextRect = _listingStandard.VirtualRect(30f);
+            // split the Rect
+            var labelRect = nextRect.LeftPart(0.9f);
+            var buttonRect = nextRect.RightPart(0.1f);
+
+            _listingStandard.GetRect(30f);
+            GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
+            Verse.Widgets.Label(labelRect, WindowLabel);
+            GenUI.ResetLabelAlign();
+
+            if (Verse.Widgets.ButtonText(buttonRect, "▲"))
                 Close();
 
             TooltipHandler.TipRegion(buttonRect, "Maximize Window");
+
+            _listingStandard.GapLine();
+
+            AddMinimizedWindowContent?.Invoke(_listingStandard, inRect);
+
+            // check if the height changed (meaning new content was added)
+            if (Math.Abs(windowRect.height - InitialSize.y) > 1f && !_minimizedWindowHasAddedContent)
+            {
+                // recalculate position
+                windowRect.y = (UI.screenHeight - windowRect.height) / 2;
+
+                // do it only once
+                _minimizedWindowHasAddedContent = true;
+            }
+
+            _listingStandard.End();
         }
 
         protected override void SetInitialSizeAndPosition()
@@ -75,12 +106,14 @@ namespace PrepareLanding.Gui.Window
             Find.WindowStack.Add(_parentWindow);
             OnMinimizedWindowClosed.Invoke();
             Closed = true;
+            _minimizedWindowHasAddedContent = false;
         }
 
         public override void PreOpen()
         {
             base.PreOpen();
             Closed = false;
+            _minimizedWindowHasAddedContent = false;
         }
     }
 }
