@@ -22,7 +22,7 @@ namespace PrepareLanding.Gui.Window
         {
             if (MinimizedWindow == null)
             {
-                Log.ErrorOnce("[PrepareLanding] Trying to minimize while there no MinimizedWindow window available.",
+                Log.ErrorOnce("[PrepareLanding] Trying to minimize while there is no MinimizedWindow window available.",
                     0x1234cafe);
                 return;
             }
@@ -37,7 +37,7 @@ namespace PrepareLanding.Gui.Window
         {
             if (MinimizedWindow == null)
             {
-                Log.ErrorOnce("[PrepareLanding] Trying to maximize while there no MinimizedWindow window available.",
+                Log.ErrorOnce("[PrepareLanding] Trying to maximize while there is no MinimizedWindow window available.",
                     0x1236cafe);
                 return;
             }
