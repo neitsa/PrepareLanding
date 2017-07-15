@@ -42,5 +42,25 @@ namespace PrepareLanding.Extensions
 
             Widgets.EndScrollView();
         }
+
+        public static float StartCaptureHeight(this Listing_Standard ls)
+        {
+            return ls.CurHeight;
+        }
+
+        public static Rect EndCaptureHeight(this Listing_Standard ls, float startHeight)
+        {
+            var r = ls.GetRect(0f);
+            r.y = startHeight;
+            r.height = ls.CurHeight - startHeight;
+            return r;
+        }
+
+        public static Rect VirtualRect(this Listing_Standard ls, float height)
+        {
+            var r = ls.GetRect(0f);
+            r.height = height;
+            return r;
+        }
     }
 }
