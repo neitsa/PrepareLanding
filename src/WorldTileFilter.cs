@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using PrepareLanding.Extensions;
 using PrepareLanding.Filters;
 using RimWorld.Planet;
 using Verse;
@@ -212,6 +213,9 @@ namespace PrepareLanding
             // remove all previously highlighted tiles on the world map
             PrepareLanding.Instance.TileHighlighter.RemoveAllTiles();
 
+            var separator = "-".Repeat(40);
+            FilterInfo.AppendMessage($"{separator}\nNew Filtering\n{separator}");
+
             // filter tiles
             var result = new List<int>();
             var firstUnionDone = false;
@@ -260,7 +264,11 @@ namespace PrepareLanding
             // all results into one list
             _matchingTileIds.AddRange(result);
 
-            FilterInfo.AppendMessage($"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
+            if(_matchingTileIds.Count == 0)
+                FilterInfo.AppendErrorMessage("No tile matches the given filter(s).", sendToLog: true);
+            else
+                FilterInfo.AppendSuccessMessage($"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
+
 
             // highlight filtered tiles
             PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
