@@ -141,6 +141,7 @@ namespace PrepareLanding
 
         public void ClearMatchingTiles()
         {
+            FilterInfoLogger.AppendWarningMessage("Filtered files cleared.");
             _matchingTileIds.Clear();
         }
 
