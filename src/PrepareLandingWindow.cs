@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using PrepareLanding.Collections;
 using PrepareLanding.Extensions;
 using PrepareLanding.Gui.Tab;
 using PrepareLanding.Gui.Window;
@@ -16,6 +18,8 @@ namespace PrepareLanding
         private readonly float _gapBetweenButtons = 10f;
 
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
+
+        private readonly PairList<string, Action> _bottomButtonsPairList;
 
         public TabGuiUtilityController TabController { get; } = new TabGuiUtilityController();
 
@@ -42,6 +46,42 @@ namespace PrepareLanding
 
             TabController.Clear();
             TabController.AddTabRange(_tabGuiUtilities);
+
+            /*
+             * Bottom buttons
+             */
+
+            _bottomButtonsPairList = new PairList<string, Action>
+            {
+                {
+                    "Filter Tiles", delegate
+                    {
+                        SoundDefOf.TickLow.PlayOneShotOnCamera();
+                        PrepareLanding.Instance.TileFilter.Filter();
+                    }
+                },
+                {
+                    "Reset Filters", delegate
+                    {
+                        SoundDefOf.TickLow.PlayOneShotOnCamera();
+                        PrepareLanding.Instance.UserData.ResetAllFields();
+                    }
+                },
+                {
+                    "Minimize", delegate
+                    {
+                        SoundDefOf.TickHigh.PlayOneShotOnCamera();
+                        Minimize();
+                    }
+                },
+                {
+                    "CloseButton".Translate(), delegate
+                    {
+                        SoundDefOf.TickHigh.PlayOneShotOnCamera();
+                        Close();
+                    }
+                }
+            };
         }
 
         protected override float Margin => 0f;
@@ -74,7 +114,7 @@ namespace PrepareLanding
 
         protected void DoBottomsButtons(Rect inRect)
         {
-            const uint numButtons = 3;
+           var numButtons = _bottomButtonsPairList.Count;
             var buttonsY = windowRect.height - 55f;
 
             var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
@@ -85,22 +125,14 @@ namespace PrepareLanding
                 return;
             }
 
-            if (Widgets.ButtonText(buttonsRect[0], "Filter"))
+            for (var i = 0; i < _bottomButtonsPairList.Count; i++)
             {
-                SoundDefOf.TickLow.PlayOneShotOnCamera();
-                PrepareLanding.Instance.TileFilter.Filter();
-            }
+                var buttonPairList = _bottomButtonsPairList[i];
+                var name = buttonPairList.Key;
+                var action = buttonPairList.Value;
 
-            if (Widgets.ButtonText(buttonsRect[1], "Minimize"))
-            {
-                SoundDefOf.TickHigh.PlayOneShotOnCamera();
-                Minimize();
-            }
-
-            if (Widgets.ButtonText(buttonsRect[2], "CloseButton".Translate()))
-            {
-                SoundDefOf.TickHigh.PlayOneShotOnCamera();
-                Close();
+                if (Widgets.ButtonText(buttonsRect[i], name))
+                    action();
             }
         }
     }
