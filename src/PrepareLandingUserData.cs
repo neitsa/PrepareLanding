@@ -142,6 +142,11 @@ namespace PrepareLanding
 
         protected void ExecuteOnWorldGenerated()
         {
+            ResetAllFields();
+        }
+
+        public void ResetAllFields()
+        {
             /*
              * TERRAIN related fields
              */
