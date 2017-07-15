@@ -268,13 +268,17 @@ namespace PrepareLanding
 
         private bool FilterPreCheck()
         {
-            // clear filter info
-            FilterInfo.Clear();
+            if (_userData.AreAllFieldsInDefaultSate())
+            {
+                FilterInfo.AppendErrorMessage("All filters are in their default state, please select at least one filter.");
+                return false;
+            }
 
             var filteredBiomes = _allFilters[nameof(_userData.ChosenBiome)].FilteredTiles;
             var filteredHilliness = _allFilters[nameof(_userData.ChosenHilliness)].FilteredTiles;
 
             // advise user that filtering all tiles without preselected biomes or hilliness is not advised (on world coverage >= 50%)
+            //  as it takes too much times with some filter, so it's better to narrow down the filtering.
             if (Find.World.info.planetCoverage >= 0.5f)
                 if (filteredBiomes.Count == 0 || filteredHilliness.Count == 0 ||
                     filteredBiomes.Count == _allValidTileIds.Count || filteredHilliness.Count == _allValidTileIds.Count)

@@ -188,6 +188,62 @@ namespace PrepareLanding
             InitUsableMinMaxNumericItem(RainFall, nameof(RainFall));
         }
 
+        public bool AreAllFieldsInDefaultSate()
+        {
+            if (_chosenBiome != null)
+                return false;
+
+            if (_chosenHilliness != Hilliness.Undefined)
+                return false;
+
+            if (_chosenCoastalTileState != MultiCheckboxState.Partial)
+                return false;
+
+            if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
+                return false;
+
+            if (SelectedRoadDefs.Any(roadDef => roadDef.Value.State != MultiCheckboxState.Partial))
+                return false;
+
+            if (SelectedRiverDefs.Any(riverDef => riverDef.Value.State != MultiCheckboxState.Partial))
+                return false;
+
+            if (SelectedStoneDefs.Any(stoneDef => stoneDef.Value.State != MultiCheckboxState.Partial))
+                return false;
+
+            if (CurrentMovementTime.Use)
+                return false;
+
+            if (SummerMovementTime.Use)
+                return false;
+
+            if (WinterMovementTime.Use)
+                return false;
+
+            if (Elevation.Use)
+                return false;
+
+            if (TimeZone.Use)
+                return false;
+
+            if (AverageTemperature.Use)
+                return false;
+
+            if (WinterTemperature.Use)
+                return false;
+
+            if (SummerTemperature.Use)
+                return false;
+
+            if (GrowingPeriod.Use)
+                return false;
+
+            if (RainFall.Use)
+                return false;
+
+            return true;
+        }
+
         protected void ExecuteOnDefsLoaded()
         {
             // biome definitions list
