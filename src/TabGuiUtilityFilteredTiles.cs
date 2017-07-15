@@ -64,10 +64,9 @@ namespace PrepareLanding
                 var selectedTile = Find.World.grid[selectedTileId];
 
                 var vector = Find.WorldGrid.LongLatOf(selectedTileId);
-                stringBuilder.Append($"{vector.y.ToStringLatitude()} {vector.x.ToStringLongitude()} - {selectedTile.biome.LabelCap} ; {selectedTileId}");
+                stringBuilder.Append($"{i}: {vector.y.ToStringLatitude()} {vector.x.ToStringLongitude()} - {selectedTile.biome.LabelCap} ; {selectedTileId}");
 
                 var labelRect = innerLs.GetRect(DefaultElementHeight);
-                labelRect.width -= 20f;
 
                 var selected = i == _selectedTileIndex;
                 if (Gui.Widgets.LabelSelectable(labelRect, stringBuilder.ToString(), ref selected))
