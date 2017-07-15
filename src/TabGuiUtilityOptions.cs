@@ -34,10 +34,8 @@ namespace PrepareLanding
 
         protected virtual void DrawOptions()
         {
-            //TODO: reset all filters to their default state
-
             ListingStandard.CheckboxLabeled("Allow Live Filtering", ref _allowLiveFiltering,
-                "Allow filtering without pressing the \"Filter\" button.");
+                "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
             _userData.AllowLiveFiltering = _allowLiveFiltering;
 
             //TODO: allow unimplemented biomes
@@ -52,7 +50,7 @@ namespace PrepareLanding
             PrepareLanding.Instance.TileHighlighter.ShowDebugTileId = _showDebugTileId;
 
             ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref _bypassMaxHighlightedTiles,
-                $"Allow to highlight more than {TileHighlighter.MaxHighlightedTiles} tiles.");
+                $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
             PrepareLanding.Instance.TileHighlighter.BypassMaxHighlightedTiles = _bypassMaxHighlightedTiles;
         }
     }
