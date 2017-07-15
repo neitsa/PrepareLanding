@@ -125,6 +125,47 @@ namespace PrepareLanding.Gui
             return Verse.Widgets.ButtonImage(butRect, Minus);
         }
 
+        public static bool LabelSelectable(Rect rect, string label, ref bool selected)
+        {
+            if (selected)
+            {
+                DrawHighlightColor(rect, Color.green, 0.5f);
+            }
+            else
+            {
+                Verse.Widgets.DrawHighlight(rect.ContractedByButLeft(5f));
+            }
+
+            Verse.Widgets.DrawHighlightIfMouseover(rect);
+
+            GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
+            Verse.Widgets.Label(rect, label);
+            GenUI.ResetLabelAlign();
+
+
+            var flag = selected;
+            var butRect = rect;
+            butRect.width -= 5f;
+            if (!selected && Verse.Widgets.ButtonInvisible(butRect))
+            {
+                SoundDefOf.TickTiny.PlayOneShotOnCamera();
+                selected = true;
+            }
+
+            return selected && !flag;
+        }
+
+        public static void DrawHighlightColor(Rect rect, Color color, float alpha)
+        {
+            var savedColor = GUI.color;
+            var newColor = color;
+            newColor.a = alpha;
+            GUI.color = newColor;
+            GUI.DrawTexture(rect, TexUI.HighlightTex);
+            GUI.color = savedColor;
+        }
+    
+
         #region TEXTFIELDNUMERIC
 
         public static void TextFieldNumericLabeled<T>(Rect rect, string label, ref T val, ref string buffer,
