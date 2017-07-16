@@ -389,9 +389,8 @@ namespace PrepareLanding
             if (!PrepareLanding.Instance.UserData.AllowLiveFiltering)
                 return;
 
-            // get the filter according to the property that changed in the user data.
-            ITileFilter tileFilter;
-            if (!_allFilters.TryGetValue(e.PropertyName, out tileFilter))
+            // defensive check to see if the filter exists.
+            if (!_allFilters.ContainsKey(e.PropertyName))
             {
                 Log.Message(
                     $"[PrepareLanding] [OnUserDataPropertyChanged] An unknown property name was passed: {e.PropertyName}");
@@ -399,8 +398,8 @@ namespace PrepareLanding
                 return;
             }
 
-            // call the filter
-            tileFilter.FilterAction(_allValidTileIds);
+            // filter now
+            Filter();
         }
 
         #region PREDICATES
