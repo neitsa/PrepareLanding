@@ -112,7 +112,7 @@ namespace PrepareLanding
 
             ListingStandard.Gap();
 
-            var text = PrepareLanding.Instance.TileFilter.FilterInfoText;
+            var text = PrepareLanding.Instance.TileFilter.FilterInfoLogger.Text;
             if (text.NullOrEmpty())
                 return;
 
