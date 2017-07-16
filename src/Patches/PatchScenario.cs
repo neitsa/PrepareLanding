@@ -17,9 +17,23 @@ namespace PrepareLanding.Patches
         public static bool GetFirstConfigPagePrefix(Scenario __instance)
         {
             Log.Message("[PrepareLanding] [prefix] Patching RimWorld.Page_SelectLandingSite.GetFirstConfigPage");
-            if (PrepareLanding.Instance == null || !PrepareLanding.Instance.ModIsActive)
+
+            // do not execute the patch if the main instance is null or the mod is not active.
+            if (PrepareLanding.Instance == null || !PrepareLanding.Instance.ModIsActive )
             {
-                Log.Message("[PrepareLanding] [prefix] Prefix will not be executed.");
+                var reason = string.Empty;
+                if (PrepareLanding.Instance == null)
+                    reason = "No main instance";
+                else
+                {
+                    if (!PrepareLanding.Instance.ModIsActive)
+                        reason = "Mod is not active";
+                }
+
+                Log.Message($"[PrepareLanding] [prefix] Prefix will not be executed. Reason: {reason}");
+
+                _prefixHasExecuted = false;
+
                 return true;
             }
 
@@ -65,17 +79,22 @@ namespace PrepareLanding.Patches
             // access private field "parts" of scenario instance.
             var fi = AccessTools.Field(typeof(Scenario), "parts");
             var parts = (List<ScenPart>) fi.GetValue(instance);
-            if (parts == null)
+            if (parts == null) // note: this shouldn't happen
             {
                 Log.Message("[PrepareLanding] List<ScenPart> parts is null in scenario");
                 return null;
             }
 
+            if (TutorSystem.TutorialMode)
+                Log.Message("[PrepareLanding] Tutorial mode detected: instantiating RimWorld code rather than our own.");
+
             var list = new List<Page>
             {
                 new Page_SelectStoryteller(),
                 new Page_CreateWorldParams(),
-                new SelectLandingSite() // note: we use our class here, replacing the RimWorld Page_SelectLandingSite class
+                // note: we use our class here, replacing the RimWorld Page_SelectLandingSite class
+                //  if not in tutorial mode, otherwise we instantiate the normal RimWorld code.
+                !TutorSystem.TutorialMode ? new SelectLandingSite() : new Page_SelectLandingSite()
             };
 
             foreach (var current in parts.SelectMany(p => p.GetConfigPages()))

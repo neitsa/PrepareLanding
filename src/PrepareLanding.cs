@@ -3,6 +3,7 @@ using HugsLib;
 using HugsLib.Utils;
 using PrepareLanding.Gui.World;
 using PrepareLanding.Patches;
+using Verse;
 
 //TODO: general TODO -> translate all GUI strings.
 
@@ -93,9 +94,11 @@ namespace PrepareLanding
         /// </summary>
         public override void DefsLoaded()
         {
-            //TODO: check somewhere that we aren't in tutorial mode... see TutorSystem.TutorialMode
             if (!ModIsActive)
+            {
+                Log.Message("[PrepareLanding] DefsLoaded: Mod is not active, bailing out.");
                 return;
+            }
 
             Logger.Message("DefsLoaded");
 
