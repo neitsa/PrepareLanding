@@ -102,8 +102,10 @@ namespace PrepareLanding
             // main instance to keep user choices on our GUI.
             UserData = new PrepareLandingUserData();
 
-            // note: the following constructor should be called after the above events have been set
+            // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter();
+            Instance.OnWorldInterfaceOnGui += TileHighlighter.HighlightedTileDrawerOnGui;
+            Instance.OnWorldInterfaceUpdate += TileHighlighter.HighlightedTileDrawerUpdate;
         }
 
         /// <summary>

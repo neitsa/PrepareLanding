@@ -20,9 +20,6 @@ namespace PrepareLanding.Gui.World
 
         public TileHighlighter()
         {
-            PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
-            PrepareLanding.Instance.OnWorldInterfaceUpdate += HighlightedTileDrawerUpdate;
-
             _defaultMaterial.color = TileColor;
         }
 
@@ -71,14 +68,14 @@ namespace PrepareLanding.Gui.World
             _highlightedTiles.Clear();
         }
 
-        protected void HighlightedTileDrawerUpdate()
+        public void HighlightedTileDrawerUpdate()
         {
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < _highlightedTiles.Count; i++)
                 _highlightedTiles[i].Draw();
         }
 
-        protected void HighlightedTileDrawerOnGui()
+        public void HighlightedTileDrawerOnGui()
         {
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleCenter;
