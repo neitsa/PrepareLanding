@@ -103,7 +103,7 @@ namespace PrepareLanding.Patches
 
             #region INSERTED_CODE
 
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Prepare Landing!"))
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Prepare Landing"))
             {
                 Log.Message("[PrepareLanding] Page button pressed!");
 
