@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using PrepareLanding.Extensions;
 using PrepareLanding.Filters;
@@ -10,7 +11,8 @@ namespace PrepareLanding
 {
     public class TabGuiUtilityInfo : TabGuiUtility
     {
-        private readonly GUIStyle _style;
+        private readonly GUIStyle _styleWorldInfo;
+        private readonly GUIStyle _styleFilterInfo;
 
         private Vector2 _scrollPosWorldInfo;
         private Vector2 _scrollPosFilterInfo;
@@ -20,7 +22,14 @@ namespace PrepareLanding
         public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            _style = new GUIStyle(Text.textFieldStyles[1])
+            _styleWorldInfo = new GUIStyle(Text.textAreaReadOnlyStyles[2])
+            {
+                alignment = TextAnchor.UpperLeft,
+                wordWrap = true,
+                richText = true
+            };
+
+            _styleFilterInfo = new GUIStyle(Text.textFieldStyles[1])
             {
                 alignment = TextAnchor.UpperLeft,
                 wordWrap = true,
@@ -59,9 +68,14 @@ namespace PrepareLanding
                 {
                     stringBuilder.AppendLine("Biomes: (number of tiles)");
                     var biomes = PrepareLanding.Instance.UserData.BiomeDefs;
+
+                    //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
+                    //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
+
                     foreach (var biome in biomes)
                     {
                         var count = TileFilterBiomes.NumberOfTilesByBiome(biome, allValidTiles);
+                        //stringBuilder.AppendLine($"    {biome.LabelCap.PadRight(longestBiomeName)} ➠ {count}");
                         stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
                     }
                 }
@@ -83,20 +97,15 @@ namespace PrepareLanding
         {
             DrawEntryHeader("World Info", backgroundColor: Color.yellow);
 
-            var originalFont = Text.Font;
-            Text.Font = GameFont.Medium;
-
-            var maxHeight = InRect.height - ListingStandard.CurHeight;
+            var maxHeight = InRect.height - ListingStandard.CurHeight - 30f;
             var scrollHeight = Text.CalcHeight(WorldInfo, ListingStandard.ColumnWidth);
             scrollHeight = Mathf.Max(maxHeight, scrollHeight);
 
             var innerLs = ListingStandard.BeginScrollView(maxHeight, scrollHeight, ref _scrollPosWorldInfo);
 
-            Widgets.Label(innerLs.GetRect(maxHeight), WorldInfo);
+            GUI.TextField(innerLs.GetRect(maxHeight), WorldInfo, _styleWorldInfo);
 
             ListingStandard.EndScrollView(innerLs);
-
-            Text.Font = originalFont;
         }
 
         protected virtual void DrawFilterInfo()
@@ -120,7 +129,7 @@ namespace PrepareLanding
 
             var innerLs = ListingStandard.BeginScrollView(maxHeight, scrollHeight, ref _scrollPosFilterInfo);
 
-            GUI.TextField(innerLs.GetRect(maxHeight), text, _style);
+            GUI.TextField(innerLs.GetRect(maxHeight), text, _styleFilterInfo);
 
             ListingStandard.EndScrollView(innerLs);
         }
