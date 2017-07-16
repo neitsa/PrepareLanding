@@ -7,10 +7,13 @@ namespace PrepareLanding
     public class TabGuiUtilityOptions : TabGuiUtility
     {
         private readonly PrepareLandingUserData _userData;
+
         private bool _allowLiveFiltering;
         private bool _allowImpassableHilliness;
         private bool _bypassMaxHighlightedTiles;
         private bool _showDebugTileId;
+        private bool _disablePreFilterCheck;
+
 
         public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -37,24 +40,29 @@ namespace PrepareLanding
         {
             ListingStandard.CheckboxLabeled("Allow Live Filtering", ref _allowLiveFiltering,
                 "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
-            _userData.AllowLiveFiltering = _allowLiveFiltering;
+            _userData.Options.AllowLiveFiltering = _allowLiveFiltering;
 
             //TODO: allow unimplemented biomes
 
             ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref _allowImpassableHilliness,
                 "Allow selection and filtering of impassable tiles.");
-            _userData.AllowImpassableHilliness = _allowImpassableHilliness;
+            _userData.Options.AllowImpassableHilliness = _allowImpassableHilliness;
 
             //TODO: allow saving / reading the set of currently applied filters
 
             // allow to show the debug tile ID on the highlighted tile (instead of 'X')
             ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref _showDebugTileId,
                 "Show the Debug Tile ID (instead of 'X') for the highlighted tiles.");
-            PrepareLanding.Instance.TileHighlighter.ShowDebugTileId = _showDebugTileId;
+            _userData.Options.ShowDebugTileId = _showDebugTileId;
 
             ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref _bypassMaxHighlightedTiles,
                 $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
-            PrepareLanding.Instance.TileHighlighter.BypassMaxHighlightedTiles = _bypassMaxHighlightedTiles;
+            _userData.Options.BypassMaxHighlightedTiles = _bypassMaxHighlightedTiles;
+
+            ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref _disablePreFilterCheck,
+                "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
+            _userData.Options.DisablePreFilterCheck = _disablePreFilterCheck;
+
         }
     }
 }

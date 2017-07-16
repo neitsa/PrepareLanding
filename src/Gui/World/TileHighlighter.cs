@@ -33,10 +33,6 @@ namespace PrepareLanding.Gui.World
             }
         }
 
-        public bool ShowDebugTileId { get; set; }
-
-        public bool BypassMaxHighlightedTiles { get; set; }
-
         internal void HighlightTile(int tile, float colorPct = 0f, string text = null)
         {
             var highlightedTile = new HighlightedTile(tile, colorPct, text);
@@ -46,15 +42,16 @@ namespace PrepareLanding.Gui.World
         public void HighlightTileList(List<int> tileList)
         {
             // do not highlight too many tiles (otherwise the slow down is noticeable)
-            if (!BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
+            if (!PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
             {
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     $"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
                 return;
             }
 
+            var showTileId = PrepareLanding.Instance.UserData.Options.ShowDebugTileId;
             foreach (var tileId in tileList)
-                HighlightTile(tileId, _defaultMaterial, ShowDebugTileId ? tileId.ToString() : "X");
+                HighlightTile(tileId, _defaultMaterial, showTileId ? tileId.ToString() : "X");
         }
 
         public void HighlightTile(int tile, Material mat, string text = null)

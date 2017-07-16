@@ -170,7 +170,7 @@ namespace PrepareLanding
             // check if live filtering is allowed or not:
             //  - If it's allowed we filter directly.
             //  - If it's not allowed, we filter everything on a queued long event.
-            if (PrepareLanding.Instance.UserData.AllowLiveFiltering)
+            if (_userData.Options.AllowLiveFiltering)
                 FilterTiles();
             else
                 LongEventHandler.QueueLongEvent(FilterTiles, "[PrepareLanding] Filtering World Tiles", true, null);
@@ -323,19 +323,17 @@ namespace PrepareLanding
                 return false;
             }
 
-            // get the filtered biomes and terrains (hilliness)
-            var filteredBiomes = _allFilters[nameof(_userData.ChosenBiome)].FilteredTiles;
-            var filteredHilliness = _allFilters[nameof(_userData.ChosenHilliness)].FilteredTiles;
-
             // advise user that filtering all tiles without preselected biomes or hilliness is not advised (with a world coverage >= 50%)
             //  as it takes too much times with some filter, so it would be better to narrow down the filtering.
             if (Find.World.info.planetCoverage >= 0.5f)
-                if (filteredBiomes.Count == 0 || filteredHilliness.Count == 0 ||
-                    filteredBiomes.Count == _allValidTileIds.Count || filteredHilliness.Count == _allValidTileIds.Count)
+                if (!_userData.Options.DisablePreFilterCheck)
                 {
-                    FilterInfoLogger.AppendErrorMessage(
-                        "No biome and no terrain selected for a Planet coverage >= 50%\n\tPlease select a biome and a terrain first.");
-                    return false;
+                    if (_userData.ChosenBiome == null || _userData.ChosenHilliness == Hilliness.Undefined)
+                    {
+                        FilterInfoLogger.AppendErrorMessage(
+                            "No biome and no terrain selected for a Planet coverage >= 50%\n\tPlease select a biome and a terrain first.");
+                        return false;
+                    }
                 }
 
             return true;
@@ -350,7 +348,7 @@ namespace PrepareLanding
         {
             //TODO: also use a dictionary and Action for this kind of event
             // options checks
-            if (e.PropertyName == nameof(_userData.AllowImpassableHilliness))
+            if (e.PropertyName == nameof(_userData.Options.AllowImpassableHilliness))
             {
                 // rebuild the valid tiles list
                 PrefilterQueueLongEvent();
@@ -358,7 +356,7 @@ namespace PrepareLanding
             }
 
             // check if live filtering is allowed or not. If it's not allowed, we filter everything on the 'Filter' button push.
-            if (!PrepareLanding.Instance.UserData.AllowLiveFiltering)
+            if (!PrepareLanding.Instance.UserData.Options.AllowLiveFiltering)
                 return;
 
             // defensive check to see if the filter exists.
@@ -435,7 +433,7 @@ namespace PrepareLanding
         {
             var tile = Find.World.grid[tileId];
 
-            var impassableTilesCondition = _userData.AllowImpassableHilliness || tile.hilliness != Hilliness.Impassable;
+            var impassableTilesCondition = _userData.Options.AllowImpassableHilliness || tile.hilliness != Hilliness.Impassable;
 
             // we must be able to build a base, the tile biome must be implemented and the tile itself must not be impassable
             // Side note on tile.WaterCovered: this doesn't work for sea ice biomes as elevation is < 0, but sea ice is a perfectly valid biome where to settle.

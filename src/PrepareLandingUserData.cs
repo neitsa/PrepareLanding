@@ -19,14 +19,22 @@ namespace PrepareLanding
         /// <summary>
         ///     Class constructor.
         /// </summary>
-        public PrepareLandingUserData()
+        public PrepareLandingUserData(PrepareLandingFilterOptions options)
         {
             // get alerted when RimWorld has loaded its definition (Defs) files
             PrepareLanding.Instance.OnDefsLoaded += ExecuteOnDefsLoaded;
 
             // get alerted when RimWorld has finished generating the world
             PrepareLanding.Instance.OnWorldGenerated += ExecuteOnWorldGenerated;
+
+            // save options
+            Options = options;
         }
+
+        /// <summary>
+        /// Filter Options (from the GUI window 'options' tab).
+        /// </summary>
+        public PrepareLandingFilterOptions Options { get; }
 
         /// <summary>
         ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.
@@ -56,32 +64,6 @@ namespace PrepareLanding
         ///     All known hilliness (<see cref="Hilliness" />) from RimWorld.
         /// </summary>
         public ReadOnlyCollection<Hilliness> HillinessCollection => _hillinesses.AsReadOnly();
-
-        /// <summary>
-        ///     Allow "live filtering" or not (user doesn't have to click the filter button if active: filtering is done on the
-        ///     fly).
-        /// </summary>
-        public bool AllowLiveFiltering { get; set; }
-
-        /// <summary>
-        /// Allow selection of impassable tiles if true.
-        /// </summary>
-        public bool AllowImpassableHilliness
-        {
-            get { return _allowImpassableHilliness; }
-            set
-            {
-                if (value == _allowImpassableHilliness)
-                    return;
-
-                _allowImpassableHilliness = value;
-
-                // rebuild list of hillinesses
-                _hillinesses = BuildHillinessValues();
-
-                OnPropertyChanged(nameof(AllowImpassableHilliness));
-            }
-        }
 
         /// <summary>
         ///     Current user selected biome.
@@ -486,8 +468,11 @@ namespace PrepareLanding
         /// <returns>A list of all available RimWorld hillinesses (<see cref="Hilliness" />).</returns>
         protected List<Hilliness> BuildHillinessValues()
         {
+            // get all possible enumeration values for hilliness
             var hillinesses = Enum.GetValues(typeof(Hilliness)).Cast<Hilliness>().ToList();
-            if (AllowImpassableHilliness)
+
+            // check if impassable tiles are allowed
+            if (Options.AllowImpassableHilliness)
                 return hillinesses;
 
             // remove impassable hilliness if not asked specifically for it.
@@ -511,7 +496,6 @@ namespace PrepareLanding
 
         private bool _allowCantBuildBase;
         private bool _allowUnimplementedBiomes;
-        private bool _allowImpassableHilliness;
 
         /// <summary>
         ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.

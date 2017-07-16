@@ -68,7 +68,7 @@ namespace PrepareLanding
                     "Reset Filters", delegate
                     {
                         SoundDefOf.TickLow.PlayOneShotOnCamera();
-                        PrepareLanding.Instance.UserData.ResetAllFields();
+                        userData.ResetAllFields();
                     }
                 },
                 {

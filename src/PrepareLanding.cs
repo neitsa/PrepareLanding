@@ -14,6 +14,11 @@ namespace PrepareLanding
     public class PrepareLanding : ModBase
     {
         /// <summary>
+        /// Filter Options (from the GUI window 'options' tab).
+        /// </summary>
+        private PrepareLandingFilterOptions _filterOptions;
+
+        /// <summary>
         ///     Main mod class constructor. Sets up the static instance.
         /// </summary>
         public PrepareLanding()
@@ -99,8 +104,11 @@ namespace PrepareLanding
             PatchWorldInterfaceOnGui.OnWorldInterfaceOnGui += WorldInterfaceOnGui;
             PatchWorldInterfaceUpdate.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
 
-            // main instance to keep user choices on our GUI.
-            UserData = new PrepareLandingUserData();
+            // various options show on the 'option' tab on the GUI.
+            _filterOptions = new PrepareLandingFilterOptions();
+
+            // main instance to keep user filter choices on the GUI.
+            UserData = new PrepareLandingUserData(_filterOptions);
 
             // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter();

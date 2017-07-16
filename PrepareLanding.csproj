@@ -82,6 +82,7 @@
     <Compile Include="src\Patches\PatchScenario.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
     <Compile Include="src\Patches\SelectLandingSite.cs" />
+    <Compile Include="src\PrepareLandingFilterOptions.cs" />
     <Compile Include="src\PrepareLandingUserData.cs" />
     <Compile Include="src\PrepareLanding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
