@@ -11,17 +11,15 @@ namespace PrepareLanding
     public class TabGuiUtilityInfo : TabGuiUtility
     {
         private readonly GUIStyle _style;
-        //private readonly PrepareLandingUserData _userData;
 
         private Vector2 _scrollPosWorldInfo;
+        private Vector2 _scrollPosFilterInfo;
 
         private string _worldInfo;
 
         public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            //_userData = userData;
-
             _style = new GUIStyle(Text.textFieldStyles[1])
             {
                 alignment = TextAnchor.UpperLeft,
@@ -120,7 +118,7 @@ namespace PrepareLanding
             var scrollHeight = Text.CalcHeight(text, ListingStandard.ColumnWidth);
             scrollHeight = Mathf.Max(maxHeight, scrollHeight);
 
-            var innerLs = ListingStandard.BeginScrollView(maxHeight, scrollHeight, ref _scrollPosWorldInfo);
+            var innerLs = ListingStandard.BeginScrollView(maxHeight, scrollHeight, ref _scrollPosFilterInfo);
 
             GUI.TextField(innerLs.GetRect(maxHeight), text, _style);
 
