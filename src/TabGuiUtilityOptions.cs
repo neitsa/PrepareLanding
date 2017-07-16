@@ -8,6 +8,7 @@ namespace PrepareLanding
     {
         private readonly PrepareLandingUserData _userData;
         private bool _allowLiveFiltering;
+        private bool _allowImpassableHilliness;
         private bool _bypassMaxHighlightedTiles;
         private bool _showDebugTileId;
 
@@ -40,7 +41,9 @@ namespace PrepareLanding
 
             //TODO: allow unimplemented biomes
 
-            //TODO: allow selection of impassable tiles
+            ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref _allowImpassableHilliness,
+                "Allow selection and filtering of impassable tiles.");
+            _userData.AllowImpassableHilliness = _allowImpassableHilliness;
 
             //TODO: allow saving / reading the set of currently applied filters
 

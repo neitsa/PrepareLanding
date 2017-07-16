@@ -64,6 +64,26 @@ namespace PrepareLanding
         public bool AllowLiveFiltering { get; set; }
 
         /// <summary>
+        /// Allow selection of impassable tiles if true.
+        /// </summary>
+        public bool AllowImpassableHilliness
+        {
+            get { return _allowImpassableHilliness; }
+            set
+            {
+                if (value == _allowImpassableHilliness)
+                    return;
+
+                _allowImpassableHilliness = value;
+
+                // rebuild list of hillinesses
+                _hillinesses = BuildHillinessValues();
+
+                OnPropertyChanged(nameof(AllowImpassableHilliness));
+            }
+        }
+
+        /// <summary>
         ///     Current user selected biome.
         /// </summary>
         public BiomeDef ChosenBiome
@@ -466,8 +486,15 @@ namespace PrepareLanding
         /// <returns>A list of all available RimWorld hillinesses (<see cref="Hilliness" />).</returns>
         protected List<Hilliness> BuildHillinessValues()
         {
-            //TODO: disable "impassable" hilliness except if explicitly asked for (debug menu or something like that)
-            return Enum.GetValues(typeof(Hilliness)).Cast<Hilliness>().ToList();
+            var hillinesses = Enum.GetValues(typeof(Hilliness)).Cast<Hilliness>().ToList();
+            if (AllowImpassableHilliness)
+                return hillinesses;
+
+            // remove impassable hilliness if not asked specifically for it.
+            if (!hillinesses.Remove(Hilliness.Impassable))
+                Log.Message("[PrepareLanding] Couldn't remove Impassable hilliness.");
+
+            return hillinesses;
         }
 
         /// <summary>
@@ -484,6 +511,7 @@ namespace PrepareLanding
 
         private bool _allowCantBuildBase;
         private bool _allowUnimplementedBiomes;
+        private bool _allowImpassableHilliness;
 
         /// <summary>
         ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.

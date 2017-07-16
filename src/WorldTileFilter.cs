@@ -65,7 +65,7 @@ namespace PrepareLanding
             _userData.PropertyChanged += OnUserDataPropertyChanged;
 
             // be alerted when the world map is generated.
-            PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
+            PrepareLanding.Instance.OnWorldGenerated += PrefilterQueueLongEvent;
 
             // instantiate all existing filters
             _allFilters = new Dictionary<string, ITileFilter>
@@ -205,9 +205,9 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Called when the world map has been generated. We use it to pre-filter tiles.
+        ///     Called when the world map has been generated. We use it to pre-filter valid tiles.
         /// </summary>
-        protected void WorldGenerated()
+        protected void PrefilterQueueLongEvent()
         {
             LongEventHandler.QueueLongEvent(Prefilter, "[PrepareLanding] Prefiltering World Tiles", true, null);
         }
@@ -218,9 +218,10 @@ namespace PrepareLanding
         /// </summary>
         protected void Prefilter()
         {
-            //TODO allow user to use non valid tiles in their search
-
             Log.Message($"[PrepareLanding] Prefilter: {Find.WorldGrid.tiles.Count} tiles in WorldGrid.tiles");
+
+            var separator = "-".Repeat(80);
+            FilterInfoLogger.AppendMessage($"{separator}\nPreFiltering\n{separator}", textColor: Color.cyan);
 
             // clear all valid tile ids
             _allValidTileIds.Clear();
@@ -375,6 +376,15 @@ namespace PrepareLanding
         /// <param name="e">The argument of the event.</param>
         private void OnUserDataPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            //TODO: also use a dictionary and Action for this kind of event
+            // options checks
+            if (e.PropertyName == nameof(_userData.AllowImpassableHilliness))
+            {
+                // rebuild the valid tiles list
+                PrefilterQueueLongEvent();
+                return;
+            }
+
             // check if live filtering is allowed or not. If it's not allowed, we filter everything on the 'Filter' button push.
             if (!PrepareLanding.Instance.UserData.AllowLiveFiltering)
                 return;
@@ -418,13 +428,15 @@ namespace PrepareLanding
                    !thingDef.building.isResourceRock;
         }
 
-        public static bool IsViableTile(int tileId)
+        public bool IsViableTile(int tileId)
         {
             var tile = Find.World.grid[tileId];
 
+            var impassableTilesCondition = _userData.AllowImpassableHilliness || tile.hilliness != Hilliness.Impassable;
+
             // we must be able to build a base, the tile biome must be implemented and the tile itself must not be impassable
-            // Side note on tile.WaterCovered: this doesn't work for sea ice as elevation is < 0, but sea ice is a perfectly valid biome where to settle.
-            return tile.biome.canBuildBase && tile.biome.implemented && tile.hilliness != Hilliness.Impassable;
+            // Side note on tile.WaterCovered: this doesn't work for sea ice biomes as elevation is < 0, but sea ice is a perfectly valid biome where to settle.
+            return tile.biome.canBuildBase && tile.biome.implemented && impassableTilesCondition;
         }
 
         #endregion PREDICATES
