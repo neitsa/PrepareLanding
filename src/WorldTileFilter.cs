@@ -153,12 +153,17 @@ namespace PrepareLanding
         public ReadOnlyCollection<int> AllValidTilesReadOnly => _allValidTileIds.AsReadOnly();
 
         /// <summary>
-        ///     Clear all tiles that match a set of filters.
+        ///     Clear all tiles that match a set of filters. Also clear the highlighted tiles on the world map.
         /// </summary>
         public void ClearMatchingTiles()
         {
             FilterInfoLogger.AppendWarningMessage("Filtered files cleared.");
+
+            // clear the list of matched tiles.
             _matchingTileIds.Clear();
+
+            // clear also highlighted tiles, if any
+            PrepareLanding.Instance.TileHighlighter.RemoveAllTiles();
         }
 
         /// <summary>
@@ -237,11 +242,8 @@ namespace PrepareLanding
             if (!FilterPreCheck())
                 return;
 
-            // clear all previous matching tiles
+            // clear all previous matching tiles and remove all previously highlighted tiles on the world map
             ClearMatchingTiles();
-
-            // remove all previously highlighted tiles on the world map
-            PrepareLanding.Instance.TileHighlighter.RemoveAllTiles();
 
             var separator = "-".Repeat(80);
             FilterInfoLogger.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
