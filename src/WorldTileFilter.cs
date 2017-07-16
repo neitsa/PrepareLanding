@@ -17,34 +17,6 @@ namespace PrepareLanding
     public class WorldTileFilter
     {
         /// <summary>
-        ///     Dictionary used to keep all filters. Key is a property name from <see cref="PrepareLandingUserData" />. Value is a
-        ///     <see cref="ITileFilter" /> instance.
-        /// </summary>
-        private readonly Dictionary<string, ITileFilter> _allFilters;
-
-        /// <summary>
-        ///     Keeps all tiles IDs that are deemed as "valid". Valid tiles are found by <see cref="IsViableTile" /> method.
-        /// </summary>
-        private readonly List<int> _allValidTileIds = new List<int>();
-
-        /// <summary>
-        ///     List of tile IDs that are valid according to a set of filters (e.g only tiles from a specific biome or whatever the
-        ///     user has chosen).
-        /// </summary>
-        private readonly List<int> _matchingTileIds = new List<int>();
-
-        /// <summary>
-        ///     List of filters sorted by their <see cref="FilterHeaviness" />. The lighter (taking less time) are first while the
-        ///     heavier (probably taking a long time) come last.
-        /// </summary>
-        private readonly List<ITileFilter> _sortedFilters = new List<ITileFilter>();
-
-        /// <summary>
-        ///     A <see cref="PrepareLandingUserData" /> instance used to keep user choices on the GUI.
-        /// </summary>
-        private readonly PrepareLandingUserData _userData;
-
-        /// <summary>
         ///     Contains all tiles (from the world map) with at least one river in it.
         /// </summary>
         public ReadOnlyCollection<int> AllTilesWithRiver;
@@ -401,6 +373,38 @@ namespace PrepareLanding
             // filter now
             Filter();
         }
+
+        #region PRIVATE_FIELDS
+
+        /// <summary>
+        ///     Dictionary used to keep all filters. Key is a property name from <see cref="PrepareLandingUserData" />. Value is a
+        ///     <see cref="ITileFilter" /> instance.
+        /// </summary>
+        private readonly Dictionary<string, ITileFilter> _allFilters;
+
+        /// <summary>
+        ///     Keeps all tiles IDs that are deemed as "valid". Valid tiles are found by <see cref="IsViableTile" /> method.
+        /// </summary>
+        private readonly List<int> _allValidTileIds = new List<int>();
+
+        /// <summary>
+        ///     List of tile IDs that are valid according to a set of filters (e.g only tiles from a specific biome or whatever the
+        ///     user has chosen).
+        /// </summary>
+        private readonly List<int> _matchingTileIds = new List<int>();
+
+        /// <summary>
+        ///     List of filters sorted by their <see cref="FilterHeaviness" />. The lighter (taking less time) are first while the
+        ///     heavier (probably taking a long time) come last.
+        /// </summary>
+        private readonly List<ITileFilter> _sortedFilters = new List<ITileFilter>();
+
+        /// <summary>
+        ///     A <see cref="PrepareLandingUserData" /> instance used to keep user choices on the GUI.
+        /// </summary>
+        private readonly PrepareLandingUserData _userData;
+
+        #endregion PRIVATE_FIELDS
 
         #region PREDICATES
 
