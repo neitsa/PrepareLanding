@@ -124,7 +124,7 @@ namespace PrepareLanding.Gui
             return Verse.Widgets.ButtonImage(butRect, Minus);
         }
 
-        public static bool LabelSelectable(Rect rect, string label, ref bool selected)
+        public static bool LabelSelectable(Rect rect, string label, ref bool selected, TextAnchor textAnchor = TextAnchor.MiddleLeft)
         {
             if (selected)
             {
@@ -137,7 +137,7 @@ namespace PrepareLanding.Gui
 
             Verse.Widgets.DrawHighlightIfMouseover(rect);
 
-            GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
+            GenUI.SetLabelAlign(textAnchor);
             Verse.Widgets.Label(rect, label);
             GenUI.ResetLabelAlign();
 
