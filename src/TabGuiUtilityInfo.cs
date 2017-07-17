@@ -22,6 +22,7 @@ namespace PrepareLanding
         public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
+            // make new text styles
             _styleWorldInfo = new GUIStyle(Text.textAreaReadOnlyStyles[2])
             {
                 alignment = TextAnchor.UpperLeft,
@@ -35,6 +36,9 @@ namespace PrepareLanding
                 wordWrap = true,
                 richText = true
             };
+
+            // make sure world info is generated once again when a new world has been made.
+            PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
         }
 
         public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
@@ -91,6 +95,14 @@ namespace PrepareLanding
             NewColumn();
             DrawFilterInfo();
             End();
+        }
+
+        /// <summary>
+        /// Called when a new world map has been generated.
+        /// </summary>
+        protected void WorldGenerated()
+        {
+            _worldInfo = BuildWorldInfo();
         }
 
         protected virtual void DrawWorldInfo()
