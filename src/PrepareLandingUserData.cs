@@ -32,7 +32,7 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        /// Filter Options (from the GUI window 'options' tab).
+        ///     Filter Options (from the GUI window 'options' tab).
         /// </summary>
         public PrepareLandingFilterOptions Options { get; }
 
@@ -218,6 +218,7 @@ namespace PrepareLanding
             /*
              * TERRAIN related fields
              */
+
             _chosenBiome = null;
             _chosenHilliness = Hilliness.Undefined;
             _chosenCoastalTileState = MultiCheckboxState.Partial;
@@ -232,6 +233,8 @@ namespace PrepareLanding
             OrderedStoneDefs.Clear();
             foreach (var stoneEntry in SelectedStoneDefs)
                 OrderedStoneDefs.Add(stoneEntry.Key);
+            // order by name at first
+            OrderedStoneDefs.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
 
             // min / max numeric fields containers
             InitUsableMinMaxNumericItem(CurrentMovementTime, nameof(CurrentMovementTime));
