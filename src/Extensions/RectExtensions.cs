@@ -17,13 +17,13 @@ namespace PrepareLanding.Extensions
             }
 
             var sum = divisors.Take(divisors.Count).Sum();
-            if (sum > 1.0f) //TODO: check with an epsilon
+            if (sum > 1.0f)
             {
                 Log.Message("[PrepareLanding] SplitRectWidth has a sum > 1");
                 result.Clear();
                 return result;
             }
-            if (sum < 1.0f) //TODO: check with an epsilon
+            if (sum < 1.0f)
                 divisors.Add(1.0f - sum);
 
             var originalWidth = r.width;
