@@ -8,6 +8,7 @@ namespace PrepareLanding.Extensions
     /// </summary>
     public static class ListingStandardExtension
     {
+        private static readonly GUIContent TmpGuiContent = new GUIContent();
         /// <summary>
         ///     Start a scroll view inside a <see cref="Listing_Standard" />.
         /// </summary>
@@ -15,19 +16,31 @@ namespace PrepareLanding.Extensions
         /// <param name="outerRectHeight">The containing <see cref="Rect" /> for the scroll view.</param>
         /// <param name="scrollViewHeight">The height of the (virtual) scroll view.</param>
         /// <param name="scrollViewPos">The scroll position.</param>
+        /// <param name="widthShrinkage">Value to be removed from the scroll view width.</param>
         /// <remarks>This call must be matched with a call to <see cref="EndScrollView" />.</remarks>
         public static Listing_Standard BeginScrollView(this Listing_Standard ls, float outerRectHeight,
-            float scrollViewHeight, ref Vector2 scrollViewPos)
+            float scrollViewHeight, ref Vector2 scrollViewPos, float widthShrinkage = 0f)
         {
             var outerRect = ls.GetRect(outerRectHeight);
-            var scrollViewRect = new Rect(0, 0, ls.ColumnWidth, scrollViewHeight);
+            var scrollViewRect = new Rect(0, 0, ls.ColumnWidth - widthShrinkage, scrollViewHeight);
 
             Widgets.BeginScrollView(outerRect, ref scrollViewPos, scrollViewRect);
 
-            var internalLs = new Listing_Standard {ColumnWidth = ls.ColumnWidth};
+            var internalLs = new Listing_Standard {ColumnWidth = ls.ColumnWidth - widthShrinkage};
             internalLs.Begin(scrollViewRect);
 
             return internalLs;
+        }
+
+        public static Listing_Standard BeginScrollViewForText(this Listing_Standard ls, float outerRectHeight,
+            string text, ref Vector2 scrollViewPos, GUIStyle textStyle, float widthShrinkage = 0f)
+        {
+            // calculate text height for the scroll view height.
+            TmpGuiContent.text = text;
+            var textHeight = textStyle.CalcHeight(TmpGuiContent, ls.ColumnWidth) + 10f;
+            var scrollViewHeight = Mathf.Max(textHeight, outerRectHeight);
+
+            return BeginScrollView(ls, outerRectHeight, scrollViewHeight, ref scrollViewPos, widthShrinkage);
         }
 
         /// <summary>
