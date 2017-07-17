@@ -31,6 +31,8 @@ namespace PrepareLanding
 
         protected virtual void DrawOptions()
         {
+            DrawEntryHeader("Filter Options", backgroundColor: Color.cyan);
+
             var allowLiveFiltering = _userData.Options.AllowLiveFiltering;
             ListingStandard.CheckboxLabeled("Allow Live Filtering", ref allowLiveFiltering,
                 "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
@@ -70,6 +72,11 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Show Filter Heaviness", ref showFilterHeaviness,
                 "Show filter heaviness (possible filter CPU calculation heaviness) on filter header in the GUI.");
             _userData.Options.ShowFilterHeaviness = showFilterHeaviness;
+
+            var allowInvalidTilesForNewSettlement = _userData.Options.AllowInvalidTilesForNewSettlement;
+            ListingStandard.CheckboxLabeled("Allow Invalid Tiles for New Settlement", ref allowInvalidTilesForNewSettlement,
+                "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
+            _userData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
 
         }
     }

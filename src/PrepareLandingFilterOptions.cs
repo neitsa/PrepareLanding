@@ -21,5 +21,7 @@ namespace PrepareLanding
         public bool DisableTileBlinking { get; set; }
 
         public bool ShowFilterHeaviness { get; set; }
+
+        public bool AllowInvalidTilesForNewSettlement  { get; set; }
     }
 }

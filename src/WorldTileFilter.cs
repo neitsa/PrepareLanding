@@ -305,10 +305,16 @@ namespace PrepareLanding
                 FilterInfoLogger.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
             }
 
-            stopWatch.Stop();
-
             // all results into one list
             _matchingTileIds.AddRange(result);
+
+            FilterInfoLogger.AppendMessage($"Before checking for valid tiles: a total of {_matchingTileIds.Count} tile(s) matches all filters.");
+
+            // last pass, remove all tile that are deemed as not being settleable
+            if(!_userData.Options.AllowInvalidTilesForNewSettlement)
+                _matchingTileIds.RemoveAll(tileId => TileFinder.IsValidTileForNewSettlement(tileId) == false);
+
+            stopWatch.Stop();
 
             // check if the applied filters gave no resulting tiles (the set of applied filters was probably too harsh).
             if (_matchingTileIds.Count == 0)
