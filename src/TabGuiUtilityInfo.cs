@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using PrepareLanding.Extensions;
 using PrepareLanding.Filters;
@@ -19,9 +18,13 @@ namespace PrepareLanding
 
         private string _worldInfo;
 
+        private readonly PrepareLandingUserData _userData;
+
         public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
+            _userData = userData;
+
             // make new text styles
             _styleWorldInfo = new GUIStyle(Text.textAreaReadOnlyStyles[2])
             {
@@ -71,7 +74,7 @@ namespace PrepareLanding
                 if (allValidTiles != null)
                 {
                     stringBuilder.AppendLine("Biomes: (number of tiles)");
-                    var biomes = PrepareLanding.Instance.UserData.BiomeDefs;
+                    var biomes = _userData.BiomeDefs;
 
                     //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
                     //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
@@ -136,10 +139,8 @@ namespace PrepareLanding
                 return;
 
             var maxHeight = InRect.height - ListingStandard.CurHeight - 30f;
-            var scrollHeight = Text.CalcHeight(text, ListingStandard.ColumnWidth);
-            scrollHeight = Mathf.Max(maxHeight, scrollHeight);
 
-            var innerLs = ListingStandard.BeginScrollView(maxHeight, scrollHeight, ref _scrollPosFilterInfo);
+            var innerLs = ListingStandard.BeginScrollViewForText(maxHeight, text, ref _scrollPosFilterInfo, _styleFilterInfo, 16f);
 
             GUI.TextField(innerLs.GetRect(maxHeight), text, _styleFilterInfo);
 
