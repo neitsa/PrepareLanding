@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using PrepareLanding.Extensions;
 using PrepareLanding.Filters;
@@ -248,10 +249,14 @@ namespace PrepareLanding
             var separator = "-".Repeat(80);
             FilterInfoLogger.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
 
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             // filter tiles
             var result = new List<int>();
             var firstUnionDone = false;
 
+            var usedFilters = 0;
             for (var i = 0; i < _sortedFilters.Count; i++)
             {
                 // get the filter
@@ -260,6 +265,9 @@ namespace PrepareLanding
                 // only use an active filter
                 if (!filter.IsFilterActive)
                     continue;
+
+                // increment count of used filters
+                usedFilters++;
 
                 // use all valid tiles until we have a first result
                 var currentList = firstUnionDone ? result : _allValidTileIds;
@@ -273,6 +281,7 @@ namespace PrepareLanding
                 {
                     FilterInfoLogger.AppendErrorMessage(
                         $"{filter.RunningDescription}: this filter results in 0 matching tiles.", sendToLog: true);
+                    stopWatch.Stop();
                     return;
                 }
 
@@ -296,6 +305,8 @@ namespace PrepareLanding
                 FilterInfoLogger.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
             }
 
+            stopWatch.Stop();
+
             // all results into one list
             _matchingTileIds.AddRange(result);
 
@@ -303,8 +314,11 @@ namespace PrepareLanding
             if (_matchingTileIds.Count == 0)
                 FilterInfoLogger.AppendErrorMessage("No tile matches the given filter(s).", sendToLog: true);
             else
+            {
+                FilterInfoLogger.AppendMessage($"All {usedFilters} filter(s) ran in {stopWatch.Elapsed}.");
                 FilterInfoLogger.AppendSuccessMessage(
                     $"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
+            }
 
             // now highlight filtered tiles
             PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
