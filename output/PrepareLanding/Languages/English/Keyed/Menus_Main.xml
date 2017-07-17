@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+    <!--=========== Mod related ==========-->
+    <PrepareLanding>PrepareLanding</PrepareLanding>
+
+    <!--=========== Main Window ==========-->
+
+    <!--============ LongEventHandler ==============-->
+    <FilteringWorldTiles>Filtering World Tiles</FilteringWorldTiles>
+    <PreFilteringWorldTiles>Prefiltering World Tiles</PreFilteringWorldTiles>
+
+</LanguageData>
