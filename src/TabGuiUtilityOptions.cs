@@ -13,6 +13,7 @@ namespace PrepareLanding
         private bool _bypassMaxHighlightedTiles;
         private bool _showDebugTileId;
         private bool _disablePreFilterCheck;
+        private bool _disableTileBlinking;
 
 
         public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
@@ -62,6 +63,10 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref _disablePreFilterCheck,
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
             _userData.Options.DisablePreFilterCheck = _disablePreFilterCheck;
+
+            ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref _disableTileBlinking,
+                "Disable tile blinking (\"breathing\") for filtered tiles on the world map.");
+            _userData.Options.DisableTileBlinking = _disableTileBlinking;
 
         }
     }

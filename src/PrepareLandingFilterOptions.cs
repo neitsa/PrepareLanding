@@ -14,8 +14,10 @@ namespace PrepareLanding
 
         public bool BypassMaxHighlightedTiles { get; set; }
 
-        public bool ShowDebugTileId { get; set; }
+        public bool ShowDebugTileId { get; set; } = true;
 
         public bool DisablePreFilterCheck { get; set; }
+
+        public bool DisableTileBlinking { get; set; }
     }
 }

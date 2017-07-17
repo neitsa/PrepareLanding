@@ -10,7 +10,7 @@ namespace PrepareLanding.Gui.World
     {
         public const int MaxHighlightedTiles = 10000;
 
-        private const float MaxDistToCameraToDisplayLabel = 39f;
+        private const float MaxDistToCameraToDisplayLabel = 50f;
 
         private readonly Material _defaultMaterial = new Material(WorldMaterials.SelectedTile);
 

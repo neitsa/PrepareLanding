@@ -14,9 +14,12 @@ namespace PrepareLanding.Gui.World
         private static readonly List<int> TmpIndices = new List<int>();
 
         private float _alpha;
+
         private AlphaRampDirection _alphaRampDirection = AlphaRampDirection.AlphaRampDown;
 
         private Mesh _mesh;
+
+        public const float DefaultTileHighlightingAlphaValue = 0.5f;
 
         public float ColorPct;
 
@@ -69,7 +72,7 @@ namespace PrepareLanding.Gui.World
 
         public void Draw()
         {
-            // do not draw tiles that are not visible, this should help on very large planets
+            // do not draw tiles that are not visible for the camera, this should help on very large planets
             if (!VisibleForCamera)
                 return;
 
@@ -99,7 +102,18 @@ namespace PrepareLanding.Gui.World
             {
                 material = CustomMat;
 
-                TileBreath(material);
+                // check if tile breathing is disabled or not
+                if (PrepareLanding.Instance.UserData.Options.DisableTileBlinking)
+                {
+                    var matColor = material.color;
+                    matColor.a = DefaultTileHighlightingAlphaValue;
+                    material.color = matColor;
+                }
+                else // blinking permitted
+                {
+                    // do the blinking
+                    TileBreath(material);
+                }
             }
             else
             {
