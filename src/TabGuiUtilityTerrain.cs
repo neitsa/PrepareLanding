@@ -59,7 +59,7 @@ namespace PrepareLanding
 
         protected virtual void DrawBiomeTypesSelection()
         {
-            DrawEntryHeader("Biome Type", false);
+            DrawEntryHeader("Biome Type", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             var biomeDefs = _userData.BiomeDefs;
 
@@ -128,7 +128,7 @@ namespace PrepareLanding
 
         protected virtual void DrawHillinessTypeSelection()
         {
-            DrawEntryHeader("Terrain".Translate());
+            DrawEntryHeader("Terrain".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
 
             if (ListingStandard.ButtonText("Select Terrain"))
             {
@@ -158,7 +158,7 @@ namespace PrepareLanding
 
         protected virtual void DrawRoadTypesSelection()
         {
-            DrawEntryHeader("Road Types");
+            DrawEntryHeader("Road Types", backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
 
             var roadDefs = _userData.RoadDefs;
             var selectedRoadDefs = _userData.SelectedRoadDefs;
@@ -203,7 +203,7 @@ namespace PrepareLanding
 
         protected virtual void DrawRiverTypesSelection()
         {
-            DrawEntryHeader("River Types");
+            DrawEntryHeader("River Types", backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
 
             var riverDefs = _userData.RiverDefs;
             var selectedRiverDefs = _userData.SelectedRiverDefs;
@@ -247,7 +247,7 @@ namespace PrepareLanding
 
         protected void DrawMovementTime()
         {
-            DrawEntryHeader("Movement Times (hours)", false);
+            DrawEntryHeader("Movement Times (hours)", false, backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
 
             DrawUsableMinMaxNumericField(_userData.CurrentMovementTime, "Current Movement Time");
             DrawUsableMinMaxNumericField(_userData.SummerMovementTime, "Summer Movement Time");
@@ -256,7 +256,7 @@ namespace PrepareLanding
 
         protected void DrawElevationSelection()
         {
-            DrawEntryHeader("Elevation (meters)");
+            DrawEntryHeader("Elevation (meters)", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
 
             // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
             // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
@@ -265,7 +265,7 @@ namespace PrepareLanding
 
         protected virtual void DrawStoneTypesSelection()
         {
-            DrawEntryHeader("StoneTypesHere".Translate());
+            DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
             var selectedStoneDefs = _userData.SelectedStoneDefs;
             var orderedStoneDefs = _userData.OrderedStoneDefs;
@@ -335,7 +335,7 @@ namespace PrepareLanding
 
         protected virtual void DrawCoastalSelection()
         {
-            DrawEntryHeader("Coastal Tile", false);
+            DrawEntryHeader("Coastal Tile", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _userData.ChosenCoastalTileState;
@@ -346,7 +346,7 @@ namespace PrepareLanding
 
         protected virtual void DrawTimeZoneSelection()
         {
-            DrawEntryHeader("Time Zone [-12, +12]");
+            DrawEntryHeader("Time Zone [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
 
             DrawUsableMinMaxNumericField(_userData.TimeZone, "Time Zone", -12, 12);
         }

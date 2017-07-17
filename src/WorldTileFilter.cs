@@ -374,6 +374,22 @@ namespace PrepareLanding
             Filter();
         }
 
+        public FilterHeaviness FilterHeavinessFromFilterSubjectThingDef(string subjectThingDef)
+        {
+            if (_filterHeavinessCache == null)
+            {
+                _filterHeavinessCache = new Dictionary<string, FilterHeaviness>();
+
+                foreach (var filter in _allFilters.Values)
+                {
+                    _filterHeavinessCache.Add(filter.SubjectThingDef, filter.Heaviness); 
+                }
+            }
+
+            FilterHeaviness filterHeaviness;
+            return _filterHeavinessCache.TryGetValue(subjectThingDef, out filterHeaviness) ? filterHeaviness : FilterHeaviness.Unknown;
+        }
+
         #region PRIVATE_FIELDS
 
         /// <summary>
@@ -403,6 +419,8 @@ namespace PrepareLanding
         ///     A <see cref="PrepareLandingUserData" /> instance used to keep user choices on the GUI.
         /// </summary>
         private readonly PrepareLandingUserData _userData;
+
+        private Dictionary<string, FilterHeaviness> _filterHeavinessCache;
 
         #endregion PRIVATE_FIELDS
 

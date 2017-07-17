@@ -8,14 +8,6 @@ namespace PrepareLanding
     {
         private readonly PrepareLandingUserData _userData;
 
-        private bool _allowLiveFiltering;
-        private bool _allowImpassableHilliness;
-        private bool _bypassMaxHighlightedTiles;
-        private bool _showDebugTileId;
-        private bool _disablePreFilterCheck;
-        private bool _disableTileBlinking;
-
-
         public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
@@ -39,34 +31,45 @@ namespace PrepareLanding
 
         protected virtual void DrawOptions()
         {
-            ListingStandard.CheckboxLabeled("Allow Live Filtering", ref _allowLiveFiltering,
+            var allowLiveFiltering = _userData.Options.AllowLiveFiltering;
+            ListingStandard.CheckboxLabeled("Allow Live Filtering", ref allowLiveFiltering,
                 "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
-            _userData.Options.AllowLiveFiltering = _allowLiveFiltering;
+            _userData.Options.AllowLiveFiltering = allowLiveFiltering;
 
             //TODO: allow unimplemented biomes
 
-            ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref _allowImpassableHilliness,
+            var allowImpassableHilliness = _userData.Options.AllowImpassableHilliness;
+            ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref allowImpassableHilliness,
                 "Allow selection and filtering of impassable tiles.");
-            _userData.Options.AllowImpassableHilliness = _allowImpassableHilliness;
+            _userData.Options.AllowImpassableHilliness = allowImpassableHilliness;
 
             //TODO: allow saving / reading the set of currently applied filters
 
             // allow to show the debug tile ID on the highlighted tile (instead of 'X')
-            ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref _showDebugTileId,
+            var showDebugTileId = _userData.Options.ShowDebugTileId;
+            ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref showDebugTileId,
                 "Show the Debug Tile ID (instead of 'X') for the highlighted tiles.");
-            _userData.Options.ShowDebugTileId = _showDebugTileId;
+            _userData.Options.ShowDebugTileId = showDebugTileId;
 
-            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref _bypassMaxHighlightedTiles,
+            var bypassMaxHighlightedTiles = _userData.Options.BypassMaxHighlightedTiles;
+            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref bypassMaxHighlightedTiles,
                 $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
-            _userData.Options.BypassMaxHighlightedTiles = _bypassMaxHighlightedTiles;
+            _userData.Options.BypassMaxHighlightedTiles = bypassMaxHighlightedTiles;
 
-            ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref _disablePreFilterCheck,
+            var disablePreFilterCheck = _userData.Options.DisablePreFilterCheck;
+            ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref disablePreFilterCheck,
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
-            _userData.Options.DisablePreFilterCheck = _disablePreFilterCheck;
+            _userData.Options.DisablePreFilterCheck = disablePreFilterCheck;
 
-            ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref _disableTileBlinking,
+            var disableTileBlinking = _userData.Options.DisableTileBlinking;
+            ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref disableTileBlinking,
                 "Disable tile blinking (\"breathing\") for filtered tiles on the world map.");
-            _userData.Options.DisableTileBlinking = _disableTileBlinking;
+            _userData.Options.DisableTileBlinking = disableTileBlinking;
+
+            var showFilterHeaviness = _userData.Options.ShowFilterHeaviness;
+            ListingStandard.CheckboxLabeled("Show Filter Heaviness", ref showFilterHeaviness,
+                "Show filter heaviness (possible filter CPU calculation heaviness) on filter header in the GUI.");
+            _userData.Options.ShowFilterHeaviness = showFilterHeaviness;
 
         }
     }

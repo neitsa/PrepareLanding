@@ -5,9 +5,11 @@ namespace PrepareLanding.Filters
 {
     public enum FilterHeaviness
     {
-        Light = 0,
-        Medium = 1,
-        Heavy = 2
+        Unknown = 0,
+        Light = 1,
+        Medium = 2,
+        Heavy = 3,
+        
     }
 
     public interface ITileFilter

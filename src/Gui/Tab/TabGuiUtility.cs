@@ -1,4 +1,5 @@
 ﻿using System;
+using PrepareLanding.Filters;
 using UnityEngine;
 using Verse;
 
@@ -59,7 +60,7 @@ namespace PrepareLanding.Gui.Tab
         }
 
         protected virtual void DrawEntryHeader(string entryLabel, bool useStartingGap = true,
-            bool useFollowingGap = false, Color? backgroundColor = null)
+            bool useFollowingGap = false, Color? backgroundColor = null, float colorAlpha = 0.2f)
         {
             if (useStartingGap)
                 ListingStandard.Gap(DefaultGapHeight);
@@ -70,7 +71,7 @@ namespace PrepareLanding.Gui.Tab
 
             var bgColor = backgroundColor.GetValueOrDefault(MenuSectionBgFillColor);
             if (backgroundColor != null)
-                bgColor.a = 0.20f;
+                bgColor.a = colorAlpha;
 
             Verse.Widgets.DrawBoxSolid(r, bgColor);
 
@@ -105,6 +106,34 @@ namespace PrepareLanding.Gui.Tab
             Widgets.TextFieldNumericLabeled(maxValueLabelRect, "Max: ", ref maxValue, ref maxValueString, min, max);
             numericItem.Max = maxValue;
             numericItem.MaxString = maxValueString;
+        }
+
+        public static Color ColorFromFilterSubjectThingDef(string filterName)
+        {
+            if (!PrepareLanding.Instance.UserData.Options.ShowFilterHeaviness)
+                return MenuSectionBgFillColor;
+
+            Color result;
+            var heaviness = PrepareLanding.Instance.TileFilter.FilterHeavinessFromFilterSubjectThingDef(filterName);
+            switch (heaviness)
+            {
+                case FilterHeaviness.Unknown:
+                    result = MenuSectionBgFillColor;
+                    break;
+                case FilterHeaviness.Light:
+                    result = Color.green;
+                    break;
+                case FilterHeaviness.Medium:
+                    result = Color.yellow;
+                    break;
+                case FilterHeaviness.Heavy:
+                    result = Color.red;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return result;
         }
     }
 }

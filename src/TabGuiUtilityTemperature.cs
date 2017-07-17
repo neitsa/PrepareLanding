@@ -38,7 +38,7 @@ namespace PrepareLanding
 
         protected void DrawTemperaturesSelection()
         {
-            DrawEntryHeader("Temperatures (Celsius)");
+            DrawEntryHeader("Temperatures (Celsius)", backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
 
             DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature",
                 TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
@@ -51,7 +51,7 @@ namespace PrepareLanding
         protected void DrawGrowingPeriodSelection()
         {
             const string label = "Growing Period";
-            DrawEntryHeader($"{label} (days)");
+            DrawEntryHeader($"{label} (days)", backgroundColor: ColorFromFilterSubjectThingDef("Growing Periods"));
 
             var boundField = _userData.GrowingPeriod;
 
@@ -100,14 +100,14 @@ namespace PrepareLanding
 
         protected virtual void DrawRainfallSelection()
         {
-            DrawEntryHeader("Rain Fall (mm)");
+            DrawEntryHeader("Rain Fall (mm)", backgroundColor: ColorFromFilterSubjectThingDef("Rain Falls"));
 
             DrawUsableMinMaxNumericField(_userData.RainFall, "Rain Fall");
         }
 
         protected virtual void DrawAnimalsCanGrazeNowSelection()
         {
-            DrawEntryHeader("Animals");
+            DrawEntryHeader("Animals", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _userData.ChosenAnimalsCanGrazeNowState;

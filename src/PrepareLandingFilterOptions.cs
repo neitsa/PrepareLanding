@@ -19,5 +19,7 @@ namespace PrepareLanding
         public bool DisablePreFilterCheck { get; set; }
 
         public bool DisableTileBlinking { get; set; }
+
+        public bool ShowFilterHeaviness { get; set; }
     }
 }
