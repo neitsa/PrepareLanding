@@ -1,12 +1,19 @@
-﻿using PrepareLanding.Gui.Tab;
+﻿using System.Collections.Generic;
+using PrepareLanding.Extensions;
+using PrepareLanding.Gui.Tab;
 using PrepareLanding.Gui.World;
 using UnityEngine;
+using Verse;
 
 namespace PrepareLanding
 {
     public class TabGuiUtilityOptions : TabGuiUtility
     {
         private readonly PrepareLandingUserData _userData;
+
+        private readonly List<float> _goToTileSplitPct = new List<float> {0.5f, 0.35f, 0.15f};
+        private int _tileNumber = -1;
+        private string _tileNumberString = string.Empty;
 
         public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -77,6 +84,24 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Allow Invalid Tiles for New Settlement", ref allowInvalidTilesForNewSettlement,
                 "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
             _userData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
+
+            var goToTileOptionRectSpace = ListingStandard.GetRect(30f);
+            var rects = goToTileOptionRectSpace.SplitRectWidth(_goToTileSplitPct);
+            Widgets.Label(rects[0], "Go to Tile:");
+            Widgets.TextFieldNumeric(rects[1], ref _tileNumber, ref _tileNumberString, -1, 300000);
+            if (Widgets.ButtonText(rects[2], "Go!"))
+            {
+                if (_tileNumber < 0 || _tileNumber >= Find.WorldGrid.TilesCount)
+                {
+                    Messages.Message($"Out of Range: {_tileNumber}; Range: [0, {Find.WorldGrid.TilesCount}).",
+                        MessageSound.RejectInput);
+                }
+                else
+                {
+                    Find.WorldInterface.SelectedTile = _tileNumber;
+                    Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
+                }
+            }
 
         }
     }
