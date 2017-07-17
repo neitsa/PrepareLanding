@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using PrepareLanding.Collections;
 using PrepareLanding.Extensions;
+using PrepareLanding.Gui;
 using PrepareLanding.Gui.Tab;
 using PrepareLanding.Gui.Window;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
+using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
@@ -16,13 +17,12 @@ namespace PrepareLanding
         private const float GapBetweenButtons = 10f;
 
         private const int MaxDisplayedTileWhenMinimized = 30;
-        private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
 
-        private readonly PairList<string, Action> _bottomButtonsPairList;
+        private readonly List<ButtonDescriptor> _bottomButtonsDescriptorList;
+        private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
+        private readonly List<ButtonDescriptor> _minimizedWindowButtonsDescriptorList;
 
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
-
-        private readonly List<float> _buttonsSplitPct = new List<float> {0.33f, 0.33f, 0.33f};
 
         private Vector2 _scrollPosMatchingTiles;
 
@@ -55,52 +55,103 @@ namespace PrepareLanding
              * Bottom buttons
              */
 
-            _bottomButtonsPairList = new PairList<string, Action>
+            #region BOTTOM_BUTTONS
+
+            var buttonFilterTiles = new ButtonDescriptor("Filter Tiles",
+                delegate
+                {
+                    SoundDefOf.TickLow.PlayOneShotOnCamera();
+
+                    // reset starting display index
+                    _tileDisplayIndexStart = 0;
+
+                    // reset selected index
+                    _selectedTileIndex = -1;
+
+                    // do the tile filtering
+                    PrepareLanding.Instance.TileFilter.Filter();
+                });
+
+            var buttonResetFilters = new ButtonDescriptor("Reset Filters",
+                delegate
+                {
+                    SoundDefOf.TickLow.PlayOneShotOnCamera();
+                    userData.ResetAllFields();
+                });
+
+            var buttonMinimize = new ButtonDescriptor("Minimize",
+                delegate
+                {
+                    SoundDefOf.TickHigh.PlayOneShotOnCamera();
+                    Minimize();
+                });
+
+            var buttonClose = new ButtonDescriptor("CloseButton".Translate(),
+                delegate
+                {
+                    SoundDefOf.TickHigh.PlayOneShotOnCamera();
+
+                    // reset starting display index
+                    _tileDisplayIndexStart = 0;
+
+                    // reset selected index
+                    _selectedTileIndex = -1;
+
+                    ForceClose();
+                });
+
+            _bottomButtonsDescriptorList =
+                new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, buttonClose};
+
+            #endregion BOTTOM_BUTTONS
+
+            /*
+             * Minimized window buttons
+             */
+
+            #region MINIMIZED_WINDOW_BUTTONS
+
+            var buttonListStart = new ButtonDescriptor("<<", delegate
             {
+                // reset starting display index
+                _tileDisplayIndexStart = 0;
+            }, "Go to start of tile list.");
+
+            var buttonPreviousPage = new ButtonDescriptor("<", delegate
+            {
+                if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
+                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
+                else
+                    Messages.Message("Reached start of tile list.", MessageSound.RejectInput);
+            }, "Go to previous list page.");
+
+            var buttonNextPage = new ButtonDescriptor(">", delegate
+            {
+                var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
+                _tileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
+                if (_tileDisplayIndexStart > matchingTilesCount)
                 {
-                    "Filter Tiles", delegate
-                    {
-                        SoundDefOf.TickLow.PlayOneShotOnCamera();
-
-                        // reset starting display index
-                        _tileDisplayIndexStart = 0;
-
-                        // reset selected index
-                        _selectedTileIndex = -1;
-
-                        // do the tile filtering
-                        PrepareLanding.Instance.TileFilter.Filter();
-                    }
-                },
-                {
-                    "Reset Filters", delegate
-                    {
-                        SoundDefOf.TickLow.PlayOneShotOnCamera();
-                        userData.ResetAllFields();
-                    }
-                },
-                {
-                    "Minimize", delegate
-                    {
-                        SoundDefOf.TickHigh.PlayOneShotOnCamera();
-                        Minimize();
-                    }
-                },
-                {
-                    "CloseButton".Translate(), delegate
-                    {
-                        SoundDefOf.TickHigh.PlayOneShotOnCamera();
-
-                        // reset starting display index
-                        _tileDisplayIndexStart = 0;
-
-                        // reset selected index
-                        _selectedTileIndex = -1;
-
-                        ForceClose();
-                    }
+                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                        MessageSound.RejectInput);
+                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 }
-            };
+            }, "Go to next list page.");
+
+            var buttonListEnd = new ButtonDescriptor(">>", delegate
+            {
+                var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
+                var tileDisplayIndexStart = matchingTilesCount - matchingTilesCount % MaxDisplayedTileWhenMinimized;
+                if (tileDisplayIndexStart == _tileDisplayIndexStart)
+                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                        MessageSound.RejectInput);
+
+                _tileDisplayIndexStart = tileDisplayIndexStart;
+            }, "Go to end of list.");
+
+            _minimizedWindowButtonsDescriptorList =
+                new List<ButtonDescriptor> {buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd};
+
+            #endregion MINIMIZED_WINDOW_BUTTONS
         }
 
         public TabGuiUtilityController TabController { get; } = new TabGuiUtilityController();
@@ -135,7 +186,7 @@ namespace PrepareLanding
 
         protected void DoBottomsButtons(Rect inRect)
         {
-            var numButtons = _bottomButtonsPairList.Count;
+            var numButtons = _bottomButtonsDescriptorList.Count;
             var buttonsY = windowRect.height - 55f;
 
             var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
@@ -148,14 +199,18 @@ namespace PrepareLanding
                 return;
             }
 
-            for (var i = 0; i < _bottomButtonsPairList.Count; i++)
+            for (var i = 0; i < _bottomButtonsDescriptorList.Count; i++)
             {
-                var buttonPairList = _bottomButtonsPairList[i];
-                var name = buttonPairList.Key;
-                var action = buttonPairList.Value;
+                // get button descriptor
+                var buttonDescriptor = _bottomButtonsDescriptorList[i];
 
-                if (Widgets.ButtonText(buttonsRect[i], name))
-                    action();
+                // display button; if clicked: call the related action
+                if (Widgets.ButtonText(buttonsRect[i], buttonDescriptor.Label))
+                    buttonDescriptor.Action();
+
+                // display tool-tip (if any)
+                if (!string.IsNullOrEmpty(buttonDescriptor.ToolTip))
+                    TooltipHandler.TipRegion(buttonsRect[i], buttonDescriptor.ToolTip);
             }
         }
 
@@ -197,33 +252,26 @@ namespace PrepareLanding
                 return;
             }
 
-            var bottomButtonsRect = listingStandard.GetRect(30f);
-            var splittedRect = bottomButtonsRect.SplitRectWidth(_buttonsSplitPct);
+            var buttonsRectSpace = listingStandard.GetRect(30f);
+            var splittedRect = buttonsRectSpace.SplitRectWidthEvenly(_minimizedWindowButtonsDescriptorList.Count);
 
-            if (Widgets.ButtonText(splittedRect[0], "<"))
-                if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
-                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
-                else
-                    Messages.Message("Reached start of tile list.", MessageSound.RejectInput);
-
-            TooltipHandler.TipRegion(splittedRect[0], "Previous Available Tiles");
-
-            if (Widgets.ButtonText(splittedRect[1], "0"))
-                _tileDisplayIndexStart = 0;
-
-            TooltipHandler.TipRegion(splittedRect[1], "Tile List Start");
-
-            if (Widgets.ButtonText(splittedRect[2], ">"))
+            for (var i = 0; i < _minimizedWindowButtonsDescriptorList.Count; i++)
             {
-                _tileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
-                if (_tileDisplayIndexStart > matchingTilesCount)
-                {
-                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
-                        MessageSound.RejectInput);
-                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
-                }
+                // get button descriptor
+                var buttonDescriptor = _minimizedWindowButtonsDescriptorList[i];
+
+                // display button; if clicked: call the related action
+                if (Widgets.ButtonText(splittedRect[i], buttonDescriptor.Label))
+                    buttonDescriptor.Action();
+
+                // display tool-tip (if any)
+                if (!string.IsNullOrEmpty(buttonDescriptor.ToolTip))
+                    TooltipHandler.TipRegion(splittedRect[i], buttonDescriptor.ToolTip);
             }
-            TooltipHandler.TipRegion(splittedRect[2], "Next Available Tiles");
+
+            /*
+             * Display label (where we actually are in the tile list)
+             */
 
             // number of elements (tiles) to display
             var itemsToDisplay = Math.Min(matchingTilesCount - _tileDisplayIndexStart, MaxDisplayedTileWhenMinimized);

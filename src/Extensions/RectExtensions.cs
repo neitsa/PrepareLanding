@@ -41,6 +41,20 @@ namespace PrepareLanding.Extensions
             return result;
         }
 
+        public static List<Rect> SplitRectWidthEvenly(this Rect r, int splitsNumber)
+        {
+            if (splitsNumber <= 0)
+                return new List<Rect>();
+
+            var splitPct = 1f / splitsNumber;
+
+            var splits = new List<float>();
+            for (var i = 0; i < splitsNumber; i++)
+                splits.Add(splitPct);
+
+            return SplitRectWidth(r, splits);
+        }
+
         /// <summary>
         ///     Given a containing <see cref="Rect" /> return of list of Rect so all of the Rects in the list are spaced evenly
         ///     from the center of the containing Rect.

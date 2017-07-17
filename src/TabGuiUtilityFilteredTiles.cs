@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using PrepareLanding.Extensions;
+using PrepareLanding.Gui;
 using PrepareLanding.Gui.Tab;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
+using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
@@ -18,12 +20,55 @@ namespace PrepareLanding
 
         private int _tileDisplayIndexStart;
 
-        private readonly List<float> _buttonsSplitPct = new List<float> { 0.33f, 0.33f, 0.34f };
-
         private const int MaxDisplayedTileWhenMinimized = 30;
+
+        private readonly List<ButtonDescriptor> _minimizedWindowButtonsDescriptorList;
 
         public TabGuiUtilityFilteredTiles(float columnSizePercent) : base(columnSizePercent)
         {
+            #region MINIMIZED_WINDOW_BUTTONS
+
+            var buttonListStart = new ButtonDescriptor("<<", delegate
+            {
+                // reset starting display index
+                _tileDisplayIndexStart = 0;
+            }, "Go to start of tile list.");
+
+            var buttonPreviousPage = new ButtonDescriptor("<", delegate
+            {
+                if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
+                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
+                else
+                    Messages.Message("Reached start of tile list.", MessageSound.RejectInput);
+            }, "Go to previous list page.");
+
+            var buttonNextPage = new ButtonDescriptor(">", delegate
+            {
+                var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
+                _tileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
+                if (_tileDisplayIndexStart > matchingTilesCount)
+                {
+                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                        MessageSound.RejectInput);
+                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
+                }
+            }, "Go to next list page.");
+
+            var buttonListEnd = new ButtonDescriptor(">>", delegate
+            {
+                var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
+                var tileDisplayIndexStart = matchingTilesCount - matchingTilesCount % MaxDisplayedTileWhenMinimized;
+                if (tileDisplayIndexStart == _tileDisplayIndexStart)
+                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                        MessageSound.RejectInput);
+
+                _tileDisplayIndexStart = tileDisplayIndexStart;
+            }, "Go to end of list.");
+
+            _minimizedWindowButtonsDescriptorList =
+                new List<ButtonDescriptor> {buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd};
+
+            #endregion MINIMIZED_WINDOW_BUTTONS
         }
 
         /// <summary>A unique identifier for the Tab.</summary>
@@ -77,33 +122,26 @@ namespace PrepareLanding
                 return;
             }
 
-            var bottomButtonsRect = ListingStandard.GetRect(30f);
-            var splittedRect = bottomButtonsRect.SplitRectWidth(_buttonsSplitPct);
+            var buttonsRectSpace = ListingStandard.GetRect(30f);
+            var splittedRect = buttonsRectSpace.SplitRectWidthEvenly(_minimizedWindowButtonsDescriptorList.Count);
 
-            if (Widgets.ButtonText(splittedRect[0], "<"))
-                if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
-                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
-                else
-                    Messages.Message("Reached start of tile list.", MessageSound.RejectInput);
-
-            TooltipHandler.TipRegion(splittedRect[0], "Previous Available Tiles");
-
-            if (Widgets.ButtonText(splittedRect[1], "0"))
-                _tileDisplayIndexStart = 0;
-
-            TooltipHandler.TipRegion(splittedRect[1], "Tile List Start");
-
-            if (Widgets.ButtonText(splittedRect[2], ">"))
+            for (var i = 0; i < _minimizedWindowButtonsDescriptorList.Count; i++)
             {
-                _tileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
-                if (_tileDisplayIndexStart > matchingTilesCount)
-                {
-                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
-                        MessageSound.RejectInput);
-                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
-                }
+                // get button descriptor
+                var buttonDescriptor = _minimizedWindowButtonsDescriptorList[i];
+
+                // display button; if clicked: call the related action
+                if (Widgets.ButtonText(splittedRect[i], buttonDescriptor.Label))
+                    buttonDescriptor.Action();
+
+                // display tool-tip (if any)
+                if (!string.IsNullOrEmpty(buttonDescriptor.ToolTip))
+                    TooltipHandler.TipRegion(splittedRect[i], buttonDescriptor.ToolTip);
             }
-            TooltipHandler.TipRegion(splittedRect[2], "Next Available Tiles");
+
+            /*
+             * Label
+             */
 
             // number of elements (tiles) to display
             var itemsToDisplay = Math.Min(matchingTilesCount - _tileDisplayIndexStart, MaxDisplayedTileWhenMinimized);
@@ -145,7 +183,8 @@ namespace PrepareLanding
 
                 // get latitude & longitude for the tile
                 var vector = Find.WorldGrid.LongLatOf(selectedTileId);
-                var labelText = $"{i}: {vector.y.ToStringLatitude()} {vector.x.ToStringLongitude()} - {selectedTile.biome.LabelCap} ; {selectedTileId}";
+                var labelText =
+                    $"{i}: {vector.y.ToStringLatitude()} {vector.x.ToStringLongitude()} - {selectedTile.biome.LabelCap} ; {selectedTileId}";
 
                 // display the label
                 var labelRect = innerLs.GetRect(elementHeight);
