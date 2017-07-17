@@ -129,7 +129,25 @@ namespace PrepareLanding.Patches
 
             if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()) &&
                 CanDoNext())
+            {
+                /* ADDED CODE */
+
+                #region INSERTED_CODE
+
+                // make sure the prepare landing window (or its minimized window) is closed when we go to the next window / game stage
+                if (Find.WindowStack.IsOpen<PrepareLandingWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
+                {
+                    if (PrepareLanding.Instance.MainWindow != null)
+                        PrepareLanding.Instance.MainWindow.ForceClose();
+                }
+
+                #endregion
+
+                /* END ADDED CODE*/
+
+                // go to next window
                 DoNext();
+            }
 
             //num6 += BottomButSize.x + 10f;
             GenUI.AbsorbClicksInRect(rect);
