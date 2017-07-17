@@ -42,7 +42,8 @@ namespace PrepareLanding.Gui.World
         public void HighlightTileList(List<int> tileList)
         {
             // do not highlight too many tiles (otherwise the slow down is noticeable)
-            if (!PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
+            if (!PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles &&
+                tileList.Count > MaxHighlightedTiles)
             {
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     $"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
@@ -102,8 +103,6 @@ namespace PrepareLanding.Gui.World
                 PrepareLanding.Instance.OnWorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
                 PrepareLanding.Instance.OnWorldInterfaceUpdate -= HighlightedTileDrawerUpdate;
             }
-
-            // TODO: set large fields to null.
 
             _disposedValue = true;
         }
