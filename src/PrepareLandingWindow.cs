@@ -61,6 +61,14 @@ namespace PrepareLanding
                     "Filter Tiles", delegate
                     {
                         SoundDefOf.TickLow.PlayOneShotOnCamera();
+
+                        // reset starting display index
+                        _tileDisplayIndexStart = 0;
+
+                        // reset selected index
+                        _selectedTileIndex = -1;
+
+                        // do the tile filtering
                         PrepareLanding.Instance.TileFilter.Filter();
                     }
                 },
@@ -82,7 +90,14 @@ namespace PrepareLanding
                     "CloseButton".Translate(), delegate
                     {
                         SoundDefOf.TickHigh.PlayOneShotOnCamera();
-                        Close();
+
+                        // reset starting display index
+                        _tileDisplayIndexStart = 0;
+
+                        // reset selected index
+                        _selectedTileIndex = -1;
+
+                        ForceClose();
                     }
                 }
             };
