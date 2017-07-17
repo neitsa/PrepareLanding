@@ -320,13 +320,23 @@ namespace PrepareLanding
 
         public static void ReorderElements<T>(int index, int newIndex, IList<T> elementsList)
         {
-            if (index == newIndex)
+            if (index == newIndex || index < 0)
+            {
+                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}");
                 return;
+            }
 
             if (elementsList.Count == 0)
+            {
+                Log.Message("[PrepareLanding] ReorderElements: elementsList count is 0.");
                 return;
+            }
 
-            //TODO check for out-of-bounds indexes
+            if (index >= elementsList.Count || newIndex >= elementsList.Count)
+            {
+                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}; elemntsList.Count: {elementsList.Count}");
+                return;
+            }
 
             var item = elementsList[index];
             elementsList.RemoveAt(index);
