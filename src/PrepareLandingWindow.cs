@@ -261,7 +261,7 @@ namespace PrepareLanding
              * Scroll view
              */
             var innerLs = listingStandard.BeginScrollView(maxScrollViewOuterHeight, scrollableViewHeight,
-                ref _scrollPosMatchingTiles);
+                ref _scrollPosMatchingTiles, 16f);
 
             var endIndex = _tileDisplayIndexStart + itemsToDisplay;
             for (var i = _tileDisplayIndexStart; i < endIndex; i++)
@@ -275,7 +275,7 @@ namespace PrepareLanding
                 // display the label
                 var labelRect = innerLs.GetRect(elementHeight);
                 var selected = i == _selectedTileIndex;
-                if (Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected))
+                if (Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
                 {
                     // go to the location of the selected tile
                     _selectedTileIndex = i;
