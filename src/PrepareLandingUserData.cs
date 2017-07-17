@@ -208,10 +208,13 @@ namespace PrepareLanding
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        ///     Reset all fields (user choices on  the GUI window) to their default state.
+        ///     Reset all fields (user choices on the GUI window) to their default state. Also clear all matching tiles.
         /// </summary>
         public void ResetAllFields()
         {
+            // clear the previously matching tiles and highlighted tiles (if any)
+            PrepareLanding.Instance.TileFilter.ClearMatchingTiles();
+
             /*
              * TERRAIN related fields
              */
