@@ -179,7 +179,7 @@ namespace PrepareLanding
             if (_userData.Options.AllowLiveFiltering)
                 FilterTiles();
             else
-                LongEventHandler.QueueLongEvent(FilterTiles, "[PrepareLanding] Filtering World Tiles", true, null);
+                LongEventHandler.QueueLongEvent(FilterTiles, $"[{"PrepareLanding".Translate()}] {"FilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace PrepareLanding
         /// </summary>
         protected void PrefilterQueueLongEvent()
         {
-            LongEventHandler.QueueLongEvent(Prefilter, "[PrepareLanding] Prefiltering World Tiles", true, null);
+            LongEventHandler.QueueLongEvent(FilterTiles, $"[{"PrepareLanding".Translate()}] {"PreFilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
