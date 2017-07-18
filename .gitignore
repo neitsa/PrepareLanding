@@ -2,6 +2,12 @@
 # Project specific
 # ==============================================================================
 
+#ignore binaries in output mod folder
+output/**/*.dll
+output/**/*.pdb
+output/**/*.mdb
+
+
 # Ignore specific tools (pdb2mdb)
 tools/*.dll
 tools/*.exe
