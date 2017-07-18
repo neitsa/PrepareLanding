@@ -96,8 +96,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call $(SolutionDir)tools\plugin_mdb.bat $(TargetPath)
-call $(SolutionDir)tools\copy.bat $(TargetDir)</PostBuildEvent>
+    <PostBuildEvent>python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
+python  $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) I:\rimworld_debug\RimWorld --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
