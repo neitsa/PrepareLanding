@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 # author: neitsa
 import argparse
+import os
 import pathlib
 import sys
 import subprocess
@@ -29,10 +30,18 @@ def main(args):
 
     pdb2mdb_path = "pdb2mdb"
     if args.bin_path:
-        if not file_exists(args.bin_path):
+        if not file_exists(args.bin_path, True):
             return -1
         pdb2mdb_path = args.bin_path
+    else:
+        # try to build a full absolute path for pdb2mdb binary
 
+        # get location of current script
+        script_path = os.path.realpath(__file__)
+        pdb2mdb_path = str(pathlib.Path(script_path).parent.joinpath(
+            pdb2mdb_path))
+
+    print("pdb2mdb binary path: '{}'".format(pdb2mdb_path))
     print("Generating mdb file")
 
     # run pdb2mdb
