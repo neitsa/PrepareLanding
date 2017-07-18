@@ -36,6 +36,12 @@ namespace PrepareLanding
         {
             if (rimWorldAlertMessage)
             {
+                if (PrepareLanding.Instance.MainWindow == null)
+                {
+                    Log.Error("[PrepareLanding] Main window is null in this context.");
+                    return;
+                }
+
                 var tab = PrepareLanding.Instance.MainWindow.TabController.TabById("WorldInfo");
                 var tabName = tab == null ? "World Info" : tab.Name;
                 Messages.Message($"An error occurred. Please see the \"{tabName}\" tab for an error description.",
