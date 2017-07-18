@@ -187,7 +187,7 @@ namespace PrepareLanding
         /// </summary>
         protected void PrefilterQueueLongEvent()
         {
-            LongEventHandler.QueueLongEvent(FilterTiles, $"[{"PrepareLanding".Translate()}] {"PreFilteringWorldTiles".Translate()}", true, null);
+            LongEventHandler.QueueLongEvent(Prefilter, $"[{"PrepareLanding".Translate()}] {"PreFilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
@@ -440,6 +440,9 @@ namespace PrepareLanding
         /// </summary>
         private readonly PrepareLandingUserData _userData;
 
+        /// <summary>
+        ///     A cache for filter heaviness. Key is the <see cref="TileFilter.SubjectThingDef"/>, value is the filter heaviness (<see cref="FilterHeaviness"/>).
+        /// </summary>
         private Dictionary<string, FilterHeaviness> _filterHeavinessCache;
 
         #endregion PRIVATE_FIELDS
