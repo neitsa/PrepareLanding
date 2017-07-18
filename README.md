@@ -1,0 +1,23 @@
+PrepareLanding
+==============
+
+**PrepareLanding** is a mod for the [RimWorld](https://rimworldgame.com/) game by [Ludeon studios](https://ludeon.com/blog/). It allows players to carefully choose their landing site before actually starting their colony.
+
+Installation
+------------
+
+[Download Here](https://github.com/neitsa/PrepareLanding/releases/latest) on Github.
+Releases deemed stable are numbered (e.g. `1.8.0`).
+Development releases are prefixed with `develop`.
+
+Documentation
+-------------
+
+A [detailed manual](http://remotetechnologiesgroup.github.io/RemoteTech) is available online.
+
+Questions? Try the [Ludeon forum thread]().
+
+Contributing
+------------
+
+See the [guidelines](CONTRIBUTING.md) for both bug reports and pull requests.
