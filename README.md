@@ -13,7 +13,7 @@ Development releases are prefixed with `develop`.
 Documentation
 -------------
 
-A [detailed manual](http://remotetechnologiesgroup.github.io/RemoteTech) is available online.
+A [detailed manual]() is available online.
 
 Questions? Try the [Ludeon forum thread]().
 
