@@ -110,6 +110,9 @@ namespace PrepareLanding
             // main instance to keep user filter choices on the GUI.
             UserData = new PrepareLandingUserData(_filterOptions);
 
+            // instantiate the main window now
+            MainWindow = new PrepareLandingWindow(UserData);
+
             // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter();
             Instance.OnWorldInterfaceOnGui += TileHighlighter.HighlightedTileDrawerOnGui;

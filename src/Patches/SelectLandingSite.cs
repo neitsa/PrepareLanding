@@ -108,18 +108,10 @@ namespace PrepareLanding.Patches
                 Log.Message("[PrepareLanding] Page button pressed!");
 
                 // don't add a new window if the window is already there
-                if (PrepareLanding.Instance.MainWindow == null || PrepareLanding.Instance.MainWindow.IsClosed)
-                {
+                if (PrepareLanding.Instance.MainWindow == null)
                     PrepareLanding.Instance.MainWindow = new PrepareLandingWindow(PrepareLanding.Instance.UserData);
 
-                    Find.WindowStack.Add(PrepareLanding.Instance.MainWindow);
-                }
-                else
-                {
-                    // just maximize it if it minimized
-                    if (PrepareLanding.Instance.MainWindow.Minimized)
-                        PrepareLanding.Instance.MainWindow.Maximize();
-                }
+                PrepareLanding.Instance.MainWindow.Show();
             }
             num6 += BottomButSize.x + 10f;
 

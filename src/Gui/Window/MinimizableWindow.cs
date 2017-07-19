@@ -5,11 +5,13 @@ namespace PrepareLanding.Gui.Window
 {
     public abstract class MinimizableWindow : Verse.Window
     {
+        // closed here means: not on the RimWorld window stack
         private bool _mainWindowClosed;
         protected MinimizedWindow MinimizedWindow;
 
         protected MinimizableWindow()
         {
+            _mainWindowClosed = true;
             MinimizedWindow = new MinimizedWindow(this);
             MinimizedWindow.OnMinimizedWindowClosed += MinimizedWindowClosed;
         }
@@ -20,6 +22,7 @@ namespace PrepareLanding.Gui.Window
 
         public override void Close(bool doCloseSound = true)
         {
+            // the base class will remove it from the window stack for us.
             base.Close(doCloseSound);
 
             _mainWindowClosed = true;
@@ -33,8 +36,37 @@ namespace PrepareLanding.Gui.Window
         {
             // close the minimized windows
             MinimizedWindow.Close(false);
+
             // close the main window
             Close();
+        }
+
+        public virtual void Show(bool showMinimized = false)
+        {
+            if (!IsClosed)
+            {
+                // window not closed, check if it's minimized
+                if(Minimized && !showMinimized)
+                    Maximize();
+
+                return;
+            }
+            
+            // defensive check, just to catch this abnormal state if code logic is very wrong
+            if (Find.WindowStack.IsOpen(GetType())) //note: this.getType()
+            {
+                // getting here means the window is closed (not visible, hence it shouldn't be on the window stack) but it's still on the window stack...
+                Log.Error("[PrepareLAnding] The main window is closed but it's still on the window stack...");
+                return;
+            }
+
+            // so, the window is "closed" (it's just not shown). Try to add it to the window stack
+            Find.WindowStack.Add(this);
+
+            if(showMinimized)
+                Minimize();
+
+            _mainWindowClosed = false;
         }
 
         public virtual void Maximize()
@@ -48,6 +80,8 @@ namespace PrepareLanding.Gui.Window
 
             // close the minimized window; this will automatically get the parent window up and set 'Minimized' to false
             MinimizedWindow.Close();
+
+            _mainWindowClosed = false;
         }
 
         public virtual void Minimize()
@@ -60,9 +94,14 @@ namespace PrepareLanding.Gui.Window
             }
 
             Minimized = true;
-            // add the "minimized" window and close the main window
+
+            // add the "minimized" window to the window stack
             Find.WindowStack.Add(MinimizedWindow);
+
+            // close the main window
             Close();
+
+            _mainWindowClosed = true;
         }
 
         public override void PreOpen()
@@ -75,6 +114,8 @@ namespace PrepareLanding.Gui.Window
         protected void MinimizedWindowClosed()
         {
             Minimized = false;
+
+            _mainWindowClosed = false;
         }
     }
 }
