@@ -18,18 +18,22 @@ namespace PrepareLanding.Gui.Window
 
         public bool IsClosed => _mainWindowClosed && MinimizedWindow.Closed;
 
-        public virtual void Minimize()
+        public override void Close(bool doCloseSound = true)
         {
-            if (MinimizedWindow == null)
-            {
-                Log.ErrorOnce("[PrepareLanding] Trying to minimize while there is no MinimizedWindow window available.",
-                    0x1234cafe);
-                return;
-            }
+            base.Close(doCloseSound);
 
-            Minimized = true;
-            // add the "minimized" window and close the main window
-            Find.WindowStack.Add(MinimizedWindow);
+            _mainWindowClosed = true;
+        }
+
+        public override void DoWindowContents(Rect inRect)
+        {
+        }
+
+        public virtual void ForceClose()
+        {
+            // close the minimized windows
+            MinimizedWindow.Close(false);
+            // close the main window
             Close();
         }
 
@@ -46,24 +50,19 @@ namespace PrepareLanding.Gui.Window
             MinimizedWindow.Close();
         }
 
-        protected void MinimizedWindowClosed()
+        public virtual void Minimize()
         {
-            Minimized = false;
-        }
+            if (MinimizedWindow == null)
+            {
+                Log.ErrorOnce("[PrepareLanding] Trying to minimize while there is no MinimizedWindow window available.",
+                    0x1234cafe);
+                return;
+            }
 
-        public virtual void ForceClose()
-        {
-            // close the minimized windows
-            MinimizedWindow.Close(false);
-            // close the main window
+            Minimized = true;
+            // add the "minimized" window and close the main window
+            Find.WindowStack.Add(MinimizedWindow);
             Close();
-        }
-
-        public override void Close(bool doCloseSound = true)
-        {
-            base.Close(doCloseSound);
-
-            _mainWindowClosed = true;
         }
 
         public override void PreOpen()
@@ -73,8 +72,9 @@ namespace PrepareLanding.Gui.Window
             _mainWindowClosed = false;
         }
 
-        public override void DoWindowContents(Rect inRect)
+        protected void MinimizedWindowClosed()
         {
+            Minimized = false;
         }
     }
 }
