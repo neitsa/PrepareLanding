@@ -74,14 +74,14 @@ namespace PrepareLanding
         public event Action OnWorldGenerated = delegate { };
 
         /// <summary>
-        ///     Methods can register to this event to be called when the OnGUI() method (while on the world map) is called. See
-        ///     also <seealso cref="WorldInterfaceOnGui" />.
+        ///     Methods can register to this event to be called when the OnGUI() method (while on the world map) is called.
+        ///     See also <seealso cref="WorldInterfaceOnGui" />.
         /// </summary>
         public event Action OnWorldInterfaceOnGui = delegate { };
 
         /// <summary>
-        ///     Methods can register to this event to be called when the Update() method (while on the world map) is called. See
-        ///     also <seealso cref="WorldInterfaceUpdate" />.
+        ///     Methods can register to this event to be called when the Update() method (while on the world map) is called.
+        ///     See also <seealso cref="WorldInterfaceUpdate" />.
         /// </summary>
         public event Action OnWorldInterfaceUpdate = delegate { };
 
@@ -110,6 +110,8 @@ namespace PrepareLanding
             // main instance to keep user filter choices on the GUI.
             UserData = new PrepareLandingUserData(_filterOptions);
 
+            TileFilter = new WorldTileFilter(UserData);
+
             // instantiate the main window now
             MainWindow = new PrepareLandingWindow(UserData);
 
@@ -127,9 +129,6 @@ namespace PrepareLanding
         {
             // disable all tiles that are currently highlighted
             TileHighlighter.RemoveAllTiles();
-
-            // new tile filter
-            TileFilter = new WorldTileFilter(UserData);
 
             // call onto subscribers to tell them that the world has been generated.
             OnWorldGenerated.Invoke();
