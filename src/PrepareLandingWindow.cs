@@ -5,6 +5,7 @@ using PrepareLanding.Gui;
 using PrepareLanding.Gui.Tab;
 using PrepareLanding.Gui.Window;
 using RimWorld;
+using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -98,7 +99,7 @@ namespace PrepareLanding
                     _selectedTileIndex = -1;
 
                     ForceClose();
-                });
+                }, displayState: DisplayState.Entry | DisplayState.MapInitializing);
 
             _bottomButtonsDescriptorList =
                 new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, buttonClose};
@@ -160,6 +161,7 @@ namespace PrepareLanding
 
         public override Vector2 InitialSize => new Vector2(1024f, 768f);
 
+        public override bool IsWindowValidInContext => WorldRendererUtility.WorldRenderedNow && (Find.WindowStack.IsOpen<PrepareLandingWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>());
 
         public override void DoWindowContents(Rect inRect)
         {
@@ -187,6 +189,11 @@ namespace PrepareLanding
         protected void DoBottomsButtons(Rect inRect)
         {
             var numButtons = _bottomButtonsDescriptorList.Count;
+            
+            // do not display the close button while playing ("World" button on bottom menu bar was clicked)
+            if (Current.ProgramState == ProgramState.Playing)
+                numButtons -= 1;
+
             var buttonsY = windowRect.height - 55f;
 
             var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
@@ -203,6 +210,9 @@ namespace PrepareLanding
             {
                 // get button descriptor
                 var buttonDescriptor = _bottomButtonsDescriptorList[i];
+
+                if (!buttonDescriptor.CanBeDisplayed)
+                    continue;
 
                 // display button; if clicked: call the related action
                 if (Widgets.ButtonText(buttonsRect[i], buttonDescriptor.Label))
