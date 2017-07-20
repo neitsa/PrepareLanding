@@ -28,6 +28,11 @@ namespace PrepareLanding
         public ReadOnlyCollection<int> AllTilesWithRoad;
 
         /// <summary>
+        ///     Class can subscribe to this event to know that the pre-filtering has been done.
+        /// </summary>
+        public event Action OnPrefilterDone;
+
+        /// <summary>
         ///     Class constructor.
         /// </summary>
         /// <param name="userData">An instance of the class used to keep user choice from the main GUI window.</param>
@@ -231,6 +236,8 @@ namespace PrepareLanding
 
             AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
             FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
+
+            OnPrefilterDone?.Invoke();
         }
 
         /// <summary>

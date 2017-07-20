@@ -40,8 +40,8 @@ namespace PrepareLanding
                 richText = true
             };
 
-            // make sure world info is generated once again when a new world has been made.
-            PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
+            // make sure world info is generated once again when the tile pre-filter has finished its job.
+            PrepareLanding.Instance.TileFilter.OnPrefilterDone += RebuildWorldInfo;
         }
 
         public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
@@ -103,7 +103,7 @@ namespace PrepareLanding
         /// <summary>
         /// Called when a new world map has been generated.
         /// </summary>
-        protected void WorldGenerated()
+        protected void RebuildWorldInfo()
         {
             _worldInfo = BuildWorldInfo();
         }
