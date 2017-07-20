@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\DataItems.cs" />
+    <Compile Include="src\Defs\MainButtonWorkerToggleWorld.cs" />
     <Compile Include="src\Extensions\ListExtensions.cs" />
     <Compile Include="src\Extensions\ListingStandardExtension.cs" />
     <Compile Include="src\Extensions\MultiCheckboxStateExtension.cs" />
