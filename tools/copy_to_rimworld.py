@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import sys
+import os
 import pathlib
 import shutil
 
@@ -13,6 +14,13 @@ MOD_NAME = "PrepareLanding"
 
 # Location of executable files in a mod folder.
 MOD_ASSEMBLIES = "Assemblies"
+
+
+def banner_execute() -> pathlib.Path:
+    script_path = pathlib.Path(os.path.realpath(__file__))
+    sep = "-" * 79
+    print("{}\nExecuting: {}\n{}".format(sep, script_path.name, sep))
+    return script_path
 
 
 def dir_exists(path_str: pathlib, check_absolute: bool = False) -> bool:
@@ -32,6 +40,8 @@ def dir_exists(path_str: pathlib, check_absolute: bool = False) -> bool:
 
 
 def main(args):
+    banner_execute()
+
     # where target dir is, for ex.: <myrepo>\PrepareLanding\bin\Debug
     if not dir_exists(args.target_dir):
         return -1
@@ -80,11 +90,15 @@ def main(args):
             return -1
 
         # copy from target_dir to output_dir
+        print("Trying to copy binary files.")
         target_dir = pathlib.Path(args.target_dir)
         for file_type in file_types:
             for file_name in target_dir.glob(file_type):
                 try:
                     shutil.copy2(file_name, str(output_dir))
+                    if args.verbose:
+                        print("Copied:\n\t- from: '{}'\n\t- to '{}'"
+                              .format(file_name, output_dir))
                 except Exception as err:
                     print("An error occured while trying to copy a file.\n"
                           "src: {}\ndst: {}\nThe error was: {}"
@@ -104,9 +118,13 @@ def main(args):
         return -1
 
     # copy the whole mod content to RimWorld
+    print("Trying to copy the whole mod to its destination.")
     src_dir = args.output_dir if args.output_dir else args.target_dir
     try:
         shutil.copytree(src_dir, str(mod_dir))
+        if args.verbose:
+            print("Copied:\n\t- from: '{}'\n\t- to '{}'"
+                  .format(src_dir, mod_dir))
     except Exception as err:
         print("An error occured while trying to copy a directory.\n"
               "src dir: {}\n"
@@ -146,6 +164,10 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         '-m', '--mdb', action="store_true", dest="mdb", default=True,
         help="Copy MDB files (if any).")
+
+    arg_parser.add_argument(
+        '--verbose', action="store_true", dest="verbose", default=True,
+        help="Verbose script. [default: True]")
 
     parsed_args = arg_parser.parse_args()
     sys.exit(main(parsed_args))

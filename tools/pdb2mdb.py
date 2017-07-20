@@ -8,6 +8,13 @@ import sys
 import subprocess
 
 
+def banner_execute() -> pathlib.Path:
+    script_path = pathlib.Path(os.path.realpath(__file__))
+    sep = "-" * 79
+    print("{}\nExecuting: {}\n{}".format(sep, script_path.name, sep))
+    return script_path
+
+
 def file_exists(path_str: pathlib, check_absolute: bool = False) -> bool:
     path = pathlib.Path(path_str)
     if not path.exists() or not path.is_file():
@@ -25,6 +32,8 @@ def file_exists(path_str: pathlib, check_absolute: bool = False) -> bool:
 
 
 def main(args):
+    script_path = banner_execute()
+
     if not file_exists(args.dll_path, True):
         return -1
 
@@ -35,11 +44,7 @@ def main(args):
         pdb2mdb_path = args.bin_path
     else:
         # try to build a full absolute path for pdb2mdb binary
-
-        # get location of current script
-        script_path = os.path.realpath(__file__)
-        pdb2mdb_path = str(pathlib.Path(script_path).parent.joinpath(
-            pdb2mdb_path))
+        pdb2mdb_path = str(script_path.parent.joinpath(pdb2mdb_path))
 
     print("pdb2mdb binary path: '{}'".format(pdb2mdb_path))
     print("Generating mdb file")
