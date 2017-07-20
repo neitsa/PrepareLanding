@@ -32,7 +32,13 @@ namespace PrepareLanding
             DrawGrowingPeriodSelection();
             NewColumn();
             DrawRainfallSelection();
-            DrawAnimalsCanGrazeNowSelection();
+
+            // "Animals Can Graze Now" relies on game ticks as VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt calls
+            //   GenTemperature.GetTemperatureAtTile which calls GenTemperature.GetTemperatureFromSeasonAtTile
+            //  This last function takes GenTicks.TicksAbs as argument but the results are not consistent between calls...
+            // All in all: better not calling it during the "select landing site" page.
+            if (GenScene.InPlayScene)
+                DrawAnimalsCanGrazeNowSelection();
             End();
         }
 
