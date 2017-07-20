@@ -7,7 +7,7 @@ namespace PrepareLanding.Gui.Window
 {
     public class MinimizedWindow : Verse.Window
     {
-        private readonly Verse.Window _parentWindow;
+        private readonly MinimizableWindow _parentWindow;
 
         private readonly Listing_Standard _listingStandard;
 
@@ -15,7 +15,7 @@ namespace PrepareLanding.Gui.Window
 
         public event Action<Listing_Standard, Rect> AddMinimizedWindowContent;
 
-        public MinimizedWindow(Verse.Window parentWindow, string windowLabel = null)
+        public MinimizedWindow(MinimizableWindow parentWindow, string windowLabel = null)
         {
             _parentWindow = parentWindow;
 
@@ -107,9 +107,15 @@ namespace PrepareLanding.Gui.Window
 
         public override void Close(bool doCloseSound = true)
         {
+            // close this minimized window
             base.Close(doCloseSound);
+
+            // display the parent (add it to the window stack)
             Find.WindowStack.Add(_parentWindow);
+
+            // tell subscribers that this minimized window has been closed
             OnMinimizedWindowClosed.Invoke();
+
             Closed = true;
             _minimizedWindowHasAddedContent = false;
         }
@@ -119,6 +125,17 @@ namespace PrepareLanding.Gui.Window
             base.PreOpen();
             Closed = false;
             _minimizedWindowHasAddedContent = false;
+        }
+
+        public override void WindowOnGUI()
+        {
+            if (!_parentWindow.IsWindowValidInContext)
+            {
+                _parentWindow.ForceClose();
+                return;
+            }
+
+            base.WindowOnGUI();
         }
     }
 }

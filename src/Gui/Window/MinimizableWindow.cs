@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RimWorld.Planet;
+using UnityEngine;
 using Verse;
 
 namespace PrepareLanding.Gui.Window
@@ -19,6 +20,10 @@ namespace PrepareLanding.Gui.Window
         public bool Minimized { get; protected set; }
 
         public bool IsClosed => _mainWindowClosed && MinimizedWindow.Closed;
+
+        public virtual bool IsWindowValidInContext => true;
+
+        public static bool WorldRenderedNow => WorldRendererUtility.WorldRenderedNow;
 
         public override void Close(bool doCloseSound = true)
         {
@@ -43,10 +48,18 @@ namespace PrepareLanding.Gui.Window
 
         public virtual void Show(bool showMinimized = false)
         {
+            // check if the window is still active
             if (!IsClosed)
             {
-                // window not closed, check if it's minimized
-                if(Minimized && !showMinimized)
+                // check if the window is still valid in this context. If it's not, then close it and just return.
+                if (!IsWindowValidInContext)
+                {
+                    ForceClose();
+                    return;
+                }
+
+                // window's not closed, check if it's already minimized and if we were asked to show it minimized or not.
+                if (Minimized && !showMinimized)
                     Maximize();
 
                 return;
@@ -60,13 +73,17 @@ namespace PrepareLanding.Gui.Window
                 return;
             }
 
-            // so, the window is "closed" (it's just not shown). Try to add it to the window stack
+            // at that point the window is closed, but we need to check if it's still valid to open it now: we must be on a state where the world is rendered
+            if (!WorldRenderedNow)
+                return;
+
+            // so, the window is "closed" (it's not on the window stack). Try to add it to the window stack
             Find.WindowStack.Add(this);
 
-            if(showMinimized)
-                Minimize();
-
             _mainWindowClosed = false;
+
+            if (showMinimized)
+                Minimize();
         }
 
         public virtual void Maximize()
@@ -116,6 +133,17 @@ namespace PrepareLanding.Gui.Window
             Minimized = false;
 
             _mainWindowClosed = false;
+        }
+
+        public override void WindowOnGUI()
+        {
+            if (!IsWindowValidInContext)
+            {
+                ForceClose();
+                return;
+            }
+
+            base.WindowOnGUI();
         }
     }
 }

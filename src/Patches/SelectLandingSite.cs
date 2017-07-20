@@ -13,9 +13,9 @@ namespace PrepareLanding.Patches
     /// </summary>
     public class SelectLandingSite : Page_SelectLandingSite
     {
-        public override void PreOpen()
+        public override void PostOpen()
         {
-            base.PreOpen();
+            base.PostOpen();
             // HACK 
             // if you look at RimWorld.Scenario.GetFirstConfigPage() you'll see that the Page_SelectLandingSite() constructor
             // is called right after the Page_CreateWorldParams() as been executed (in fact after the Page_CreateWorldParams.CanDoNext() 
