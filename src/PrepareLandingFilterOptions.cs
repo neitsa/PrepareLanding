@@ -1,6 +1,4 @@
-﻿using Steamworks;
-
-namespace PrepareLanding
+﻿namespace PrepareLanding
 {
     public class PrepareLandingFilterOptions
     {
