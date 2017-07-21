@@ -3,10 +3,9 @@
 # ==============================================================================
 
 #ignore binaries in output mod folder
-output/**/*.dll
-output/**/*.pdb
-output/**/*.mdb
-
+output/PrepareLanding/Assemblies/*.dll
+output/PrepareLanding/Assemblies/*.pdb
+output/PrepareLanding/Assemblies/*.mdb
 
 # Ignore specific tools (pdb2mdb)
 tools/*.dll
