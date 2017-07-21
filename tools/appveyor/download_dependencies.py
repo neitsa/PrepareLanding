@@ -140,8 +140,6 @@ class UrlDescriptor(object):
 
 class UrlDownloader(object):
 
-    GITHUB_LATEST_TEMPLATE = "https://api.github.com/repos/{}/releases/latest"
-
     def __init__(self, url_descriptor: Optional[UrlDescriptor] = None):
         self._current_url_desc = url_descriptor
         self._download_path = None
