@@ -8,7 +8,7 @@ Installation
 
 [Download Here](https://github.com/neitsa/PrepareLanding/releases/latest) on Github.
 Releases deemed stable are numbered (e.g. `1.8.0`).
-Development releases are prefixed with `develop`.
+Development releases are postfixed with `develop` (e.g. `PrepareLanding-1.2.0-develop`).
 
 Documentation
 -------------
