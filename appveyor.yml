@@ -121,7 +121,7 @@
     # path to Visual Studio solution or project
     project: .\PrepareLanding.sln
     # MSBuild verbosity level, possible values are: quiet|minimal|normal|detailed
-    verbosity: detailed
+    verbosity: normal
 
   # scripts to run before build
   before_build:
