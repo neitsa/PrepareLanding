@@ -13,9 +13,9 @@ Development releases are postfixed with `develop` (e.g. `PrepareLanding-1.2.0-de
 Documentation
 -------------
 
-A [detailed manual]() is available online.
+A [detailed manual]() is available online (`[TODO]`).
 
-Questions? Try the [Ludeon forum thread]().
+Questions? Try the [Ludeon forum thread]() (`[TODO]`).
 
 Contributing
 ------------
