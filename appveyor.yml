@@ -1,0 +1,229 @@
+#==============================================================================#
+#                           Develop configuration                              #
+#==============================================================================#
+
+# configuration for "develop" branch
+# build in Release mode and deploy to github
+-
+  #---------------------------------#
+  #      general configuration      #
+  #---------------------------------#
+
+  # version format (you need to bump it when changing version)
+  version: 0.3.0-{build}-{branch}
+
+  # branches
+  branches:
+    # whitelist
+    only:
+      - develop
+    # blacklist
+    except:
+      - gh-pages
+
+  # Do not build on tags (note: otherwise appveyor keeps looping on a release)
+  # we simply want to build on a new push
+  skip_tags: true
+
+  #---------------------------------#
+  #    environment configuration    #
+  #---------------------------------#
+
+  # Build worker image (VM template)
+  image: Visual Studio 2015
+
+  # scripts that are called at very beginning, before repo cloning
+  init:
+    - git config --global core.autocrlf input
+
+  # clone directory
+  clone_folder: c:\projects\preparelanding
+
+  # fetch our repository as a zip archive (shallow clone) instead of a "full" git repo with its history.
+  shallow_clone: true
+
+  # environment variables
+  environment:
+    DLL_ARCH_PASS: # RimWorld DLLs archive password (secured)
+      secure: m0qPdh03pFIYhw0c3YzLFQO/4SKmx6hA+KuXlZbIUAI=
+
+  matrix:
+    # set this flag to immediately finish build once one of the jobs fails.
+    fast_finish: true
+
+  # scripts that run after cloning repository
+  install:
+    # Note: by default, all script lines are interpreted as batch
+    - cmd: echo Starting install
+    
+      #---------------------------------#
+      #   Setup environment variables   #
+      #---------------------------------#
+    
+    # set up env variable for python path ( path is hardcoded, see https://www.appveyor.com/docs/build-environment/#python )
+    - cmd: set PYTHON_PATH="C:\Python36-x64"
+    - cmd: set PATH=%PYTHON_PATH%;%PATH%
+    - cmd: python --version
+    
+    #
+    # setup various directories
+    #
+    
+    # repo location
+    - cmd: echo %APPVEYOR_BUILD_FOLDER%
+    # downloaded stuff go here
+    - cmd: set DOWNLOAD_FOLDER=%APPVEYOR_BUILD_FOLDER%\download
+    - cmd: mkdir %DOWNLOAD_FOLDER%
+    # the final zip is put here
+    - cmd: set ARTIFACTS_FOLDER=%APPVEYOR_BUILD_FOLDER%\artifacts
+    - cmd: mkdir %ARTIFACTS_FOLDER%
+    # location of the dependencies required to build the projet
+    - cmd: set LIBS_FOLDER=%APPVEYOR_BUILD_FOLDER%\libs
+    # location of the mod files (everything that represents the mod, including binaries)
+    - cmd: set OUTPUT_FOLDER=%APPVEYOR_BUILD_FOLDER%\output\PrepareLanding
+    # location of the mod file binaries
+    - cmd: set OUTPUT_ASSEMBLY_FOLDER=%APPVEYOR_BUILD_FOLDER%\output\PrepareLanding\Assemblies
+    # location of the python scripts used to prepare the build
+    - cmd: set PYTHON_SCRIPTS_FOLDER=%APPVEYOR_BUILD_FOLDER%\tools\appveyor
+    
+    # install requirements for our python scripts
+    - cmd: python -m pip install -r %PYTHON_SCRIPTS_FOLDER%\python-requirements.txt    
+    
+    #
+    # Download required assemblies DLLs
+    #    
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib --download_path %DOWNLOAD_FOLDER%
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_17b.7z --download_path %DOWNLOAD_FOLDER%
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -p%DLL_ARCH_PASS% -e *.dll
+    - cmd: dir %LIBS_FOLDER%
+    
+    - cmd: echo Ending install
+
+  #---------------------------------#
+  #       build configuration       #
+  #---------------------------------#
+
+  # build platform, i.e. x86, x64, Any CPU. This setting is optional.
+  # to add several platforms to build matrix:
+  platform:
+    #- x86
+    - Any CPU
+
+  # build Configuration, i.e. Debug, Release, etc.
+  # to add several configurations to build matrix:
+  configuration:
+    - Release
+
+  build:
+    # enable MSBuild parallel builds
+    parallel: true
+    # path to Visual Studio solution or project
+    project: %APPVEYOR_BUILD_FOLDER%\PrepareLanding.sln
+    # MSBuild verbosity level, possible values are: quiet|minimal|normal|detailed
+    verbosity: detailed
+
+  # scripts to run before build
+  before_build:
+
+  # scripts to run *after* solution is built and *before* automatic packaging occurs (web apps, NuGet packages, Azure Cloud Services)
+  before_package:
+    # delete downloaded assembly files
+    - cmd: del %ASSEMBLY_FOLDER%\Assembly-CSharp.dll
+    - cmd: del %ASSEMBLY_FOLDER%\UnityEngine.dll
+    - cmd: cd %ASSEMBLY_FOLDER% & dir
+    - cmd: echo done!
+
+  # scripts to run after build
+  after_build:
+    # zip the mod directory and put it in artifact folder
+    - cmd: 7z.exe a %ARTIFACTS_FOLDER%\PrepareLanding.zip %OUTPUT_FOLDER%
+
+  # to run your custom scripts instead of automatic MSBuild
+  build_script:
+
+  # to disable automatic builds
+  #build: off
+
+  #---------------------------------#
+  #      artifacts configuration    #
+  #---------------------------------#
+
+  artifacts:
+    # pushing entire folder as a zip archive
+    - path: artifacts\PrepareLanding.zip
+      name: pl_gd
+
+  #---------------------------------#
+  #     deployment configuration    #
+  #---------------------------------#
+
+  # to disable deployment
+  #deploy: off
+
+  # scripts to run before deployment
+  before_deploy:
+
+  # providers: Local, FTP, WebDeploy, AzureCS, AzureBlob, S3, NuGet, Environment
+  # provider names are case-sensitive!
+  deploy:
+    # Deploy to GitHub 'releases'
+    - provider: GitHub
+      # artfact we want to push on github
+      artifact: pl_gd
+      # release name pushed on github
+      release: PrepareLanding-$(appveyor_build_version)
+      # auth token to push on github
+      auth_token:
+        secure: "5FfSut5Qv4O4YbaeWzW3f6DQ5eLWMGY5/HEjT/f9fKOh9Kma59MfxAlK9Q4BZKlF"
+      # is it a draft release?
+      draft: false
+      # is a a pre-release?
+      prerelease: true
+      # which branch?
+      on:
+        branch: develop
+        # deploy on tag push only
+        appveyor_repo_tag: false
+
+  # scripts to run after deployment
+  after_deploy:
+
+  # to run your custom scripts instead of provider deployments
+  deploy_script:
+
+  #---------------------------------#
+  #        global handlers          #
+  #---------------------------------#
+
+  # on successful build
+  on_success:
+    #- do something
+
+  # on build failure
+  on_failure:
+    #- do something
+
+  # after build failure or success
+  on_finish:
+    #- do something
+
+  #---------------------------------#
+  #         notifications           #
+  #---------------------------------#
+
+  notifications:
+
+    # Email
+    #- provider: Email
+    #  to:
+    #    - user1@email.com
+    #    - user2@email.com
+    #  subject: 'Build {{status}}'                  # optional
+    #  message: "{{message}}, {{commitId}}, ..."    # optional
+    #  on_build_status_changed: true
+    
+    # Github
+    - provider: GitHubPullRequest
+      auth_token:
+        secure: "5FfSut5Qv4O4YbaeWzW3f6DQ5eLWMGY5/HEjT/f9fKOh9Kma59MfxAlK9Q4BZKlF"
