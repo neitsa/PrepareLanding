@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 logger.setLevel(logging.DEBUG)
 
+EXTRACT_METHODS = ['e', 'x']
+
 
 def get_latest_file_in_dir(dir_path: Path) -> Optional[Path]:
     latest_file_time = 0
@@ -80,12 +82,23 @@ def main(args):
     # -o option must be attached to the directory, otherwise it doesn't work...
     o_switch = "-o{}".format(str(output_path))
 
-    subprocess_args = [str(program_path), "x", str(input_file), o_switch]
+    # extraction method
+    if args.extract_method:
+        if args.extract_method not in EXTRACT_METHODS:
+            logger.error("Unknown extract method: '{}'".format(
+                args.extract_method))
+            return -1
+        else:
+            extract_method = args.extract_method
+    else:
+        extract_method = "x"
+
+    subprocess_args = [str(program_path), extract_method, str(input_file),
+                       o_switch]
 
     # check for password, if any
     if args.password:
-        subprocess_args.append("-p")
-        subprocess_args.append(args.password)
+        subprocess_args.append("-p{}".format(args.password))
 
     # check for extensions
     if args.extension_list:
@@ -141,6 +154,10 @@ if __name__ == "__main__":
         '-z', '--program_path', action="store", type=Path,
         help="Full path to 7Zip program if needed. [default: use the PATH env. "
              "var.]")
+
+    arg_parser.add_argument(
+        '-x', '--extract_method', action="store",
+        help="7Zip extraction method, must be 'e' or 'x' [default: x]")
 
     parsed_args = arg_parser.parse_args()
 
