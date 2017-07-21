@@ -119,7 +119,7 @@
     # enable MSBuild parallel builds
     parallel: true
     # path to Visual Studio solution or project
-    project: %APPVEYOR_BUILD_FOLDER%\PrepareLanding.sln
+    project: .\PrepareLanding.sln
     # MSBuild verbosity level, possible values are: quiet|minimal|normal|detailed
     verbosity: detailed
 
@@ -129,9 +129,9 @@
   # scripts to run *after* solution is built and *before* automatic packaging occurs (web apps, NuGet packages, Azure Cloud Services)
   before_package:
     # delete downloaded assembly files
-    - cmd: del %ASSEMBLY_FOLDER%\Assembly-CSharp.dll
-    - cmd: del %ASSEMBLY_FOLDER%\UnityEngine.dll
-    - cmd: cd %ASSEMBLY_FOLDER% & dir
+    - cmd: del %LIBS_FOLDER%\Assembly-CSharp.dll
+    - cmd: del %LIBS_FOLDER%\UnityEngine.dll
+    - cmd: cd %LIBS_FOLDER% & dir
     - cmd: echo done!
 
   # scripts to run after build
