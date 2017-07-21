@@ -346,26 +346,31 @@ def main(args):
 
     for url_descriptor in urls:
         downloader.current_url_descriptor = url_descriptor
-        if downloader.download_from_url_descriptor(
+        if not downloader.download_from_url_descriptor(
                 download_path=args.download_path):
-            if not downloader.extract(
-                    extract_path=args.extract_path, password=args.zip_password):
-                return -1
-
-            if args.copy_destination and downloader.download_path:
-                dir_name = UrlDownloader.zipped_dir_name(
-                    downloader.download_path, args.zip_password)
-                if not dir_name:
-                    # use the extract path
-                    copy_source = args.extract_path
-                else:
-                    # append the directory at the 'top' of the zip
-                    copy_source = args.extract_path.joinpath(dir_name)
-                # copy
-                copy_to_dir(copy_source, args.copy_destination)
-
-        else:
             return -1
+
+        # check if extraction is asked for
+        if not args.extract:
+            continue
+
+        # extract package
+        if not downloader.extract(
+                extract_path=args.extract_path, password=args.zip_password):
+            return -1
+
+        # copy extracted files to destination
+        if args.copy_destination and downloader.download_path:
+            dir_name = UrlDownloader.zipped_dir_name(
+                downloader.download_path, args.zip_password)
+            if not dir_name:
+                # use the extract path
+                copy_source = args.extract_path
+            else:
+                # append the directory at the 'top' of the zip
+                copy_source = args.extract_path.joinpath(dir_name)
+            # copy
+            copy_to_dir(copy_source, args.copy_destination)
 
     return 0
 
@@ -385,6 +390,14 @@ if __name__ == "__main__":
              "[default: working directory]")
 
     arg_parser.add_argument(
+        '-c', '--copy_destination', action="store", type=pathlib.Path,
+        help="Directory where to copy all DLLs from downloaded package.")
+
+    arg_parser.add_argument(
+        '-x', '--extract', action="store_true", default=False,
+        help="Extract zip files [default: False]")
+
+    arg_parser.add_argument(
         '-e', '--extract_path', action="store", type=pathlib.Path,
         help="Directory path where to extract dependencies. "
              "[default: working directory]")
@@ -393,10 +406,6 @@ if __name__ == "__main__":
         '-z', '--zip_password', action="store", type=str,
         help="Zip password for zip added with the '-u' option. "
              "[note: same password is used for all zip files]")
-
-    arg_parser.add_argument(
-        '-c', '--copy_destination', action="store", type=pathlib.Path,
-        help="Directory where to copy all DLLs from downloaded package.")
 
     parsed_args = arg_parser.parse_args()
     if not parsed_args.url_list:
