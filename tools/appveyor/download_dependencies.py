@@ -197,24 +197,6 @@ class UrlDownloader(object):
             else:
                 raise ValueError("No URL descriptor.")
 
-        filename = urllib.parse.urlsplit(url).path.split("/")[-1]
-        if not download_path:
-            download_path = pathlib.Path(filename)
-        else:
-            if download_path.is_dir():
-                if not download_path.exists():
-                    try:
-                        os.makedirs(str(download_path))
-                    except Exception as err:
-                        logger.error("Couldn't make download directory at: "
-                                     "'{}'. Error was: {}".
-                                     format(download_path, err))
-                        return None
-
-                download_path = download_path.joinpath(filename)
-            else:
-                download_path = download_path
-
         if not self.download_file(url, download_path):
             return None
 
@@ -231,6 +213,25 @@ class UrlDownloader(object):
             logger.error("Failed to download file at: {}\n\tThe status "
                          "code was: {}".format(url, response.status_code))
             return False
+
+        # make sure download path is correct, we should end up with a file name
+        filename = urllib.parse.urlsplit(url).path.split("/")[-1]
+        if not download_path:
+            download_path = pathlib.Path(filename)
+        else:
+            if download_path.is_dir():
+                if not download_path.exists():
+                    try:
+                        os.makedirs(str(download_path))
+                    except Exception as err:
+                        logger.error("Couldn't make download directory at: "
+                                     "'{}'. Error was: {}".
+                                     format(download_path, err))
+                        return False
+
+                download_path = download_path.joinpath(filename)
+            else:
+                download_path = download_path
 
         # if file exists, remove it
         if download_path.exists():
