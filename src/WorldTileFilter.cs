@@ -42,6 +42,9 @@ namespace PrepareLanding
             _userData = userData;
             _userData.PropertyChanged += OnUserDataPropertyChanged;
 
+            // register to option property changed
+            _userData.Options.PropertyChanged += OnOptionPropertyChanged;
+
             // be alerted when the world map is generated.
             PrepareLanding.Instance.OnWorldGenerated += PrefilterQueueLongEvent;
 
@@ -369,11 +372,11 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Called when a property from <see cref="PrepareLandingUserData" /> has changed.
+        ///     Called when a property from <see cref="PrepareLandingFilterOptions" /> has changed.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The argument of the event.</param>
-        private void OnUserDataPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnOptionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             //TODO: also use a dictionary and Action for this kind of event
             // options checks
@@ -384,6 +387,15 @@ namespace PrepareLanding
                 return;
             }
 
+        }
+
+        /// <summary>
+        ///     Called when a property from <see cref="PrepareLandingUserData" /> has changed.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The argument of the event.</param>
+        private void OnUserDataPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
             // check if live filtering is allowed or not. If it's not allowed, we filter everything on the 'Filter' button push.
             if (!PrepareLanding.Instance.UserData.Options.AllowLiveFiltering)
                 return;

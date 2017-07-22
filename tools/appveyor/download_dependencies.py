@@ -18,6 +18,10 @@ logger.setLevel(logging.DEBUG)
 # disable logging from the package used by requests
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
+HTTP_HEADERS = {
+    'User-Agent': 'neitsa',
+}
+
 
 class UrlDescriptor(object):
     GITHUB_LATEST_TEMPLATE = "https://api.github.com/repos/{}/releases/latest"
@@ -45,10 +49,10 @@ class UrlDescriptor(object):
                                           self._github_repo)
 
         url = self.GITHUB_LATEST_TEMPLATE.format(profile_and_repo)
-        response = requests.get(url)
+        response = requests.get(url, headers=HTTP_HEADERS)
         if response.status_code != 200:
             logger.error("Github URL response code was: {}"
-                         .format(response.status_code), file=sys.stderr)
+                         .format(response.status_code))
             return None
 
         response_text = response.text

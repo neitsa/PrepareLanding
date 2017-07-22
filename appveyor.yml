@@ -25,6 +25,11 @@
   # we simply want to build on a new push
   skip_tags: true
 
+  # Including commits with particular message
+  # Start a new build if message contains 'ci-build'
+  only_commits:
+    message: /ci-build/
+
   #---------------------------------#
   #    environment configuration    #
   #---------------------------------#
@@ -55,20 +60,20 @@
   install:
     # Note: by default, all script lines are interpreted as batch
     - cmd: echo Starting install
-    
+
       #---------------------------------#
       #   Setup environment variables   #
       #---------------------------------#
-    
+
     # set up env variable for python path ( path is hardcoded, see https://www.appveyor.com/docs/build-environment/#python )
     - cmd: set PYTHON_PATH="C:\Python36-x64"
     - cmd: set PATH=%PYTHON_PATH%;%PATH%
     - cmd: python --version
-    
+
     #
     # setup various directories
     #
-    
+
     # repo location
     - cmd: echo %APPVEYOR_BUILD_FOLDER%
     # downloaded stuff go here
@@ -85,19 +90,19 @@
     - cmd: set OUTPUT_ASSEMBLY_FOLDER=%APPVEYOR_BUILD_FOLDER%\output\PrepareLanding\Assemblies
     # location of the python scripts used to prepare the build
     - cmd: set PYTHON_SCRIPTS_FOLDER=%APPVEYOR_BUILD_FOLDER%\tools\appveyor
-    
+
     # install requirements for our python scripts
-    - cmd: python -m pip install -r %PYTHON_SCRIPTS_FOLDER%\python-requirements.txt    
-    
+    - cmd: python -m pip install -r %PYTHON_SCRIPTS_FOLDER%\python-requirements.txt
+
     #
     # Download required assemblies DLLs
-    #    
+    #
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib --download_path %DOWNLOAD_FOLDER%
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_17b.7z --download_path %DOWNLOAD_FOLDER%
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -p%DLL_ARCH_PASS% -e *.dll
     - cmd: dir %LIBS_FOLDER%
-    
+
     - cmd: echo Ending install
 
   #---------------------------------#
@@ -222,7 +227,7 @@
     #  subject: 'Build {{status}}'                  # optional
     #  message: "{{message}}, {{commitId}}, ..."    # optional
     #  on_build_status_changed: true
-    
+
     # Github
     - provider: GitHubPullRequest
       auth_token:
