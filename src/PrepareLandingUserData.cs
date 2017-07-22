@@ -29,6 +29,9 @@ namespace PrepareLanding
 
             // save options
             Options = options;
+
+            // register to the option changed event
+            Options.PropertyChanged += OptionChanged;
         }
 
         /// <summary>
@@ -326,6 +329,19 @@ namespace PrepareLanding
         protected void ExecuteOnWorldGenerated()
         {
             ResetAllFields();
+        }
+
+        /// <summary>
+        ///     Called when an option changed.
+        /// </summary>
+        protected void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            // rebuild possible hilliness values if the option changed
+            if (eventArgs.PropertyName == nameof(Options.AllowImpassableHilliness))
+            {
+                _hillinesses = BuildHillinessValues();
+                _chosenHilliness = Hilliness.Undefined;
+            }
         }
 
         /// <summary>
