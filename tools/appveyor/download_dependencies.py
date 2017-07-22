@@ -48,7 +48,7 @@ class UrlDescriptor(object):
         response = requests.get(url)
         if response.status_code != 200:
             logger.error("Github URL response code was: {}"
-                         .format(response.status_code), file=sys.stderr)
+                         .format(response.status_code))
             return None
 
         response_text = response.text
