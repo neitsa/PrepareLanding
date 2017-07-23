@@ -16,6 +16,7 @@ namespace PrepareLanding
         private static Vector2 _scrollPosRoadSelection = Vector2.zero;
         private static Vector2 _scrollPosRiverSelection = Vector2.zero;
         private static Vector2 _scrollPosStoneSelection = Vector2.zero;
+        private string _buffer;
 
         private readonly PrepareLandingUserData _userData;
 
@@ -59,12 +60,12 @@ namespace PrepareLanding
 
         protected virtual void DrawBiomeTypesSelection()
         {
-            DrawEntryHeader("Biome Type", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("Biome", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             var biomeDefs = _userData.BiomeDefs;
 
             // "Select" button
-            if (ListingStandard.ButtonText("Select Biome Type"))
+            if (ListingStandard.ButtonText("Select Biome"))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
 
@@ -272,8 +273,12 @@ namespace PrepareLanding
 
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset All"))
+            {
                 foreach (var stoneDefEntry in selectedStoneDefs)
                     stoneDefEntry.Value.State = stoneDefEntry.Value.DefaultState;
+
+                _userData.StoneTypesNumberOnly = false;
+            }
 
             // re-orderable list group
             var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
@@ -285,37 +290,67 @@ namespace PrepareLanding
 
             var maxHeight = InRect.height - ListingStandard.CurHeight;
             var height = Mathf.Min(selectedStoneDefs.Count * DefaultElementHeight, maxHeight);
-            var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count * DefaultElementHeight,
-                ref _scrollPosStoneSelection);
 
-            foreach (var currentOrderedStoneDef in orderedStoneDefs)
+            if (!_userData.StoneTypesNumberOnly)
             {
-                ThreeStateItem threeStateItem;
+                // stone types, standard selection
 
-                if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out threeStateItem))
+                var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count * DefaultElementHeight,
+                    ref _scrollPosStoneSelection);
+                
+                foreach (var currentOrderedStoneDef in orderedStoneDefs)
                 {
-                    Log.Message("A stoneDef wasn't found in selectedStoneDefs");
-                    continue;
+                    ThreeStateItem threeStateItem;
+
+                    if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out threeStateItem))
+                    {
+                        Log.Message("A stoneDef wasn't found in selectedStoneDefs");
+                        continue;
+                    }
+
+                    var flag = currentOrderedStoneDef == _selectedStoneDef;
+
+                    // save temporary state as it might change in CheckBoxLabeledMulti
+                    var tmpState = threeStateItem.State;
+
+                    var itemRect = inLs.GetRect(DefaultElementHeight);
+                    if (Widgets.CheckBoxLabeledSelectableMulti(itemRect, currentOrderedStoneDef.LabelCap,
+                        ref flag, ref tmpState))
+                        _selectedStoneDef = currentOrderedStoneDef;
+
+                    // if the state changed, update the item with the new state
+                    threeStateItem.State = tmpState;
+
+                    ReorderableWidget.Reorderable(reorderableGroup, itemRect);
+                    TooltipHandler.TipRegion(itemRect, currentOrderedStoneDef.description);
                 }
 
-                var flag = currentOrderedStoneDef == _selectedStoneDef;
-
-                // save temporary state as it might change in CheckBoxLabeledMulti
-                var tmpState = threeStateItem.State;
-
-                var itemRect = inLs.GetRect(DefaultElementHeight);
-                if (Widgets.CheckBoxLabeledSelectableMulti(itemRect, currentOrderedStoneDef.LabelCap,
-                    ref flag, ref tmpState))
-                    _selectedStoneDef = currentOrderedStoneDef;
-
-                // if the state changed, update the item with the new state
-                threeStateItem.State = tmpState;
-
-                ReorderableWidget.Reorderable(reorderableGroup, itemRect);
-                TooltipHandler.TipRegion(itemRect, currentOrderedStoneDef.description);
+                ListingStandard.EndScrollView(inLs);
+            }
+            else
+            {
+                // just keep the height of what should have been the scroll view but don't draw it. Put a big red cross on it.
+                var scrollViewRect = ListingStandard.GetRect(height);
+                GUI.DrawTexture(scrollViewRect, Verse.Widgets.CheckboxOffTex);
             }
 
-            ListingStandard.EndScrollView(inLs);
+            // choose stone types depending on their number on tiles.
+            ListingStandard.GapLine(6f);
+
+            var stoneTypesNumberRect = ListingStandard.GetRect(DefaultElementHeight);
+            var leftRect = stoneTypesNumberRect.LeftPart(0.80f);
+            var rightRect = stoneTypesNumberRect.RightPart(0.20f);
+
+            var filterByStoneNumber = _userData.StoneTypesNumberOnly;
+            Verse.Widgets.CheckboxLabeled(leftRect, "Use # of stone types [2,3]:", ref filterByStoneNumber);
+            _userData.StoneTypesNumberOnly = filterByStoneNumber;
+
+            var numberOfStones = _userData.StoneTypesNumber;
+            Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _buffer, 2, 3);
+            _userData.StoneTypesNumber = numberOfStones;
+
+            const string tooltipText = "Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.";
+            TooltipHandler.TipRegion(leftRect, tooltipText);
         }
 
         public static void ReorderElements<T>(int index, int newIndex, IList<T> elementsList)
