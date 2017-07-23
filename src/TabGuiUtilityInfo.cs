@@ -10,15 +10,15 @@ namespace PrepareLanding
 {
     public class TabGuiUtilityInfo : TabGuiUtility
     {
-        private readonly GUIStyle _styleWorldInfo;
         private readonly GUIStyle _styleFilterInfo;
-
-        private Vector2 _scrollPosWorldInfo;
-        private Vector2 _scrollPosFilterInfo;
-
-        private string _worldInfo;
+        private readonly GUIStyle _styleWorldInfo;
 
         private readonly PrepareLandingUserData _userData;
+        private Vector2 _scrollPosFilterInfo;
+
+        private Vector2 _scrollPosWorldInfo;
+
+        private string _worldInfo;
 
         public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -100,12 +100,23 @@ namespace PrepareLanding
             End();
         }
 
-        /// <summary>
-        /// Called when a new world map has been generated.
-        /// </summary>
-        protected void RebuildWorldInfo()
+        protected virtual void DrawFilterInfo()
         {
-            _worldInfo = BuildWorldInfo();
+            DrawEntryHeader("Filter Info", backgroundColor: Color.yellow);
+
+            if (ListingStandard.ButtonText("Clear Info"))
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.Clear();
+
+            ListingStandard.Gap();
+
+            var text = PrepareLanding.Instance.TileFilter.FilterInfoLogger.Text;
+            if (text.NullOrEmpty())
+                return;
+
+            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
+
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, text, ref _scrollPosFilterInfo, _styleFilterInfo,
+                16f);
         }
 
         protected virtual void DrawWorldInfo()
@@ -123,25 +134,12 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(innerLs);
         }
 
-        protected virtual void DrawFilterInfo()
+        /// <summary>
+        ///     Called when a new world map has been generated.
+        /// </summary>
+        protected void RebuildWorldInfo()
         {
-            DrawEntryHeader("Filter Info", backgroundColor: Color.yellow);
-
-            if (ListingStandard.ButtonText("Clear Info"))
-            {
-                PrepareLanding.Instance.TileFilter.FilterInfoLogger.Clear();
-            }
-
-            ListingStandard.Gap();
-
-            var text = PrepareLanding.Instance.TileFilter.FilterInfoLogger.Text;
-            if (text.NullOrEmpty())
-                return;
-
-            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
-
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, text, ref _scrollPosFilterInfo, _styleFilterInfo,
-                16f);
+            _worldInfo = BuildWorldInfo();
         }
     }
 }
