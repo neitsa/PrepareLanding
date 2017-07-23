@@ -17,7 +17,7 @@ Documentation
 
 A [detailed manual](https://neitsa.github.io/games/rimworld/preparelanding/) is available online :construction:.
 
-Questions? Try the [Ludeon forum thread]() (`[TODO]`).
+Questions? Try the [Ludeon forum thread](https://ludeon.com/forums/index.php?topic=34592.0).
 
 Contributing
 ------------
