@@ -386,7 +386,6 @@ namespace PrepareLanding
                 PrefilterQueueLongEvent();
                 return;
             }
-
         }
 
         /// <summary>
@@ -413,6 +412,11 @@ namespace PrepareLanding
             Filter();
         }
 
+        /// <summary>
+        /// Given the <see cref="TileFilter.SubjectThingDef"/> from a filter, returns the filter heaviness.
+        /// </summary>
+        /// <param name="subjectThingDef">The <see cref="TileFilter.SubjectThingDef"/> from a filter.</param>
+        /// <returns>The filter heaviness of the filter if the filter is found, otherwise <see cref="FilterHeaviness.Unknown"/>.</returns>
         public FilterHeaviness FilterHeavinessFromFilterSubjectThingDef(string subjectThingDef)
         {
             if (_filterHeavinessCache == null)

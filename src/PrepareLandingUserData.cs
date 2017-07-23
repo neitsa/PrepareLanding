@@ -133,6 +133,38 @@ namespace PrepareLanding
         }
 
         /// <summary>
+        ///     If True, filter only tiles with a given number of stone types (whatever the stone types are).
+        /// </summary>
+        public bool StoneTypesNumberOnly
+        {
+            get { return _stoneTypesNumberOnly; }
+            set
+            {
+                if (value == _stoneTypesNumberOnly)
+                    return;
+
+                _stoneTypesNumberOnly = value;
+                OnPropertyChanged(nameof(StoneTypesNumberOnly));
+            }
+        }
+
+        /// <summary>
+        ///     The number of stones per tile to filter when the <see cref="StoneTypesNumberOnly"/> boolean is true.
+        /// </summary>
+        public int StoneTypesNumber
+        {
+            get { return _stoneTypesNumber; }
+            set
+            {
+                if (value == _stoneTypesNumber)
+                    return;
+
+                _stoneTypesNumber = value;
+                OnPropertyChanged(nameof(StoneTypesNumber));
+            }
+        }
+
+        /// <summary>
         ///     Current user choices for the roads filtering.
         /// </summary>
         public Dictionary<RoadDef, ThreeStateItem> SelectedRoadDefs { get; } =
@@ -287,6 +319,9 @@ namespace PrepareLanding
                 return false;
 
             if (SelectedStoneDefs.Any(stoneDef => stoneDef.Value.State != MultiCheckboxState.Partial))
+                return false;
+
+            if (_stoneTypesNumberOnly)
                 return false;
 
             if (CurrentMovementTime.Use)
@@ -548,6 +583,16 @@ namespace PrepareLanding
         ///     List of all RimWorld hillinesses.
         /// </summary>
         private List<Hilliness> _hillinesses;
+
+        /// <summary>
+        ///     If true, filter only tiles with only a given number of stone types.
+        /// </summary>
+        private bool _stoneTypesNumberOnly;
+
+        /// <summary>
+        ///     Number of stone types when filtering with <see cref="_stoneTypesNumberOnly"/>.
+        /// </summary>
+        private int _stoneTypesNumber = 2;
 
         /// <summary>
         ///     All river definitions (<see cref="RiverDef" />) from RimWorld.
