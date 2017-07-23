@@ -32,15 +32,16 @@ namespace PrepareLanding.Extensions
             return internalLs;
         }
 
-        public static Listing_Standard BeginScrollViewForText(this Listing_Standard ls, float outerRectHeight,
+        public static void ScrollableTextArea(this Listing_Standard ls, float outerRectHeight,
             string text, ref Vector2 scrollViewPos, GUIStyle textStyle, float widthShrinkage = 0f)
         {
-            // calculate text height for the scroll view height.
-            TmpGuiContent.text = text;
-            var textHeight = textStyle.CalcHeight(TmpGuiContent, ls.ColumnWidth) + 10f;
-            var scrollViewHeight = Mathf.Max(textHeight, outerRectHeight);
+            var scrollViewHeight = ls.CalcHeightForScrollView(text, textStyle, outerRectHeight, widthShrinkage);
 
-            return BeginScrollView(ls, outerRectHeight, scrollViewHeight, ref scrollViewPos, widthShrinkage);
+            var textRect = ls.GetRect(outerRectHeight);
+            var scrollViewRect = new Rect(0f, 0f, ls.ColumnWidth - widthShrinkage, scrollViewHeight);
+            Widgets.BeginScrollView(textRect, ref scrollViewPos, scrollViewRect);
+            GUI.TextArea(scrollViewRect, text, textStyle);
+            Widgets.EndScrollView();
         }
 
         /// <summary>
@@ -74,6 +75,15 @@ namespace PrepareLanding.Extensions
             var r = ls.GetRect(0f);
             r.height = height;
             return r;
+        }
+
+        public static float CalcHeightForScrollView(this Listing_Standard ls, string text, GUIStyle textStyle, float outerRectHeight, float widthShrinkage = 0f)
+        {
+            TmpGuiContent.text = text;
+            var textHeight = textStyle.CalcHeight(TmpGuiContent, ls.ColumnWidth - widthShrinkage) - 10f;
+            var maxHeight = Mathf.Max(textHeight, outerRectHeight);
+
+            return maxHeight;
         }
     }
 }

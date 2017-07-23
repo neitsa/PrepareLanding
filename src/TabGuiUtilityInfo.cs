@@ -138,13 +138,10 @@ namespace PrepareLanding
             if (text.NullOrEmpty())
                 return;
 
-            var maxHeight = InRect.height - ListingStandard.CurHeight - 30f;
+            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
 
-            var innerLs = ListingStandard.BeginScrollViewForText(maxHeight, text, ref _scrollPosFilterInfo, _styleFilterInfo, 16f);
-
-            GUI.TextField(innerLs.GetRect(maxHeight), text, _styleFilterInfo);
-
-            ListingStandard.EndScrollView(innerLs);
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, text, ref _scrollPosFilterInfo, _styleFilterInfo,
+                16f);
         }
     }
 }
