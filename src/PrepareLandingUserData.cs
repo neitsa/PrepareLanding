@@ -32,7 +32,11 @@ namespace PrepareLanding
 
             // register to the option changed event
             Options.PropertyChanged += OptionChanged;
+
+            PresetManager = new PresetManager(this);
         }
+
+        public PresetManager PresetManager { get; }
 
         /// <summary>
         ///     Filter Options (from the GUI window 'options' tab).
@@ -311,14 +315,14 @@ namespace PrepareLanding
 
             if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
                 return false;
-
-            if (SelectedRoadDefs.Any(roadDef => roadDef.Value.State != MultiCheckboxState.Partial))
+            
+            if (!IsDefDictInDefaultState(SelectedRoadDefs))
                 return false;
 
-            if (SelectedRiverDefs.Any(riverDef => riverDef.Value.State != MultiCheckboxState.Partial))
+            if (!IsDefDictInDefaultState(SelectedRiverDefs))
                 return false;
 
-            if (SelectedStoneDefs.Any(stoneDef => stoneDef.Value.State != MultiCheckboxState.Partial))
+            if (!IsDefDictInDefaultState(SelectedStoneDefs))
                 return false;
 
             if (_stoneTypesNumberOnly)
@@ -355,6 +359,11 @@ namespace PrepareLanding
                 return false;
 
             return true;
+        }
+
+        public static bool IsDefDictInDefaultState<T>(Dictionary<T, ThreeStateItem> dict) where T : Def
+        {
+            return dict.All(def => def.Value.State == MultiCheckboxState.Partial);
         }
 
         /// <summary>
@@ -408,7 +417,7 @@ namespace PrepareLanding
         /// <param name="numericItem">An instance of <see cref="UsableMinMaxNumericItem{T}" /> to be initialized.</param>
         /// <param name="propertyChangedName">The property name bound to the <see cref="UsableMinMaxNumericItem{T}" />.</param>
         protected void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
-            string propertyChangedName) where T : struct
+            string propertyChangedName) where T : struct, IComparable, IConvertible
         {
             numericItem.PropertyChanged += delegate { OnPropertyChanged(propertyChangedName); };
         }
@@ -443,6 +452,13 @@ namespace PrepareLanding
                 };
                 dictionary.Add(elementDef, item);
             }
+        }
+
+
+        protected ThreeStateItem InitThreeStateItem(string propertyChanedName,
+            MultiCheckboxState defaultState = MultiCheckboxState.Partial)
+        {
+            return new ThreeStateItem(defaultState);
         }
 
         /* Definitions  building */

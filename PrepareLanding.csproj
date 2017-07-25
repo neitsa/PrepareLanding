@@ -84,6 +84,7 @@
     <Compile Include="src\PrepareLanding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\PrepareLandingWindow.cs" />
+    <Compile Include="src\PresetManager.cs" />
     <Compile Include="src\TabGuiUtilityFilteredTiles.cs" />
     <Compile Include="src\TabGuiUtilityInfo.cs" />
     <Compile Include="src\TabGuiUtilityOptions.cs" />
