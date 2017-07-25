@@ -51,8 +51,7 @@ namespace PrepareLanding
         /// <summary>
         ///     The main GUI window instance.
         /// </summary>
-        public PrepareLandingWindow MainWindow { get; set; }
-
+        public PrepareLandingWindow MainWindow { get; set; } //TODO see if this can be set to a "private set" rather than a public one
 
         /// <summary>
         ///     A unique identifier for your mod.
