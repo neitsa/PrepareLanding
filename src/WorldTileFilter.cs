@@ -279,6 +279,7 @@ namespace PrepareLanding
                 }
 
                 // just send a warning that even if some filter was active it resulted in all tiles matching...
+                // this might happen, for example, on 5% coverage wold where the map is composed of only one biome.
                 if (filteredTiles.Count == _allValidTileIds.Count)
                     FilterInfoLogger.AppendWarningMessage(
                         $"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
