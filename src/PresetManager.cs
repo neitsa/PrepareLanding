@@ -100,6 +100,22 @@ namespace PrepareLanding
                 LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", userData.GrowingPeriod);
                 LoadUsableMinMax(xTemperature, "RainFall", userData.RainFall);
                 userData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
+
+                /*
+                 * Options
+                 */
+                var xOptions = xDocument.Element(RootName)?.Element(OptionNode);
+                if (xOptions == null)
+                    return;
+
+                LoadBoolean(xOptions, "AllowImpassableHilliness", b => userData.Options.AllowImpassableHilliness = b);
+                LoadBoolean(xOptions, "AllowInvalidTilesForNewSettlement", b => userData.Options.AllowInvalidTilesForNewSettlement = b);
+                LoadBoolean(xOptions, "AllowLiveFiltering", b => userData.Options.AllowLiveFiltering = b);
+                LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => userData.Options.BypassMaxHighlightedTiles = b);
+                LoadBoolean(xOptions, "DisablePreFilterCheck", b => userData.Options.DisablePreFilterCheck = b);
+                LoadBoolean(xOptions, "DisableTileBlinking", b => userData.Options.DisableTileBlinking = b);
+                LoadBoolean(xOptions, "ShowDebugTileId", b => userData.Options.ShowDebugTileId = b);
+                LoadBoolean(xOptions, "ShowFilterHeaviness", b => userData.Options.ShowFilterHeaviness = b);
             }
             catch (Exception e)
             {
@@ -465,6 +481,17 @@ namespace PrepareLanding
                     return;
                 item.Max = value;
             }
+        }
+
+        private static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
+        {
+            bool value;
+            if(!Load(xParent, entryName, out value))
+                return false;
+
+            actionSet(value);
+
+            return true;
         }
 
         #endregion LOAD_PRESET
