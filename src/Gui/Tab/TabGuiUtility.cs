@@ -84,8 +84,7 @@ namespace PrepareLanding.Gui.Tab
         }
 
         protected virtual void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label,
-            float min = 0f, float max = 1E+09f)
-            where T : struct
+            float min = 0f, float max = 1E+09f) where T: struct , IComparable, IConvertible
         {
             var tmpCheckedOn = numericItem.Use;
 
