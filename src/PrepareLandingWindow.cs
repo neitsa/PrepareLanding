@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PrepareLanding.Extensions;
 using PrepareLanding.Gui;
 using PrepareLanding.Gui.Tab;
@@ -101,6 +102,7 @@ namespace PrepareLanding
                     ForceClose();
                 }, displayState: DisplayState.Entry | DisplayState.MapInitializing);
 
+
             _bottomButtonsDescriptorList =
                 new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, buttonClose};
 
@@ -177,6 +179,46 @@ namespace PrepareLanding
             DoBottomsButtons(inRect);
         }
 
+        public override void PreOpen()
+        {
+            base.PreOpen();
+
+            /*
+             * note: this code is in PreOpen() rather than in the ctor because otherwise RmiWorld would crash (more precisely, Unity would crash).
+             * I can't remember exactly where, but it deals with Unity calculating the text size of a floating menu
+             * So better to let this code here rather than in the ctor.
+             */
+            if (Enumerable.Any(_bottomButtonsDescriptorList, buttonDesctipor => buttonDesctipor.Label == "Load / Save"))
+                return;
+
+            var buttonSaveLoadPreset = new ButtonDescriptor("Load / Save", "Load or Save Filter Presets");
+            buttonSaveLoadPreset.AddFloatMenuOption("Save", delegate
+                {
+                    PrepareLanding.Instance.PresetManager.TestSave();
+                }, delegate
+                {
+                    var mousePos = Event.current.mousePosition;
+                    var rect = new Rect(mousePos.x, mousePos.y, 30f, 30f);
+
+                    TooltipHandler.TipRegion(rect, "Save current filter states to a preset.");
+                }
+            );
+            buttonSaveLoadPreset.AddFloatMenuOption("Load", delegate
+                {
+                    PrepareLanding.Instance.PresetManager.TestLoad();
+                }, delegate
+                {
+                    var mousePos = Event.current.mousePosition;
+                    var rect = new Rect(mousePos.x, mousePos.y, 30f, 30f);
+
+                    TooltipHandler.TipRegion(rect, "Load a preset.");
+                }
+            );
+            buttonSaveLoadPreset.AddFloatMenu("Select Action");
+            _bottomButtonsDescriptorList.Add(buttonSaveLoadPreset);
+        }
+
+
         public override void PostClose()
         {
             base.PostClose();
@@ -211,16 +253,7 @@ namespace PrepareLanding
                 // get button descriptor
                 var buttonDescriptor = _bottomButtonsDescriptorList[i];
 
-                if (!buttonDescriptor.CanBeDisplayed)
-                    continue;
-
-                // display button; if clicked: call the related action
-                if (Widgets.ButtonText(buttonsRect[i], buttonDescriptor.Label))
-                    buttonDescriptor.Action();
-
-                // display tool-tip (if any)
-                if (!string.IsNullOrEmpty(buttonDescriptor.ToolTip))
-                    TooltipHandler.TipRegion(buttonsRect[i], buttonDescriptor.ToolTip);
+                buttonDescriptor.DrawButton(buttonsRect[i]);
             }
         }
 
