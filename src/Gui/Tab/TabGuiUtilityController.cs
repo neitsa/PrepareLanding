@@ -87,6 +87,19 @@ namespace PrepareLanding.Gui.Tab
         }
 
         /// <summary>
+        ///     Select a tab by its identifier  (<see cref="ITabGuiUtility.Id" />).
+        /// </summary>
+        /// <param name="id">The identifier of the tab to be selected.</param>
+        public void SetSelectedTabById(string id)
+        {
+            var tab = TabById(id);
+            if (tab == null)
+                return;
+
+            SelectedTab = tab;
+        }
+
+        /// <summary>
         ///     Setup the tabs to be displayed.
         /// </summary>
         protected void SetupTabs()
