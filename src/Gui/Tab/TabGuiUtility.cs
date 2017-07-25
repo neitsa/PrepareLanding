@@ -31,6 +31,8 @@ namespace PrepareLanding.Gui.Tab
 
         public abstract string Name { get; }
 
+        public abstract bool CanBeDrawn { get; set; }
+
         public TabRecord TabRecord { get; set; }
 
         public Listing_Standard ListingStandard { get; protected set; }

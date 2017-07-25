@@ -73,7 +73,11 @@ namespace PrepareLanding.Gui.Tab
         /// <param name="inRect">The <see cref="Rect" /> in which to draw the tab content.</param>
         public void DrawSelectedTab(Rect inRect)
         {
-            SelectedTab?.Draw(inRect);
+            if (SelectedTab == null)
+                return;
+
+            if(SelectedTab.CanBeDrawn)
+                SelectedTab.Draw(inRect);
         }
 
         /// <summary>

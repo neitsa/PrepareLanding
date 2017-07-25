@@ -16,6 +16,11 @@ namespace PrepareLanding.Gui.Tab
         string Name { get; }
 
         /// <summary>
+        ///     Gets whether the tab can be draw or not.
+        /// </summary>
+        bool CanBeDrawn { get; }
+
+        /// <summary>
         ///     The <see cref="TabRecord" /> that describes the tab.
         /// </summary>
         TabRecord TabRecord { get; set; }

@@ -27,6 +27,9 @@ namespace PrepareLanding
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
         public override string Name => Id;
 
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
+
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>
         public override void Draw(Rect inRect)

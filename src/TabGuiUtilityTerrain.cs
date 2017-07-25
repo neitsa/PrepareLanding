@@ -31,11 +31,13 @@ namespace PrepareLanding
         /// <summary>A unique identifier for the Tab.</summary>
         public override string Id => Name;
 
-
         /// <summary>
         ///     The name of the tab (that is actually displayed at its top).
         /// </summary>
         public override string Name => "Terrain";
+
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
 
         /// <summary>
         ///     Draw the actual content of this window.

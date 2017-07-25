@@ -50,6 +50,9 @@ namespace PrepareLanding
 
         public override string Name => "World Info";
 
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
+
         public string BuildWorldInfo()
         {
             var stringBuilder = new StringBuilder();
