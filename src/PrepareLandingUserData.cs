@@ -294,6 +294,7 @@ namespace PrepareLanding
             GrowingPeriod =
                 new MinMaxFromRestrictedListItem<Twelfth>(twelfthList, Twelfth.Undefined, Twelfth.Undefined);
             GrowingPeriod.PropertyChanged += delegate { OnPropertyChanged(nameof(GrowingPeriod)); };
+            GrowingPeriod.Use = false;
 
             InitUsableMinMaxNumericItem(RainFall, nameof(RainFall));
         }
@@ -419,6 +420,7 @@ namespace PrepareLanding
         protected void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
             string propertyChangedName) where T : struct, IComparable, IConvertible
         {
+            numericItem.Use = false;
             numericItem.PropertyChanged += delegate { OnPropertyChanged(propertyChangedName); };
         }
 
