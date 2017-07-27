@@ -87,6 +87,7 @@
     <Compile Include="src\PresetManager.cs" />
     <Compile Include="src\TabGuiUtilityFilteredTiles.cs" />
     <Compile Include="src\TabGuiUtilityInfo.cs" />
+    <Compile Include="src\TabGuiUtilityLoadSave.cs" />
     <Compile Include="src\TabGuiUtilityOptions.cs" />
     <Compile Include="src\TabGuiUtilityTemperature.cs" />
     <Compile Include="src\TabGuiUtilityTerrain.cs" />

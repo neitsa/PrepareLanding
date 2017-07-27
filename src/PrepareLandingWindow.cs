@@ -21,7 +21,7 @@ namespace PrepareLanding
         private const int MaxDisplayedTileWhenMinimized = 30;
 
         private readonly List<ButtonDescriptor> _bottomButtonsDescriptorList;
-        private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
+        private readonly Vector2 _bottomButtonSize = new Vector2(105f, 30f);
         private readonly List<ButtonDescriptor> _minimizedWindowButtonsDescriptorList;
 
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
@@ -32,8 +32,12 @@ namespace PrepareLanding
 
         private int _tileDisplayIndexStart;
 
+        private PrepareLandingUserData _userData;
+
         public PrepareLandingWindow(PrepareLandingUserData userData)
         {
+            _userData = userData;
+
             doCloseButton = false; // explicitly disable close button, we'll draw it ourselves
             doCloseX = true;
             optionalTitle = "Prepare Landing";
@@ -49,6 +53,7 @@ namespace PrepareLanding
             _tabGuiUtilities.Add(new TabGuiUtilityFilteredTiles(0.48f));
             _tabGuiUtilities.Add(new TabGuiUtilityInfo(userData, 0.48f));
             _tabGuiUtilities.Add(new TabGuiUtilityOptions(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabGuiUtilityLoadSave(userData, 0.48f));
 
             TabController.Clear();
             TabController.AddTabRange(_tabGuiUtilities);
@@ -184,8 +189,8 @@ namespace PrepareLanding
             base.PreOpen();
 
             /*
-             * note: this code is in PreOpen() rather than in the ctor because otherwise RmiWorld would crash (more precisely, Unity would crash).
-             * I can't remember exactly where, but it deals with Unity calculating the text size of a floating menu
+             * note: this code is in PreOpen() rather than in the ctor because otherwise RimWorld would crash (more precisely, Unity crashes).
+             * I can't remember exactly where, but it deals with Unity calculating the text size of a floating menu.
              * So better to let this code here rather than in the ctor.
              */
             if (Enumerable.Any(_bottomButtonsDescriptorList, buttonDesctipor => buttonDesctipor.Label == "Load / Save"))
@@ -194,7 +199,13 @@ namespace PrepareLanding
             var buttonSaveLoadPreset = new ButtonDescriptor("Load / Save", "Load or Save Filter Presets");
             buttonSaveLoadPreset.AddFloatMenuOption("Save", delegate
                 {
-                    PrepareLanding.Instance.PresetManager.TestSave();
+                    //_userData.PresetManager.TestSave();
+                    var tab = TabController.TabById("LoadSave") as TabGuiUtilityLoadSave;
+                    if (tab == null)
+                        return;
+
+                    tab.LoadSaveMode = LoadSaveMode.Save;
+                    TabController.SetSelectedTabById("LoadSave");
                 }, delegate
                 {
                     var mousePos = Event.current.mousePosition;
@@ -205,7 +216,14 @@ namespace PrepareLanding
             );
             buttonSaveLoadPreset.AddFloatMenuOption("Load", delegate
                 {
-                    PrepareLanding.Instance.PresetManager.TestLoad();
+                    //_userData.PresetManager.TestLoad();
+                    var tab = TabController.TabById("LoadSave") as TabGuiUtilityLoadSave;
+                    if (tab == null)
+                        return;
+
+                    tab.LoadSaveMode = LoadSaveMode.Load;
+                    TabController.SetSelectedTabById("LoadSave");
+
                 }, delegate
                 {
                     var mousePos = Event.current.mousePosition;
