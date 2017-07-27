@@ -15,6 +15,8 @@ namespace PrepareLanding.Gui.Tab
         /// </summary>
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
 
+        private ITabGuiUtility _previouslySelectedTab = null;
+
         /// <summary>
         ///     The currently selected tab in the GUI.
         /// </summary>
@@ -59,12 +61,15 @@ namespace PrepareLanding.Gui.Tab
             if (_tabGuiUtilities.Count == 0)
                 return;
 
-            TabDrawer.DrawTabs(inRect,
-                _tabGuiUtilities.Select(tab =>
+            var tabRecordsToDraw = _tabGuiUtilities.Where(tab => tab.CanBeDrawn)
+                .Select(tab =>
                 {
                     tab.TabRecord.selected = SelectedTab == tab;
                     return tab.TabRecord;
-                }));
+                });
+
+            TabDrawer.DrawTabs(inRect, tabRecordsToDraw);
+
         }
 
         /// <summary>
@@ -94,13 +99,30 @@ namespace PrepareLanding.Gui.Tab
         ///     Select a tab by its identifier  (<see cref="ITabGuiUtility.Id" />).
         /// </summary>
         /// <param name="id">The identifier of the tab to be selected.</param>
-        public void SetSelectedTabById(string id)
+        public bool SetSelectedTabById(string id)
         {
             var tab = TabById(id);
             if (tab == null)
-                return;
+                return false;
 
             SelectedTab = tab;
+            SelectedTab.TabRecord.selected = true;
+            return true;
+        }
+
+        /// <summary>
+        /// Select the previously selected tab as the currently selected tab
+        /// </summary>
+        public void SetPreviousTabAsSelectedTab()
+        {
+            if (_previouslySelectedTab == null)
+                _previouslySelectedTab = _tabGuiUtilities[0];
+
+            if (SelectedTab != null)
+                SelectedTab.TabRecord.selected = false;
+
+            SelectedTab = _previouslySelectedTab;
+            SelectedTab.TabRecord.selected = true;
         }
 
         /// <summary>
@@ -112,7 +134,13 @@ namespace PrepareLanding.Gui.Tab
             {
                 var currentTab = tabGuiUtility;
 
-                currentTab.TabRecord = new TabRecord(currentTab.Name, delegate { SelectedTab = currentTab; }, false);
+                currentTab.TabRecord = new TabRecord(currentTab.Name,
+                    delegate
+                    {
+                        _previouslySelectedTab = SelectedTab;
+                        SelectedTab = currentTab;
+                    }, 
+                    false);
             }
 
             SelectedTab = _tabGuiUtilities[0];
