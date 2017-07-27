@@ -2,20 +2,26 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Runtime.Remoting.Activation;
+using System.Security.Cryptography;
+using System.Text;
 using System.Xml.Linq;
+using PrepareLanding.Extensions;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
 namespace PrepareLanding
 {
-    public class PresetManager
+
+    public class Preset
     {
+        private const string PresetVersionNode = "Version";
         public const string PresetVersion = "1.0";
+        private const string PresetDescriptionNode = "Description";
+        private const string PresetTemplateNode = "Template";
 
-        public const string DefaultExtension = ".XML";
-
-        private const string RootName = "Preset";
         private const string FilterNode = "Filters";
         private const string TerrainNode = "Terrain";
         private const string TemperatureNode = "Temperature";
@@ -37,119 +43,125 @@ namespace PrepareLanding
 
         private readonly PrepareLandingUserData _userData;
 
-        public PresetManager(PrepareLandingUserData userData)
+        private StringBuilder _presetInfo;
+        private int _indent;
+
+        public string Description { get; set; }
+
+        public string Version { get; set;  }
+
+        public bool IsTemplate { get; private set; }
+
+        public string PresetInfo => _presetInfo.ToString();
+
+        public Preset(PrepareLandingUserData userData)
         {
             _userData = userData;
+            IsTemplate = false;
         }
 
-        public string FolderName => PrepareLanding.Instance.ModIdentifier;
-
-        public void LoadFilterPreset(string presetName, PrepareLandingUserData userData)
+        public void LoadPresetInfo(XElement xRootNode)
         {
-            var filePath = GetPresetFilePath(presetName);
+            Version = xRootNode.Element(PresetVersionNode)?.Value;
+            Description = xRootNode.Element(PresetDescriptionNode)?.Value;
+            LoadBoolean(xRootNode, PresetTemplateNode, b => IsTemplate = b);
 
-            if (!File.Exists(filePath))
+            _presetInfo = new StringBuilder();
+            _indent = 0;
+
+            LoadPresetInfoRecusive(xRootNode);
+        }
+
+        private void LoadPresetInfoRecusive(XElement xRootNode)
+        {
+            
+            foreach (var element in xRootNode.Elements())
+            {
+                var indentString = " ".Repeat(_indent);
+                _presetInfo.AppendLine(element.HasElements
+                    ? $"{indentString}{element.Name}"
+                    : $"{indentString}{element.Name}: {element.Value}");
+
+                _indent += 4;
+                LoadPresetInfoRecusive(element);
+            }
+
+            _indent -= 4;
+            if (_indent < 0)
+                _indent = 0;
+        }
+
+        public void LoadPreset(XElement xRootNode)
+        {
+            /*
+             * Header
+             */
+            Version = xRootNode.Element(PresetVersionNode)?.Value;
+            Description = xRootNode.Element(PresetDescriptionNode)?.Value;
+            LoadBoolean(xRootNode, PresetTemplateNode, b => IsTemplate = b);
+
+            /*
+             *  Filters
+             */
+
+            var xFilters = xRootNode.Element(FilterNode);
+
+            // terrain
+            var xTerrain = xFilters?.Element(TerrainNode);
+            if (xTerrain == null)
                 return;
 
-            // disable live filtering as we are gonna change some filters on the fly
-            var liveFilterting = userData.Options.AllowLiveFiltering;
-            userData.Options.AllowLiveFiltering = false;
-
-            // reset everything into it's default state
-            _userData.ResetAllFields();
-
-            try
-            {
-                var xDocument = XDocument.Load(filePath);
-                if (xDocument.Root == null)
-                    throw new Exception("No root node");
-
-                /*
-                 * Filters
-                 */
-
-                var xFilters = xDocument.Element(RootName)?.Element(FilterNode);
-
-                // terrain
-                var xTerrain = xFilters?.Element(TerrainNode);
-                if (xTerrain == null)
-                    return;
-
-                _userData.ChosenBiome = LoadDef<BiomeDef>(xTerrain, "Biome") as BiomeDef;
-                _userData.ChosenHilliness = LoadEnum<Hilliness>(xTerrain, "Hilliness");
-                LoadMultiThreeStates(xTerrain, "Roads", "Road", userData.SelectedRoadDefs);
-                LoadMultiThreeStates(xTerrain, "Rivers", "River", userData.SelectedRiverDefs);
-                LoadUsableMinMax(xTerrain, "CurrentMovementTime", userData.CurrentMovementTime);
-                LoadUsableMinMax(xTerrain, "SummerMovementTime", userData.SummerMovementTime);
-                LoadUsableMinMax(xTerrain, "WinterMovementTime", userData.WinterMovementTime);
-                LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", userData.SelectedStoneDefs,
-                    userData.OrderedStoneDefs);
-                userData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
-                LoadUsableMinMax(xTerrain, "Elevation", userData.Elevation);
-                LoadUsableMinMax(xTerrain, "TimeZone", userData.TimeZone);
+            _userData.ChosenBiome = LoadDef<BiomeDef>(xTerrain, "Biome") as BiomeDef;
+            _userData.ChosenHilliness = LoadEnum<Hilliness>(xTerrain, "Hilliness");
+            LoadMultiThreeStates(xTerrain, "Roads", "Road", _userData.SelectedRoadDefs);
+            LoadMultiThreeStates(xTerrain, "Rivers", "River", _userData.SelectedRiverDefs);
+            LoadUsableMinMax(xTerrain, "CurrentMovementTime", _userData.CurrentMovementTime);
+            LoadUsableMinMax(xTerrain, "SummerMovementTime", _userData.SummerMovementTime);
+            LoadUsableMinMax(xTerrain, "WinterMovementTime", _userData.WinterMovementTime);
+            LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _userData.SelectedStoneDefs,
+                _userData.OrderedStoneDefs);
+            _userData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
+            LoadUsableMinMax(xTerrain, "Elevation", _userData.Elevation);
+            LoadUsableMinMax(xTerrain, "TimeZone", _userData.TimeZone);
 
 
-                // temperature
-                var xTemperature = xFilters.Element(TemperatureNode);
-                if (xTemperature == null)
-                    return;
+            // temperature
+            var xTemperature = xFilters.Element(TemperatureNode);
+            if (xTemperature == null)
+                return;
 
-                LoadUsableMinMax(xTemperature, "AverageTemperature", userData.AverageTemperature);
-                LoadUsableMinMax(xTemperature, "SummerTemperature", userData.SummerTemperature);
-                LoadUsableMinMax(xTemperature, "WinterTemperature", userData.WinterTemperature);
-                LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", userData.GrowingPeriod);
-                LoadUsableMinMax(xTemperature, "RainFall", userData.RainFall);
-                userData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
+            LoadUsableMinMax(xTemperature, "AverageTemperature", _userData.AverageTemperature);
+            LoadUsableMinMax(xTemperature, "SummerTemperature", _userData.SummerTemperature);
+            LoadUsableMinMax(xTemperature, "WinterTemperature", _userData.WinterTemperature);
+            LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", _userData.GrowingPeriod);
+            LoadUsableMinMax(xTemperature, "RainFall", _userData.RainFall);
+            _userData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
 
-                /*
-                 * Options
-                 */
-                var xOptions = xDocument.Element(RootName)?.Element(OptionNode);
-                if (xOptions == null)
-                    return;
+            /*
+             * Options
+             */
+            var xOptions = xRootNode.Element(OptionNode);
+            if (xOptions == null)
+                return;
 
-                LoadBoolean(xOptions, "AllowImpassableHilliness", b => userData.Options.AllowImpassableHilliness = b);
-                LoadBoolean(xOptions, "AllowInvalidTilesForNewSettlement", b => userData.Options.AllowInvalidTilesForNewSettlement = b);
-                LoadBoolean(xOptions, "AllowLiveFiltering", b => userData.Options.AllowLiveFiltering = b);
-                LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => userData.Options.BypassMaxHighlightedTiles = b);
-                LoadBoolean(xOptions, "DisablePreFilterCheck", b => userData.Options.DisablePreFilterCheck = b);
-                LoadBoolean(xOptions, "DisableTileBlinking", b => userData.Options.DisableTileBlinking = b);
-                LoadBoolean(xOptions, "ShowDebugTileId", b => userData.Options.ShowDebugTileId = b);
-                LoadBoolean(xOptions, "ShowFilterHeaviness", b => userData.Options.ShowFilterHeaviness = b);
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Failed to load preset file '{filePath}'. Error:\n\t{e}\n\t{e.Message}");
-                //throw;
-            }
-            finally
-            {
-                // re-enable live filtering.
-                userData.Options.AllowLiveFiltering = liveFilterting;
-            }
+            LoadBoolean(xOptions, "AllowImpassableHilliness", b => _userData.Options.AllowImpassableHilliness = b);
+            LoadBoolean(xOptions, "AllowInvalidTilesForNewSettlement", b => _userData.Options.AllowInvalidTilesForNewSettlement = b);
+            LoadBoolean(xOptions, "AllowLiveFiltering", b => _userData.Options.AllowLiveFiltering = b);
+            LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => _userData.Options.BypassMaxHighlightedTiles = b);
+            LoadBoolean(xOptions, "DisablePreFilterCheck", b => _userData.Options.DisablePreFilterCheck = b);
+            LoadBoolean(xOptions, "DisableTileBlinking", b => _userData.Options.DisableTileBlinking = b);
+            LoadBoolean(xOptions, "ShowDebugTileId", b => _userData.Options.ShowDebugTileId = b);
+            LoadBoolean(xOptions, "ShowFilterHeaviness", b => _userData.Options.ShowFilterHeaviness = b);
 
-            // todo: check root xDoc.Root == null
         }
 
-        public void SaveFilterPreset(string presetName, PrepareLandingUserData userData)
+        public void SavePreset(XElement xRoot, string description = null, bool saveOptions = false)
         {
-            var filePath = GetPresetFilePath(presetName);
-
-            if (File.Exists(filePath))
-            {
-                // TODO ask if overwrite
-            }
-
             try
             {
-                var xDocument = new XDocument();
-
-                var xRoot = new XElement(RootName);
-                xDocument.Add(xRoot);
-
-                xRoot.Add(new XElement("Version", PresetVersion));
-                xRoot.Add(new XElement("PresetTemplate", false));
-                xRoot.Add(new XElement("Description", "My super description"));
+                xRoot.Add(new XElement(PresetVersionNode, PresetVersion));
+                xRoot.Add(new XElement(PresetTemplateNode, false));
+                xRoot.Add(new XElement(PresetDescriptionNode, string.IsNullOrEmpty(description) ? "None" : description));
 
                 /*
                  * filters
@@ -161,29 +173,29 @@ namespace PrepareLanding
                 var xTerrainFilters = new XElement(TerrainNode);
                 xFilter.Add(xTerrainFilters);
 
-                SaveDef(xTerrainFilters, "Biome", userData.ChosenBiome);
-                SaveHilliness(xTerrainFilters, "Hilliness", userData.ChosenHilliness);
-                SaveMultiThreeStates(xTerrainFilters, "Roads", "Road", userData.SelectedRoadDefs);
-                SaveMultiThreeStates(xTerrainFilters, "Rivers", "River", userData.SelectedRiverDefs);
-                SaveUsableMinMax(xTerrainFilters, "CurrentMovementTime", userData.CurrentMovementTime);
-                SaveUsableMinMax(xTerrainFilters, "SummerMovementTime", userData.SummerMovementTime);
-                SaveUsableMinMax(xTerrainFilters, "WinterMovementTime", userData.WinterMovementTime);
-                SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", userData.SelectedStoneDefs,
-                    userData.OrderedStoneDefs);
-                SaveThreeState(xTerrainFilters, "CoastalTile", userData.ChosenCoastalTileState);
-                SaveUsableMinMax(xTerrainFilters, "Elevation", userData.Elevation);
-                SaveUsableMinMax(xTerrainFilters, "TimeZone", userData.TimeZone);
+                SaveDef(xTerrainFilters, "Biome", _userData.ChosenBiome);
+                SaveHilliness(xTerrainFilters, "Hilliness", _userData.ChosenHilliness);
+                SaveMultiThreeStates(xTerrainFilters, "Roads", "Road", _userData.SelectedRoadDefs);
+                SaveMultiThreeStates(xTerrainFilters, "Rivers", "River", _userData.SelectedRiverDefs);
+                SaveUsableMinMax(xTerrainFilters, "CurrentMovementTime", _userData.CurrentMovementTime);
+                SaveUsableMinMax(xTerrainFilters, "SummerMovementTime", _userData.SummerMovementTime);
+                SaveUsableMinMax(xTerrainFilters, "WinterMovementTime", _userData.WinterMovementTime);
+                SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _userData.SelectedStoneDefs,
+                    _userData.OrderedStoneDefs);
+                SaveThreeState(xTerrainFilters, "CoastalTile", _userData.ChosenCoastalTileState);
+                SaveUsableMinMax(xTerrainFilters, "Elevation", _userData.Elevation);
+                SaveUsableMinMax(xTerrainFilters, "TimeZone", _userData.TimeZone);
 
                 // Temperature
                 var xTemperatureFilters = new XElement("Temperature");
                 xFilter.Add(xTemperatureFilters);
 
-                SaveUsableMinMax(xTemperatureFilters, "AverageTemperature", userData.AverageTemperature);
-                SaveUsableMinMax(xTemperatureFilters, "SummerTemperature", userData.SummerTemperature);
-                SaveUsableMinMax(xTemperatureFilters, "WinterTemperature", userData.WinterTemperature);
-                SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", userData.GrowingPeriod);
-                SaveUsableMinMax(xTemperatureFilters, "RainFall", userData.RainFall);
-                SaveThreeState(xTerrainFilters, "AnimalsCanGrazeNow", userData.ChosenAnimalsCanGrazeNowState);
+                SaveUsableMinMax(xTemperatureFilters, "AverageTemperature", _userData.AverageTemperature);
+                SaveUsableMinMax(xTemperatureFilters, "SummerTemperature", _userData.SummerTemperature);
+                SaveUsableMinMax(xTemperatureFilters, "WinterTemperature", _userData.WinterTemperature);
+                SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", _userData.GrowingPeriod);
+                SaveUsableMinMax(xTemperatureFilters, "RainFall", _userData.RainFall);
+                SaveThreeState(xTerrainFilters, "AnimalsCanGrazeNow", _userData.ChosenAnimalsCanGrazeNowState);
 
                 /*
                  * Options
@@ -191,59 +203,25 @@ namespace PrepareLanding
                 var xOption = new XElement(OptionNode);
                 xRoot.Add(xOption);
 
-                SaveBoolean(xOption, "AllowImpassableHilliness", userData.Options.AllowImpassableHilliness);
-                SaveBoolean(xOption, "AllowInvalidTilesForNewSettlement",
-                    userData.Options.AllowInvalidTilesForNewSettlement);
-                SaveBoolean(xOption, "AllowLiveFiltering", userData.Options.AllowLiveFiltering);
-                SaveBoolean(xOption, "BypassMaxHighlightedTiles", userData.Options.BypassMaxHighlightedTiles);
-                SaveBoolean(xOption, "DisablePreFilterCheck", userData.Options.DisablePreFilterCheck);
-                SaveBoolean(xOption, "DisableTileBlinking", userData.Options.DisableTileBlinking);
-                SaveBoolean(xOption, "ShowDebugTileId", userData.Options.ShowDebugTileId);
-                SaveBoolean(xOption, "ShowFilterHeaviness", userData.Options.ShowFilterHeaviness);
+                // don't save options if not asked for
+                if (!saveOptions)
+                    return;
 
-                // save
-                xDocument.Save(filePath, SaveOptions.None);
+                SaveBoolean(xOption, "AllowImpassableHilliness", _userData.Options.AllowImpassableHilliness);
+                SaveBoolean(xOption, "AllowInvalidTilesForNewSettlement",
+                    _userData.Options.AllowInvalidTilesForNewSettlement);
+                SaveBoolean(xOption, "AllowLiveFiltering", _userData.Options.AllowLiveFiltering);
+                SaveBoolean(xOption, "BypassMaxHighlightedTiles", _userData.Options.BypassMaxHighlightedTiles);
+                SaveBoolean(xOption, "DisablePreFilterCheck", _userData.Options.DisablePreFilterCheck);
+                SaveBoolean(xOption, "DisableTileBlinking", _userData.Options.DisableTileBlinking);
+                SaveBoolean(xOption, "ShowDebugTileId", _userData.Options.ShowDebugTileId);
+                SaveBoolean(xOption, "ShowFilterHeaviness", _userData.Options.ShowFilterHeaviness);
             }
             catch (Exception e)
             {
-                Log.Error($"Failed to save preset file '{filePath}'. error:\n\t{e}\n\t{e.Message}");
+                Log.Error($"Failed to save preset file. error:\n\t{e}\n\t{e.Message}");
+                throw;
             }
-        }
-
-        public void TestLoad()
-        {
-            LoadFilterPreset("test.XML", PrepareLanding.Instance.UserData);
-        }
-
-        public void TestSave()
-        {
-            SaveFilterPreset("test.XML", PrepareLanding.Instance.UserData);
-        }
-
-        private string GetPresetFilePath(string fileName)
-        {
-            var folderPath = Path.Combine(GenFilePaths.SaveDataFolderPath, FolderName);
-            var directoryInfo = new DirectoryInfo(folderPath);
-            if (!directoryInfo.Exists)
-            {
-                Log.Message($"[PrepareLanding] Creating mod folder at: '{folderPath}'.");
-                directoryInfo.Create();
-            }
-
-            // file extension checking, just being precautious
-            var filePath = Path.Combine(folderPath, fileName);
-            if (!Path.HasExtension(filePath))
-            {
-                filePath = Path.ChangeExtension(filePath, DefaultExtension);
-            }
-            else
-            {
-                var extension = Path.GetExtension(filePath);
-                if (extension != DefaultExtension)
-                    filePath = Path.ChangeExtension(filePath, DefaultExtension);
-            }
-
-            return filePath;
         }
 
         #region LOAD_PRESET
@@ -281,7 +259,7 @@ namespace PrepareLanding
                     break;
 
                 default:
-                    Log.Message("Unknown defType");
+                    Log.Error("[PrepareLanding] LoadDef: Unknown defType");
                     break;
             }
 
@@ -297,7 +275,7 @@ namespace PrepareLanding
             if (!Enum.IsDefined(typeof(T), xFoundElement.Value))
                 return default(T);
 
-            return (T) Enum.Parse(typeof(T), xFoundElement.Value, true);
+            return (T)Enum.Parse(typeof(T), xFoundElement.Value, true);
         }
 
         private void LoadMultiThreeStates<T>(XContainer xParent, string elementName, string subElementName,
@@ -375,7 +353,7 @@ namespace PrepareLanding
                 return false;
             }
 
-            result = (T) Convert.ChangeType(xFoundElement.Value, typeof(T));
+            result = (T)Convert.ChangeType(xFoundElement.Value, typeof(T));
             return true;
         }
 
@@ -486,7 +464,7 @@ namespace PrepareLanding
         private static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
         {
             bool value;
-            if(!Load(xParent, entryName, out value))
+            if (!Load(xParent, entryName, out value))
                 return false;
 
             actionSet(value);
@@ -603,5 +581,319 @@ namespace PrepareLanding
         }
 
         #endregion SAVE_PRESET
+
+    }
+
+
+    public class PresetManager
+    {
+        public const string DefaultFileName = "PLPreset";
+
+        public const string PresetVersion = "1.0";
+
+        public const string DefaultExtension = ".XML";
+
+        private const string RootName = "Preset";
+
+        private IEnumerable<FileInfo> _allPresetFiles;
+
+        private readonly PrepareLandingUserData _userData;
+
+        private readonly Dictionary<string, Preset> _presetCache = new Dictionary<string, Preset>();
+
+        public IEnumerable<FileInfo> AllPresetFiles
+        {
+            get
+            {
+                if (_allPresetFiles == null && !IsPresetDirectoryEmpty())
+                    RenewPresetFileCache();
+
+                return _allPresetFiles;
+            }
+            private set { _allPresetFiles = value; }
+        }
+
+        /// <summary>
+        /// Name of the preset save folder.
+        /// </summary>
+        public static string FolderName => PrepareLanding.Instance.ModIdentifier;
+
+        public PresetManager(PrepareLandingUserData userData)
+        {
+            _userData = userData;
+            PreloadPresets();
+        }
+
+        public void LoadPresetInfo(string presetName, bool forceReload = false)
+        {
+            var filePath = GetPresetFilePath(presetName);
+
+            if (!File.Exists(filePath))
+                return;
+
+            if (_presetCache.ContainsKey(presetName) && !forceReload)
+                return;
+
+            try
+            {
+                var xDocument = XDocument.Load(filePath);
+                if (xDocument.Root == null)
+                    throw new Exception("No root node");
+
+                // get the root element
+                var xPreset = xDocument.Element(RootName);
+                if (xPreset == null)
+                    throw new Exception($"No root node named '{RootName}'");
+
+                // create the preset or load it if it already exists
+                var preset = !_presetCache.ContainsKey(presetName) ? new Preset(_userData) : _presetCache[presetName];
+
+                preset.LoadPresetInfo(xPreset);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+        }
+
+        public void LoadPreset(string presetName, bool forceReload = false)
+        {
+            if (string.IsNullOrEmpty(presetName))
+                return;
+
+            var filePath = GetPresetFilePath(presetName);
+
+            if (!File.Exists(filePath))
+                return;
+
+            if (_presetCache.ContainsKey(presetName) && !forceReload)
+                return;
+
+            // disable live filtering as we are gonna change some filters on the fly
+            var liveFilterting = _userData.Options.AllowLiveFiltering;
+            _userData.Options.AllowLiveFiltering = false;
+
+            // reset all filter states into their default state
+            _userData.ResetAllFields();
+
+            try
+            {
+                var xDocument = XDocument.Load(filePath);
+                if (xDocument.Root == null)
+                    throw new Exception("No root node");
+
+                // get the root element
+                var xPreset = xDocument.Element(RootName);
+                if (xPreset == null)
+                    throw new Exception($"No root node named '{RootName}'");
+
+                // reload the preset if it was already in the cache
+                Preset preset;
+                if (_presetCache.TryGetValue(presetName, out preset))
+                {
+                    preset.LoadPreset(xPreset);
+
+                    //reload its info
+                    preset.LoadPresetInfo(xPreset);
+                }
+                else
+                {
+                    // create the preset and load it
+                    preset = new Preset(_userData);
+                    preset.LoadPreset(xPreset);
+                    preset.LoadPresetInfo(xPreset);
+
+                    // add it to the cache
+                    _presetCache.Add(presetName, preset);
+                }
+
+                // renew file cache
+                RenewPresetFileCache();
+
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Failed to load preset file '{filePath}'. Error:\n\t{e}\n\t{e.Message}");
+                //throw;
+            }
+            finally
+            {
+                // re-enable live filtering.
+                _userData.Options.AllowLiveFiltering = liveFilterting;
+            }
+        }
+
+        public void SavePreset(string presetName, string description = null, bool saveOptions = false)
+        {
+            if (string.IsNullOrEmpty(presetName))
+                return;
+
+            var filePath = GetPresetFilePath(presetName);
+
+            try
+            {
+                // create document
+                var xDocument = new XDocument();
+
+                // add root node
+                var xRoot = new XElement(RootName);
+                xDocument.Add(xRoot);
+
+                // create preset and start save
+                var preset = new Preset(_userData);
+                preset.SavePreset(xRoot, description, saveOptions);
+
+                // save the document
+                xDocument.Save(filePath);
+
+                // reload the preset if it was already in the cache
+                if (_presetCache.ContainsKey(presetName))
+                {
+                    LoadPreset(presetName, true);
+                }
+                else
+                {
+                    // add it to the cache
+                    _presetCache.Add(presetName, preset);
+
+                    // renew file cache
+                    RenewPresetFileCache();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Failed to save preset file '{filePath}'. error:\n\t{e}\n\t{e.Message}");
+            }
+        }
+
+        private void PreloadPresets()
+        {
+            foreach (var presetFile in AllPresetFiles)
+            {
+                var preset = new Preset(_userData);
+                var presetName = Path.GetFileNameWithoutExtension(presetFile.Name);
+                _presetCache.Add(presetName, preset);
+                LoadPresetInfo(presetName, true);
+            }
+        }
+
+        #region FILE_DIR_HANDLING
+
+        /// <summary>
+        /// Full path of the save folder
+        /// </summary>
+        public static string SaveFolder
+        {
+            get
+            {
+                var folderPath = Path.Combine(GenFilePaths.SaveDataFolderPath, FolderName);
+                var directoryInfo = new DirectoryInfo(folderPath);
+                if (directoryInfo.Exists)
+                    return folderPath;
+
+                Log.Message($"[PrepareLanding] Trying to create mod folder at: '{folderPath}'.");
+                try
+                {
+                    directoryInfo.Create();
+                    Log.Message($"[PrepareLanding] Successfully created the mod folder at: '{folderPath}'.");
+                }
+                catch (Exception e)
+                {
+                    Log.Message(
+                        $"[PrepareLanding] An error occurred while trying to create the mod folder at: '{folderPath}'.\n\tThe Error was: {e.Message}");
+                    return null;
+                }
+                return folderPath;
+            }
+        }
+
+        public bool IsPresetDirectoryEmpty()
+        {
+            return Directory.GetFiles(SaveFolder).Length == 0;
+        }
+
+        private static string GetPresetFilePath(string fileName)
+        {
+            // file extension checking, just being precautious
+            var filePath = Path.Combine(SaveFolder, fileName);
+            if (!Path.HasExtension(filePath))
+            {
+                filePath = Path.ChangeExtension(filePath, DefaultExtension);
+            }
+            else
+            {
+                var extension = Path.GetExtension(filePath);
+                if (string.Compare(extension, DefaultExtension, StringComparison.OrdinalIgnoreCase) != 0)
+                    filePath = Path.ChangeExtension(filePath, DefaultExtension);
+            }
+
+            return filePath;
+        }
+
+        public bool PresetFileExists(string presetName)
+        {
+            if (string.IsNullOrEmpty(presetName))
+                return false;
+
+            return AllPresetFiles.Any(file => string.Compare(file.Name, presetName, StringComparison.CurrentCultureIgnoreCase) == 0);
+        }
+
+        public Preset PresetByPresetName(string presetName)
+        {
+            if (string.IsNullOrEmpty(presetName))
+                return null;
+
+            Preset presetValue;
+            _presetCache.TryGetValue(presetName, out presetValue);
+            return presetValue;
+        }
+
+        private void RenewPresetFileCache()
+        {
+            var dirInfo = new DirectoryInfo(SaveFolder);
+
+            AllPresetFiles = from file in dirInfo.GetFiles()
+                         where string.Compare(file.Extension, DefaultExtension, StringComparison.OrdinalIgnoreCase) == 0
+                         orderby file.LastWriteTime descending
+                         select file;
+        }
+
+        public string NextPresetFileName
+        {
+            get
+            {
+                var counter = 0;
+                string fileName;
+                do
+                {
+                    fileName = $"{DefaultFileName}_{counter}{DefaultExtension}";
+                    counter++;
+                } while (PresetFileExists($"{fileName}"));
+
+                return Path.GetFileNameWithoutExtension(fileName);
+            }
+        }
+
+        public static bool PresetExists(string presetName)
+        {
+            var filePath = GetPresetFilePath(presetName);
+
+            return File.Exists(filePath);
+        }
+
+        public static string PresetFileMd5(string filePath)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filePath))
+                {
+                    return BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "‌​").ToLower();
+                }
+            }
+        }
+
+        #endregion FILE_DIR_HANDLING
     }
 }
