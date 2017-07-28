@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using PrepareLanding.Extensions;
 using PrepareLanding.Gui.Tab;
 using UnityEngine;
@@ -34,9 +32,9 @@ namespace PrepareLanding
 
         private string _presetDescription = string.Empty;
 
-        private bool _saveOptions;
+        private string _presetAuthor = string.Empty;
 
-        private bool _presetExistsFlag;
+        private bool _saveOptions;
 
         private bool _allowOverwriteExistingPreset;
 
@@ -123,10 +121,7 @@ namespace PrepareLanding
         protected void DrawBottomButtons(Rect inRect)
         {
             var buttonsY = inRect.height - 30f;
-
-            var numButtons = 2;
-            if (_presetExistsFlag)
-                numButtons++;
+            const int numButtons = 2;
 
             var buttonRects = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x, _bottomButtonSize.y, 20f);
             if (buttonRects.Count != numButtons)
@@ -151,8 +146,15 @@ namespace PrepareLanding
                     throw new ArgumentOutOfRangeException();
             }
 
+            var presetExistsNoOverwrite = PresetManager.PresetExists(_selectedFileName) &&
+                                          !_allowOverwriteExistingPreset;
+
             var savedColor = GUI.color;
-            GUI.color = Color.green;
+            if (LoadSaveMode == LoadSaveMode.Save)
+                GUI.color = presetExistsNoOverwrite ? Color.red : Color.green;
+            else
+                GUI.color = Color.green;
+
             if (Verse.Widgets.ButtonText(buttonRects[0], $"{verb} Preset"))
             {
                 if (LoadSaveMode == LoadSaveMode.Load)
@@ -161,15 +163,16 @@ namespace PrepareLanding
                 }
                 else if (LoadSaveMode == LoadSaveMode.Save)
                 {
-                    if (PresetManager.PresetExists(_selectedFileName) && !_allowOverwriteExistingPreset)
-                        _presetExistsFlag = true;
+                    if (presetExistsNoOverwrite)
+                    {
+                        _allowOverwriteExistingPreset = true;
+                        Messages.Message($"Click again on the \"{verb}\" button to confirm the overwrite of the existing preset.", MessageSound.Standard);
+                    }
                     else
                     {
-                        _presetExistsFlag = false;
                         _allowOverwriteExistingPreset = false;
-                        _userData.PresetManager.SavePreset(_selectedFileName, _presetDescription, _saveOptions);
+                        _userData.PresetManager.SavePreset(_selectedFileName, _presetDescription, _presetAuthor, _saveOptions);
                     }
-
                 }
             }
             GUI.color = savedColor;
@@ -177,23 +180,11 @@ namespace PrepareLanding
             if (Verse.Widgets.ButtonText(buttonRects[1], $"Exit {verb}"))
             {
                 LoadSaveMode = LoadSaveMode.Unknown;
+                _allowOverwriteExistingPreset = false;
                 _selectedFileIndex = -1;
                 _selectedFileName = null;
                 PrepareLanding.Instance.MainWindow.TabController.SetPreviousTabAsSelectedTab();
             }
-
-            if (_presetExistsFlag && numButtons == 3)
-            {
-                savedColor = GUI.color;
-                GUI.color = Color.red;
-                if (Verse.Widgets.ButtonText(buttonRects[2], "Confirm Overwrite"))
-                {
-                    _allowOverwriteExistingPreset = true;
-                }
-                GUI.color = savedColor;
-            }
-
-
         }
 
         #region LOAD_MODE
@@ -218,14 +209,12 @@ namespace PrepareLanding
                 return;
             }
 
-            var fileInfos = presetFiles as IList<FileInfo> ?? presetFiles.ToList();
-            if (!fileInfos.Any())
+            var presetFilesCount = presetFiles.Count;
+            if (presetFiles.Count == 0)
             {
                 ListingStandard.Label("No existing presets.");
                 return;
             }
-
-            var itemsToDisplay = fileInfos.Count;
 
             // add a gap before the scroll view
             ListingStandard.Gap(DefaultGapLineHeight);
@@ -238,7 +227,7 @@ namespace PrepareLanding
             var maxScrollViewOuterHeight = InRect.height - ListingStandard.CurHeight - 30f;
 
             // height of the 'virtual' portion of the scroll view
-            var scrollableViewHeight = itemsToDisplay * DefaultElementHeight + DefaultGapLineHeight * MaxDisplayedFiles;
+            var scrollableViewHeight = presetFilesCount * DefaultElementHeight + DefaultGapLineHeight * MaxDisplayedFiles;
 
             /*
              * Scroll view
@@ -246,10 +235,10 @@ namespace PrepareLanding
             var innerLs = ListingStandard.BeginScrollView(maxScrollViewOuterHeight, scrollableViewHeight,
                 ref _scrollPosPresetFiles, 16f);
 
-            var endIndex = _fileDisplayIndexStart + itemsToDisplay;
+            var endIndex = _fileDisplayIndexStart + presetFilesCount;
             for (var i = _fileDisplayIndexStart; i < endIndex; i++)
             {
-                var selectedFile = fileInfos[i];
+                var selectedFile = presetFiles[i];
 
                 // get file name
                 var labelText = Path.GetFileNameWithoutExtension(selectedFile.Name);
@@ -285,7 +274,7 @@ namespace PrepareLanding
                 return;
 
             var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - DefaultElementHeight;
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo, ref _scrollPosPresetInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.FilterInfo, ref _scrollPosPresetInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
         }
 
         #endregion LOAD_MODE
@@ -317,6 +306,14 @@ namespace PrepareLanding
             ListingStandard.GapLine(DefaultGapLineHeight);
 
             ListingStandard.CheckboxLabeled("Save Options", ref _saveOptions, "Check to also save options alongside filters.");
+
+            ListingStandard.GapLine(DefaultGapLineHeight);
+
+            DrawEntryHeader($"Author: [optional; 50 chars max]");
+
+            _presetAuthor = ListingStandard.TextEntry(_presetAuthor);
+            if (_presetAuthor.Length >= 50)
+                _presetAuthor = _presetAuthor.Substring(0, 50);
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
