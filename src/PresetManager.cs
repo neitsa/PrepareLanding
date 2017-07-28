@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Activation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
@@ -14,19 +13,109 @@ using Verse;
 
 namespace PrepareLanding
 {
+    public class PresetInfo
+    {
+        public const string InfoNode = "Info";
+        public const string PresetVersionNode = "Version";
+        public const string PresetVersion = "1.0";
+        public const string PresetDescriptionNode = "Description";
+        public const string PresetTemplateNode = "Template";
+        public const string PresetAuthorNode = "Author";
+        public const string PresetDateNode = "Date";
+
+        public string Description { get; set; }
+
+        public string Version { get; set; }
+
+        public string Author { get; set; }
+
+        public DateTime Date { get; set; }
+
+        public bool IsTemplate { get; private set; }
+
+        private StringBuilder _filterInfo;
+
+        public string FilterInfo => _filterInfo.ToString();
+
+        private StringBuilder _optionInfo;
+
+        public string OptionInfo => _optionInfo.ToString();
+
+        private int _indentLevel;
+
+        public void SavePresetInfo(XContainer xRootElement)
+        {
+            var xInfoElement = new XElement(InfoNode);
+            xRootElement.Add(xInfoElement);
+
+            xInfoElement.Add(new XElement(PresetVersionNode, PresetVersion));
+            xInfoElement.Add(new XElement(PresetAuthorNode, Author));
+            xInfoElement.Add(new XElement(PresetTemplateNode, false));
+            xInfoElement.Add(new XElement(PresetDescriptionNode, string.IsNullOrEmpty(Description) ? "None" : Description));
+            //xInfoElement.Add(new XElement(PresetDateNode, DateTime.Now));
+        }
+
+        public void LoadPresetInfo(XContainer xRootNode)
+        {
+            _filterInfo = new StringBuilder();
+            _optionInfo = new StringBuilder();
+
+            var xInfoNode = xRootNode?.Element(InfoNode);
+            if (xInfoNode == null)
+                return;
+
+            Version = xInfoNode.Element(PresetVersionNode)?.Value;
+            Author = xInfoNode.Element(PresetAuthorNode)?.Value;
+            //Date = xRootNode.Element(PresetDateNode)?.Value;
+            Description = xInfoNode.Element(PresetDescriptionNode)?.Value;
+            Preset.LoadBoolean(xInfoNode, PresetTemplateNode, b => IsTemplate = b);
+
+            var xPresetNode = xInfoNode.Parent;
+
+            var xFilters = xPresetNode?.Element(Preset.FilterNode);
+            if (xFilters == null)
+                return;
+
+            _indentLevel = 0;
+            LoadPresetInfoRecursive(xFilters, _filterInfo);
+
+            var xOptions = xPresetNode.Element(Preset.OptionNode);
+            if (xOptions == null)
+                return;
+
+            _indentLevel = 0;
+            LoadPresetInfoRecursive(xOptions, _optionInfo);
+        }
+
+        private void LoadPresetInfoRecursive(XContainer xRootNode, StringBuilder sb)
+        {
+            foreach (var element in xRootNode.Elements())
+            {
+                var indentString = " ".Repeat(_indentLevel);
+                sb.AppendLine(element.HasElements
+                    ? $"{indentString}{element.Name}"
+                    : $"{indentString}{element.Name}: {element.Value}");
+
+                _indentLevel += 4;
+                LoadPresetInfoRecursive(element, sb);
+            }
+
+            _indentLevel -= 4;
+            if (_indentLevel < 0)
+                _indentLevel = 0;
+        }
+    }
 
     public class Preset
     {
-        private const string PresetVersionNode = "Version";
-        public const string PresetVersion = "1.0";
-        private const string PresetDescriptionNode = "Description";
-        private const string PresetTemplateNode = "Template";
+        #region XML_NODES
 
-        private const string FilterNode = "Filters";
+        public const string RootName = "Preset";
+        public const string FilterNode = "Filters";
         private const string TerrainNode = "Terrain";
         private const string TemperatureNode = "Temperature";
 
-        private const string OptionNode = "Options";
+        public const string OptionNode = "Options";
 
         // use / min / max
         private const string MinNode = "Min";
@@ -41,64 +130,73 @@ namespace PrepareLanding
         // state
         private const string StateNode = "State";
 
+        #endregion XML_NODES
+
         private readonly PrepareLandingUserData _userData;
 
-        private StringBuilder _presetInfo;
-        private int _indent;
+        public string PresetName { get; }
 
-        public string Description { get; set; }
+        public PresetInfo PresetInfo { get; }
 
-        public string Version { get; set;  }
-
-        public bool IsTemplate { get; private set; }
-
-        public string PresetInfo => _presetInfo.ToString();
-
-        public Preset(PrepareLandingUserData userData)
+        public Preset(string presetName, PrepareLandingUserData userData)
         {
+            PresetName = presetName;
             _userData = userData;
-            IsTemplate = false;
+            PresetInfo = new PresetInfo();
         }
 
-        public void LoadPresetInfo(XElement xRootNode)
+        private XElement GetTopElement(out XDocument xDocument, bool fileMustExist)
         {
-            Version = xRootNode.Element(PresetVersionNode)?.Value;
-            Description = xRootNode.Element(PresetDescriptionNode)?.Value;
-            LoadBoolean(xRootNode, PresetTemplateNode, b => IsTemplate = b);
+            var filePath = PresetManager.FullPresetPathFromPresetName(PresetName, fileMustExist);
+            if (string.IsNullOrEmpty(filePath))
+                throw new ArgumentException($"[PrepareLanding] presetName ({PresetName}) doesn't lead to a full path.");
 
-            _presetInfo = new StringBuilder();
-            _indent = 0;
-
-            LoadPresetInfoRecusive(xRootNode);
-        }
-
-        private void LoadPresetInfoRecusive(XElement xRootNode)
-        {
-            
-            foreach (var element in xRootNode.Elements())
+            XElement xPreset;
+            if (fileMustExist)
             {
-                var indentString = " ".Repeat(_indent);
-                _presetInfo.AppendLine(element.HasElements
-                    ? $"{indentString}{element.Name}"
-                    : $"{indentString}{element.Name}: {element.Value}");
+                // load the document and check if there's a root node.
+                xDocument = XDocument.Load(filePath);
+                if (xDocument.Root == null)
+                    throw new Exception("No root node");
 
-                _indent += 4;
-                LoadPresetInfoRecusive(element);
+                // get the root element
+                xPreset = xDocument.Element(RootName);
+                if (xPreset == null)
+                    throw new Exception($"No root node named '{RootName}'");
+            }
+            else
+            {
+                // create document
+                xDocument = new XDocument();
+
+                // add root node
+                xPreset = new XElement(RootName);
+                xDocument.Add(xPreset);
             }
 
-            _indent -= 4;
-            if (_indent < 0)
-                _indent = 0;
+            return xPreset;
         }
 
-        public void LoadPreset(XElement xRootNode)
+        public void LoadPresetInfo()
         {
+            XDocument xDocument;
+            var xRootNode = GetTopElement(out xDocument, true);
+            if (xRootNode == null)
+                return;
+
+            PresetInfo.LoadPresetInfo(xRootNode);
+        }
+
+        public void LoadPreset(bool loadOptions = true)
+        {
+            XDocument xDocument;
+            var xRootNode = GetTopElement(out xDocument, true);
+            if (xRootNode == null)
+                return;
             /*
              * Header
              */
-            Version = xRootNode.Element(PresetVersionNode)?.Value;
-            Description = xRootNode.Element(PresetDescriptionNode)?.Value;
-            LoadBoolean(xRootNode, PresetTemplateNode, b => IsTemplate = b);
+            LoadPresetInfo();
 
             /*
              *  Filters
@@ -144,6 +242,10 @@ namespace PrepareLanding
             if (xOptions == null)
                 return;
 
+            // just check if asked to load options or not.
+            if (!loadOptions)
+                return;
+
             LoadBoolean(xOptions, "AllowImpassableHilliness", b => _userData.Options.AllowImpassableHilliness = b);
             LoadBoolean(xOptions, "AllowInvalidTilesForNewSettlement", b => _userData.Options.AllowInvalidTilesForNewSettlement = b);
             LoadBoolean(xOptions, "AllowLiveFiltering", b => _userData.Options.AllowLiveFiltering = b);
@@ -152,16 +254,19 @@ namespace PrepareLanding
             LoadBoolean(xOptions, "DisableTileBlinking", b => _userData.Options.DisableTileBlinking = b);
             LoadBoolean(xOptions, "ShowDebugTileId", b => _userData.Options.ShowDebugTileId = b);
             LoadBoolean(xOptions, "ShowFilterHeaviness", b => _userData.Options.ShowFilterHeaviness = b);
-
         }
 
-        public void SavePreset(XElement xRoot, string description = null, bool saveOptions = false)
+        public void SavePreset(string description = null, bool saveOptions = false)
         {
             try
             {
-                xRoot.Add(new XElement(PresetVersionNode, PresetVersion));
-                xRoot.Add(new XElement(PresetTemplateNode, false));
-                xRoot.Add(new XElement(PresetDescriptionNode, string.IsNullOrEmpty(description) ? "None" : description));
+                XDocument xDocument;
+                var xRoot = GetTopElement(out xDocument, false);
+                if (xRoot == null)
+                    return;
+
+                // preset info
+                PresetInfo.SavePresetInfo(xRoot);
 
                 /*
                  * filters
@@ -216,6 +321,9 @@ namespace PrepareLanding
                 SaveBoolean(xOption, "DisableTileBlinking", _userData.Options.DisableTileBlinking);
                 SaveBoolean(xOption, "ShowDebugTileId", _userData.Options.ShowDebugTileId);
                 SaveBoolean(xOption, "ShowFilterHeaviness", _userData.Options.ShowFilterHeaviness);
+
+                // save the document
+                xDocument.Save(PresetManager.FullPresetPathFromPresetName(PresetName, false));
             }
             catch (Exception e)
             {
@@ -398,10 +506,7 @@ namespace PrepareLanding
         private static MultiCheckboxState LoadThreeState(XContainer xParent, string containerName)
         {
             var xChild = xParent.Element(containerName);
-            if (xChild == null)
-                return default(MultiCheckboxState);
-
-            return LoadEnum<MultiCheckboxState>(xChild, StateNode);
+            return xChild == null ? default(MultiCheckboxState) : LoadEnum<MultiCheckboxState>(xChild, StateNode);
         }
 
         private static void LoadMinMaxFromRestrictedList<T>(XContainer xParent, string elementName,
@@ -461,7 +566,7 @@ namespace PrepareLanding
             }
         }
 
-        private static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
+        internal static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
         {
             bool value;
             if (!Load(xParent, entryName, out value))
@@ -587,30 +692,25 @@ namespace PrepareLanding
 
     public class PresetManager
     {
-        public const string DefaultFileName = "PLPreset";
-
-        public const string PresetVersion = "1.0";
+        public const string DefaultPresetName = "PLPreset";
 
         public const string DefaultExtension = ".XML";
 
-        private const string RootName = "Preset";
-
-        private IEnumerable<FileInfo> _allPresetFiles;
+        private readonly List<FileInfo> _allPresetFiles = new List<FileInfo>();
 
         private readonly PrepareLandingUserData _userData;
 
         private readonly Dictionary<string, Preset> _presetCache = new Dictionary<string, Preset>();
 
-        public IEnumerable<FileInfo> AllPresetFiles
+        public List<FileInfo> AllPresetFiles
         {
             get
             {
-                if (_allPresetFiles == null && !IsPresetDirectoryEmpty())
+                if (_allPresetFiles.Count == 0 && !IsPresetDirectoryEmpty())
                     RenewPresetFileCache();
 
                 return _allPresetFiles;
             }
-            private set { _allPresetFiles = value; }
         }
 
         /// <summary>
@@ -621,6 +721,10 @@ namespace PrepareLanding
         public PresetManager(PrepareLandingUserData userData)
         {
             _userData = userData;
+
+            // just make sure the preset dir exists by calling the SaveFolder Property
+            Log.Message($"[PrepareLanding] Preset folder is at: {SaveFolder}");
+
             PreloadPresets();
         }
 
@@ -635,27 +739,18 @@ namespace PrepareLanding
                 return;
 
             try
-            {
-                var xDocument = XDocument.Load(filePath);
-                if (xDocument.Root == null)
-                    throw new Exception("No root node");
-
-                // get the root element
-                var xPreset = xDocument.Element(RootName);
-                if (xPreset == null)
-                    throw new Exception($"No root node named '{RootName}'");
-
+            { 
                 // create the preset or load it if it already exists
-                var preset = !_presetCache.ContainsKey(presetName) ? new Preset(_userData) : _presetCache[presetName];
+                var preset = !_presetCache.ContainsKey(presetName) ? new Preset(presetName, _userData) : _presetCache[presetName];
 
-                preset.LoadPresetInfo(xPreset);
+                preset.LoadPresetInfo();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Messages.Message("[PrepareLanding] Error loading preset info.", MessageSound.RejectInput);
+                Log.Error($"[PrepareLanding] LoadPresetInfo error: {e}");
                 throw;
             }
-
         }
 
         public void LoadPreset(string presetName, bool forceReload = false)
@@ -680,30 +775,21 @@ namespace PrepareLanding
 
             try
             {
-                var xDocument = XDocument.Load(filePath);
-                if (xDocument.Root == null)
-                    throw new Exception("No root node");
-
-                // get the root element
-                var xPreset = xDocument.Element(RootName);
-                if (xPreset == null)
-                    throw new Exception($"No root node named '{RootName}'");
-
                 // reload the preset if it was already in the cache
                 Preset preset;
                 if (_presetCache.TryGetValue(presetName, out preset))
                 {
-                    preset.LoadPreset(xPreset);
+                    preset.LoadPreset();
 
                     //reload its info
-                    preset.LoadPresetInfo(xPreset);
+                    preset.LoadPresetInfo();
                 }
                 else
                 {
                     // create the preset and load it
-                    preset = new Preset(_userData);
-                    preset.LoadPreset(xPreset);
-                    preset.LoadPresetInfo(xPreset);
+                    preset = new Preset(presetName, _userData);
+                    preset.LoadPreset();
+                    preset.LoadPresetInfo();
 
                     // add it to the cache
                     _presetCache.Add(presetName, preset);
@@ -711,12 +797,11 @@ namespace PrepareLanding
 
                 // renew file cache
                 RenewPresetFileCache();
-
             }
             catch (Exception e)
             {
+                Messages.Message("[PrepareLanding] Error loading preset.", MessageSound.RejectInput);
                 Log.Error($"Failed to load preset file '{filePath}'. Error:\n\t{e}\n\t{e.Message}");
-                //throw;
             }
             finally
             {
@@ -725,37 +810,40 @@ namespace PrepareLanding
             }
         }
 
-        public void SavePreset(string presetName, string description = null, bool saveOptions = false)
+        public void SavePreset(string presetName, string description = null, string author = null, bool saveOptions = false)
         {
             if (string.IsNullOrEmpty(presetName))
                 return;
 
             var filePath = GetPresetFilePath(presetName);
 
+            // just check we aren't trying to overwrite a template preset
+            if (_presetCache.ContainsKey(presetName))
+            {
+                if (_presetCache[presetName].PresetInfo.IsTemplate)
+                {
+                    Messages.Message("[PrepareLanding] It is not allowed to overwrite a template preset.",
+                        MessageSound.RejectInput);
+                    return;
+                }
+            }
+
             try
             {
-                // create document
-                var xDocument = new XDocument();
-
-                // add root node
-                var xRoot = new XElement(RootName);
-                xDocument.Add(xRoot);
-
                 // create preset and start save
-                var preset = new Preset(_userData);
-                preset.SavePreset(xRoot, description, saveOptions);
+                var preset = new Preset(presetName, _userData);
+                preset.PresetInfo.Description = description;
+                preset.PresetInfo.Author = author;
+                preset.SavePreset(description, saveOptions);
 
-                // save the document
-                xDocument.Save(filePath);
-
-                // reload the preset if it was already in the cache
+                // reload the preset now if it was already in the cache
                 if (_presetCache.ContainsKey(presetName))
                 {
                     LoadPreset(presetName, true);
                 }
                 else
                 {
-                    // add it to the cache
+                    // it's a new preset: add it to the cache
                     _presetCache.Add(presetName, preset);
 
                     // renew file cache
@@ -764,7 +852,12 @@ namespace PrepareLanding
             }
             catch (Exception e)
             {
-                Log.Error($"Failed to save preset file '{filePath}'. error:\n\t{e}\n\t{e.Message}");
+                // remove preset in cache on exception
+                if (_presetCache.ContainsKey(presetName))
+                    _presetCache.Remove(presetName);
+
+                Messages.Message("[PrepareLanding] Failed to save preset file.", MessageSound.RejectInput);
+                Log.Error($"[PrepareLanding] Failed to save preset file '{filePath}'. error:\n\t{e}\n\t{e.Message}");
             }
         }
 
@@ -772,8 +865,9 @@ namespace PrepareLanding
         {
             foreach (var presetFile in AllPresetFiles)
             {
-                var preset = new Preset(_userData);
                 var presetName = Path.GetFileNameWithoutExtension(presetFile.Name);
+                var preset = new Preset(presetName, _userData);
+                
                 _presetCache.Add(presetName, preset);
                 LoadPresetInfo(presetName, true);
             }
@@ -816,8 +910,12 @@ namespace PrepareLanding
 
         private static string GetPresetFilePath(string fileName)
         {
-            // file extension checking, just being precautious
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentException("[PrepareLanding] GetPresetFilePath: filename is null");
+
             var filePath = Path.Combine(SaveFolder, fileName);
+
+            // file extension checking, just being precautious
             if (!Path.HasExtension(filePath))
             {
                 filePath = Path.ChangeExtension(filePath, DefaultExtension);
@@ -828,6 +926,15 @@ namespace PrepareLanding
                 if (string.Compare(extension, DefaultExtension, StringComparison.OrdinalIgnoreCase) != 0)
                     filePath = Path.ChangeExtension(filePath, DefaultExtension);
             }
+
+            return filePath;
+        }
+
+        public static string FullPresetPathFromPresetName(string presetName, bool fileMustExists)
+        {
+            var filePath = GetPresetFilePath(presetName);
+            if(fileMustExists)
+                return File.Exists(filePath) ? filePath : null;
 
             return filePath;
         }
@@ -854,10 +961,14 @@ namespace PrepareLanding
         {
             var dirInfo = new DirectoryInfo(SaveFolder);
 
-            AllPresetFiles = from file in dirInfo.GetFiles()
+            _allPresetFiles.Clear();
+
+            var orderedFiles = from file in dirInfo.GetFiles()
                          where string.Compare(file.Extension, DefaultExtension, StringComparison.OrdinalIgnoreCase) == 0
                          orderby file.LastWriteTime descending
                          select file;
+
+            _allPresetFiles.AddRange(orderedFiles);
         }
 
         public string NextPresetFileName
@@ -868,7 +979,7 @@ namespace PrepareLanding
                 string fileName;
                 do
                 {
-                    fileName = $"{DefaultFileName}_{counter}{DefaultExtension}";
+                    fileName = $"{DefaultPresetName}_{counter}{DefaultExtension}";
                     counter++;
                 } while (PresetFileExists($"{fileName}"));
 
