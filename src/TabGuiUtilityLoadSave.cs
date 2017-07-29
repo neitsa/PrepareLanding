@@ -4,6 +4,7 @@ using PrepareLanding.Extensions;
 using PrepareLanding.Gui.Tab;
 using UnityEngine;
 using Verse;
+using Verse.Steam;
 
 namespace PrepareLanding
 {
@@ -20,9 +21,13 @@ namespace PrepareLanding
 
         private Vector2 _scrollPosPresetFiles;
 
-        private Vector2 _scrollPosPresetInfo;
+        private Vector2 _scrollPosPresetFilterInfo;
+
+        private Vector2 _scrollPosPresetOptionInfo;
 
         private Vector2 _scrollPosPresetDescription;
+
+        private Vector2 _scrollPosPresetLoadDescription;
 
         private int _fileDisplayIndexStart = 0;
 
@@ -30,9 +35,9 @@ namespace PrepareLanding
 
         private string _selectedFileName = string.Empty;
 
-        private string _presetDescription = string.Empty;
+        private string _presetDescriptionSave = string.Empty;
 
-        private string _presetAuthor = string.Empty;
+        private string _presetAuthorSave = string.Empty;
 
         private bool _saveOptions;
 
@@ -43,6 +48,8 @@ namespace PrepareLanding
         public const float MaxDisplayedFiles = 20f;
 
         public const int MaxDescriptionLength = 300;
+
+        public const int MaxAuthorNameLength = 50;
 
         public LoadSaveMode LoadSaveMode { get; set; }
 
@@ -60,6 +67,11 @@ namespace PrepareLanding
                 wordWrap = true,
                 richText = true
             };
+
+            // setup default name
+            if (SteamManager.Initialized)
+                _presetAuthorSave = SteamUtility.SteamPersonaName;
+            // TODO check if possible to get logged in user if non steam rimworld
         }
 
         /// <summary>A unique identifier for the Tab.</summary>
@@ -146,8 +158,9 @@ namespace PrepareLanding
                     throw new ArgumentOutOfRangeException();
             }
 
-            var presetExistsNoOverwrite = PresetManager.PresetExists(_selectedFileName) &&
-                                          !_allowOverwriteExistingPreset;
+            var presetExistsNoOverwrite = false;
+            if (!string.IsNullOrEmpty(_selectedFileName))
+                presetExistsNoOverwrite = PresetManager.PresetExists(_selectedFileName) && !_allowOverwriteExistingPreset;
 
             var savedColor = GUI.color;
             if (LoadSaveMode == LoadSaveMode.Save)
@@ -159,7 +172,15 @@ namespace PrepareLanding
             {
                 if (LoadSaveMode == LoadSaveMode.Load)
                 {
-                    _userData.PresetManager.LoadPreset(_selectedFileName, true);
+                    if(!string.IsNullOrEmpty(_selectedFileName))
+                    { 
+                        if(_userData.PresetManager.LoadPreset(_selectedFileName, true))
+                            Messages.Message("Successfuly loaded the preset!", MessageSound.Benefit);
+                        else
+                            Messages.Message("Error: couldn't load the preset...", MessageSound.Negative);
+                    }
+                    else
+                        Messages.Message("Pick a preset first.", MessageSound.Negative);
                 }
                 else if (LoadSaveMode == LoadSaveMode.Save)
                 {
@@ -171,7 +192,10 @@ namespace PrepareLanding
                     else
                     {
                         _allowOverwriteExistingPreset = false;
-                        _userData.PresetManager.SavePreset(_selectedFileName, _presetDescription, _presetAuthor, _saveOptions);
+                        if(_userData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave, _saveOptions))
+                            Messages.Message("Successfuly saved the preset!", MessageSound.Benefit);
+                        else
+                            Messages.Message("Error: couldn't save the preset...", MessageSound.Negative);
                     }
                 }
             }
@@ -262,19 +286,29 @@ namespace PrepareLanding
 
         protected void DrawLoadPresetInfo(Rect inRect)
         {
-            DrawEntryHeader("Preset info", backgroundColor: Color.green);
+            DrawEntryHeader("Preset Info:", backgroundColor: Color.green);
 
             if (_selectedFileIndex < 0)
                 return;
 
-            ListingStandard.TextEntryLabeled("Preset Name:", _selectedFileName);
+            ListingStandard.TextEntryLabeled2("Preset Name:", _selectedFileName);
 
             var preset = _userData.PresetManager.PresetByPresetName(_selectedFileName);
             if (preset == null)
                 return;
 
-            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - DefaultElementHeight;
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.FilterInfo, ref _scrollPosPresetInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
+            ListingStandard.TextEntryLabeled2("Author:", preset.PresetInfo.Author);
+
+            ListingStandard.Label("Description:");
+            var descriptionRect = ListingStandard.GetRect(80f);
+            Widgets.TextAreaScrollable(descriptionRect, preset.PresetInfo.Description, ref _scrollPosPresetLoadDescription);
+
+            ListingStandard.Label("Filters:");
+            var maxOuterRectHeight = 130f;
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.FilterInfo, ref _scrollPosPresetFilterInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
+
+            ListingStandard.Label("Options:");
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.OptionInfo, ref _scrollPosPresetOptionInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
         }
 
         #endregion LOAD_MODE
@@ -311,19 +345,19 @@ namespace PrepareLanding
 
             DrawEntryHeader($"Author: [optional; 50 chars max]");
 
-            _presetAuthor = ListingStandard.TextEntry(_presetAuthor);
-            if (_presetAuthor.Length >= 50)
-                _presetAuthor = _presetAuthor.Substring(0, 50);
+            _presetAuthorSave = ListingStandard.TextEntry(_presetAuthorSave);
+            if (_presetAuthorSave.Length >= MaxAuthorNameLength)
+                _presetAuthorSave = _presetAuthorSave.Substring(0, MaxAuthorNameLength);
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
             DrawEntryHeader($"Description: [optional; {MaxDescriptionLength} chars max]");
 
             var descriptionRect = ListingStandard.GetRect(80f);
-            _presetDescription = Widgets.TextAreaScrollable(descriptionRect, _presetDescription,
+            _presetDescriptionSave = Widgets.TextAreaScrollable(descriptionRect, _presetDescriptionSave,
                 ref _scrollPosPresetDescription);
-            if (_presetDescription.Length >= MaxDescriptionLength)
-                _presetDescription = _presetDescription.Substring(0, MaxDescriptionLength);
+            if (_presetDescriptionSave.Length >= MaxDescriptionLength)
+                _presetDescriptionSave = _presetDescriptionSave.Substring(0, MaxDescriptionLength);
 
         }
 
