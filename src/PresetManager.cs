@@ -715,7 +715,6 @@ namespace PrepareLanding
 
     }
 
-
     public class PresetManager
     {
         public const string DefaultPresetName = "PLPreset";
@@ -740,18 +739,43 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        /// Name of the preset save folder.
+        /// Name of the preset folder.
         /// </summary>
         public static string FolderName => PrepareLanding.Instance.ModIdentifier;
+
+        public static string PresetTemplateFolder => Path.Combine(PrepareLanding.Instance.ModFolder, "Presets");
 
         public PresetManager(PrepareLandingUserData userData)
         {
             _userData = userData;
 
-            // just make sure the preset dir exists by calling the SaveFolder Property
-            Log.Message($"[PrepareLanding] Preset folder is at: {SaveFolder}");
+            // just make sure the preset dir exists by calling the PresetFolder Property
+            Log.Message($"[PrepareLanding] Preset folder is at: {PresetFolder}");
+
+            // location of the preset templates, provided de facto with the mod
+            Log.Message($"[PrepareLanding] Preset template folder is at: {PresetTemplateFolder}");
+
+            CopyFromTemplateFolderToPresetFolder(PresetTemplateFolder, PresetFolder);
 
             PreloadPresets();
+        }
+
+        private void CopyFromTemplateFolderToPresetFolder(string sourceFolder, string destFolder)
+        {
+            if (!Directory.Exists(sourceFolder) || !Directory.Exists(destFolder))
+                return;
+
+            foreach (var sourceFile in Directory.GetFiles(sourceFolder))
+            {
+                var sourceFileName = Path.GetFileName(sourceFile);
+                if (string.IsNullOrEmpty(sourceFileName))
+                    continue;
+
+                var destFilePath = Path.Combine(destFolder, sourceFileName);
+
+                if(!Md5HashEquals(sourceFile, destFilePath))
+                    File.Copy(sourceFile, destFilePath);
+            }
         }
 
         public void LoadPresetInfo(string presetName, bool forceReload = false)
@@ -918,9 +942,9 @@ namespace PrepareLanding
         #region FILE_DIR_HANDLING
 
         /// <summary>
-        /// Full path of the save folder
+        /// Full path of the preset folder (from user folder, not the mod one).
         /// </summary>
-        public static string SaveFolder
+        public static string PresetFolder
         {
             get
             {
@@ -947,7 +971,7 @@ namespace PrepareLanding
 
         public bool IsPresetDirectoryEmpty()
         {
-            return Directory.GetFiles(SaveFolder).Length == 0;
+            return Directory.GetFiles(PresetFolder).Length == 0;
         }
 
         private static string GetPresetFilePath(string fileName)
@@ -955,7 +979,7 @@ namespace PrepareLanding
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentException("[PrepareLanding] GetPresetFilePath: filename is null");
 
-            var filePath = Path.Combine(SaveFolder, fileName);
+            var filePath = Path.Combine(PresetFolder, fileName);
 
             // file extension checking, just being precautious
             if (!Path.HasExtension(filePath))
@@ -1001,7 +1025,7 @@ namespace PrepareLanding
 
         private void RenewPresetFileCache()
         {
-            var dirInfo = new DirectoryInfo(SaveFolder);
+            var dirInfo = new DirectoryInfo(PresetFolder);
 
             _allPresetFiles.Clear();
 
@@ -1036,15 +1060,37 @@ namespace PrepareLanding
             return File.Exists(filePath);
         }
 
-        public static string PresetFileMd5(string filePath)
+        public static bool Md5HashEquals(string filePath1, string filePath2)
         {
+            if (!File.Exists(filePath1) || !File.Exists(filePath2))
+                return false;
+
+            byte[] file1Hash;
+            byte[] file2Hash;
+
             using (var md5 = MD5.Create())
             {
-                using (var stream = File.OpenRead(filePath))
+                using (var stream = File.OpenRead(filePath1))
                 {
-                    return BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "‌​").ToLower();
+                    file1Hash = md5.ComputeHash(stream);
+                }
+                
+                using (var stream = File.OpenRead(filePath2))
+                {
+                    file2Hash = md5.ComputeHash(stream);
                 }
             }
+
+            if (file1Hash.Length != file2Hash.Length)
+                return false;
+
+            for (var i = 0; i < file1Hash.Length; i++)
+            {
+                if (file1Hash[i] != file2Hash[i])
+                    return false;
+            }
+
+            return true;
         }
 
         #endregion FILE_DIR_HANDLING

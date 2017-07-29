@@ -33,6 +33,7 @@ namespace PrepareLanding
             // register to the option changed event
             Options.PropertyChanged += OptionChanged;
 
+            // create the preset manager.
             PresetManager = new PresetManager(this);
         }
 
