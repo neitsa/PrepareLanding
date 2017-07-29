@@ -343,7 +343,7 @@ namespace PrepareLanding
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
-            DrawEntryHeader($"Author: [optional; 50 chars max]");
+            DrawEntryHeader($"Author: [optional; {MaxAuthorNameLength} chars max]");
 
             _presetAuthorSave = ListingStandard.TextEntry(_presetAuthorSave);
             if (_presetAuthorSave.Length >= MaxAuthorNameLength)
