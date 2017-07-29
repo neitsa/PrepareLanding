@@ -59,6 +59,10 @@ namespace PrepareLanding
         /// </summary>
         public override string ModIdentifier => "PrepareLanding";
 
+        /// <summary>
+        /// The full path of the mod folder. 
+        /// </summary>
+        public string ModFolder => ModContentPack.RootDir;
 
         /// <summary>
         ///     Methods can register to this event to be called when definitions (Defs) have been loaded.
