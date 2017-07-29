@@ -70,6 +70,15 @@ namespace PrepareLanding.Extensions
             return r;
         }
 
+        public static string TextEntryLabeled2(this Listing_Standard ls, string label, string text, int lineCount = 1)
+        {
+            var rect = ls.GetRect(Text.LineHeight * lineCount);
+            var labelRect = rect.LeftHalf().Rounded();
+            var textRect = rect.RightHalf().Rounded();
+            Widgets.Label(labelRect, label);
+            return rect.height <= 30f ? Widgets.TextField(textRect, text) : Widgets.TextArea(textRect, text);
+        }
+
         public static Rect VirtualRect(this Listing_Standard ls, float height)
         {
             var r = ls.GetRect(0f);
