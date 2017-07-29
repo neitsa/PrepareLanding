@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using PrepareLanding.Extensions;
+using PrepareLanding.Gui;
 using PrepareLanding.Gui.Tab;
 using UnityEngine;
 using Verse;
 using Verse.Steam;
+using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
@@ -29,10 +32,6 @@ namespace PrepareLanding
 
         private Vector2 _scrollPosPresetLoadDescription;
 
-        private int _fileDisplayIndexStart = 0;
-
-        private int _selectedFileIndex = -1;
-
         private string _selectedFileName = string.Empty;
 
         private string _presetDescriptionSave = string.Empty;
@@ -45,7 +44,10 @@ namespace PrepareLanding
 
         private readonly GUIStyle _stylePresetInfo;
 
-        public const float MaxDisplayedFiles = 20f;
+        private readonly List<ButtonDescriptor> _buttonList;
+        private int _listDisplayStartIndex;
+        private int _selectedItemIndex = -1;
+        public const int MaxItemsToDisplay = 20;
 
         public const int MaxDescriptionLength = 300;
 
@@ -72,6 +74,50 @@ namespace PrepareLanding
             if (SteamManager.Initialized)
                 _presetAuthorSave = SteamUtility.SteamPersonaName;
             // TODO check if possible to get logged in user if non steam rimworld
+
+            #region LIST_BUTTONS
+
+            var buttonListStart = new ButtonDescriptor("<<", delegate
+            {
+                // reset starting display index
+                _listDisplayStartIndex = 0;
+            }, "Go to start of item list.");
+
+            var buttonPreviousPage = new ButtonDescriptor("<", delegate
+            {
+                if (_listDisplayStartIndex >= MaxItemsToDisplay)
+                    _listDisplayStartIndex -= MaxItemsToDisplay;
+                else
+                    Messages.Message("Reached start of item list.", MessageSound.RejectInput);
+            }, "Go to previous list page.");
+
+            var buttonNextPage = new ButtonDescriptor(">", delegate
+            {
+                var presetFilesCount = _userData.PresetManager.AllPresetFiles.Count;
+                _listDisplayStartIndex += MaxItemsToDisplay;
+                if (_listDisplayStartIndex > presetFilesCount)
+                {
+                    Messages.Message($"No more available items to display (max: {presetFilesCount}).",
+                        MessageSound.RejectInput);
+                    _listDisplayStartIndex -= MaxItemsToDisplay;
+                }
+            }, "Go to next list page.");
+
+            var buttonListEnd = new ButtonDescriptor(">>", delegate
+            {
+                var presetFilesCount = _userData.PresetManager.AllPresetFiles.Count;
+                var displayIndexStart = presetFilesCount - presetFilesCount % MaxItemsToDisplay;
+                if (displayIndexStart == _listDisplayStartIndex)
+                    Messages.Message($"No more available items to display (max: {presetFilesCount}).",
+                        MessageSound.RejectInput);
+
+                _listDisplayStartIndex = displayIndexStart;
+            }, "Go to end of list.");
+
+            _buttonList =
+                new List<ButtonDescriptor> { buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd };
+
+            #endregion
         }
 
         /// <summary>A unique identifier for the Tab.</summary>
@@ -168,7 +214,7 @@ namespace PrepareLanding
             else
                 GUI.color = Color.green;
 
-            if (Verse.Widgets.ButtonText(buttonRects[0], $"{verb} Preset"))
+            if (Widgets.ButtonText(buttonRects[0], $"{verb} Preset"))
             {
                 if (LoadSaveMode == LoadSaveMode.Load)
                 {
@@ -201,11 +247,11 @@ namespace PrepareLanding
             }
             GUI.color = savedColor;
 
-            if (Verse.Widgets.ButtonText(buttonRects[1], $"Exit {verb}"))
+            if (Widgets.ButtonText(buttonRects[1], $"Exit {verb}"))
             {
                 LoadSaveMode = LoadSaveMode.Unknown;
                 _allowOverwriteExistingPreset = false;
-                _selectedFileIndex = -1;
+                _selectedItemIndex = -1;
                 _selectedFileName = null;
                 PrepareLanding.Instance.MainWindow.TabController.SetPreviousTabAsSelectedTab();
             }
@@ -244,6 +290,47 @@ namespace PrepareLanding
             ListingStandard.Gap(DefaultGapLineHeight);
 
             /*
+             * Buttons
+             */
+
+            var buttonsRectSpace = ListingStandard.GetRect(30f);
+            var splittedRect = buttonsRectSpace.SplitRectWidthEvenly(_buttonList.Count);
+
+            for (var i = 0; i < _buttonList.Count; i++)
+            {
+                // get button descriptor
+                var buttonDescriptor = _buttonList[i];
+
+                // display button; if clicked: call the related action
+                if (Widgets.ButtonText(splittedRect[i], buttonDescriptor.Label))
+                    buttonDescriptor.Action();
+
+                // display tool-tip (if any)
+                if (!string.IsNullOrEmpty(buttonDescriptor.ToolTip))
+                    TooltipHandler.TipRegion(splittedRect[i], buttonDescriptor.ToolTip);
+            }
+
+            /*
+             * Label
+             */
+
+            // number of elements (tiles) to display
+            var itemsToDisplay = Math.Min(presetFilesCount - _listDisplayStartIndex, MaxItemsToDisplay);
+
+            // label to display where we actually are in the tile list
+            GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
+            var heightBefore = ListingStandard.StartCaptureHeight();
+            ListingStandard.Label(
+                $"{_listDisplayStartIndex}: {_listDisplayStartIndex + itemsToDisplay - 1} / {presetFilesCount - 1}",
+                DefaultElementHeight);
+            GenUI.ResetLabelAlign();
+            var counterLabelRect = ListingStandard.EndCaptureHeight(heightBefore);
+            Gui.Widgets.DrawHighlightColor(counterLabelRect, Color.cyan, 0.50f);
+
+            // add a gap before the scroll view
+            ListingStandard.Gap(DefaultGapLineHeight);
+
+            /*
              * Calculate heights
              */
 
@@ -251,7 +338,7 @@ namespace PrepareLanding
             var maxScrollViewOuterHeight = InRect.height - ListingStandard.CurHeight - 30f;
 
             // height of the 'virtual' portion of the scroll view
-            var scrollableViewHeight = presetFilesCount * DefaultElementHeight + DefaultGapLineHeight * MaxDisplayedFiles;
+            var scrollableViewHeight = itemsToDisplay * DefaultElementHeight + DefaultGapLineHeight * MaxItemsToDisplay;
 
             /*
              * Scroll view
@@ -259,24 +346,21 @@ namespace PrepareLanding
             var innerLs = ListingStandard.BeginScrollView(maxScrollViewOuterHeight, scrollableViewHeight,
                 ref _scrollPosPresetFiles, 16f);
 
-            var endIndex = _fileDisplayIndexStart + presetFilesCount;
-            for (var i = _fileDisplayIndexStart; i < endIndex; i++)
+            var endIndex = _listDisplayStartIndex + itemsToDisplay;
+            for (var i = _listDisplayStartIndex; i < endIndex; i++)
             {
-                var selectedFile = presetFiles[i];
-
-                // get file name
-                var labelText = Path.GetFileNameWithoutExtension(selectedFile.Name);
+                var selectedPresetFile = presetFiles[i];
+                var labelText = Path.GetFileNameWithoutExtension(selectedPresetFile.Name);
 
                 // display the label
                 var labelRect = innerLs.GetRect(DefaultElementHeight);
-                var selected = i == _selectedFileIndex;
+                var selected = i == _selectedItemIndex;
                 if (Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
                 {
-                    // go to the location of the selected tile
-                    _selectedFileIndex = i;
+                    // save item index
+                    _selectedItemIndex = i;
                     _selectedFileName = labelText;
                 }
-
                 // add a thin line between each label
                 innerLs.GapLine(DefaultGapLineHeight);
             }
@@ -288,7 +372,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Preset Info:", backgroundColor: Color.green);
 
-            if (_selectedFileIndex < 0)
+            if (_selectedItemIndex < 0)
                 return;
 
             ListingStandard.TextEntryLabeled2("Preset Name:", _selectedFileName);
@@ -304,7 +388,7 @@ namespace PrepareLanding
             Widgets.TextAreaScrollable(descriptionRect, preset.PresetInfo.Description, ref _scrollPosPresetLoadDescription);
 
             ListingStandard.Label("Filters:");
-            var maxOuterRectHeight = 130f;
+            const float maxOuterRectHeight = 130f;
             ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.FilterInfo, ref _scrollPosPresetFilterInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
 
             ListingStandard.Label("Options:");
