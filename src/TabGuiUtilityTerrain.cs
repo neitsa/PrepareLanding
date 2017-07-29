@@ -16,7 +16,7 @@ namespace PrepareLanding
         private static Vector2 _scrollPosRoadSelection = Vector2.zero;
         private static Vector2 _scrollPosRiverSelection = Vector2.zero;
         private static Vector2 _scrollPosStoneSelection = Vector2.zero;
-        private string _buffer;
+        private string _bufferStringNumberOfStones;
 
         private readonly PrepareLandingUserData _userData;
 
@@ -337,7 +337,7 @@ namespace PrepareLanding
             }
 
             // choose stone types depending on their number on tiles.
-            ListingStandard.GapLine(6f);
+            ListingStandard.GapLine(DefaultGapLineHeight);
 
             var stoneTypesNumberRect = ListingStandard.GetRect(DefaultElementHeight);
             var leftRect = stoneTypesNumberRect.LeftPart(0.80f);
@@ -348,7 +348,7 @@ namespace PrepareLanding
             _userData.StoneTypesNumberOnly = filterByStoneNumber;
 
             var numberOfStones = _userData.StoneTypesNumber;
-            Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _buffer, 2, 3);
+            Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _bufferStringNumberOfStones, 2, 3);
             _userData.StoneTypesNumber = numberOfStones;
 
             const string tooltipText = "Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.";
