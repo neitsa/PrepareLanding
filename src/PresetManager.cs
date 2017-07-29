@@ -216,8 +216,20 @@ namespace PrepareLanding
             LoadUsableMinMax(xTerrain, "CurrentMovementTime", _userData.CurrentMovementTime);
             LoadUsableMinMax(xTerrain, "SummerMovementTime", _userData.SummerMovementTime);
             LoadUsableMinMax(xTerrain, "WinterMovementTime", _userData.WinterMovementTime);
-            LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _userData.SelectedStoneDefs,
-                _userData.OrderedStoneDefs);
+            if(xTerrain.Element("StoneTypesNumberOnly") == null)
+            { 
+                LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _userData.SelectedStoneDefs, _userData.OrderedStoneDefs);
+            }
+            else
+            {
+                LoadBoolean(xTerrain, "StoneTypesNumberOnly", b => _userData.StoneTypesNumberOnly = b);
+                if (_userData.StoneTypesNumberOnly)
+                {
+                    int stoneTypesNumber;
+                    Load(xTerrain, "StoneTypesNumber", out stoneTypesNumber);
+                    _userData.StoneTypesNumber = stoneTypesNumber;
+                }
+            }
             _userData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
             LoadUsableMinMax(xTerrain, "Elevation", _userData.Elevation);
             LoadUsableMinMax(xTerrain, "TimeZone", _userData.TimeZone);
@@ -285,8 +297,15 @@ namespace PrepareLanding
                 SaveUsableMinMax(xTerrainFilters, "CurrentMovementTime", _userData.CurrentMovementTime);
                 SaveUsableMinMax(xTerrainFilters, "SummerMovementTime", _userData.SummerMovementTime);
                 SaveUsableMinMax(xTerrainFilters, "WinterMovementTime", _userData.WinterMovementTime);
-                SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _userData.SelectedStoneDefs,
-                    _userData.OrderedStoneDefs);
+                if (_userData.StoneTypesNumberOnly)
+                {
+                    SaveBoolean(xTerrainFilters, "StoneTypesNumberOnly", _userData.StoneTypesNumberOnly);
+                    Save(xTerrainFilters, "StoneTypesNumber", _userData.StoneTypesNumber);
+                }
+                else
+                {
+                    SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _userData.SelectedStoneDefs, _userData.OrderedStoneDefs);
+                }
                 SaveThreeState(xTerrainFilters, "CoastalTile", _userData.ChosenCoastalTileState);
                 SaveUsableMinMax(xTerrainFilters, "Elevation", _userData.Elevation);
                 SaveUsableMinMax(xTerrainFilters, "TimeZone", _userData.TimeZone);
@@ -685,6 +704,13 @@ namespace PrepareLanding
             xElement.Add(new XElement(MaxNode, item.Max.ToString(CultureInfo.InvariantCulture)));
         }
 
+        private static void Save<T>(XContainer xParent, string elementName, T value) where T : IConvertible
+        {
+            var result = (T)Convert.ChangeType(value, typeof(string));
+            var xElement = new XElement(elementName, result);
+            xParent.Add(xElement);
+        }
+
         #endregion SAVE_PRESET
 
     }
@@ -753,18 +779,20 @@ namespace PrepareLanding
             }
         }
 
-        public void LoadPreset(string presetName, bool forceReload = false)
+        public bool LoadPreset(string presetName, bool forceReload = false)
         {
+            bool successfulLoad;
+
             if (string.IsNullOrEmpty(presetName))
-                return;
+                return false;
 
             var filePath = GetPresetFilePath(presetName);
 
             if (!File.Exists(filePath))
-                return;
+                return false;
 
             if (_presetCache.ContainsKey(presetName) && !forceReload)
-                return;
+                return false;
 
             // disable live filtering as we are gonna change some filters on the fly
             var liveFilterting = _userData.Options.AllowLiveFiltering;
@@ -797,23 +825,31 @@ namespace PrepareLanding
 
                 // renew file cache
                 RenewPresetFileCache();
+
+                successfulLoad = true;
             }
             catch (Exception e)
             {
                 Messages.Message("[PrepareLanding] Error loading preset.", MessageSound.RejectInput);
                 Log.Error($"Failed to load preset file '{filePath}'. Error:\n\t{e}\n\t{e.Message}");
+
+                successfulLoad = false;
             }
             finally
             {
                 // re-enable live filtering.
                 _userData.Options.AllowLiveFiltering = liveFilterting;
             }
+
+            return successfulLoad;
         }
 
-        public void SavePreset(string presetName, string description = null, string author = null, bool saveOptions = false)
+        public bool SavePreset(string presetName, string description = null, string author = null, bool saveOptions = false)
         {
+            bool successfulSave;
+
             if (string.IsNullOrEmpty(presetName))
-                return;
+                return false;
 
             var filePath = GetPresetFilePath(presetName);
 
@@ -824,7 +860,7 @@ namespace PrepareLanding
                 {
                     Messages.Message("[PrepareLanding] It is not allowed to overwrite a template preset.",
                         MessageSound.RejectInput);
-                    return;
+                    return false;
                 }
             }
 
@@ -849,6 +885,8 @@ namespace PrepareLanding
                     // renew file cache
                     RenewPresetFileCache();
                 }
+
+                successfulSave = true;
             }
             catch (Exception e)
             {
@@ -858,7 +896,11 @@ namespace PrepareLanding
 
                 Messages.Message("[PrepareLanding] Failed to save preset file.", MessageSound.RejectInput);
                 Log.Error($"[PrepareLanding] Failed to save preset file '{filePath}'. error:\n\t{e}\n\t{e.Message}");
+
+                successfulSave = false;
             }
+
+            return successfulSave;
         }
 
         private void PreloadPresets()
