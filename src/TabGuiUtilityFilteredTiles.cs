@@ -97,8 +97,6 @@ namespace PrepareLanding
 
             // default line height
             const float gapLineHeight = 4f;
-            // default visual element height
-            const float elementHeight = 30f;
 
             //check if we have something to display (tiles)
             var matchingTiles = PrepareLanding.Instance.TileFilter.AllMatchingTiles;
@@ -154,7 +152,7 @@ namespace PrepareLanding
             var heightBefore = ListingStandard.StartCaptureHeight();
             ListingStandard.Label(
                 $"{_tileDisplayIndexStart}: {_tileDisplayIndexStart + itemsToDisplay - 1} / {matchingTilesCount - 1}",
-                elementHeight);
+                DefaultElementHeight);
             GenUI.ResetLabelAlign();
             var counterLabelRect = ListingStandard.EndCaptureHeight(heightBefore);
             Gui.Widgets.DrawHighlightColor(counterLabelRect, Color.cyan, 0.50f);
@@ -170,7 +168,7 @@ namespace PrepareLanding
             var maxScrollViewOuterHeight = InRect.height - ListingStandard.CurHeight - 30f;
 
             // height of the 'virtual' portion of the scroll view
-            var scrollableViewHeight = itemsToDisplay * elementHeight + gapLineHeight * MaxDisplayedTileWhenMinimized;
+            var scrollableViewHeight = itemsToDisplay * DefaultElementHeight + gapLineHeight * MaxDisplayedTileWhenMinimized;
 
             /*
              * Scroll view
@@ -190,7 +188,7 @@ namespace PrepareLanding
                     $"{i}: {vector.y.ToStringLatitude()} {vector.x.ToStringLongitude()} - {selectedTile.biome.LabelCap} ; {selectedTileId}";
 
                 // display the label
-                var labelRect = innerLs.GetRect(elementHeight);
+                var labelRect = innerLs.GetRect(DefaultElementHeight);
                 var selected = i == _selectedTileIndex;
                 if (Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
                 {
