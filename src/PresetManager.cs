@@ -328,20 +328,20 @@ namespace PrepareLanding
                 var xOption = new XElement(OptionNode);
                 xRoot.Add(xOption);
 
-                // don't save options if not asked for
-                if (!saveOptions)
-                    return;
-
-                SaveBoolean(xOption, "AllowImpassableHilliness", _userData.Options.AllowImpassableHilliness);
-                SaveBoolean(xOption, "AllowInvalidTilesForNewSettlement",
-                    _userData.Options.AllowInvalidTilesForNewSettlement);
-                SaveBoolean(xOption, "AllowLiveFiltering", _userData.Options.AllowLiveFiltering);
-                SaveBoolean(xOption, "BypassMaxHighlightedTiles", _userData.Options.BypassMaxHighlightedTiles);
-                SaveBoolean(xOption, "DisablePreFilterCheck", _userData.Options.DisablePreFilterCheck);
-                SaveBoolean(xOption, "DisableTileHighlighting", _userData.Options.DisableTileHighlighting);
-                SaveBoolean(xOption, "DisableTileBlinking", _userData.Options.DisableTileBlinking);
-                SaveBoolean(xOption, "ShowDebugTileId", _userData.Options.ShowDebugTileId);
-                SaveBoolean(xOption, "ShowFilterHeaviness", _userData.Options.ShowFilterHeaviness);
+                // save options if specifically asked for
+                if (saveOptions)
+                {
+                    SaveBoolean(xOption, "AllowImpassableHilliness", _userData.Options.AllowImpassableHilliness);
+                    SaveBoolean(xOption, "AllowInvalidTilesForNewSettlement",
+                        _userData.Options.AllowInvalidTilesForNewSettlement);
+                    SaveBoolean(xOption, "AllowLiveFiltering", _userData.Options.AllowLiveFiltering);
+                    SaveBoolean(xOption, "BypassMaxHighlightedTiles", _userData.Options.BypassMaxHighlightedTiles);
+                    SaveBoolean(xOption, "DisablePreFilterCheck", _userData.Options.DisablePreFilterCheck);
+                    SaveBoolean(xOption, "DisableTileHighlighting", _userData.Options.DisableTileHighlighting);
+                    SaveBoolean(xOption, "DisableTileBlinking", _userData.Options.DisableTileBlinking);
+                    SaveBoolean(xOption, "ShowDebugTileId", _userData.Options.ShowDebugTileId);
+                    SaveBoolean(xOption, "ShowFilterHeaviness", _userData.Options.ShowFilterHeaviness);
+                }
 
                 // save the document
                 xDocument.Save(PresetManager.FullPresetPathFromPresetName(PresetName, false));
@@ -708,7 +708,7 @@ namespace PrepareLanding
 
         private static void Save<T>(XContainer xParent, string elementName, T value) where T : IConvertible
         {
-            var result = (T)Convert.ChangeType(value, typeof(string));
+            var result = (string) Convert.ChangeType(value, typeof(string));
             var xElement = new XElement(elementName, result);
             xParent.Add(xElement);
         }
