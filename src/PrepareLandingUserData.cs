@@ -37,6 +37,9 @@ namespace PrepareLanding
             PresetManager = new PresetManager(this);
         }
 
+        /// <summary>
+        ///     Used to load / save filters and options.
+        /// </summary>
         public PresetManager PresetManager { get; }
 
         /// <summary>
@@ -276,6 +279,10 @@ namespace PrepareLanding
             // order by name at first
             OrderedStoneDefs.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
 
+            // stone numbers
+            StoneTypesNumberOnly = false;
+            StoneTypesNumber = 2;
+
             // min / max numeric fields containers
             InitUsableMinMaxNumericItem(CurrentMovementTime, nameof(CurrentMovementTime));
             InitUsableMinMaxNumericItem(SummerMovementTime, nameof(SummerMovementTime));
@@ -456,7 +463,6 @@ namespace PrepareLanding
                 dictionary.Add(elementDef, item);
             }
         }
-
 
         protected ThreeStateItem InitThreeStateItem(string propertyChanedName,
             MultiCheckboxState defaultState = MultiCheckboxState.Partial)
