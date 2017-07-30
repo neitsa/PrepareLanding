@@ -16,7 +16,7 @@ namespace PrepareLanding
         private static Vector2 _scrollPosRoadSelection = Vector2.zero;
         private static Vector2 _scrollPosRiverSelection = Vector2.zero;
         private static Vector2 _scrollPosStoneSelection = Vector2.zero;
-        private string _buffer;
+        private string _bufferStringNumberOfStones;
 
         private readonly PrepareLandingUserData _userData;
 
@@ -31,11 +31,13 @@ namespace PrepareLanding
         /// <summary>A unique identifier for the Tab.</summary>
         public override string Id => Name;
 
-
         /// <summary>
         ///     The name of the tab (that is actually displayed at its top).
         /// </summary>
         public override string Name => "Terrain";
+
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
 
         /// <summary>
         ///     Draw the actual content of this window.
@@ -60,7 +62,7 @@ namespace PrepareLanding
 
         protected virtual void DrawBiomeTypesSelection()
         {
-            DrawEntryHeader("Biome", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("Biome Types", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             var biomeDefs = _userData.BiomeDefs;
 
@@ -129,7 +131,7 @@ namespace PrepareLanding
 
         protected virtual void DrawHillinessTypeSelection()
         {
-            DrawEntryHeader("Terrain".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
+            DrawEntryHeader($"{"Terrain".Translate()} Types", backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
 
             if (ListingStandard.ButtonText("Select Terrain"))
             {
@@ -335,7 +337,7 @@ namespace PrepareLanding
             }
 
             // choose stone types depending on their number on tiles.
-            ListingStandard.GapLine(6f);
+            ListingStandard.GapLine(DefaultGapLineHeight);
 
             var stoneTypesNumberRect = ListingStandard.GetRect(DefaultElementHeight);
             var leftRect = stoneTypesNumberRect.LeftPart(0.80f);
@@ -346,7 +348,7 @@ namespace PrepareLanding
             _userData.StoneTypesNumberOnly = filterByStoneNumber;
 
             var numberOfStones = _userData.StoneTypesNumber;
-            Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _buffer, 2, 3);
+            Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _bufferStringNumberOfStones, 2, 3);
             _userData.StoneTypesNumber = numberOfStones;
 
             const string tooltipText = "Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.";

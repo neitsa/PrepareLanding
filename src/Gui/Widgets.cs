@@ -26,14 +26,17 @@ namespace PrepareLanding.Gui
                 {
                     case MultiCheckboxState.On:
                         state = MultiCheckboxState.Partial;
+                        SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
                         break;
 
                     case MultiCheckboxState.Partial:
                         state = MultiCheckboxState.Off;
+                        SoundDefOf.CheckboxTurnedOff.PlayOneShotOnCamera();
                         break;
 
                     case MultiCheckboxState.Off:
                         state = MultiCheckboxState.On;
+                        SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
                         break;
                 }
 

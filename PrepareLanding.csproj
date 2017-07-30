@@ -84,8 +84,10 @@
     <Compile Include="src\PrepareLanding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\PrepareLandingWindow.cs" />
+    <Compile Include="src\PresetManager.cs" />
     <Compile Include="src\TabGuiUtilityFilteredTiles.cs" />
     <Compile Include="src\TabGuiUtilityInfo.cs" />
+    <Compile Include="src\TabGuiUtilityLoadSave.cs" />
     <Compile Include="src\TabGuiUtilityOptions.cs" />
     <Compile Include="src\TabGuiUtilityTemperature.cs" />
     <Compile Include="src\TabGuiUtilityTerrain.cs" />
@@ -94,7 +96,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
-if $(ConfigurationName) == Debug python  $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) I:\rimworld_debug\RimWorld --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
+if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) I:\rimworld_debug\RimWorld --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
 if $(ConfigurationName) == Release xcopy $(TargetPath) $(ProjectDir)output\PrepareLanding\Assemblies</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
