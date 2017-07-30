@@ -15,47 +15,48 @@ namespace PrepareLanding
     {
         Unknown = 0,
         Load = 1,
-        Save = 2,
+        Save = 2
     }
 
     public class TabGuiUtilityLoadSave : TabGuiUtility
     {
-        private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
-
-        private Vector2 _scrollPosPresetFiles;
-
-        private Vector2 _scrollPosPresetFilterInfo;
-
-        private Vector2 _scrollPosPresetOptionInfo;
-
-        private Vector2 _scrollPosPresetDescription;
-
-        private Vector2 _scrollPosPresetLoadDescription;
-
-        private string _selectedFileName = string.Empty;
-
-        private string _presetDescriptionSave = string.Empty;
-
-        private string _presetAuthorSave = string.Empty;
-
-        private bool _saveOptions;
-
-        private bool _allowOverwriteExistingPreset;
-
-        private readonly GUIStyle _stylePresetInfo;
-
-        private readonly List<ButtonDescriptor> _buttonList;
-        private int _listDisplayStartIndex;
-        private int _selectedItemIndex = -1;
         public const int MaxItemsToDisplay = 20;
 
         public const int MaxDescriptionLength = 300;
 
         public const int MaxAuthorNameLength = 50;
 
-        public LoadSaveMode LoadSaveMode { get; set; }
+        private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
+
+        private readonly List<ButtonDescriptor> _buttonList;
+
+        private readonly GUIStyle _stylePresetInfo;
 
         private readonly PrepareLandingUserData _userData;
+
+        private bool _allowOverwriteExistingPreset;
+
+        private int _listDisplayStartIndex;
+
+        private string _presetAuthorSave = string.Empty;
+
+        private string _presetDescriptionSave = string.Empty;
+
+        private bool _saveOptions;
+
+        private Vector2 _scrollPosPresetDescription;
+
+        private Vector2 _scrollPosPresetFiles;
+
+        private Vector2 _scrollPosPresetFilterInfo;
+
+        private Vector2 _scrollPosPresetLoadDescription;
+
+        private Vector2 _scrollPosPresetOptionInfo;
+
+        private string _selectedFileName = string.Empty;
+
+        private int _selectedItemIndex = -1;
 
         public TabGuiUtilityLoadSave(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -106,7 +107,7 @@ namespace PrepareLanding
             var buttonListEnd = new ButtonDescriptor(">>", delegate
             {
                 var presetFilesCount = _userData.PresetManager.AllPresetFiles.Count;
-                var displayIndexStart = presetFilesCount - presetFilesCount % MaxItemsToDisplay;
+                var displayIndexStart = presetFilesCount - presetFilesCount%MaxItemsToDisplay;
                 if (displayIndexStart == _listDisplayStartIndex)
                     Messages.Message($"No more available items to display (max: {presetFilesCount}).",
                         MessageSound.RejectInput);
@@ -115,10 +116,12 @@ namespace PrepareLanding
             }, "Go to end of list.");
 
             _buttonList =
-                new List<ButtonDescriptor> { buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd };
+                new List<ButtonDescriptor> {buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd};
 
             #endregion
         }
+
+        public LoadSaveMode LoadSaveMode { get; set; }
 
         /// <summary>A unique identifier for the Tab.</summary>
         public override string Id => "LoadSave";
@@ -152,7 +155,7 @@ namespace PrepareLanding
         {
             get { return LoadSaveMode != LoadSaveMode.Unknown; }
             set { }
-        } 
+        }
 
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>
@@ -181,11 +184,10 @@ namespace PrepareLanding
             var buttonsY = inRect.height - 30f;
             const int numButtons = 2;
 
-            var buttonRects = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x, _bottomButtonSize.y, 20f);
+            var buttonRects = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
+                _bottomButtonSize.y, 20f);
             if (buttonRects.Count != numButtons)
-            {
                 return;
-            }
 
             string verb;
             switch (LoadSaveMode)
@@ -204,47 +206,29 @@ namespace PrepareLanding
                     throw new ArgumentOutOfRangeException();
             }
 
-            var presetExistsNoOverwrite = false;
+            var presetExistsProtectFromOverwrite = false;
             if (!string.IsNullOrEmpty(_selectedFileName))
-                presetExistsNoOverwrite = PresetManager.PresetExists(_selectedFileName) && !_allowOverwriteExistingPreset;
+                presetExistsProtectFromOverwrite = PresetManager.PresetExists(_selectedFileName) &&
+                                                   !_allowOverwriteExistingPreset;
 
             var savedColor = GUI.color;
             if (LoadSaveMode == LoadSaveMode.Save)
-                GUI.color = presetExistsNoOverwrite ? Color.red : Color.green;
+                GUI.color = presetExistsProtectFromOverwrite ? Color.red : Color.green;
             else
                 GUI.color = Color.green;
 
             if (Widgets.ButtonText(buttonRects[0], $"{verb} Preset"))
-            {
-                if (LoadSaveMode == LoadSaveMode.Load)
+                switch (LoadSaveMode)
                 {
-                    if(!string.IsNullOrEmpty(_selectedFileName))
-                    { 
-                        if(_userData.PresetManager.LoadPreset(_selectedFileName, true))
-                            Messages.Message("Successfuly loaded the preset!", MessageSound.Benefit);
-                        else
-                            Messages.Message("Error: couldn't load the preset...", MessageSound.Negative);
-                    }
-                    else
-                        Messages.Message("Pick a preset first.", MessageSound.Negative);
+                    case LoadSaveMode.Load:
+                        LoadPreset();
+                        break;
+                    case LoadSaveMode.Save:
+                        SavePreset(presetExistsProtectFromOverwrite);
+                        break;
+                    default:
+                        break;
                 }
-                else if (LoadSaveMode == LoadSaveMode.Save)
-                {
-                    if (presetExistsNoOverwrite)
-                    {
-                        _allowOverwriteExistingPreset = true;
-                        Messages.Message($"Click again on the \"{verb}\" button to confirm the overwrite of the existing preset.", MessageSound.Standard);
-                    }
-                    else
-                    {
-                        _allowOverwriteExistingPreset = false;
-                        if(_userData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave, _saveOptions))
-                            Messages.Message("Successfuly saved the preset!", MessageSound.Benefit);
-                        else
-                            Messages.Message("Error: couldn't save the preset...", MessageSound.Negative);
-                    }
-                }
-            }
             GUI.color = savedColor;
 
             if (Widgets.ButtonText(buttonRects[1], $"Exit {verb}"))
@@ -268,9 +252,20 @@ namespace PrepareLanding
             End();
         }
 
+        private void LoadPreset()
+        {
+            if (!string.IsNullOrEmpty(_selectedFileName))
+                if (_userData.PresetManager.LoadPreset(_selectedFileName, true))
+                    Messages.Message("Successfuly loaded the preset!", MessageSound.Benefit);
+                else
+                    Messages.Message("Error: couldn't load the preset...", MessageSound.Negative);
+            else
+                Messages.Message("Pick a preset first.", MessageSound.Negative);
+        }
+
         protected void DrawLoadPresetList(Rect inRect)
         {
-            DrawEntryHeader("Preset Files: Load mode", backgroundColor:Color.green);
+            DrawEntryHeader("Preset Files: Load mode", backgroundColor: Color.green);
 
             var presetFiles = _userData.PresetManager.AllPresetFiles;
             if (presetFiles == null)
@@ -338,7 +333,7 @@ namespace PrepareLanding
             var maxScrollViewOuterHeight = InRect.height - ListingStandard.CurHeight - 30f;
 
             // height of the 'virtual' portion of the scroll view
-            var scrollableViewHeight = itemsToDisplay * DefaultElementHeight + DefaultGapLineHeight * MaxItemsToDisplay;
+            var scrollableViewHeight = itemsToDisplay*DefaultElementHeight + DefaultGapLineHeight*MaxItemsToDisplay;
 
             /*
              * Scroll view
@@ -385,14 +380,17 @@ namespace PrepareLanding
 
             ListingStandard.Label("Description:");
             var descriptionRect = ListingStandard.GetRect(80f);
-            Widgets.TextAreaScrollable(descriptionRect, preset.PresetInfo.Description, ref _scrollPosPresetLoadDescription);
+            Widgets.TextAreaScrollable(descriptionRect, preset.PresetInfo.Description,
+                ref _scrollPosPresetLoadDescription);
 
             ListingStandard.Label("Filters:");
             const float maxOuterRectHeight = 130f;
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.FilterInfo, ref _scrollPosPresetFilterInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.FilterInfo,
+                ref _scrollPosPresetFilterInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
 
             ListingStandard.Label("Options:");
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.OptionInfo, ref _scrollPosPresetOptionInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.OptionInfo,
+                ref _scrollPosPresetOptionInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
         }
 
         #endregion LOAD_MODE
@@ -404,6 +402,31 @@ namespace PrepareLanding
             Begin(inRect);
             DrawSaveFileName(inRect);
             End();
+        }
+
+        private void SavePreset(bool presetExistsProtectFromOverwrite)
+        {
+            if (_userData.AreAllFieldsInDefaultSate())
+                Messages.Message("All filters seem to be in their default state", MessageSound.RejectInput);
+            else
+            {
+                if (presetExistsProtectFromOverwrite)
+                {
+                    _allowOverwriteExistingPreset = true;
+                    Messages.Message(
+                        $"Click again on the \"Save\" button to confirm the overwrite of the existing preset.",
+                        MessageSound.Standard);
+                }
+                else
+                {
+                    _allowOverwriteExistingPreset = false;
+                    if (_userData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave,
+                        _saveOptions))
+                        Messages.Message("Successfuly saved the preset!", MessageSound.Benefit);
+                    else
+                        Messages.Message("Error: couldn't save the preset...", MessageSound.Negative);
+                }
+            }
         }
 
         protected void DrawSaveFileName(Rect inRect)
@@ -423,7 +446,8 @@ namespace PrepareLanding
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
-            ListingStandard.CheckboxLabeled("Save Options", ref _saveOptions, "Check to also save options alongside filters.");
+            ListingStandard.CheckboxLabeled("Save Options", ref _saveOptions,
+                "Check to also save options alongside filters.");
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
@@ -442,7 +466,6 @@ namespace PrepareLanding
                 ref _scrollPosPresetDescription);
             if (_presetDescriptionSave.Length >= MaxDescriptionLength)
                 _presetDescriptionSave = _presetDescriptionSave.Substring(0, MaxDescriptionLength);
-
         }
 
         #endregion SAVE_MODE
