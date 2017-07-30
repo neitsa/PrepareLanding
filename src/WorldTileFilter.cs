@@ -161,7 +161,7 @@ namespace PrepareLanding
         /// </summary>
         public void ClearMatchingTiles()
         {
-            FilterInfoLogger.AppendWarningMessage("Filtered files cleared.");
+            FilterInfoLogger.AppendWarningMessage("Filtered tiles cleared.");
 
             // clear the list of matched tiles.
             _matchingTileIds.Clear();
