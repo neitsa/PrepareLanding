@@ -62,7 +62,7 @@ namespace PrepareLanding
 
         protected virtual void DrawBiomeTypesSelection()
         {
-            DrawEntryHeader("Biome", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("Biome Types", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             var biomeDefs = _userData.BiomeDefs;
 
@@ -131,7 +131,7 @@ namespace PrepareLanding
 
         protected virtual void DrawHillinessTypeSelection()
         {
-            DrawEntryHeader("Terrain".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
+            DrawEntryHeader($"{"Terrain".Translate()} Types", backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
 
             if (ListingStandard.ButtonText("Select Terrain"))
             {
