@@ -263,6 +263,7 @@ namespace PrepareLanding
             LoadBoolean(xOptions, "AllowLiveFiltering", b => _userData.Options.AllowLiveFiltering = b);
             LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => _userData.Options.BypassMaxHighlightedTiles = b);
             LoadBoolean(xOptions, "DisablePreFilterCheck", b => _userData.Options.DisablePreFilterCheck = b);
+            LoadBoolean(xOptions, "DisableTileHighlighting", b => _userData.Options.DisableTileHighlighting = b);
             LoadBoolean(xOptions, "DisableTileBlinking", b => _userData.Options.DisableTileBlinking = b);
             LoadBoolean(xOptions, "ShowDebugTileId", b => _userData.Options.ShowDebugTileId = b);
             LoadBoolean(xOptions, "ShowFilterHeaviness", b => _userData.Options.ShowFilterHeaviness = b);
@@ -337,6 +338,7 @@ namespace PrepareLanding
                 SaveBoolean(xOption, "AllowLiveFiltering", _userData.Options.AllowLiveFiltering);
                 SaveBoolean(xOption, "BypassMaxHighlightedTiles", _userData.Options.BypassMaxHighlightedTiles);
                 SaveBoolean(xOption, "DisablePreFilterCheck", _userData.Options.DisablePreFilterCheck);
+                SaveBoolean(xOption, "DisableTileHighlighting", _userData.Options.DisableTileHighlighting);
                 SaveBoolean(xOption, "DisableTileBlinking", _userData.Options.DisableTileBlinking);
                 SaveBoolean(xOption, "ShowDebugTileId", _userData.Options.ShowDebugTileId);
                 SaveBoolean(xOption, "ShowFilterHeaviness", _userData.Options.ShowFilterHeaviness);

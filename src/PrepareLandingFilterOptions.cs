@@ -10,6 +10,7 @@ namespace PrepareLanding
         private bool _allowLiveFiltering;
         private bool _bypassMaxHighlightedTiles;
         private bool _disablePreFilterCheck;
+        private bool _disableTileHighlighting;
         private bool _disableTileBlinking;
         private bool _showDebugTileId;
         private bool _showFilterHeaviness;
@@ -86,6 +87,18 @@ namespace PrepareLanding
             }
         }
 
+        public bool DisableTileHighlighting
+        {
+            get { return _disableTileHighlighting; }
+            set
+            {
+                if (value == _disableTileHighlighting)
+                    return;
+
+                _disableTileHighlighting = value;
+                OnPropertyChanged(nameof(DisableTileHighlighting));
+            }
+        }
 
         public bool DisableTileBlinking
         {

@@ -73,6 +73,11 @@ namespace PrepareLanding
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
             _userData.Options.DisablePreFilterCheck = disablePreFilterCheck;
 
+            var disableTileHighligthing = _userData.Options.DisableTileHighlighting;
+            ListingStandard.CheckboxLabeled("Disable Tile Highligthing", ref disableTileHighligthing,
+                "Disable tile highlighting altogether.");
+            _userData.Options.DisableTileHighlighting = disableTileHighligthing;
+
             var disableTileBlinking = _userData.Options.DisableTileBlinking;
             ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref disableTileBlinking,
                 "Disable tile blinking (\"breathing\") for filtered tiles on the world map.");
