@@ -103,7 +103,7 @@ namespace PrepareLanding.Gui.World
                 material = CustomMat;
 
                 // check if tile breathing is disabled or not
-                if (PrepareLanding.Instance.UserData.Options.DisableTileBlinking)
+                if (PrepareLanding.Instance.TileHighlighter.DisableTileBlinking)
                 {
                     var matColor = material.color;
                     matColor.a = DefaultTileHighlightingAlphaValue;

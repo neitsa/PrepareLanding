@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using JetBrains.Annotations;
@@ -41,7 +42,7 @@ namespace PrepareLanding
     }
 
 
-    public class UsableMinMaxNumericItem<T> : INotifyPropertyChanged where T : struct
+    public class UsableMinMaxNumericItem<T> : INotifyPropertyChanged where T : struct, IComparable, IConvertible
     {
         private T _max;
         private string _maxString;
@@ -145,7 +146,7 @@ namespace PrepareLanding
         }
     }
 
-    public class MinMaxFromRestrictedListItem<T> : INotifyPropertyChanged where T : struct
+    public class MinMaxFromRestrictedListItem<T> : INotifyPropertyChanged where T : struct, IConvertible
     {
         private readonly List<T> _options;
         private T _max;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
@@ -18,9 +19,18 @@ namespace PrepareLanding.Gui.World
 
         private Color _materialColor = Color.green;
 
+        public bool DisableTileHighlighting { get; set; }
+
+        public bool DisableTileBlinking { get; set; }
+
+        public bool BypassMaxHighlightedTiles { get; set; }
+
+        public bool ShowDebugTileId { get; set; }
+
         public TileHighlighter()
         {
             _defaultMaterial.color = TileColor;
+            PrepareLanding.Instance.UserData.Options.PropertyChanged += OnOptionChanged;
         }
 
         public Color TileColor
@@ -41,18 +51,23 @@ namespace PrepareLanding.Gui.World
 
         public void HighlightTileList(List<int> tileList)
         {
+            // do not highlight if disabled
+            if (DisableTileHighlighting)
+            {
+                RemoveAllTiles();
+                return;
+            }
+
             // do not highlight too many tiles (otherwise the slow down is noticeable)
-            if (!PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles &&
-                tileList.Count > MaxHighlightedTiles)
+            if (!BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
             {
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
                     $"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
                 return;
             }
-
-            var showTileId = PrepareLanding.Instance.UserData.Options.ShowDebugTileId;
+;
             foreach (var tileId in tileList)
-                HighlightTile(tileId, _defaultMaterial, showTileId ? tileId.ToString() : "X");
+                HighlightTile(tileId, _defaultMaterial, ShowDebugTileId ? tileId.ToString() : "X");
         }
 
         public void HighlightTile(int tile, Material mat, string text = null)
@@ -68,7 +83,9 @@ namespace PrepareLanding.Gui.World
 
         public void HighlightedTileDrawerUpdate()
         {
-            // ReSharper disable once ForCanBeConvertedToForeach
+            if (DisableTileHighlighting)
+                return;
+
             for (var i = 0; i < _highlightedTiles.Count; i++)
                 _highlightedTiles[i].Draw();
         }
@@ -87,6 +104,28 @@ namespace PrepareLanding.Gui.World
             Text.Anchor = TextAnchor.UpperLeft;
         }
 
+        private void OnOptionChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(PrepareLanding.Instance.UserData.Options.DisableTileBlinking):
+                    DisableTileBlinking = PrepareLanding.Instance.UserData.Options.DisableTileBlinking;
+                    return;
+                case nameof(PrepareLanding.Instance.UserData.Options.DisableTileHighlighting):
+                    DisableTileHighlighting = PrepareLanding.Instance.UserData.Options.DisableTileHighlighting;
+                    return;
+                case nameof(PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles):
+                    BypassMaxHighlightedTiles = PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles;
+                    break;
+                case nameof(PrepareLanding.Instance.UserData.Options.ShowDebugTileId):
+                    ShowDebugTileId = PrepareLanding.Instance.UserData.Options.ShowDebugTileId;
+                    break;
+
+                default:
+                    return;
+            }
+        }
+
         #region IDisposable Support
 
         private bool _disposedValue; // To detect redundant calls
@@ -102,6 +141,7 @@ namespace PrepareLanding.Gui.World
 
                 PrepareLanding.Instance.OnWorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
                 PrepareLanding.Instance.OnWorldInterfaceUpdate -= HighlightedTileDrawerUpdate;
+                PrepareLanding.Instance.UserData.Options.PropertyChanged -= OnOptionChanged;
             }
 
             _disposedValue = true;

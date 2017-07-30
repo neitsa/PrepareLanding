@@ -10,6 +10,7 @@ namespace PrepareLanding.Gui.Tab
         public const float DefaultElementHeight = 30f;
         public const float DefaultGapLineHeight = 6f;
         public const float DefaultGapHeight = 12f;
+        public const float DefaultScrollableViewShrinkWidth = 16f;
 
         private static ColorInt _windowBgFillColorInt = new ColorInt(21, 25, 29);
         public static Color WindowBgFillColor = _windowBgFillColorInt.ToColor;
@@ -30,6 +31,8 @@ namespace PrepareLanding.Gui.Tab
         public abstract string Id { get; }
 
         public abstract string Name { get; }
+
+        public abstract bool CanBeDrawn { get; set; }
 
         public TabRecord TabRecord { get; set; }
 
@@ -84,8 +87,7 @@ namespace PrepareLanding.Gui.Tab
         }
 
         protected virtual void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label,
-            float min = 0f, float max = 1E+09f)
-            where T : struct
+            float min = 0f, float max = 1E+09f) where T: struct , IComparable, IConvertible
         {
             var tmpCheckedOn = numericItem.Use;
 

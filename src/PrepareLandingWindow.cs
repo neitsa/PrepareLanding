@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PrepareLanding.Extensions;
 using PrepareLanding.Gui;
 using PrepareLanding.Gui.Tab;
@@ -20,7 +21,7 @@ namespace PrepareLanding
         private const int MaxDisplayedTileWhenMinimized = 30;
 
         private readonly List<ButtonDescriptor> _bottomButtonsDescriptorList;
-        private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
+        private readonly Vector2 _bottomButtonSize = new Vector2(105f, 30f);
         private readonly List<ButtonDescriptor> _minimizedWindowButtonsDescriptorList;
 
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
@@ -31,8 +32,12 @@ namespace PrepareLanding
 
         private int _tileDisplayIndexStart;
 
+        private PrepareLandingUserData _userData;
+
         public PrepareLandingWindow(PrepareLandingUserData userData)
         {
+            _userData = userData;
+
             doCloseButton = false; // explicitly disable close button, we'll draw it ourselves
             doCloseX = true;
             optionalTitle = "Prepare Landing";
@@ -48,6 +53,7 @@ namespace PrepareLanding
             _tabGuiUtilities.Add(new TabGuiUtilityFilteredTiles(0.48f));
             _tabGuiUtilities.Add(new TabGuiUtilityInfo(userData, 0.48f));
             _tabGuiUtilities.Add(new TabGuiUtilityOptions(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabGuiUtilityLoadSave(userData, 0.48f));
 
             TabController.Clear();
             TabController.AddTabRange(_tabGuiUtilities);
@@ -100,6 +106,7 @@ namespace PrepareLanding
 
                     ForceClose();
                 }, displayState: DisplayState.Entry | DisplayState.MapInitializing);
+
 
             _bottomButtonsDescriptorList =
                 new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, buttonClose};
@@ -177,6 +184,59 @@ namespace PrepareLanding
             DoBottomsButtons(inRect);
         }
 
+        public override void PreOpen()
+        {
+            base.PreOpen();
+
+            /*
+             * note: this code is in PreOpen() rather than in the ctor because otherwise RimWorld would crash (more precisely, Unity crashes).
+             * I can't remember exactly where, but it deals with Unity calculating the text size of a floating menu.
+             * So better to let this code here rather than in the ctor.
+             */
+            if (Enumerable.Any(_bottomButtonsDescriptorList, buttonDesctipor => buttonDesctipor.Label == "Load / Save"))
+                return;
+
+            var buttonSaveLoadPreset = new ButtonDescriptor("Load / Save", "Load or Save Filter Presets");
+            buttonSaveLoadPreset.AddFloatMenuOption("Save", delegate
+                {
+                    //_userData.PresetManager.TestSave();
+                    var tab = TabController.TabById("LoadSave") as TabGuiUtilityLoadSave;
+                    if (tab == null)
+                        return;
+
+                    tab.LoadSaveMode = LoadSaveMode.Save;
+                    TabController.SetSelectedTabById("LoadSave");
+                }, delegate
+                {
+                    var mousePos = Event.current.mousePosition;
+                    var rect = new Rect(mousePos.x, mousePos.y, 30f, 30f);
+
+                    TooltipHandler.TipRegion(rect, "Save current filter states to a preset.");
+                }
+            );
+            buttonSaveLoadPreset.AddFloatMenuOption("Load", delegate
+                {
+                    //_userData.PresetManager.TestLoad();
+                    var tab = TabController.TabById("LoadSave") as TabGuiUtilityLoadSave;
+                    if (tab == null)
+                        return;
+
+                    tab.LoadSaveMode = LoadSaveMode.Load;
+                    TabController.SetSelectedTabById("LoadSave");
+
+                }, delegate
+                {
+                    var mousePos = Event.current.mousePosition;
+                    var rect = new Rect(mousePos.x, mousePos.y, 30f, 30f);
+
+                    TooltipHandler.TipRegion(rect, "Load a preset.");
+                }
+            );
+            buttonSaveLoadPreset.AddFloatMenu("Select Action");
+            _bottomButtonsDescriptorList.Add(buttonSaveLoadPreset);
+        }
+
+
         public override void PostClose()
         {
             base.PostClose();
@@ -211,16 +271,7 @@ namespace PrepareLanding
                 // get button descriptor
                 var buttonDescriptor = _bottomButtonsDescriptorList[i];
 
-                if (!buttonDescriptor.CanBeDisplayed)
-                    continue;
-
-                // display button; if clicked: call the related action
-                if (Widgets.ButtonText(buttonsRect[i], buttonDescriptor.Label))
-                    buttonDescriptor.Action();
-
-                // display tool-tip (if any)
-                if (!string.IsNullOrEmpty(buttonDescriptor.ToolTip))
-                    TooltipHandler.TipRegion(buttonsRect[i], buttonDescriptor.ToolTip);
+                buttonDescriptor.DrawButton(buttonsRect[i]);
             }
         }
 

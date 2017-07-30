@@ -20,19 +20,8 @@ namespace PrepareLanding
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void Append(string text)
-        {
-            _stringBuilder.Append(text);
-            OnPropertyChanged(nameof(Text));
-        }
-
-        private void AppendLine(string text)
-        {
-            _stringBuilder.AppendLine(text);
-            OnPropertyChanged(nameof(Text));
-        }
-
-        public void AppendErrorMessage(string text, bool rimWorldAlertMessage = true, bool sendToLog = false)
+        public void AppendErrorMessage(string text, string shortRimWorldMessage = null,
+            bool rimWorldAlertMessage = true, bool sendToLog = false)
         {
             if (rimWorldAlertMessage)
             {
@@ -44,7 +33,9 @@ namespace PrepareLanding
 
                 var tab = PrepareLanding.Instance.MainWindow.TabController.TabById("WorldInfo");
                 var tabName = tab == null ? "World Info" : tab.Name;
-                Messages.Message($"An error occurred. Please see the \"{tabName}\" tab for an error description.",
+                var shortMessage = shortRimWorldMessage == null ? "" : $": {shortRimWorldMessage}";
+                Messages.Message(
+                    $"[PrepareLanding] A filter error occurred{shortMessage}\nPlease see the \"{tabName}\" tab for an error description.",
                     MessageSound.RejectInput);
             }
 
@@ -55,13 +46,15 @@ namespace PrepareLanding
             AppendLine(errorText);
         }
 
-        public void AppendWarningMessage(string text, bool sendToLog = false)
+        public void AppendMessage(string text, bool sendToLog = false, Color? textColor = null)
         {
             if (sendToLog)
                 Log.Message($"[PrepareLanding] {text}");
 
-            var warningText = RichText.Bold(RichText.Color(text, ColorLibrary.Orange));
-            AppendLine(warningText);
+            if (textColor != null)
+                text = RichText.Color(text, (Color) textColor);
+
+            AppendLine(text);
         }
 
         public void AppendSuccessMessage(string text, bool sendToLog = false)
@@ -73,15 +66,13 @@ namespace PrepareLanding
             AppendLine(successText);
         }
 
-        public void AppendMessage(string text, bool sendToLog = false, Color? textColor = null)
+        public void AppendWarningMessage(string text, bool sendToLog = false)
         {
             if (sendToLog)
                 Log.Message($"[PrepareLanding] {text}");
 
-            if (textColor != null)
-                text = RichText.Color(text, (Color)textColor);
-
-            AppendLine(text);
+            var warningText = RichText.Bold(RichText.Color(text, ColorLibrary.Orange));
+            AppendLine(warningText);
         }
 
         public void Clear()
@@ -96,6 +87,18 @@ namespace PrepareLanding
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void Append(string text)
+        {
+            _stringBuilder.Append(text);
+            OnPropertyChanged(nameof(Text));
+        }
+
+        private void AppendLine(string text)
+        {
+            _stringBuilder.AppendLine(text);
+            OnPropertyChanged(nameof(Text));
         }
     }
 }

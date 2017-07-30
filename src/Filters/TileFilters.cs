@@ -160,7 +160,7 @@ namespace PrepareLanding.Filters
             get
             {
                 var stoneDefs = UserData.SelectedStoneDefs;
-                return stoneDefs.Any(entry => entry.Value.State != MultiCheckboxState.Partial);
+                return stoneDefs.Any(entry => entry.Value.State != MultiCheckboxState.Partial) || UserData.StoneTypesNumberOnly;
             }
         }
 
@@ -170,6 +170,20 @@ namespace PrepareLanding.Filters
 
             if (!IsFilterActive)
                 return;
+
+            // special case where we filter tiles with 2 or 3 stone types, whatever they are.
+            if (UserData.StoneTypesNumberOnly)
+            {
+                var numberOfStones = UserData.StoneTypesNumber;
+                foreach (var tileId in inputList)
+                {
+                    // get number of stone types in the tile
+                    if(Find.World.NaturalRockTypesIn(tileId).Count() == numberOfStones)
+                        _filteredTiles.Add(tileId);
+                }
+
+                return;
+            }
 
             // collect stones that are in On & Partial states, in their precise order on the GUI!
             var orderedStoneDefsOn = (from stone in UserData.OrderedStoneDefs

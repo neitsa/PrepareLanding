@@ -21,6 +21,9 @@ namespace PrepareLanding
 
         public override string Name => "Temperature";
 
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
+
         /// <summary>
         ///     Draw the actual content of this window.
         /// </summary>

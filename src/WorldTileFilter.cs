@@ -28,11 +28,6 @@ namespace PrepareLanding
         public ReadOnlyCollection<int> AllTilesWithRoad;
 
         /// <summary>
-        ///     Class can subscribe to this event to know that the pre-filtering has been done.
-        /// </summary>
-        public event Action OnPrefilterDone;
-
-        /// <summary>
         ///     Class constructor.
         /// </summary>
         /// <param name="userData">An instance of the class used to keep user choice from the main GUI window.</param>
@@ -166,7 +161,7 @@ namespace PrepareLanding
         /// </summary>
         public void ClearMatchingTiles()
         {
-            FilterInfoLogger.AppendWarningMessage("Filtered files cleared.");
+            FilterInfoLogger.AppendWarningMessage("Filtered tiles cleared.");
 
             // clear the list of matched tiles.
             _matchingTileIds.Clear();
@@ -187,15 +182,151 @@ namespace PrepareLanding
             if (_userData.Options.AllowLiveFiltering)
                 FilterTiles();
             else
-                LongEventHandler.QueueLongEvent(FilterTiles, $"[{"PrepareLanding".Translate()}] {"FilteringWorldTiles".Translate()}", true, null);
+                LongEventHandler.QueueLongEvent(FilterTiles,
+                    $"[{"PrepareLanding".Translate()}] {"FilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
-        ///     Called when the world map has been generated. We use it to pre-filter valid tiles.
+        ///     Given the <see cref="TileFilter.SubjectThingDef" /> from a filter, returns the filter heaviness.
         /// </summary>
-        protected void PrefilterQueueLongEvent()
+        /// <param name="subjectThingDef">The <see cref="TileFilter.SubjectThingDef" /> from a filter.</param>
+        /// <returns>The filter heaviness of the filter if the filter is found, otherwise <see cref="FilterHeaviness.Unknown" />.</returns>
+        public FilterHeaviness FilterHeavinessFromFilterSubjectThingDef(string subjectThingDef)
         {
-            LongEventHandler.QueueLongEvent(Prefilter, $"[{"PrepareLanding".Translate()}] {"PreFilteringWorldTiles".Translate()}", true, null);
+            if (_filterHeavinessCache == null)
+            {
+                _filterHeavinessCache = new Dictionary<string, FilterHeaviness>();
+
+                foreach (var filter in _allFilters.Values)
+                    _filterHeavinessCache.Add(filter.SubjectThingDef, filter.Heaviness);
+            }
+
+            FilterHeaviness filterHeaviness;
+            return _filterHeavinessCache.TryGetValue(subjectThingDef, out filterHeaviness)
+                ? filterHeaviness
+                : FilterHeaviness.Unknown;
+        }
+
+        /// <summary>
+        ///     Class can subscribe to this event to know that the pre-filtering has been done.
+        /// </summary>
+        public event Action OnPrefilterDone;
+
+        /// <summary>
+        ///     Main workhorse method that does the actual tile filtering. <see cref="Filter" /> is actually a wrapper around this
+        ///     method.
+        /// </summary>
+        protected void FilterTiles()
+        {
+            // do a preventive check before filtering anything
+            if (!FilterPreCheck())
+                return;
+
+            // clear all previous matching tiles and remove all previously highlighted tiles on the world map
+            ClearMatchingTiles();
+
+            var separator = "-".Repeat(80);
+            FilterInfoLogger.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
+
+            var globalFilterStopWatch = new Stopwatch();
+            var localFilterStopWatch = new Stopwatch();
+
+            globalFilterStopWatch.Start();
+
+            // filter tiles
+            var result = new List<int>();
+            var firstUnionDone = false;
+
+            FilterInfoLogger.AppendMessage($"Starting filtering with: {_allValidTileIds.Count} tiles.");
+
+            var usedFilters = 0;
+            for (var i = 0; i < _sortedFilters.Count; i++)
+            {
+                // get the filter
+                var filter = _sortedFilters[i];
+
+                // only use an active filter
+                if (!filter.IsFilterActive)
+                    continue;
+
+                // add filter (used for logging purpose)
+                usedFilters++;
+
+                // use all valid tiles until we have a first result
+                var currentList = firstUnionDone ? result : _allValidTileIds;
+
+                // do the actual filtering
+                localFilterStopWatch.Start();
+                filter.FilterAction(currentList);
+                localFilterStopWatch.Stop();
+                var filterTime = localFilterStopWatch.Elapsed;
+                localFilterStopWatch.Reset();
+
+                // check if anything was filtered
+                var filteredTiles = filter.FilteredTiles;
+                if (filteredTiles.Count == 0 && filter.IsFilterActive)
+                {
+                    var conjunctionMessage = ".";
+                    if (usedFilters > 1)
+                        conjunctionMessage = $"(in conjunction with the previous { usedFilters - 1} filters)";
+
+                    FilterInfoLogger.AppendErrorMessage(
+                        $"{filter.RunningDescription}: this filter resulted in 0 matching tiles{conjunctionMessage} Maybe the filtering was a little bit too harsh?",
+                        "Filter resulted in 0 tiles", sendToLog: true);
+
+                    globalFilterStopWatch.Stop();
+                    return;
+                }
+
+                // just send a warning that even if some filter was active it resulted in all tiles matching...
+                // this might happen, for example, on 5% coverage wold where the map is composed of only one biome.
+                if (filteredTiles.Count == _allValidTileIds.Count)
+                    FilterInfoLogger.AppendWarningMessage(
+                        $"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
+
+                // actually make a union with the empty result (as of now) when we have the first filter giving something.
+                if (!firstUnionDone)
+                {
+                    result = filteredTiles.Union(result).ToList();
+                    firstUnionDone = true;
+                }
+                else
+                {
+                    // just intersect this filter result with all the previous results
+                    result = filteredTiles.Intersect(result).ToList();
+                }
+
+                FilterInfoLogger.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
+                FilterInfoLogger.AppendMessage(
+                    $"\t\"{filter.SubjectThingDef}\" filter ran in: {filterTime}.");
+            }
+
+            // all results into one list
+            _matchingTileIds.AddRange(result);
+
+            FilterInfoLogger.AppendMessage(
+                $"Before checking for valid tiles: a total of {_matchingTileIds.Count} tile(s) matches all filters.");
+
+            // last pass, remove all tile that are deemed as not being settleable
+            if (!_userData.Options.AllowInvalidTilesForNewSettlement)
+                _matchingTileIds.RemoveAll(tileId => TileFinder.IsValidTileForNewSettlement(tileId) == false);
+
+            globalFilterStopWatch.Stop();
+
+            // check if the applied filters gave no resulting tiles (the set of applied filters was probably too harsh).
+            if (_matchingTileIds.Count == 0)
+            {
+                FilterInfoLogger.AppendErrorMessage("No tile matches the given filter(s).", sendToLog: true);
+            }
+            else
+            {
+                FilterInfoLogger.AppendMessage($"All {usedFilters} filter(s) ran in {globalFilterStopWatch.Elapsed}.");
+                FilterInfoLogger.AppendSuccessMessage(
+                    $"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
+            }
+
+            // now highlight filtered tiles
+            PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
         }
 
         /// <summary>
@@ -244,100 +375,12 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Main workhorse method that does the actual tile filtering. <see cref="Filter" /> is actually a wrapper around this
-        ///     method.
+        ///     Called when the world map has been generated. We use it to pre-filter valid tiles.
         /// </summary>
-        protected void FilterTiles()
+        protected void PrefilterQueueLongEvent()
         {
-            // do a preventive check before filtering anything
-            if (!FilterPreCheck())
-                return;
-
-            // clear all previous matching tiles and remove all previously highlighted tiles on the world map
-            ClearMatchingTiles();
-
-            var separator = "-".Repeat(80);
-            FilterInfoLogger.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
-
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
-
-            // filter tiles
-            var result = new List<int>();
-            var firstUnionDone = false;
-
-            var usedFilters = 0;
-            for (var i = 0; i < _sortedFilters.Count; i++)
-            {
-                // get the filter
-                var filter = _sortedFilters[i];
-
-                // only use an active filter
-                if (!filter.IsFilterActive)
-                    continue;
-
-                // increment count of used filters
-                usedFilters++;
-
-                // use all valid tiles until we have a first result
-                var currentList = firstUnionDone ? result : _allValidTileIds;
-
-                // do the actual filtering
-                filter.FilterAction(currentList);
-
-                // check if anything was filtered
-                var filteredTiles = filter.FilteredTiles;
-                if (filteredTiles.Count == 0 && filter.IsFilterActive)
-                {
-                    FilterInfoLogger.AppendErrorMessage(
-                        $"{filter.RunningDescription}: this filter results in 0 matching tiles.", sendToLog: true);
-                    stopWatch.Stop();
-                    return;
-                }
-
-                // just send a warning that even if some filter was active it resulted in all tiles matching...
-                if (filteredTiles.Count == _allValidTileIds.Count)
-                    FilterInfoLogger.AppendWarningMessage(
-                        $"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
-
-                // actually make a union with the empty result (as of now) when we have the first filter giving something.
-                if (!firstUnionDone)
-                {
-                    result = filteredTiles.Union(result).ToList();
-                    firstUnionDone = true;
-                }
-                else
-                {
-                    // just intersect this filter result with all the previous results
-                    result = filteredTiles.Intersect(result).ToList();
-                }
-
-                FilterInfoLogger.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
-            }
-
-            // all results into one list
-            _matchingTileIds.AddRange(result);
-
-            FilterInfoLogger.AppendMessage($"Before checking for valid tiles: a total of {_matchingTileIds.Count} tile(s) matches all filters.");
-
-            // last pass, remove all tile that are deemed as not being settleable
-            if(!_userData.Options.AllowInvalidTilesForNewSettlement)
-                _matchingTileIds.RemoveAll(tileId => TileFinder.IsValidTileForNewSettlement(tileId) == false);
-
-            stopWatch.Stop();
-
-            // check if the applied filters gave no resulting tiles (the set of applied filters was probably too harsh).
-            if (_matchingTileIds.Count == 0)
-                FilterInfoLogger.AppendErrorMessage("No tile matches the given filter(s).", sendToLog: true);
-            else
-            {
-                FilterInfoLogger.AppendMessage($"All {usedFilters} filter(s) ran in {stopWatch.Elapsed}.");
-                FilterInfoLogger.AppendSuccessMessage(
-                    $"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
-            }
-
-            // now highlight filtered tiles
-            PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
+            LongEventHandler.QueueLongEvent(Prefilter,
+                $"[{"PrepareLanding".Translate()}] {"PreFilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
@@ -359,14 +402,12 @@ namespace PrepareLanding
             //  as it takes too much times with some filter, so it would be better to narrow down the filtering.
             if (Find.World.info.planetCoverage >= 0.5f)
                 if (!_userData.Options.DisablePreFilterCheck)
-                {
                     if (_userData.ChosenBiome == null || _userData.ChosenHilliness == Hilliness.Undefined)
                     {
                         FilterInfoLogger.AppendErrorMessage(
                             "No biome and no terrain selected for a Planet coverage >= 50%\n\tPlease select a biome and a terrain first.");
                         return false;
                     }
-                }
 
             return true;
         }
@@ -384,9 +425,7 @@ namespace PrepareLanding
             {
                 // rebuild the valid tiles list
                 PrefilterQueueLongEvent();
-                return;
             }
-
         }
 
         /// <summary>
@@ -411,22 +450,6 @@ namespace PrepareLanding
 
             // filter now
             Filter();
-        }
-
-        public FilterHeaviness FilterHeavinessFromFilterSubjectThingDef(string subjectThingDef)
-        {
-            if (_filterHeavinessCache == null)
-            {
-                _filterHeavinessCache = new Dictionary<string, FilterHeaviness>();
-
-                foreach (var filter in _allFilters.Values)
-                {
-                    _filterHeavinessCache.Add(filter.SubjectThingDef, filter.Heaviness); 
-                }
-            }
-
-            FilterHeaviness filterHeaviness;
-            return _filterHeavinessCache.TryGetValue(subjectThingDef, out filterHeaviness) ? filterHeaviness : FilterHeaviness.Unknown;
         }
 
         #region PRIVATE_FIELDS
@@ -460,7 +483,8 @@ namespace PrepareLanding
         private readonly PrepareLandingUserData _userData;
 
         /// <summary>
-        ///     A cache for filter heaviness. Key is the <see cref="TileFilter.SubjectThingDef"/>, value is the filter heaviness (<see cref="FilterHeaviness"/>).
+        ///     A cache for filter heaviness. Key is the <see cref="TileFilter.SubjectThingDef" />, value is the filter heaviness (
+        ///     <see cref="FilterHeaviness" />).
         /// </summary>
         private Dictionary<string, FilterHeaviness> _filterHeavinessCache;
 
@@ -495,7 +519,8 @@ namespace PrepareLanding
         {
             var tile = Find.World.grid[tileId];
 
-            var impassableTilesCondition = _userData.Options.AllowImpassableHilliness || tile.hilliness != Hilliness.Impassable;
+            var impassableTilesCondition = _userData.Options.AllowImpassableHilliness ||
+                                           tile.hilliness != Hilliness.Impassable;
 
             // we must be able to build a base, the tile biome must be implemented and the tile itself must not be impassable
             // Side note on tile.WaterCovered: this doesn't work for sea ice biomes as elevation is < 0, but sea ice is a perfectly valid biome where to settle.
