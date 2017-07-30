@@ -14,7 +14,7 @@ namespace PrepareLanding
     public class PrepareLanding : ModBase
     {
         /// <summary>
-        /// Filter Options (from the GUI window 'options' tab).
+        ///     Filter Options (from the GUI window 'options' tab).
         /// </summary>
         private PrepareLandingFilterOptions _filterOptions;
 
@@ -51,7 +51,9 @@ namespace PrepareLanding
         /// <summary>
         ///     The main GUI window instance.
         /// </summary>
-        public PrepareLandingWindow MainWindow { get; set; } //TODO see if this can be set to a "private set" rather than a public one
+        public PrepareLandingWindow MainWindow { get; set; }
+
+        //TODO see if this can be set to a "private set" rather than a public one
 
         /// <summary>
         ///     A unique identifier for your mod.
@@ -60,7 +62,7 @@ namespace PrepareLanding
         public override string ModIdentifier => "PrepareLanding";
 
         /// <summary>
-        /// The full path of the mod folder. 
+        ///     The full path of the mod folder.
         /// </summary>
         public string ModFolder => ModContentPack.RootDir;
 
