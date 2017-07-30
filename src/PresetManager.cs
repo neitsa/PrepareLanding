@@ -908,6 +908,9 @@ namespace PrepareLanding
                     // it's a new preset: add it to the cache
                     _presetCache.Add(presetName, preset);
 
+                    // load its info
+                    preset.LoadPresetInfo();
+
                     // renew file cache
                     RenewPresetFileCache();
                 }
