@@ -762,7 +762,7 @@ namespace PrepareLanding
             PreloadPresets();
         }
 
-        private void CopyFromTemplateFolderToPresetFolder(string sourceFolder, string destFolder)
+        private static void CopyFromTemplateFolderToPresetFolder(string sourceFolder, string destFolder)
         {
             if (!Directory.Exists(sourceFolder) || !Directory.Exists(destFolder))
                 return;
@@ -774,9 +774,18 @@ namespace PrepareLanding
                     continue;
 
                 var destFilePath = Path.Combine(destFolder, sourceFileName);
-
-                if(!Md5HashEquals(sourceFile, destFilePath))
-                    File.Copy(sourceFile, destFilePath);
+                try
+                {
+                    if (!Md5HashEquals(sourceFile, destFilePath))
+                    {
+                        File.Delete(destFilePath);
+                        File.Copy(sourceFile, destFilePath);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"[PrepareLanding] An error occured in CopyFromTemplateFolderToPresetFolder.\n\t:Source: {sourceFile}\n\tDest:{destFilePath}\n\tError: {e}");
+                }
             }
         }
 
