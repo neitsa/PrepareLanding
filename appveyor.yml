@@ -97,7 +97,7 @@
     #
     # Download required assemblies DLLs
     #
-    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib --download_path %DOWNLOAD_FOLDER%
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib/releases/download/v3.1.2/HugsLib_3.1.2.zip --download_path %DOWNLOAD_FOLDER%
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_17b.7z --download_path %DOWNLOAD_FOLDER%
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -p%DLL_ARCH_PASS% -e *.dll
