@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace PrepareLanding
 {
-    public class PrepareLandingFilterOptions : INotifyPropertyChanged
+    public class FilterOptions : INotifyPropertyChanged
     {
         private bool _allowImpassableHilliness;
         private bool _allowInvalidTilesForNewSettlement;

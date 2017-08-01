@@ -19,7 +19,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Class constructor.
         /// </summary>
-        public UserData(PrepareLandingFilterOptions options)
+        public UserData(FilterOptions options)
         {
             // get alerted when RimWorld has loaded its definition (Defs) files
             PrepareLanding.Instance.OnDefsLoaded += ExecuteOnDefsLoaded;
@@ -45,7 +45,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Filter Options (from the GUI window 'options' tab).
         /// </summary>
-        public PrepareLandingFilterOptions Options { get; }
+        public FilterOptions Options { get; }
 
         /// <summary>
         ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.

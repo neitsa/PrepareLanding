@@ -16,7 +16,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Filter Options (from the GUI window 'options' tab).
         /// </summary>
-        private PrepareLandingFilterOptions _filterOptions;
+        private FilterOptions _filterOptions;
 
         /// <summary>
         ///     Main mod class constructor. Sets up the static instance.
@@ -110,7 +110,7 @@ namespace PrepareLanding
             PatchWorldInterfaceUpdate.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
 
             // various options show on the 'option' tab on the GUI.
-            _filterOptions = new PrepareLandingFilterOptions();
+            _filterOptions = new FilterOptions();
 
             // main instance to keep user filter choices on the GUI.
             UserData = new UserData(_filterOptions);

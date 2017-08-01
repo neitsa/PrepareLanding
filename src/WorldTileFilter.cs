@@ -413,7 +413,7 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Called when a property from <see cref="PrepareLandingFilterOptions" /> has changed.
+        ///     Called when a property from <see cref="FilterOptions" /> has changed.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The argument of the event.</param>
