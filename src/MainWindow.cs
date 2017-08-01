@@ -32,7 +32,7 @@ namespace PrepareLanding
 
         private int _tileDisplayIndexStart;
 
-        private ButtonDescriptor _buttonCloseDescriptor;
+        private readonly ButtonDescriptor _buttonCloseDescriptor;
 
         private UserData _userData;
 
