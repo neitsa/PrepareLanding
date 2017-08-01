@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Text;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Filters;
-using PrepareLanding.Gui.Tab;
 using UnityEngine;
 using Verse;
 

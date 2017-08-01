@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui;
+using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Gui;
-using PrepareLanding.Gui.Tab;
 using UnityEngine;
 using Verse;
 using Verse.Steam;
@@ -352,7 +353,7 @@ namespace PrepareLanding
                 DefaultElementHeight);
             GenUI.ResetLabelAlign();
             var counterLabelRect = ListingStandard.EndCaptureHeight(heightBefore);
-            Gui.Widgets.DrawHighlightColor(counterLabelRect, Color.cyan, 0.50f);
+            Core.Gui.Widgets.DrawHighlightColor(counterLabelRect, Color.cyan, 0.50f);
 
             // add a gap before the scroll view
             ListingStandard.Gap(DefaultGapLineHeight);
@@ -382,7 +383,7 @@ namespace PrepareLanding
                 // display the label
                 var labelRect = innerLs.GetRect(DefaultElementHeight);
                 var selected = i == _selectedItemIndex;
-                if (Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
+                if (Core.Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
                 {
                     // save item index
                     _selectedItemIndex = i;

@@ -1,4 +1,4 @@
-﻿using PrepareLanding.Gui.Window;
+﻿using PrepareLanding.Core.Gui.Window;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;

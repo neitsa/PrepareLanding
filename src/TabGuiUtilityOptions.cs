@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using PrepareLanding.Extensions;
-using PrepareLanding.Gui.Tab;
+using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Gui.World;
 using UnityEngine;
 using Verse;

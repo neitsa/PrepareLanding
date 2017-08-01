@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Gui
+namespace PrepareLanding.Core.Gui
 {
     public class ButtonDescriptor
     {

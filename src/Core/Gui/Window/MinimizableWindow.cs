@@ -2,7 +2,7 @@
 using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Gui.Window
+namespace PrepareLanding.Core.Gui.Window
 {
     public abstract class MinimizableWindow : Verse.Window
     {

@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
 using RimWorld.Planet;
 using UnityEngine;

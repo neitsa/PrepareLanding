@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Gui.Tab
+namespace PrepareLanding.Core.Gui.Tab
 {
     /// <summary>
     ///     A tab controller used to control the tabs in a tabbed GUI view.

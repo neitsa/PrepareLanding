@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Gui.Tab
+namespace PrepareLanding.Core.Gui.Tab
 {
     public interface ITabGuiUtility
     {

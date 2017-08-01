@@ -6,7 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;

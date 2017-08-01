@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Extensions
+namespace PrepareLanding.Core.Extensions
 {
     /// <summary>
     ///     Extension class for <see cref="Verse.Listing_Standard" />.

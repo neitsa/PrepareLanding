@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace PrepareLanding.Gui
+namespace PrepareLanding.Core.Gui
 {
     /// <summary>
     ///     Extensions for <see cref="Verse.Text" /> class.

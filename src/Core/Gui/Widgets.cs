@@ -1,10 +1,10 @@
-﻿using PrepareLanding.Extensions;
+﻿using PrepareLanding.Core.Extensions;
 using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
 
-namespace PrepareLanding.Gui
+namespace PrepareLanding.Core.Gui
 {
     [StaticConstructorOnStartup]
     public static class Widgets

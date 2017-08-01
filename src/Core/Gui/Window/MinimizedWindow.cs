@@ -1,9 +1,9 @@
 ﻿using System;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
 using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Gui.Window
+namespace PrepareLanding.Core.Gui.Window
 {
     public class MinimizedWindow : Verse.Window
     {

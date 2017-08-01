@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;

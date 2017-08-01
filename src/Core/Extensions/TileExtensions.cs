@@ -1,7 +1,7 @@
 ﻿using RimWorld.Planet;
 using Verse;
 
-namespace PrepareLanding.Extensions
+namespace PrepareLanding.Core.Extensions
 {
     public static class TileExtensions
     {

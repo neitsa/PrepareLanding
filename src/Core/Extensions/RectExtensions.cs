@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Extensions
+namespace PrepareLanding.Core.Extensions
 {
     public static class RectExtensions
     {

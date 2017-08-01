@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PrepareLanding.Extensions;
-using PrepareLanding.Gui;
-using PrepareLanding.Gui.Tab;
-using PrepareLanding.Gui.Window;
+using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui;
+using PrepareLanding.Core.Gui.Tab;
+using PrepareLanding.Core.Gui.Window;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -357,7 +357,7 @@ namespace PrepareLanding
                 elementHeight);
             GenUI.ResetLabelAlign();
             var counterLabelRect = listingStandard.EndCaptureHeight(heightBefore);
-            Gui.Widgets.DrawHighlightColor(counterLabelRect, Color.cyan, 0.50f);
+            Core.Gui.Widgets.DrawHighlightColor(counterLabelRect, Color.cyan, 0.50f);
 
             // add a gap before the scroll view
             listingStandard.Gap(gapLineHeight);
@@ -396,7 +396,7 @@ namespace PrepareLanding
                 // display the label
                 var labelRect = innerLs.GetRect(elementHeight);
                 var selected = i == _selectedTileIndex;
-                if (Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
+                if (Core.Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
                 {
                     // go to the location of the selected tile
                     _selectedTileIndex = i;

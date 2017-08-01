@@ -3,7 +3,7 @@ using PrepareLanding.Filters;
 using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Gui.Tab
+namespace PrepareLanding.Core.Gui.Tab
 {
     public abstract class TabGuiUtility : ITabGuiUtilityColumned
     {

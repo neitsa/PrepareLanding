@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace PrepareLanding.Extensions
+namespace PrepareLanding.Core.Extensions
 {
     public static class ListExtensions
     {

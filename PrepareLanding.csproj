@@ -52,29 +52,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Core\Extensions\ListExtensions.cs" />
+    <Compile Include="src\Core\Extensions\ListingStandardExtension.cs" />
+    <Compile Include="src\Core\Extensions\MultiCheckboxStateExtension.cs" />
+    <Compile Include="src\Core\Extensions\RectExtensions.cs" />
+    <Compile Include="src\Core\Extensions\StringExtensions.cs" />
+    <Compile Include="src\Core\Extensions\TileExtensions.cs" />
+    <Compile Include="src\Core\Extensions\TwelfthExtensions.cs" />
+    <Compile Include="src\Core\Gui\ButtonDescriptor.cs" />
+    <Compile Include="src\Core\Gui\RichText.cs" />
+    <Compile Include="src\Core\Gui\Tab\ITabGuiUtility.cs" />
+    <Compile Include="src\Core\Gui\Tab\TabGuiUtility.cs" />
+    <Compile Include="src\Core\Gui\Tab\TabGuiUtilityController.cs" />
+    <Compile Include="src\Core\Gui\Widgets.cs" />
+    <Compile Include="src\Core\Gui\Window\MinimizableWindow.cs" />
+    <Compile Include="src\Core\Gui\Window\MinimizedWindow.cs" />
+    <Compile Include="src\Core\Gui\World\HighlightedTile.cs" />
+    <Compile Include="src\Core\Gui\World\TileHighlighter.cs" />
     <Compile Include="src\DataItems.cs" />
     <Compile Include="src\Defs\MainButtonWorkerToggleWorld.cs" />
-    <Compile Include="src\Extensions\ListExtensions.cs" />
-    <Compile Include="src\Extensions\ListingStandardExtension.cs" />
-    <Compile Include="src\Extensions\MultiCheckboxStateExtension.cs" />
-    <Compile Include="src\Extensions\RectExtensions.cs" />
-    <Compile Include="src\Extensions\StringExtensions.cs" />
     <Compile Include="src\Filters\ITileFilter.cs" />
     <Compile Include="src\Filters\TileFilter.cs" />
     <Compile Include="src\Filters\TileFilters.cs" />
-    <Compile Include="src\Gui\ButtonDescriptor.cs" />
-    <Compile Include="src\Gui\RichText.cs" />
-    <Compile Include="src\Extensions\TileExtensions.cs" />
-    <Compile Include="src\Extensions\TwelfthExtensions.cs" />
     <Compile Include="src\FilterInfoLogger.cs" />
-    <Compile Include="src\Gui\Tab\ITabGuiUtility.cs" />
-    <Compile Include="src\Gui\Tab\TabGuiUtility.cs" />
-    <Compile Include="src\Gui\Tab\TabGuiUtilityController.cs" />
-    <Compile Include="src\Gui\Widgets.cs" />
-    <Compile Include="src\Gui\Window\MinimizableWindow.cs" />
-    <Compile Include="src\Gui\Window\MinimizedWindow.cs" />
-    <Compile Include="src\Gui\World\HighlightedTile.cs" />
-    <Compile Include="src\Gui\World\TileHighlighter.cs" />
     <Compile Include="src\MonoController.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
@@ -93,6 +93,7 @@
     <Compile Include="src\TabGuiUtilityTerrain.cs" />
     <Compile Include="src\WorldTileFilter.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)

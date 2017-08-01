@@ -1,7 +1,7 @@
 ﻿using System;
 using Verse;
 
-namespace PrepareLanding.Extensions
+namespace PrepareLanding.Core.Extensions
 {
     public static class MultiCheckboxStateExtension
     {

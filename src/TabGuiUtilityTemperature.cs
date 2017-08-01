@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using PrepareLanding.Extensions;
-using PrepareLanding.Gui.Tab;
+using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui.Tab;
 using UnityEngine;
 using Verse;
-using Widgets = PrepareLanding.Gui.Widgets;
+using Widgets = PrepareLanding.Core.Gui.Widgets;
 
 namespace PrepareLanding
 {
