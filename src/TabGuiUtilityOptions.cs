@@ -9,10 +9,13 @@ namespace PrepareLanding
 {
     public class TabGuiUtilityOptions : TabGuiUtility
     {
-        private readonly PrepareLandingUserData _userData;
-
+        // split percentage for the 3 elements of the "go to tile" entry.
         private readonly List<float> _goToTileSplitPct = new List<float> {0.5f, 0.35f, 0.15f};
-        private int _tileNumber = -1;
+        // hold user choices
+        private readonly PrepareLandingUserData _userData;
+        // default tile number (for "go to tile").
+        private int _tileNumber;
+        // tile number, as string (for "go to tile")
         private string _tileNumberString = string.Empty;
 
         public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
@@ -21,14 +24,14 @@ namespace PrepareLanding
             _userData = userData;
         }
 
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
+
         /// <summary>A unique identifier for the Tab.</summary>
         public override string Id => "Options";
 
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
         public override string Name => Id;
-
-        /// <summary>Gets whether the tab can be draw or not.</summary>
-        public override bool CanBeDrawn { get; set; } = true;
 
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>
@@ -89,7 +92,8 @@ namespace PrepareLanding
             _userData.Options.ShowFilterHeaviness = showFilterHeaviness;
 
             var allowInvalidTilesForNewSettlement = _userData.Options.AllowInvalidTilesForNewSettlement;
-            ListingStandard.CheckboxLabeled("Allow Invalid Tiles for New Settlement", ref allowInvalidTilesForNewSettlement,
+            ListingStandard.CheckboxLabeled("Allow Invalid Tiles for New Settlement",
+                ref allowInvalidTilesForNewSettlement,
                 "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
             _userData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
 
@@ -98,8 +102,8 @@ namespace PrepareLanding
             Widgets.Label(rects[0], "Go to Tile:");
             Widgets.TextFieldNumeric(rects[1], ref _tileNumber, ref _tileNumberString, -1, 300000);
             if (Widgets.ButtonText(rects[2], "Go!"))
-            {
-                if (_tileNumber < 0 || _tileNumber >= Find.WorldGrid.TilesCount)
+            { 
+                if ((_tileNumber < 0) || (_tileNumber >= Find.WorldGrid.TilesCount))
                 {
                     Messages.Message($"Out of Range: {_tileNumber}; Range: [0, {Find.WorldGrid.TilesCount}).",
                         MessageSound.RejectInput);
@@ -110,7 +114,6 @@ namespace PrepareLanding
                     Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
                 }
             }
-
         }
     }
 }

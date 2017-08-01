@@ -11,37 +11,69 @@ using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
+    /// <summary>
+    ///     Type of mode we are in on the "load / save" tab.
+    /// </summary>
     public enum LoadSaveMode
     {
+        /// <summary>
+        ///     Unknown mode.
+        /// </summary>
         Unknown = 0,
+
+        /// <summary>
+        ///     Tab is in load mode
+        /// </summary>
         Load = 1,
+
+        /// <summary>
+        ///     Tab is in save mode.
+        /// </summary>
         Save = 2
     }
 
     public class TabGuiUtilityLoadSave : TabGuiUtility
     {
+        /// <summary>
+        ///     Maximum number of preset to display at once.
+        /// </summary>
         public const int MaxItemsToDisplay = 20;
 
+        /// <summary>
+        ///     Maximum length of preset description.
+        /// </summary>
         public const int MaxDescriptionLength = 300;
 
+        /// <summary>
+        ///     Maximum author name length.
+        /// </summary>
         public const int MaxAuthorNameLength = 50;
 
+        // size of a bottom button (length, height)
         private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
 
+        // list of descriptors for bottom buttons
         private readonly List<ButtonDescriptor> _buttonList;
 
+        // gui style for the preset info text box.
         private readonly GUIStyle _stylePresetInfo;
 
+        // holds user choices
         private readonly PrepareLandingUserData _userData;
 
+        // wheter or not, if clicking on save, this overwrite the preset directly (true) or first display a warning.
         private bool _allowOverwriteExistingPreset;
 
+        // starting index of the preset list
         private int _listDisplayStartIndex;
 
+        // preset author name during save mode.
         private string _presetAuthorSave = string.Empty;
 
+        // preset description text during save mode.
         private string _presetDescriptionSave = string.Empty;
 
+        // whether or not to save options with the preset
         private bool _saveOptions;
 
         private Vector2 _scrollPosPresetDescription;
@@ -54,8 +86,10 @@ namespace PrepareLanding
 
         private Vector2 _scrollPosPresetOptionInfo;
 
+        // filename of the selected preset (load mode)
         private string _selectedFileName = string.Empty;
 
+        // index of the selected preset in the preset list (load mode)
         private int _selectedItemIndex = -1;
 
         public TabGuiUtilityLoadSave(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
@@ -121,10 +155,17 @@ namespace PrepareLanding
             #endregion
         }
 
-        public LoadSaveMode LoadSaveMode { get; set; }
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn
+        {
+            get { return LoadSaveMode != LoadSaveMode.Unknown; }
+            set { }
+        }
 
         /// <summary>A unique identifier for the Tab.</summary>
         public override string Id => "LoadSave";
+
+        public LoadSaveMode LoadSaveMode { get; set; }
 
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
         public override string Name
@@ -148,13 +189,6 @@ namespace PrepareLanding
                 }
                 return name;
             }
-        }
-
-        /// <summary>Gets whether the tab can be draw or not.</summary>
-        public override bool CanBeDrawn
-        {
-            get { return LoadSaveMode != LoadSaveMode.Unknown; }
-            set { }
         }
 
         /// <summary>Draw the content of the tab.</summary>
@@ -225,8 +259,6 @@ namespace PrepareLanding
                         break;
                     case LoadSaveMode.Save:
                         SavePreset(presetExistsProtectFromOverwrite);
-                        break;
-                    default:
                         break;
                 }
             GUI.color = savedColor;

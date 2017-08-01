@@ -10,10 +10,45 @@ namespace PrepareLanding
         private bool _allowLiveFiltering;
         private bool _bypassMaxHighlightedTiles;
         private bool _disablePreFilterCheck;
-        private bool _disableTileHighlighting;
         private bool _disableTileBlinking;
+        private bool _disableTileHighlighting;
         private bool _showDebugTileId;
         private bool _showFilterHeaviness;
+
+        /// <summary>
+        ///     Allow selection and filtering of impassable tiles.
+        /// </summary>
+        public bool AllowImpassableHilliness
+        {
+            get { return _allowImpassableHilliness; }
+            set
+            {
+                if (value == _allowImpassableHilliness)
+                    return;
+
+                _allowImpassableHilliness = value;
+                OnPropertyChanged(nameof(AllowImpassableHilliness));
+
+                // note: turning this one on /off also turns on /off the AllowInvalidTilesForNewSettlement
+                AllowInvalidTilesForNewSettlement = value;
+            }
+        }
+
+        /// <summary>
+        ///     Allow filtering of tiles that would normally not be deemed as valid for new settlements.
+        /// </summary>
+        public bool AllowInvalidTilesForNewSettlement
+        {
+            get { return _allowInvalidTilesForNewSettlement; }
+            set
+            {
+                if (value == _allowInvalidTilesForNewSettlement)
+                    return;
+
+                _allowInvalidTilesForNewSettlement = value;
+                OnPropertyChanged(nameof(AllowInvalidTilesForNewSettlement));
+            }
+        }
 
         /// <summary>
         ///     Allow "live filtering" or not (user doesn't have to click the filter button if active: filtering is done on the
@@ -32,22 +67,10 @@ namespace PrepareLanding
             }
         }
 
-        public bool AllowImpassableHilliness
-        {
-            get { return _allowImpassableHilliness; }
-            set
-            {
-                if (value == _allowImpassableHilliness)
-                    return;
-
-                _allowImpassableHilliness = value;
-                OnPropertyChanged(nameof(AllowImpassableHilliness));
-
-                // note: turning this one on /off also turns on /off the AllowInvalidTilesForNewSettlement
-                AllowInvalidTilesForNewSettlement = value;
-            }
-        }
-
+        /// <summary>
+        ///     If true, Bypass the maximum number of allowed highlighted tiles (
+        ///     <see cref="Gui.World.TileHighlighter.MaxHighlightedTiles" />).
+        /// </summary>
         public bool BypassMaxHighlightedTiles
         {
             get { return _bypassMaxHighlightedTiles; }
@@ -61,19 +84,9 @@ namespace PrepareLanding
             }
         }
 
-        public bool ShowDebugTileId
-        {
-            get { return _showDebugTileId; }
-            set
-            {
-                if (value == _showDebugTileId)
-                    return;
-
-                _showDebugTileId = value;
-                OnPropertyChanged(nameof(ShowDebugTileId));
-            }
-        }
-
+        /// <summary>
+        ///     Disable the prefilter check (<see cref="WorldTileFilter.Prefilter" />).
+        /// </summary>
         public bool DisablePreFilterCheck
         {
             get { return _disablePreFilterCheck; }
@@ -87,19 +100,9 @@ namespace PrepareLanding
             }
         }
 
-        public bool DisableTileHighlighting
-        {
-            get { return _disableTileHighlighting; }
-            set
-            {
-                if (value == _disableTileHighlighting)
-                    return;
-
-                _disableTileHighlighting = value;
-                OnPropertyChanged(nameof(DisableTileHighlighting));
-            }
-        }
-
+        /// <summary>
+        ///     Disable filtered tiles blinking (if true).
+        /// </summary>
         public bool DisableTileBlinking
         {
             get { return _disableTileBlinking; }
@@ -113,6 +116,41 @@ namespace PrepareLanding
             }
         }
 
+        /// <summary>
+        ///     If true, disable filtered tile highlighting altogether.
+        /// </summary>
+        public bool DisableTileHighlighting
+        {
+            get { return _disableTileHighlighting; }
+            set
+            {
+                if (value == _disableTileHighlighting)
+                    return;
+
+                _disableTileHighlighting = value;
+                OnPropertyChanged(nameof(DisableTileHighlighting));
+            }
+        }
+
+        /// <summary>
+        ///     If true, show the tile identifier on the world map.
+        /// </summary>
+        public bool ShowDebugTileId
+        {
+            get { return _showDebugTileId; }
+            set
+            {
+                if (value == _showDebugTileId)
+                    return;
+
+                _showDebugTileId = value;
+                OnPropertyChanged(nameof(ShowDebugTileId));
+            }
+        }
+
+        /// <summary>
+        ///     Show filter heaviness on the GUI with a color code (green: light, yellow: medium, red: heavy)
+        /// </summary>
         public bool ShowFilterHeaviness
         {
             get { return _showFilterHeaviness; }
@@ -123,20 +161,6 @@ namespace PrepareLanding
 
                 _showFilterHeaviness = value;
                 OnPropertyChanged(nameof(ShowFilterHeaviness));
-            }
-        }
-
-
-        public bool AllowInvalidTilesForNewSettlement
-        {
-            get { return _allowInvalidTilesForNewSettlement; }
-            set
-            {
-                if (value == _allowInvalidTilesForNewSettlement)
-                    return;
-
-                _allowInvalidTilesForNewSettlement = value;
-                OnPropertyChanged(nameof(AllowInvalidTilesForNewSettlement));
             }
         }
 

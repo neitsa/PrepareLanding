@@ -13,20 +13,34 @@ namespace PrepareLanding
 {
     public class TabGuiUtilityTerrain : TabGuiUtility
     {
+        // scroll bar position for road selection
         private static Vector2 _scrollPosRoadSelection = Vector2.zero;
+        // scroll bar position for river selection
         private static Vector2 _scrollPosRiverSelection = Vector2.zero;
+        // scroll bar position for stone selection
         private static Vector2 _scrollPosStoneSelection = Vector2.zero;
+
+        // user choices
+        private readonly PrepareLandingUserData _userData;
+        // string buffer for "number of stones" selection 
         private string _bufferStringNumberOfStones;
 
-        private readonly PrepareLandingUserData _userData;
-
+        // holds the currently selected stone def when reordering them.
         private ThingDef _selectedStoneDef;
 
+        /// <summary>
+        ///     Filters Terrain tab constructor.
+        /// </summary>
+        /// <param name="userData">Instance used to hold user choices.</param>
+        /// <param name="columnSizePercent">Size of a column (in percent of the tab).</param>
         public TabGuiUtilityTerrain(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;
         }
+
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
 
         /// <summary>A unique identifier for the Tab.</summary>
         public override string Id => Name;
@@ -35,9 +49,6 @@ namespace PrepareLanding
         ///     The name of the tab (that is actually displayed at its top).
         /// </summary>
         public override string Name => "Terrain";
-
-        /// <summary>Gets whether the tab can be draw or not.</summary>
-        public override bool CanBeDrawn { get; set; } = true;
 
         /// <summary>
         ///     Draw the actual content of this window.
@@ -58,6 +69,39 @@ namespace PrepareLanding
             DrawElevationSelection();
             DrawTimeZoneSelection();
             End();
+        }
+
+        /// <summary>
+        /// Re-order elements in a list.
+        /// </summary>
+        /// <typeparam name="T">type of elements in the list.</typeparam>
+        /// <param name="index">The old index of the element to move.</param>
+        /// <param name="newIndex">The new index of the element to move.</param>
+        /// <param name="elementsList">The list of elements.</param>
+        public static void ReorderElements<T>(int index, int newIndex, IList<T> elementsList)
+        {
+            if ((index == newIndex) || (index < 0))
+            {
+                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}");
+                return;
+            }
+
+            if (elementsList.Count == 0)
+            {
+                Log.Message("[PrepareLanding] ReorderElements: elementsList count is 0.");
+                return;
+            }
+
+            if ((index >= elementsList.Count) || (newIndex >= elementsList.Count))
+            {
+                Log.Message(
+                    $"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}; elemntsList.Count: {elementsList.Count}");
+                return;
+            }
+
+            var item = elementsList[index];
+            elementsList.RemoveAt(index);
+            elementsList.Insert(newIndex, item);
         }
 
         protected virtual void DrawBiomeTypesSelection()
@@ -129,9 +173,30 @@ namespace PrepareLanding
             }
         }
 
+        protected virtual void DrawCoastalSelection()
+        {
+            DrawEntryHeader("Coastal Tile", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
+
+            var rect = ListingStandard.GetRect(DefaultElementHeight);
+            var tmpCheckState = _userData.ChosenCoastalTileState;
+            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile:", ref tmpCheckState);
+
+            _userData.ChosenCoastalTileState = tmpCheckState;
+        }
+
+        protected void DrawElevationSelection()
+        {
+            DrawEntryHeader("Elevation (meters)", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
+
+            // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
+            // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
+            DrawUsableMinMaxNumericField(_userData.Elevation, "Elevation", -500f, 5000f);
+        }
+
         protected virtual void DrawHillinessTypeSelection()
         {
-            DrawEntryHeader($"{"Terrain".Translate()} Types", backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
+            DrawEntryHeader($"{"Terrain".Translate()} Types",
+                backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
 
             if (ListingStandard.ButtonText("Select Terrain"))
             {
@@ -159,6 +224,60 @@ namespace PrepareLanding
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
+        protected void DrawMovementTime()
+        {
+            DrawEntryHeader("Movement Times (hours)", false,
+                backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
+
+            DrawUsableMinMaxNumericField(_userData.CurrentMovementTime, "Current Movement Time");
+            DrawUsableMinMaxNumericField(_userData.SummerMovementTime, "Summer Movement Time");
+            DrawUsableMinMaxNumericField(_userData.WinterMovementTime, "Winter Movement Time");
+        }
+
+        protected virtual void DrawRiverTypesSelection()
+        {
+            DrawEntryHeader("River Types", backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
+
+            var riverDefs = _userData.RiverDefs;
+            var selectedRiverDefs = _userData.SelectedRiverDefs;
+
+            // Reset button: reset all entries to Off state
+            if (ListingStandard.ButtonText("Reset All"))
+                foreach (var riverDefEntry in selectedRiverDefs)
+                    riverDefEntry.Value.State = MultiCheckboxState.Partial;
+
+            var inLs = ListingStandard.BeginScrollView(4*DefaultElementHeight,
+                selectedRiverDefs.Count*DefaultElementHeight, ref _scrollPosRiverSelection);
+
+            // display river elements
+            foreach (var riverDef in riverDefs)
+            {
+                ThreeStateItem threeStateItem;
+                if (!selectedRiverDefs.TryGetValue(riverDef, out threeStateItem))
+                {
+                    Log.Error(
+                        $"[PrepareLanding] [DrawRiverTypesSelection] an item in riverDefs is not in selectedRiverDefs: {riverDef.LabelCap}");
+                    continue;
+                }
+
+                // save temporary state as it might change in CheckBoxLabeledMulti
+                var tmpState = threeStateItem.State;
+
+                var itemRect = inLs.GetRect(DefaultElementHeight);
+                Widgets.CheckBoxLabeledMulti(itemRect, riverDef.LabelCap, ref tmpState);
+
+                // if the state changed, update the item with the new state
+                // ReSharper disable once RedundantCheckBeforeAssignment
+                if (tmpState != threeStateItem.State)
+                    threeStateItem.State = tmpState;
+
+                if (!string.IsNullOrEmpty(riverDef.description))
+                    TooltipHandler.TipRegion(itemRect, riverDef.description);
+            }
+
+            ListingStandard.EndScrollView(inLs);
+        }
+
         protected virtual void DrawRoadTypesSelection()
         {
             DrawEntryHeader("Road Types", backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
@@ -171,8 +290,8 @@ namespace PrepareLanding
                 foreach (var roadDefEntry in selectedRoadDefs)
                     roadDefEntry.Value.State = MultiCheckboxState.Partial;
 
-            var scrollViewHeight = selectedRoadDefs.Count * DefaultElementHeight;
-            var inLs = ListingStandard.BeginScrollView(5 * DefaultElementHeight, scrollViewHeight,
+            var scrollViewHeight = selectedRoadDefs.Count*DefaultElementHeight;
+            var inLs = ListingStandard.BeginScrollView(5*DefaultElementHeight, scrollViewHeight,
                 ref _scrollPosRoadSelection);
 
             // display road elements
@@ -204,68 +323,6 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        protected virtual void DrawRiverTypesSelection()
-        {
-            DrawEntryHeader("River Types", backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
-
-            var riverDefs = _userData.RiverDefs;
-            var selectedRiverDefs = _userData.SelectedRiverDefs;
-
-            // Reset button: reset all entries to Off state
-            if (ListingStandard.ButtonText("Reset All"))
-                foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.Partial;
-
-            var inLs = ListingStandard.BeginScrollView(4 * DefaultElementHeight,
-                selectedRiverDefs.Count * DefaultElementHeight, ref _scrollPosRiverSelection);
-
-            // display river elements
-            foreach (var riverDef in riverDefs)
-            {
-                ThreeStateItem threeStateItem;
-                if (!selectedRiverDefs.TryGetValue(riverDef, out threeStateItem))
-                {
-                    Log.Error(
-                        $"[PrepareLanding] [DrawRiverTypesSelection] an item in riverDefs is not in selectedRiverDefs: {riverDef.LabelCap}");
-                    continue;
-                }
-
-                // save temporary state as it might change in CheckBoxLabeledMulti
-                var tmpState = threeStateItem.State;
-
-                var itemRect = inLs.GetRect(DefaultElementHeight);
-                Widgets.CheckBoxLabeledMulti(itemRect, riverDef.LabelCap, ref tmpState);
-
-                // if the state changed, update the item with the new state
-                // ReSharper disable once RedundantCheckBeforeAssignment
-                if (tmpState != threeStateItem.State)
-                    threeStateItem.State = tmpState;
-
-                if (!string.IsNullOrEmpty(riverDef.description))
-                    TooltipHandler.TipRegion(itemRect, riverDef.description);
-            }
-
-            ListingStandard.EndScrollView(inLs);
-        }
-
-        protected void DrawMovementTime()
-        {
-            DrawEntryHeader("Movement Times (hours)", false, backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
-
-            DrawUsableMinMaxNumericField(_userData.CurrentMovementTime, "Current Movement Time");
-            DrawUsableMinMaxNumericField(_userData.SummerMovementTime, "Summer Movement Time");
-            DrawUsableMinMaxNumericField(_userData.WinterMovementTime, "Winter Movement Time");
-        }
-
-        protected void DrawElevationSelection()
-        {
-            DrawEntryHeader("Elevation (meters)", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
-
-            // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
-            // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
-            DrawUsableMinMaxNumericField(_userData.Elevation, "Elevation", -500f, 5000f);
-        }
-
         protected virtual void DrawStoneTypesSelection()
         {
             DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
@@ -291,15 +348,15 @@ namespace PrepareLanding
             });
 
             var maxHeight = InRect.height - ListingStandard.CurHeight;
-            var height = Mathf.Min(selectedStoneDefs.Count * DefaultElementHeight, maxHeight);
+            var height = Mathf.Min(selectedStoneDefs.Count*DefaultElementHeight, maxHeight);
 
             if (!_userData.StoneTypesNumberOnly)
             {
                 // stone types, standard selection
 
-                var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count * DefaultElementHeight,
+                var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count*DefaultElementHeight,
                     ref _scrollPosStoneSelection);
-                
+
                 foreach (var currentOrderedStoneDef in orderedStoneDefs)
                 {
                     ThreeStateItem threeStateItem;
@@ -351,44 +408,9 @@ namespace PrepareLanding
             Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _bufferStringNumberOfStones, 2, 3);
             _userData.StoneTypesNumber = numberOfStones;
 
-            const string tooltipText = "Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.";
+            const string tooltipText =
+                "Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.";
             TooltipHandler.TipRegion(leftRect, tooltipText);
-        }
-
-        public static void ReorderElements<T>(int index, int newIndex, IList<T> elementsList)
-        {
-            if (index == newIndex || index < 0)
-            {
-                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}");
-                return;
-            }
-
-            if (elementsList.Count == 0)
-            {
-                Log.Message("[PrepareLanding] ReorderElements: elementsList count is 0.");
-                return;
-            }
-
-            if (index >= elementsList.Count || newIndex >= elementsList.Count)
-            {
-                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}; elemntsList.Count: {elementsList.Count}");
-                return;
-            }
-
-            var item = elementsList[index];
-            elementsList.RemoveAt(index);
-            elementsList.Insert(newIndex, item);
-        }
-
-        protected virtual void DrawCoastalSelection()
-        {
-            DrawEntryHeader("Coastal Tile", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
-
-            var rect = ListingStandard.GetRect(DefaultElementHeight);
-            var tmpCheckState = _userData.ChosenCoastalTileState;
-            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile:", ref tmpCheckState);
-
-            _userData.ChosenCoastalTileState = tmpCheckState;
         }
 
         protected virtual void DrawTimeZoneSelection()

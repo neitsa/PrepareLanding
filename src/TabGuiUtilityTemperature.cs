@@ -17,12 +17,18 @@ namespace PrepareLanding
             _userData = userData;
         }
 
-        public override string Id => Name;
-
-        public override string Name => "Temperature";
-
         /// <summary>Gets whether the tab can be draw or not.</summary>
         public override bool CanBeDrawn { get; set; } = true;
+
+        /// <summary>
+        ///     A unique identifier for the Tab.
+        /// </summary>
+        public override string Id => Name;
+
+        /// <summary>
+        ///     The name of the tab (that is actually displayed at its top).
+        /// </summary>
+        public override string Name => "Temperature";
 
         /// <summary>
         ///     Draw the actual content of this window.
@@ -45,16 +51,15 @@ namespace PrepareLanding
             End();
         }
 
-        protected void DrawTemperaturesSelection()
+        protected virtual void DrawAnimalsCanGrazeNowSelection()
         {
-            DrawEntryHeader("Temperatures (Celsius)", backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
+            DrawEntryHeader("Animals", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
 
-            DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature",
-                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
-            DrawUsableMinMaxNumericField(_userData.WinterTemperature, "Winter Temperature",
-                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
-            DrawUsableMinMaxNumericField(_userData.SummerTemperature, "Summer Temperature",
-                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            var rect = ListingStandard.GetRect(DefaultElementHeight);
+            var tmpCheckState = _userData.ChosenAnimalsCanGrazeNowState;
+            Widgets.CheckBoxLabeledMulti(rect, "Animals Can Graze Now:", ref tmpCheckState);
+
+            _userData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
         }
 
         protected void DrawGrowingPeriodSelection()
@@ -66,7 +71,7 @@ namespace PrepareLanding
 
             var tmpCheckedOn = boundField.Use;
 
-            ListingStandard.Gap(DefaultGapHeight);
+            ListingStandard.Gap();
             ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"Use Min/Max {label}");
             boundField.Use = tmpCheckedOn;
 
@@ -114,15 +119,17 @@ namespace PrepareLanding
             DrawUsableMinMaxNumericField(_userData.RainFall, "Rain Fall");
         }
 
-        protected virtual void DrawAnimalsCanGrazeNowSelection()
+        protected void DrawTemperaturesSelection()
         {
-            DrawEntryHeader("Animals", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
+            DrawEntryHeader("Temperatures (Celsius)",
+                backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
 
-            var rect = ListingStandard.GetRect(DefaultElementHeight);
-            var tmpCheckState = _userData.ChosenAnimalsCanGrazeNowState;
-            Widgets.CheckBoxLabeledMulti(rect, "Animals Can Graze Now:", ref tmpCheckState);
-
-            _userData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
+            DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature",
+                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            DrawUsableMinMaxNumericField(_userData.WinterTemperature, "Winter Temperature",
+                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            DrawUsableMinMaxNumericField(_userData.SummerTemperature, "Summer Temperature",
+                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
         }
     }
 }
