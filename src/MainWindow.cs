@@ -14,7 +14,7 @@ using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
-    public class PrepareLandingWindow : MinimizableWindow
+    public class MainWindow : MinimizableWindow
     {
         private const float GapBetweenButtons = 10f;
 
@@ -36,7 +36,7 @@ namespace PrepareLanding
 
         private PrepareLandingUserData _userData;
 
-        public PrepareLandingWindow(PrepareLandingUserData userData)
+        public MainWindow(PrepareLandingUserData userData)
         {
             _userData = userData;
 
@@ -170,7 +170,7 @@ namespace PrepareLanding
 
         public override Vector2 InitialSize => new Vector2(1024f, 768f);
 
-        public override bool IsWindowValidInContext => WorldRendererUtility.WorldRenderedNow && (Find.WindowStack.IsOpen<PrepareLandingWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>());
+        public override bool IsWindowValidInContext => WorldRendererUtility.WorldRenderedNow && (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>());
 
         public override void DoWindowContents(Rect inRect)
         {
@@ -273,7 +273,7 @@ namespace PrepareLanding
             if (buttonsRect.Count != numButtons)
             {
                 Log.ErrorOnce(
-                    $"[PrepareLanding] Couldn't not get enough room for {numButtons} (in PrepareLandingWindow.DoBottomsButtons)",
+                    $"[PrepareLanding] Couldn't not get enough room for {numButtons} (in MainWindow.DoBottomsButtons)",
                     0x1237cafe);
                 return;
             }

@@ -51,7 +51,7 @@ namespace PrepareLanding
         /// <summary>
         ///     The main GUI window instance.
         /// </summary>
-        public PrepareLandingWindow MainWindow { get; set; }
+        public MainWindow MainWindow { get; set; }
 
         //TODO see if this can be set to a "private set" rather than a public one
 
@@ -118,7 +118,7 @@ namespace PrepareLanding
             TileFilter = new WorldTileFilter(UserData);
 
             // instantiate the main window now
-            MainWindow = new PrepareLandingWindow(UserData);
+            MainWindow = new MainWindow(UserData);
 
             // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter();
