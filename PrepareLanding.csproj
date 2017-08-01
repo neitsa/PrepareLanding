@@ -83,7 +83,7 @@
     <Compile Include="src\Patches\SelectLandingSite.cs" />
     <Compile Include="src\PrepareLanding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\PresetManager.cs" />
+    <Compile Include="src\Presets\PresetManager.cs" />
     <Compile Include="src\TabFilteredTiles.cs" />
     <Compile Include="src\TabInfo.cs" />
     <Compile Include="src\TabLoadSave.cs" />
