@@ -15,37 +15,25 @@ namespace PrepareLanding.Presets
         public const string PresetAuthorNode = "Author";
         public const string PresetDateNode = "Date";
 
-        public string Description { get; set; }
+        private StringBuilder _filterInfo;
 
-        public string Version { get; set; }
+        private int _indentLevel;
+
+        private StringBuilder _optionInfo;
 
         public string Author { get; set; }
 
         public DateTime Date { get; set; }
 
-        public bool IsTemplate { get; private set; }
-
-        private StringBuilder _filterInfo;
+        public string Description { get; set; }
 
         public string FilterInfo => _filterInfo.ToString();
 
-        private StringBuilder _optionInfo;
+        public bool IsTemplate { get; private set; }
 
         public string OptionInfo => _optionInfo.ToString();
 
-        private int _indentLevel;
-
-        public void SavePresetInfo(XContainer xRootElement)
-        {
-            var xInfoElement = new XElement(InfoNode);
-            xRootElement.Add(xInfoElement);
-
-            xInfoElement.Add(new XElement(PresetVersionNode, PresetVersion));
-            xInfoElement.Add(new XElement(PresetAuthorNode, Author));
-            xInfoElement.Add(new XElement(PresetTemplateNode, false));
-            xInfoElement.Add(new XElement(PresetDescriptionNode, string.IsNullOrEmpty(Description) ? "None" : Description));
-            //xInfoElement.Add(new XElement(PresetDateNode, DateTime.Now));
-        }
+        public string Version { get; set; }
 
         public void LoadPresetInfo(XContainer xRootNode)
         {
@@ -77,6 +65,19 @@ namespace PrepareLanding.Presets
 
             _indentLevel = 0;
             LoadPresetInfoRecursive(xOptions, _optionInfo);
+        }
+
+        public void SavePresetInfo(XContainer xRootElement)
+        {
+            var xInfoElement = new XElement(InfoNode);
+            xRootElement.Add(xInfoElement);
+
+            xInfoElement.Add(new XElement(PresetVersionNode, PresetVersion));
+            xInfoElement.Add(new XElement(PresetAuthorNode, Author));
+            xInfoElement.Add(new XElement(PresetTemplateNode, false));
+            xInfoElement.Add(new XElement(PresetDescriptionNode,
+                string.IsNullOrEmpty(Description) ? "None" : Description));
+            //xInfoElement.Add(new XElement(PresetDateNode, DateTime.Now));
         }
 
         private void LoadPresetInfoRecursive(XContainer xRootNode, StringBuilder sb)

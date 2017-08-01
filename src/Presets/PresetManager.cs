@@ -15,27 +15,9 @@ namespace PrepareLanding.Presets
 
         private readonly List<FileInfo> _allPresetFiles = new List<FileInfo>();
 
-        private readonly UserData _userData;
-
         private readonly Dictionary<string, Preset> _presetCache = new Dictionary<string, Preset>();
 
-        public List<FileInfo> AllPresetFiles
-        {
-            get
-            {
-                if (_allPresetFiles.Count == 0 && !IsPresetDirectoryEmpty())
-                    RenewPresetFileCache();
-
-                return _allPresetFiles;
-            }
-        }
-
-        /// <summary>
-        /// Name of the preset folder.
-        /// </summary>
-        public static string FolderName => PrepareLanding.Instance.ModIdentifier;
-
-        public static string PresetTemplateFolder => Path.Combine(PrepareLanding.Instance.ModFolder, "Presets");
+        private readonly UserData _userData;
 
         public PresetManager(UserData userData)
         {
@@ -52,57 +34,23 @@ namespace PrepareLanding.Presets
             PreloadPresets();
         }
 
-        private static void CopyFromTemplateFolderToPresetFolder(string sourceFolder, string destFolder)
+        public List<FileInfo> AllPresetFiles
         {
-            if (!Directory.Exists(sourceFolder) || !Directory.Exists(destFolder))
-                return;
-
-            foreach (var sourceFile in Directory.GetFiles(sourceFolder))
+            get
             {
-                var sourceFileName = Path.GetFileName(sourceFile);
-                if (string.IsNullOrEmpty(sourceFileName))
-                    continue;
+                if ((_allPresetFiles.Count == 0) && !IsPresetDirectoryEmpty())
+                    RenewPresetFileCache();
 
-                var destFilePath = Path.Combine(destFolder, sourceFileName);
-                try
-                {
-                    if (!Md5HashEquals(sourceFile, destFilePath))
-                    {
-                        File.Delete(destFilePath);
-                        File.Copy(sourceFile, destFilePath);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"[PrepareLanding] An error occured in CopyFromTemplateFolderToPresetFolder.\n\t:Source: {sourceFile}\n\tDest:{destFilePath}\n\tError: {e}");
-                }
+                return _allPresetFiles;
             }
         }
 
-        public void LoadPresetInfo(string presetName, bool forceReload = false)
-        {
-            var filePath = GetPresetFilePath(presetName);
+        /// <summary>
+        ///     Name of the preset folder.
+        /// </summary>
+        public static string FolderName => PrepareLanding.Instance.ModIdentifier;
 
-            if (!File.Exists(filePath))
-                return;
-
-            if (_presetCache.ContainsKey(presetName) && !forceReload)
-                return;
-
-            try
-            { 
-                // create the preset or load it if it already exists
-                var preset = !_presetCache.ContainsKey(presetName) ? new Preset(presetName, _userData) : _presetCache[presetName];
-
-                preset.LoadPresetInfo();
-            }
-            catch (Exception e)
-            {
-                Messages.Message("[PrepareLanding] Error loading preset info.", MessageSound.RejectInput);
-                Log.Error($"[PrepareLanding] LoadPresetInfo error: {e}");
-                throw;
-            }
-        }
+        public static string PresetTemplateFolder => Path.Combine(PrepareLanding.Instance.ModFolder, "Presets");
 
         public bool LoadPreset(string presetName, bool forceReload = false)
         {
@@ -169,7 +117,35 @@ namespace PrepareLanding.Presets
             return successfulLoad;
         }
 
-        public bool SavePreset(string presetName, string description = null, string author = null, bool saveOptions = false)
+        public void LoadPresetInfo(string presetName, bool forceReload = false)
+        {
+            var filePath = GetPresetFilePath(presetName);
+
+            if (!File.Exists(filePath))
+                return;
+
+            if (_presetCache.ContainsKey(presetName) && !forceReload)
+                return;
+
+            try
+            {
+                // create the preset or load it if it already exists
+                var preset = !_presetCache.ContainsKey(presetName)
+                    ? new Preset(presetName, _userData)
+                    : _presetCache[presetName];
+
+                preset.LoadPresetInfo();
+            }
+            catch (Exception e)
+            {
+                Messages.Message("[PrepareLanding] Error loading preset info.", MessageSound.RejectInput);
+                Log.Error($"[PrepareLanding] LoadPresetInfo error: {e}");
+                throw;
+            }
+        }
+
+        public bool SavePreset(string presetName, string description = null, string author = null,
+            bool saveOptions = false)
         {
             bool successfulSave;
 
@@ -180,14 +156,12 @@ namespace PrepareLanding.Presets
 
             // just check we aren't trying to overwrite a template preset
             if (_presetCache.ContainsKey(presetName))
-            {
                 if (_presetCache[presetName].PresetInfo.IsTemplate)
                 {
                     Messages.Message("[PrepareLanding] It is not allowed to overwrite a template preset.",
                         MessageSound.RejectInput);
                     return false;
                 }
-            }
 
             try
             {
@@ -231,13 +205,41 @@ namespace PrepareLanding.Presets
             return successfulSave;
         }
 
+        private static void CopyFromTemplateFolderToPresetFolder(string sourceFolder, string destFolder)
+        {
+            if (!Directory.Exists(sourceFolder) || !Directory.Exists(destFolder))
+                return;
+
+            foreach (var sourceFile in Directory.GetFiles(sourceFolder))
+            {
+                var sourceFileName = Path.GetFileName(sourceFile);
+                if (string.IsNullOrEmpty(sourceFileName))
+                    continue;
+
+                var destFilePath = Path.Combine(destFolder, sourceFileName);
+                try
+                {
+                    if (!Md5HashEquals(sourceFile, destFilePath))
+                    {
+                        File.Delete(destFilePath);
+                        File.Copy(sourceFile, destFilePath);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error(
+                        $"[PrepareLanding] An error occured in CopyFromTemplateFolderToPresetFolder.\n\t:Source: {sourceFile}\n\tDest:{destFilePath}\n\tError: {e}");
+                }
+            }
+        }
+
         private void PreloadPresets()
         {
             foreach (var presetFile in AllPresetFiles)
             {
                 var presetName = Path.GetFileNameWithoutExtension(presetFile.Name);
                 var preset = new Preset(presetName, _userData);
-                
+
                 _presetCache.Add(presetName, preset);
                 LoadPresetInfo(presetName, true);
             }
@@ -246,7 +248,7 @@ namespace PrepareLanding.Presets
         #region FILE_DIR_HANDLING
 
         /// <summary>
-        /// Full path of the preset folder (from user folder, not the mod one).
+        ///     Full path of the preset folder (from user folder, not the mod one).
         /// </summary>
         public static string PresetFolder
         {
@@ -303,7 +305,7 @@ namespace PrepareLanding.Presets
         public static string FullPresetPathFromPresetName(string presetName, bool fileMustExists)
         {
             var filePath = GetPresetFilePath(presetName);
-            if(fileMustExists)
+            if (fileMustExists)
                 return File.Exists(filePath) ? filePath : null;
 
             return filePath;
@@ -314,7 +316,9 @@ namespace PrepareLanding.Presets
             if (string.IsNullOrEmpty(presetName))
                 return false;
 
-            return AllPresetFiles.Any(file => string.Compare(file.Name, presetName, StringComparison.CurrentCultureIgnoreCase) == 0);
+            return
+                AllPresetFiles.Any(
+                    file => string.Compare(file.Name, presetName, StringComparison.CurrentCultureIgnoreCase) == 0);
         }
 
         public Preset PresetByPresetName(string presetName)
@@ -334,9 +338,9 @@ namespace PrepareLanding.Presets
             _allPresetFiles.Clear();
 
             var orderedFiles = from file in dirInfo.GetFiles()
-                         where string.Compare(file.Extension, DefaultExtension, StringComparison.OrdinalIgnoreCase) == 0
-                         orderby file.LastWriteTime descending
-                         select file;
+                where string.Compare(file.Extension, DefaultExtension, StringComparison.OrdinalIgnoreCase) == 0
+                orderby file.LastWriteTime descending
+                select file;
 
             _allPresetFiles.AddRange(orderedFiles);
         }
@@ -378,7 +382,7 @@ namespace PrepareLanding.Presets
                 {
                     file1Hash = md5.ComputeHash(stream);
                 }
-                
+
                 using (var stream = File.OpenRead(filePath2))
                 {
                     file2Hash = md5.ComputeHash(stream);
@@ -389,10 +393,8 @@ namespace PrepareLanding.Presets
                 return false;
 
             for (var i = 0; i < file1Hash.Length; i++)
-            {
                 if (file1Hash[i] != file2Hash[i])
                     return false;
-            }
 
             return true;
         }

@@ -10,35 +10,7 @@ namespace PrepareLanding.Presets
 {
     public class Preset
     {
-        #region XML_NODES
-
-        public const string RootName = "Preset";
-        public const string FilterNode = "Filters";
-        private const string TerrainNode = "Terrain";
-        private const string TemperatureNode = "Temperature";
-
-        public const string OptionNode = "Options";
-
-        // use / min / max
-        private const string MinNode = "Min";
-
-        private const string MaxNode = "Max";
-
-        private const string UseNode = "Use";
-
-        // def
-        private const string DefNameNode = "defName";
-
-        // state
-        private const string StateNode = "State";
-
-        #endregion XML_NODES
-
         private readonly UserData _userData;
-
-        public string PresetName { get; }
-
-        public PresetInfo PresetInfo { get; }
 
         public Preset(string presetName, UserData userData)
         {
@@ -47,47 +19,9 @@ namespace PrepareLanding.Presets
             PresetInfo = new PresetInfo();
         }
 
-        private XElement GetTopElement(out XDocument xDocument, bool fileMustExist)
-        {
-            var filePath = PresetManager.FullPresetPathFromPresetName(PresetName, fileMustExist);
-            if (string.IsNullOrEmpty(filePath))
-                throw new ArgumentException($"[PrepareLanding] presetName ({PresetName}) doesn't lead to a full path.");
+        public PresetInfo PresetInfo { get; }
 
-            XElement xPreset;
-            if (fileMustExist)
-            {
-                // load the document and check if there's a root node.
-                xDocument = XDocument.Load(filePath);
-                if (xDocument.Root == null)
-                    throw new Exception("No root node");
-
-                // get the root element
-                xPreset = xDocument.Element(RootName);
-                if (xPreset == null)
-                    throw new Exception($"No root node named '{RootName}'");
-            }
-            else
-            {
-                // create document
-                xDocument = new XDocument();
-
-                // add root node
-                xPreset = new XElement(RootName);
-                xDocument.Add(xPreset);
-            }
-
-            return xPreset;
-        }
-
-        public void LoadPresetInfo()
-        {
-            XDocument xDocument;
-            var xRootNode = GetTopElement(out xDocument, true);
-            if (xRootNode == null)
-                return;
-
-            PresetInfo.LoadPresetInfo(xRootNode);
-        }
+        public string PresetName { get; }
 
         public void LoadPreset(bool loadOptions = true)
         {
@@ -120,7 +54,8 @@ namespace PrepareLanding.Presets
             LoadUsableMinMax(xTerrain, "WinterMovementTime", _userData.WinterMovementTime);
             if (xTerrain.Element("StoneTypesNumberOnly") == null)
             {
-                LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _userData.SelectedStoneDefs, _userData.OrderedStoneDefs);
+                LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _userData.SelectedStoneDefs,
+                    _userData.OrderedStoneDefs);
             }
             else
             {
@@ -161,7 +96,8 @@ namespace PrepareLanding.Presets
                 return;
 
             LoadBoolean(xOptions, "AllowImpassableHilliness", b => _userData.Options.AllowImpassableHilliness = b);
-            LoadBoolean(xOptions, "AllowInvalidTilesForNewSettlement", b => _userData.Options.AllowInvalidTilesForNewSettlement = b);
+            LoadBoolean(xOptions, "AllowInvalidTilesForNewSettlement",
+                b => _userData.Options.AllowInvalidTilesForNewSettlement = b);
             LoadBoolean(xOptions, "AllowLiveFiltering", b => _userData.Options.AllowLiveFiltering = b);
             LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => _userData.Options.BypassMaxHighlightedTiles = b);
             LoadBoolean(xOptions, "DisablePreFilterCheck", b => _userData.Options.DisablePreFilterCheck = b);
@@ -169,6 +105,16 @@ namespace PrepareLanding.Presets
             LoadBoolean(xOptions, "DisableTileBlinking", b => _userData.Options.DisableTileBlinking = b);
             LoadBoolean(xOptions, "ShowDebugTileId", b => _userData.Options.ShowDebugTileId = b);
             LoadBoolean(xOptions, "ShowFilterHeaviness", b => _userData.Options.ShowFilterHeaviness = b);
+        }
+
+        public void LoadPresetInfo()
+        {
+            XDocument xDocument;
+            var xRootNode = GetTopElement(out xDocument, true);
+            if (xRootNode == null)
+                return;
+
+            PresetInfo.LoadPresetInfo(xRootNode);
         }
 
         public void SavePreset(string description = null, bool saveOptions = false)
@@ -207,7 +153,8 @@ namespace PrepareLanding.Presets
                 }
                 else
                 {
-                    SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _userData.SelectedStoneDefs, _userData.OrderedStoneDefs);
+                    SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _userData.SelectedStoneDefs,
+                        _userData.OrderedStoneDefs);
                 }
                 SaveThreeState(xTerrainFilters, "CoastalTile", _userData.ChosenCoastalTileState);
                 SaveUsableMinMax(xTerrainFilters, "Elevation", _userData.Elevation);
@@ -255,6 +202,62 @@ namespace PrepareLanding.Presets
             }
         }
 
+        private XElement GetTopElement(out XDocument xDocument, bool fileMustExist)
+        {
+            var filePath = PresetManager.FullPresetPathFromPresetName(PresetName, fileMustExist);
+            if (string.IsNullOrEmpty(filePath))
+                throw new ArgumentException($"[PrepareLanding] presetName ({PresetName}) doesn't lead to a full path.");
+
+            XElement xPreset;
+            if (fileMustExist)
+            {
+                // load the document and check if there's a root node.
+                xDocument = XDocument.Load(filePath);
+                if (xDocument.Root == null)
+                    throw new Exception("No root node");
+
+                // get the root element
+                xPreset = xDocument.Element(RootName);
+                if (xPreset == null)
+                    throw new Exception($"No root node named '{RootName}'");
+            }
+            else
+            {
+                // create document
+                xDocument = new XDocument();
+
+                // add root node
+                xPreset = new XElement(RootName);
+                xDocument.Add(xPreset);
+            }
+
+            return xPreset;
+        }
+
+        #region XML_NODES
+
+        public const string RootName = "Preset";
+        public const string FilterNode = "Filters";
+        private const string TerrainNode = "Terrain";
+        private const string TemperatureNode = "Temperature";
+
+        public const string OptionNode = "Options";
+
+        // use / min / max
+        private const string MinNode = "Min";
+
+        private const string MaxNode = "Max";
+
+        private const string UseNode = "Use";
+
+        // def
+        private const string DefNameNode = "defName";
+
+        // state
+        private const string StateNode = "State";
+
+        #endregion XML_NODES
+
         #region LOAD_PRESET
 
         private Def LoadDef<T>(XContainer xParent, string elementName) where T : Def
@@ -283,7 +286,8 @@ namespace PrepareLanding.Presets
                             return riverDef;
                     break;
 
-                case nameof(ThingDef): // TODO: be wary that multiple things might be ThinDef, so better check if its a stone before parsing StoneDefs.
+                case nameof(ThingDef):
+                    // TODO: be wary that multiple things might be ThinDef, so better check if its a stone before parsing StoneDefs.
                     foreach (var stoneDef in _userData.StoneDefs)
                         if (string.Equals(stoneDef.defName, xFoundElement.Value, StringComparison.OrdinalIgnoreCase))
                             return stoneDef;
@@ -306,7 +310,7 @@ namespace PrepareLanding.Presets
             if (!Enum.IsDefined(typeof(T), xFoundElement.Value))
                 return default(T);
 
-            return (T)Enum.Parse(typeof(T), xFoundElement.Value, true);
+            return (T) Enum.Parse(typeof(T), xFoundElement.Value, true);
         }
 
         private void LoadMultiThreeStates<T>(XContainer xParent, string elementName, string subElementName,
@@ -384,7 +388,7 @@ namespace PrepareLanding.Presets
                 return false;
             }
 
-            result = (T)Convert.ChangeType(xFoundElement.Value, typeof(T));
+            result = (T) Convert.ChangeType(xFoundElement.Value, typeof(T));
             return true;
         }
 
@@ -416,7 +420,7 @@ namespace PrepareLanding.Presets
                 threeStateItem.State = state;
             }
 
-        EnsureAllEntriesPresent:
+            EnsureAllEntriesPresent:
             foreach (var entry in dict)
             {
                 if (orderedList.Contains(entry.Key))
@@ -610,13 +614,11 @@ namespace PrepareLanding.Presets
 
         private static void Save<T>(XContainer xParent, string elementName, T value) where T : IConvertible
         {
-            var result = (string)Convert.ChangeType(value, typeof(string));
+            var result = (string) Convert.ChangeType(value, typeof(string));
             var xElement = new XElement(elementName, result);
             xParent.Add(xElement);
         }
 
         #endregion SAVE_PRESET
-
     }
-
 }
