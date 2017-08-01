@@ -446,7 +446,7 @@ namespace PrepareLanding
                 {
                     _allowOverwriteExistingPreset = true;
                     Messages.Message(
-                        $"Click again on the \"Save\" button to confirm the overwrite of the existing preset.",
+                        "Click again on the \"Save\" button to confirm the overwrite of the existing preset.",
                         MessageSound.Standard);
                 }
                 else
