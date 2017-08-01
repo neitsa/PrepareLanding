@@ -13,14 +13,14 @@ namespace PrepareLanding
         private readonly GUIStyle _styleFilterInfo;
         private readonly GUIStyle _styleWorldInfo;
 
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
         private Vector2 _scrollPosFilterInfo;
 
         private Vector2 _scrollPosWorldInfo;
 
         private string _worldInfo;
 
-        public TabInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabInfo(UserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

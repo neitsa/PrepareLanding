@@ -132,13 +132,13 @@ namespace PrepareLanding
 
         #endregion XML_NODES
 
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
 
         public string PresetName { get; }
 
         public PresetInfo PresetInfo { get; }
 
-        public Preset(string presetName, PrepareLandingUserData userData)
+        public Preset(string presetName, UserData userData)
         {
             PresetName = presetName;
             _userData = userData;
@@ -629,7 +629,7 @@ namespace PrepareLanding
         private static void SaveMultiThreeStates<T>(XContainer xRoot, string containerName, string entryName,
             Dictionary<T, ThreeStateItem> dict) where T : Def
         {
-            if (PrepareLandingUserData.IsDefDictInDefaultState(dict))
+            if (UserData.IsDefDictInDefaultState(dict))
                 return;
 
             var xContainerElement = new XElement(containerName);
@@ -657,7 +657,7 @@ namespace PrepareLanding
         private static void SaveMultiThreeStatesOrdered<T>(XContainer xRoot, string containerName, string entryName,
             Dictionary<T, ThreeStateItem> dict, IEnumerable<T> orderedList) where T : Def
         {
-            if (PrepareLandingUserData.IsDefDictInDefaultState(dict))
+            if (UserData.IsDefDictInDefaultState(dict))
                 return;
 
             var xContainerElement = new XElement(containerName);
@@ -725,7 +725,7 @@ namespace PrepareLanding
 
         private readonly List<FileInfo> _allPresetFiles = new List<FileInfo>();
 
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
 
         private readonly Dictionary<string, Preset> _presetCache = new Dictionary<string, Preset>();
 
@@ -747,7 +747,7 @@ namespace PrepareLanding
 
         public static string PresetTemplateFolder => Path.Combine(PrepareLanding.Instance.ModFolder, "Presets");
 
-        public PresetManager(PrepareLandingUserData userData)
+        public PresetManager(UserData userData)
         {
             _userData = userData;
 

@@ -34,9 +34,9 @@ namespace PrepareLanding
 
         private ButtonDescriptor _buttonCloseDescriptor;
 
-        private PrepareLandingUserData _userData;
+        private UserData _userData;
 
-        public MainWindow(PrepareLandingUserData userData)
+        public MainWindow(UserData userData)
         {
             _userData = userData;
 

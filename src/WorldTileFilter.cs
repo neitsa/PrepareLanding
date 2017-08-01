@@ -31,7 +31,7 @@ namespace PrepareLanding
         ///     Class constructor.
         /// </summary>
         /// <param name="userData">An instance of the class used to keep user choice from the main GUI window.</param>
-        public WorldTileFilter(PrepareLandingUserData userData)
+        public WorldTileFilter(UserData userData)
         {
             // save user data and subscribe to the event that is fired when a property changed (so we know if something changed on the GUI).
             _userData = userData;
@@ -426,7 +426,7 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Called when a property from <see cref="PrepareLandingUserData" /> has changed.
+        ///     Called when a property from <see cref="UserData" /> has changed.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The argument of the event.</param>
@@ -452,7 +452,7 @@ namespace PrepareLanding
         #region PRIVATE_FIELDS
 
         /// <summary>
-        ///     Dictionary used to keep all filters. Key is a property name from <see cref="PrepareLandingUserData" />. Value is a
+        ///     Dictionary used to keep all filters. Key is a property name from <see cref="UserData" />. Value is a
         ///     <see cref="ITileFilter" /> instance.
         /// </summary>
         private readonly Dictionary<string, ITileFilter> _allFilters;
@@ -475,9 +475,9 @@ namespace PrepareLanding
         private readonly List<ITileFilter> _sortedFilters = new List<ITileFilter>();
 
         /// <summary>
-        ///     A <see cref="PrepareLandingUserData" /> instance used to keep user choices on the GUI.
+        ///     A <see cref="UserData" /> instance used to keep user choices on the GUI.
         /// </summary>
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
 
         /// <summary>
         ///     A cache for filter heaviness. Key is the <see cref="TileFilter.SubjectThingDef" />, value is the filter heaviness (

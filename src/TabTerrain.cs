@@ -21,7 +21,7 @@ namespace PrepareLanding
         private static Vector2 _scrollPosStoneSelection = Vector2.zero;
 
         // user choices
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
         // string buffer for "number of stones" selection 
         private string _bufferStringNumberOfStones;
 
@@ -33,7 +33,7 @@ namespace PrepareLanding
         /// </summary>
         /// <param name="userData">Instance used to hold user choices.</param>
         /// <param name="columnSizePercent">Size of a column (in percent of the tab).</param>
-        public TabTerrain(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabTerrain(UserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

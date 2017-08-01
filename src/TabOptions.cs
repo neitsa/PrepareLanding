@@ -12,13 +12,13 @@ namespace PrepareLanding
         // split percentage for the 3 elements of the "go to tile" entry.
         private readonly List<float> _goToTileSplitPct = new List<float> {0.5f, 0.35f, 0.15f};
         // hold user choices
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
         // default tile number (for "go to tile").
         private int _tileNumber;
         // tile number, as string (for "go to tile")
         private string _tileNumberString = string.Empty;
 
-        public TabOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabOptions(UserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

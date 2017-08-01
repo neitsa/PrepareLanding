@@ -9,9 +9,9 @@ namespace PrepareLanding
 {
     public class TabTemperature : TabGuiUtility
     {
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
 
-        public TabTemperature(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabTemperature(UserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

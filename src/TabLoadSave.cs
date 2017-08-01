@@ -59,7 +59,7 @@ namespace PrepareLanding
         private readonly GUIStyle _stylePresetInfo;
 
         // holds user choices
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
 
         // wheter or not, if clicking on save, this overwrite the preset directly (true) or first display a warning.
         private bool _allowOverwriteExistingPreset;
@@ -92,7 +92,7 @@ namespace PrepareLanding
         // index of the selected preset in the preset list (load mode)
         private int _selectedItemIndex = -1;
 
-        public TabLoadSave(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabLoadSave(UserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

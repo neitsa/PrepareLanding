@@ -36,7 +36,7 @@ namespace PrepareLanding
         /// <summary>
         ///     User choices on the GUI are kept in this instance.
         /// </summary>
-        public PrepareLandingUserData UserData { get; private set; }
+        public UserData UserData { get; private set; }
 
         /// <summary>
         ///     The filtering class instance used to filter tiles on the world map.
@@ -113,7 +113,7 @@ namespace PrepareLanding
             _filterOptions = new PrepareLandingFilterOptions();
 
             // main instance to keep user filter choices on the GUI.
-            UserData = new PrepareLandingUserData(_filterOptions);
+            UserData = new UserData(_filterOptions);
 
             TileFilter = new WorldTileFilter(UserData);
 

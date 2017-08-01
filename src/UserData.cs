@@ -14,12 +14,12 @@ namespace PrepareLanding
     ///     Class used to keep user choices (from the main GUI window) and various definitions (<see cref="Verse.Def" />) that
     ///     are used throughout the mod.
     /// </summary>
-    public class PrepareLandingUserData : INotifyPropertyChanged
+    public class UserData : INotifyPropertyChanged
     {
         /// <summary>
         ///     Class constructor.
         /// </summary>
-        public PrepareLandingUserData(PrepareLandingFilterOptions options)
+        public UserData(PrepareLandingFilterOptions options)
         {
             // get alerted when RimWorld has loaded its definition (Defs) files
             PrepareLanding.Instance.OnDefsLoaded += ExecuteOnDefsLoaded;
