@@ -75,6 +75,7 @@
     <Compile Include="src\Filters\TileFilter.cs" />
     <Compile Include="src\Filters\TileFilters.cs" />
     <Compile Include="src\FilterInfoLogger.cs" />
+    <Compile Include="src\MainWindow.cs" />
     <Compile Include="src\MonoController.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
@@ -83,7 +84,6 @@
     <Compile Include="src\PrepareLandingUserData.cs" />
     <Compile Include="src\PrepareLanding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\PrepareLandingWindow.cs" />
     <Compile Include="src\PresetManager.cs" />
     <Compile Include="src\TabFilteredTiles.cs" />
     <Compile Include="src\TabInfo.cs" />
