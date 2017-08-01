@@ -71,6 +71,7 @@
     <Compile Include="src\Core\Gui\World\TileHighlighter.cs" />
     <Compile Include="src\DataItems.cs" />
     <Compile Include="src\Defs\MainButtonWorkerToggleWorld.cs" />
+    <Compile Include="src\FilterOptions.cs" />
     <Compile Include="src\Filters\ITileFilter.cs" />
     <Compile Include="src\Filters\TileFilter.cs" />
     <Compile Include="src\Filters\TileFilters.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="src\Patches\PatchScenario.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
     <Compile Include="src\Patches\SelectLandingSite.cs" />
-    <Compile Include="src\PrepareLandingFilterOptions.cs" />
     <Compile Include="src\PrepareLanding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\PresetManager.cs" />
