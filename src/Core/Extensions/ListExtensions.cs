@@ -13,7 +13,7 @@ namespace PrepareLanding.Core.Extensions
         public static bool ContainsAll<T>(this IEnumerable<T> thisEnumerable, IEnumerable<T> other)
         {
             var otherList = other as IList<T> ?? other.ToList();
-            return thisEnumerable.Intersect(otherList).Count() == otherList.Count();
+            return thisEnumerable.Intersect(otherList).Count() == otherList.Count;
         }
 
         public static bool IsSubset<T>(this IEnumerable<T> thisEnumerable, IEnumerable<T> other)
