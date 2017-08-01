@@ -69,7 +69,7 @@ namespace PrepareLanding
 
         /// <summary>
         ///     If true, Bypass the maximum number of allowed highlighted tiles (
-        ///     <see cref="TileHighlighter.MaxHighlightedTiles" />).
+        ///     <see cref="Core.Gui.World.TileHighlighter.MaxHighlightedTiles" />).
         /// </summary>
         public bool BypassMaxHighlightedTiles
         {
