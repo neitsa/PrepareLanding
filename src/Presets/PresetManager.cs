@@ -11,7 +11,7 @@ using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
-namespace PrepareLanding
+namespace PrepareLanding.Presets
 {
     public class PresetInfo
     {
