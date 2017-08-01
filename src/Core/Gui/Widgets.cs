@@ -103,7 +103,7 @@ namespace PrepareLanding.Core.Gui
             if (Verse.Widgets.ButtonInvisible(butRect2))
             {
                 var nextState = state.NextState();
-                if (nextState == MultiCheckboxState.Off || state == MultiCheckboxState.Partial)
+                if ((nextState == MultiCheckboxState.Off) || (state == MultiCheckboxState.Partial))
                     SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
                 else
                     SoundDefOf.CheckboxTurnedOff.PlayOneShotOnCamera();
@@ -127,16 +127,13 @@ namespace PrepareLanding.Core.Gui
             return Verse.Widgets.ButtonImage(butRect, Minus);
         }
 
-        public static bool LabelSelectable(Rect rect, string label, ref bool selected, TextAnchor textAnchor = TextAnchor.MiddleLeft)
+        public static bool LabelSelectable(Rect rect, string label, ref bool selected,
+            TextAnchor textAnchor = TextAnchor.MiddleLeft)
         {
             if (selected)
-            {
                 DrawHighlightColor(rect, Color.green, 0.5f);
-            }
             else
-            {
                 Verse.Widgets.DrawHighlight(rect.ContractedByButLeft(5f));
-            }
 
             Verse.Widgets.DrawHighlightIfMouseover(rect);
 
@@ -166,9 +163,13 @@ namespace PrepareLanding.Core.Gui
             GUI.DrawTexture(rect, TexUI.HighlightTex);
             GUI.color = savedColor;
         }
-    
+
 
         #region TEXTFIELDNUMERIC
+
+        /*
+         * Code below is a direct ripoff from RimWorld to alleviate a bug in TextFieldNumeric.
+         */
 
         public static void TextFieldNumericLabeled<T>(Rect rect, string label, ref T val, ref string buffer,
             float min = 0f, float max = 1E+09f, bool useAnchor = true) where T : struct
