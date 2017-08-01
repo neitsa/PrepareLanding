@@ -93,7 +93,7 @@ class UrlDescriptor(object):
         # must have 2 OR 3 slashes
         # e.g.: http://github.com/neitsa/foo/ -> '/neitsa/foo/'
         url_slash_count = url_path.count("/")
-        if 2 > url_slash_count > 3:
+        if url_slash_count < 2 or url_slash_count > 3:
             return False
 
         # 3 slashes: must start with a slash and end with one

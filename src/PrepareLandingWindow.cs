@@ -32,6 +32,8 @@ namespace PrepareLanding
 
         private int _tileDisplayIndexStart;
 
+        private ButtonDescriptor _buttonCloseDescriptor;
+
         private PrepareLandingUserData _userData;
 
         public PrepareLandingWindow(PrepareLandingUserData userData)
@@ -93,7 +95,7 @@ namespace PrepareLanding
                     Minimize();
                 });
 
-            var buttonClose = new ButtonDescriptor("CloseButton".Translate(),
+            _buttonCloseDescriptor = new ButtonDescriptor("CloseButton".Translate(),
                 delegate
                 {
                     SoundDefOf.TickHigh.PlayOneShotOnCamera();
@@ -109,7 +111,7 @@ namespace PrepareLanding
 
 
             _bottomButtonsDescriptorList =
-                new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, buttonClose};
+                new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, _buttonCloseDescriptor};
 
             #endregion BOTTOM_BUTTONS
 
@@ -234,6 +236,20 @@ namespace PrepareLanding
             );
             buttonSaveLoadPreset.AddFloatMenu("Select Action");
             _bottomButtonsDescriptorList.Add(buttonSaveLoadPreset);
+
+            // do not display the "close" button while playing (the "World" button on bottom menu bar was clicked)
+            //    otherwise there's no way to get the window back...
+            if (Current.ProgramState == ProgramState.Playing)
+            {
+                if(_bottomButtonsDescriptorList.Contains(_buttonCloseDescriptor)) 
+                    _bottomButtonsDescriptorList.Remove(_buttonCloseDescriptor);
+            }
+            else
+            {
+                if (!_bottomButtonsDescriptorList.Contains(_buttonCloseDescriptor))
+                    _bottomButtonsDescriptorList.Add(_buttonCloseDescriptor);
+
+            }
         }
 
 
@@ -249,10 +265,6 @@ namespace PrepareLanding
         protected void DoBottomsButtons(Rect inRect)
         {
             var numButtons = _bottomButtonsDescriptorList.Count;
-            
-            // do not display the close button while playing ("World" button on bottom menu bar was clicked)
-            if (Current.ProgramState == ProgramState.Playing)
-                numButtons -= 1;
 
             var buttonsY = windowRect.height - 55f;
 
@@ -266,7 +278,7 @@ namespace PrepareLanding
                 return;
             }
 
-            for (var i = 0; i < _bottomButtonsDescriptorList.Count; i++)
+            for (var i = 0; i < numButtons; i++)
             {
                 // get button descriptor
                 var buttonDescriptor = _bottomButtonsDescriptorList[i];
