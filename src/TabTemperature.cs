@@ -7,11 +7,11 @@ using Widgets = PrepareLanding.Core.Gui.Widgets;
 
 namespace PrepareLanding
 {
-    public class TabGuiUtilityTemperature : TabGuiUtility
+    public class TabTemperature : TabGuiUtility
     {
         private readonly PrepareLandingUserData _userData;
 
-        public TabGuiUtilityTemperature(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabTemperature(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

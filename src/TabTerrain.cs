@@ -11,7 +11,7 @@ using Widgets = PrepareLanding.Core.Gui.Widgets;
 
 namespace PrepareLanding
 {
-    public class TabGuiUtilityTerrain : TabGuiUtility
+    public class TabTerrain : TabGuiUtility
     {
         // scroll bar position for road selection
         private static Vector2 _scrollPosRoadSelection = Vector2.zero;
@@ -33,7 +33,7 @@ namespace PrepareLanding
         /// </summary>
         /// <param name="userData">Instance used to hold user choices.</param>
         /// <param name="columnSizePercent">Size of a column (in percent of the tab).</param>
-        public TabGuiUtilityTerrain(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabTerrain(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

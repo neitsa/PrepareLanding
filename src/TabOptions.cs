@@ -7,7 +7,7 @@ using Verse;
 
 namespace PrepareLanding
 {
-    public class TabGuiUtilityOptions : TabGuiUtility
+    public class TabOptions : TabGuiUtility
     {
         // split percentage for the 3 elements of the "go to tile" entry.
         private readonly List<float> _goToTileSplitPct = new List<float> {0.5f, 0.35f, 0.15f};
@@ -18,7 +18,7 @@ namespace PrepareLanding
         // tile number, as string (for "go to tile")
         private string _tileNumberString = string.Empty;
 
-        public TabGuiUtilityOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabOptions(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

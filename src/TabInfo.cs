@@ -8,7 +8,7 @@ using Verse;
 
 namespace PrepareLanding
 {
-    public class TabGuiUtilityInfo : TabGuiUtility
+    public class TabInfo : TabGuiUtility
     {
         private readonly GUIStyle _styleFilterInfo;
         private readonly GUIStyle _styleWorldInfo;
@@ -20,7 +20,7 @@ namespace PrepareLanding
 
         private string _worldInfo;
 
-        public TabGuiUtilityInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabInfo(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;

@@ -4,7 +4,6 @@ using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
-using PrepareLanding.Gui;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -13,7 +12,7 @@ using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
-    public class TabGuiUtilityFilteredTiles : TabGuiUtility
+    public class TabFilteredTiles : TabGuiUtility
     {
         private Vector2 _scrollPosMatchingTiles;
 
@@ -25,7 +24,7 @@ namespace PrepareLanding
 
         private readonly List<ButtonDescriptor> _minimizedWindowButtonsDescriptorList;
 
-        public TabGuiUtilityFilteredTiles(float columnSizePercent) : base(columnSizePercent)
+        public TabFilteredTiles(float columnSizePercent) : base(columnSizePercent)
         {
             #region MINIMIZED_WINDOW_BUTTONS
 

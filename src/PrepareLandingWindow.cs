@@ -50,12 +50,12 @@ namespace PrepareLanding
              * GUI utilities (tabs)
              */
             _tabGuiUtilities.Clear();
-            _tabGuiUtilities.Add(new TabGuiUtilityTerrain(userData, 0.30f));
-            _tabGuiUtilities.Add(new TabGuiUtilityTemperature(userData, 0.30f));
-            _tabGuiUtilities.Add(new TabGuiUtilityFilteredTiles(0.48f));
-            _tabGuiUtilities.Add(new TabGuiUtilityInfo(userData, 0.48f));
-            _tabGuiUtilities.Add(new TabGuiUtilityOptions(userData, 0.30f));
-            _tabGuiUtilities.Add(new TabGuiUtilityLoadSave(userData, 0.48f));
+            _tabGuiUtilities.Add(new TabTerrain(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabTemperature(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabFilteredTiles(0.48f));
+            _tabGuiUtilities.Add(new TabInfo(userData, 0.48f));
+            _tabGuiUtilities.Add(new TabOptions(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabLoadSave(userData, 0.48f));
 
             TabController.Clear();
             TabController.AddTabRange(_tabGuiUtilities);
@@ -202,7 +202,7 @@ namespace PrepareLanding
             buttonSaveLoadPreset.AddFloatMenuOption("Save", delegate
                 {
                     //_userData.PresetManager.TestSave();
-                    var tab = TabController.TabById("LoadSave") as TabGuiUtilityLoadSave;
+                    var tab = TabController.TabById("LoadSave") as TabLoadSave;
                     if (tab == null)
                         return;
 
@@ -219,7 +219,7 @@ namespace PrepareLanding
             buttonSaveLoadPreset.AddFloatMenuOption("Load", delegate
                 {
                     //_userData.PresetManager.TestLoad();
-                    var tab = TabController.TabById("LoadSave") as TabGuiUtilityLoadSave;
+                    var tab = TabController.TabById("LoadSave") as TabLoadSave;
                     if (tab == null)
                         return;
 

@@ -4,7 +4,6 @@ using System.IO;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
-using PrepareLanding.Gui;
 using UnityEngine;
 using Verse;
 using Verse.Steam;
@@ -33,7 +32,7 @@ namespace PrepareLanding
         Save = 2
     }
 
-    public class TabGuiUtilityLoadSave : TabGuiUtility
+    public class TabLoadSave : TabGuiUtility
     {
         /// <summary>
         ///     Maximum number of preset to display at once.
@@ -93,7 +92,7 @@ namespace PrepareLanding
         // index of the selected preset in the preset list (load mode)
         private int _selectedItemIndex = -1;
 
-        public TabGuiUtilityLoadSave(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
+        public TabLoadSave(PrepareLandingUserData userData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
             _userData = userData;
