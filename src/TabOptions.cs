@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
-using PrepareLanding.Gui.World;
+using PrepareLanding.Core.Gui.World;
 using UnityEngine;
 using Verse;
 

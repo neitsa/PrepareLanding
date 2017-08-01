@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using JetBrains.Annotations;
+using PrepareLanding.Core.Gui.World;
 
 namespace PrepareLanding
 {
@@ -69,7 +70,7 @@ namespace PrepareLanding
 
         /// <summary>
         ///     If true, Bypass the maximum number of allowed highlighted tiles (
-        ///     <see cref="Gui.World.TileHighlighter.MaxHighlightedTiles" />).
+        ///     <see cref="TileHighlighter.MaxHighlightedTiles" />).
         /// </summary>
         public bool BypassMaxHighlightedTiles
         {

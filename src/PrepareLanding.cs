@@ -1,6 +1,6 @@
 ﻿using System;
 using HugsLib;
-using PrepareLanding.Gui.World;
+using PrepareLanding.Core.Gui.World;
 using PrepareLanding.Patches;
 using Verse;
 

@@ -5,7 +5,7 @@ using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
-namespace PrepareLanding.Gui.World
+namespace PrepareLanding.Core.Gui.World
 {
     public class TileHighlighter : IDisposable
     {
