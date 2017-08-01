@@ -15,7 +15,10 @@ namespace PrepareLanding.Core.Gui.Tab
         /// </summary>
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
 
-        private ITabGuiUtility _previouslySelectedTab = null;
+        /// <summary>
+        ///     The previously selected tab.
+        /// </summary>
+        private ITabGuiUtility _previouslySelectedTab;
 
         /// <summary>
         ///     The currently selected tab in the GUI.
@@ -53,6 +56,19 @@ namespace PrepareLanding.Core.Gui.Tab
         }
 
         /// <summary>
+        ///     Draw the content of the selected Tab.
+        /// </summary>
+        /// <param name="inRect">The <see cref="Rect" /> in which to draw the tab content.</param>
+        public void DrawSelectedTab(Rect inRect)
+        {
+            if (SelectedTab == null)
+                return;
+
+            if (SelectedTab.CanBeDrawn)
+                SelectedTab.Draw(inRect);
+        }
+
+        /// <summary>
         ///     Draw the frame around the tabs (and not the tab contents!).
         /// </summary>
         /// <param name="inRect">The <see cref="Rect" /> of the tabs.</param>
@@ -69,30 +85,21 @@ namespace PrepareLanding.Core.Gui.Tab
                 });
 
             TabDrawer.DrawTabs(inRect, tabRecordsToDraw);
-
         }
 
         /// <summary>
-        ///     Draw the content of the selected Tab.
+        ///     Select the previously selected tab as the currently selected tab
         /// </summary>
-        /// <param name="inRect">The <see cref="Rect" /> in which to draw the tab content.</param>
-        public void DrawSelectedTab(Rect inRect)
+        public void SetPreviousTabAsSelectedTab()
         {
-            if (SelectedTab == null)
-                return;
+            if (_previouslySelectedTab == null)
+                _previouslySelectedTab = _tabGuiUtilities[0];
 
-            if(SelectedTab.CanBeDrawn)
-                SelectedTab.Draw(inRect);
-        }
+            if (SelectedTab != null)
+                SelectedTab.TabRecord.selected = false;
 
-        /// <summary>
-        ///     Get a Tab given its identifier (<see cref="ITabGuiUtility.Id" />).
-        /// </summary>
-        /// <param name="id">The identifier of the tab to get.</param>
-        /// <returns>A tab if such a tab with the given id exists or null otherwise.</returns>
-        public ITabGuiUtility TabById(string id)
-        {
-            return _tabGuiUtilities.FirstOrDefault(tab => tab.Id == id);
+            SelectedTab = _previouslySelectedTab;
+            SelectedTab.TabRecord.selected = true;
         }
 
         /// <summary>
@@ -111,18 +118,13 @@ namespace PrepareLanding.Core.Gui.Tab
         }
 
         /// <summary>
-        /// Select the previously selected tab as the currently selected tab
+        ///     Get a Tab given its identifier (<see cref="ITabGuiUtility.Id" />).
         /// </summary>
-        public void SetPreviousTabAsSelectedTab()
+        /// <param name="id">The identifier of the tab to get.</param>
+        /// <returns>A tab if such a tab with the given id exists or null otherwise.</returns>
+        public ITabGuiUtility TabById(string id)
         {
-            if (_previouslySelectedTab == null)
-                _previouslySelectedTab = _tabGuiUtilities[0];
-
-            if (SelectedTab != null)
-                SelectedTab.TabRecord.selected = false;
-
-            SelectedTab = _previouslySelectedTab;
-            SelectedTab.TabRecord.selected = true;
+            return _tabGuiUtilities.FirstOrDefault(tab => tab.Id == id);
         }
 
         /// <summary>
@@ -139,7 +141,7 @@ namespace PrepareLanding.Core.Gui.Tab
                     {
                         _previouslySelectedTab = SelectedTab;
                         SelectedTab = currentTab;
-                    }, 
+                    },
                     false);
             }
 
