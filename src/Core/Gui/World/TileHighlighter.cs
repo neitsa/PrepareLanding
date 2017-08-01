@@ -9,6 +9,9 @@ namespace PrepareLanding.Core.Gui.World
 {
     public class TileHighlighter : IDisposable
     {
+        /// <summary>
+        ///     Maximum number of tiles that can be highlighted at once.
+        /// </summary>
         public const int MaxHighlightedTiles = 10000;
 
         private const float MaxDistToCameraToDisplayLabel = 50f;
@@ -19,19 +22,19 @@ namespace PrepareLanding.Core.Gui.World
 
         private Color _materialColor = Color.green;
 
-        public bool DisableTileHighlighting { get; set; }
-
-        public bool DisableTileBlinking { get; set; }
-
-        public bool BypassMaxHighlightedTiles { get; set; }
-
-        public bool ShowDebugTileId { get; set; }
-
         public TileHighlighter()
         {
             _defaultMaterial.color = TileColor;
             PrepareLanding.Instance.UserData.Options.PropertyChanged += OnOptionChanged;
         }
+
+        public bool BypassMaxHighlightedTiles { get; set; }
+
+        public bool DisableTileBlinking { get; set; }
+
+        public bool DisableTileHighlighting { get; set; }
+
+        public bool ShowDebugTileId { get; set; }
 
         public Color TileColor
         {
@@ -41,53 +44,6 @@ namespace PrepareLanding.Core.Gui.World
                 _materialColor = value;
                 _defaultMaterial.color = _materialColor;
             }
-        }
-
-        internal void HighlightTile(int tile, float colorPct = 0f, string text = null)
-        {
-            var highlightedTile = new HighlightedTile(tile, colorPct, text);
-            _highlightedTiles.Add(highlightedTile);
-        }
-
-        public void HighlightTileList(List<int> tileList)
-        {
-            // do not highlight if disabled
-            if (DisableTileHighlighting)
-            {
-                RemoveAllTiles();
-                return;
-            }
-
-            // do not highlight too many tiles (otherwise the slow down is noticeable)
-            if (!BypassMaxHighlightedTiles && tileList.Count > MaxHighlightedTiles)
-            {
-                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
-                    $"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
-                return;
-            }
-;
-            foreach (var tileId in tileList)
-                HighlightTile(tileId, _defaultMaterial, ShowDebugTileId ? tileId.ToString() : "X");
-        }
-
-        public void HighlightTile(int tile, Material mat, string text = null)
-        {
-            var debugTile = new HighlightedTile(tile, mat, text);
-            _highlightedTiles.Add(debugTile);
-        }
-
-        public void RemoveAllTiles()
-        {
-            _highlightedTiles.Clear();
-        }
-
-        public void HighlightedTileDrawerUpdate()
-        {
-            if (DisableTileHighlighting)
-                return;
-
-            for (var i = 0; i < _highlightedTiles.Count; i++)
-                _highlightedTiles[i].Draw();
         }
 
         public void HighlightedTileDrawerOnGui()
@@ -102,6 +58,53 @@ namespace PrepareLanding.Core.Gui.World
 
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
+        }
+
+        public void HighlightedTileDrawerUpdate()
+        {
+            if (DisableTileHighlighting)
+                return;
+
+            for (var i = 0; i < _highlightedTiles.Count; i++)
+                _highlightedTiles[i].Draw();
+        }
+
+        public void HighlightTile(int tile, Material mat, string text = null)
+        {
+            var debugTile = new HighlightedTile(tile, mat, text);
+            _highlightedTiles.Add(debugTile);
+        }
+
+        public void HighlightTileList(List<int> tileList)
+        {
+            // do not highlight if disabled
+            if (DisableTileHighlighting)
+            {
+                RemoveAllTiles();
+                return;
+            }
+
+            // do not highlight too many tiles (otherwise the slow down is noticeable)
+            if (!BypassMaxHighlightedTiles && (tileList.Count > MaxHighlightedTiles))
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
+                    $"Too many tiles to highlight ({tileList.Count}). Try to add more filters to decrease the actual count.");
+                return;
+            }
+
+            foreach (var tileId in tileList)
+                HighlightTile(tileId, _defaultMaterial, ShowDebugTileId ? tileId.ToString() : "X");
+        }
+
+        public void RemoveAllTiles()
+        {
+            _highlightedTiles.Clear();
+        }
+
+        internal void HighlightTile(int tile, float colorPct = 0f, string text = null)
+        {
+            var highlightedTile = new HighlightedTile(tile, colorPct, text);
+            _highlightedTiles.Add(highlightedTile);
         }
 
         private void OnOptionChanged(object sender, PropertyChangedEventArgs e)
