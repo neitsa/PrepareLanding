@@ -76,6 +76,11 @@ namespace PrepareLanding
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
             _userData.Options.DisablePreFilterCheck = disablePreFilterCheck;
 
+            var resetAllFieldsOnNewGeneratedWorld = _userData.Options.ResetAllFieldsOnNewGeneratedWorld;
+            ListingStandard.CheckboxLabeled("Reset all filters on new world", ref resetAllFieldsOnNewGeneratedWorld,
+                "If ON, all filters are reset to their default state on a new generated world, otherwise the filters are kept in their previous state.");
+            _userData.Options.ResetAllFieldsOnNewGeneratedWorld = resetAllFieldsOnNewGeneratedWorld;
+
             var disableTileHighligthing = _userData.Options.DisableTileHighlighting;
             ListingStandard.CheckboxLabeled("Disable Tile Highligthing", ref disableTileHighligthing,
                 "Disable tile highlighting altogether.");

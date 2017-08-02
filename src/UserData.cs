@@ -382,7 +382,8 @@ namespace PrepareLanding
         /// </summary>
         protected void ExecuteOnWorldGenerated()
         {
-            ResetAllFields();
+            if(Options.ResetAllFieldsOnNewGeneratedWorld)
+                ResetAllFields();
         }
 
         /// <summary>

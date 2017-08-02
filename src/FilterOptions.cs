@@ -10,6 +10,7 @@ namespace PrepareLanding
         private bool _allowLiveFiltering;
         private bool _bypassMaxHighlightedTiles;
         private bool _disablePreFilterCheck;
+        private bool _resetAllFieldsOnNewGeneratedWorld;
         private bool _disableTileBlinking;
         private bool _disableTileHighlighting;
         private bool _showDebugTileId;
@@ -97,6 +98,22 @@ namespace PrepareLanding
 
                 _disablePreFilterCheck = value;
                 OnPropertyChanged(nameof(DisablePreFilterCheck));
+            }
+        }
+
+        /// <summary>
+        ///     If ON all the filters are reset on a new world (if false, the filters are kept in their previous state).
+        /// </summary>
+        public bool ResetAllFieldsOnNewGeneratedWorld
+        {
+            get { return _resetAllFieldsOnNewGeneratedWorld; }
+            set
+            {
+                if (value == _resetAllFieldsOnNewGeneratedWorld)
+                    return;
+
+                _resetAllFieldsOnNewGeneratedWorld = value;
+                OnPropertyChanged(nameof(ResetAllFieldsOnNewGeneratedWorld));
             }
         }
 
