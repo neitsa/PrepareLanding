@@ -39,14 +39,9 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Used to load / save filters and options.
+        ///     Current user choices for the average temperature.
         /// </summary>
-        public PresetManager PresetManager { get; }
-
-        /// <summary>
-        ///     Filter Options (from the GUI window 'options' tab).
-        /// </summary>
-        public FilterOptions Options { get; }
+        public UsableMinMaxNumericItem<float> AverageTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
         ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.
@@ -54,28 +49,20 @@ namespace PrepareLanding
         public ReadOnlyCollection<BiomeDef> BiomeDefs => _biomeDefs.AsReadOnly();
 
         /// <summary>
-        ///     All "stone" definitions from RimWorld.
+        ///     Current user choice for the "Animal Can Graze Now" state.
         /// </summary>
-        /// <remarks>
-        ///     Note that stone types (e.g Marble, Granite, etc. are <see cref="ThingDef" /> and have no particular
-        ///     definition).
-        /// </remarks>
-        public ReadOnlyCollection<ThingDef> StoneDefs => _stoneDefs.AsReadOnly();
+        public MultiCheckboxState ChosenAnimalsCanGrazeNowState
+        {
+            get { return _chosenAnimalsCanGrazeNowState; }
+            set
+            {
+                if (value == _chosenAnimalsCanGrazeNowState)
+                    return;
 
-        /// <summary>
-        ///     All road definitions (<see cref="RoadDef" />) from RimWorld.
-        /// </summary>
-        public ReadOnlyCollection<RoadDef> RoadDefs => _roadDefs.AsReadOnly();
-
-        /// <summary>
-        ///     All river definitions (<see cref="RiverDef" />) from RimWorld.
-        /// </summary>
-        public ReadOnlyCollection<RiverDef> RiverDefs => _riverDefs.AsReadOnly();
-
-        /// <summary>
-        ///     All known hilliness (<see cref="Hilliness" />) from RimWorld.
-        /// </summary>
-        public ReadOnlyCollection<Hilliness> HillinessCollection => _hillinesses.AsReadOnly();
+                _chosenAnimalsCanGrazeNowState = value;
+                OnPropertyChanged(nameof(ChosenAnimalsCanGrazeNowState));
+            }
+        }
 
         /// <summary>
         ///     Current user selected biome.
@@ -90,22 +77,6 @@ namespace PrepareLanding
 
                 _chosenBiome = value;
                 OnPropertyChanged(nameof(ChosenBiome));
-            }
-        }
-
-        /// <summary>
-        ///     Current user selected hilliness.
-        /// </summary>
-        public Hilliness ChosenHilliness
-        {
-            get { return _chosenHilliness; }
-            set
-            {
-                if (value == _chosenHilliness)
-                    return;
-
-                _chosenHilliness = value;
-                OnPropertyChanged(nameof(ChosenHilliness));
             }
         }
 
@@ -126,18 +97,111 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Current user choice for the "Animal Can Graze Now" state.
+        ///     Current user selected hilliness.
         /// </summary>
-        public MultiCheckboxState ChosenAnimalsCanGrazeNowState
+        public Hilliness ChosenHilliness
         {
-            get { return _chosenAnimalsCanGrazeNowState; }
+            get { return _chosenHilliness; }
             set
             {
-                if (value == _chosenAnimalsCanGrazeNowState)
+                if (value == _chosenHilliness)
                     return;
 
-                _chosenAnimalsCanGrazeNowState = value;
-                OnPropertyChanged(nameof(ChosenAnimalsCanGrazeNowState));
+                _chosenHilliness = value;
+                OnPropertyChanged(nameof(ChosenHilliness));
+            }
+        }
+
+        /// <summary>
+        ///     Current user choices for the current movement time.
+        /// </summary>
+        public UsableMinMaxNumericItem<float> CurrentMovementTime { get; } = new UsableMinMaxNumericItem<float>();
+
+        /// <summary>
+        ///     Current user choices for the elevation.
+        /// </summary>
+        public UsableMinMaxNumericItem<float> Elevation { get; } = new UsableMinMaxNumericItem<float>();
+
+        /// <summary>
+        ///     Current user choices for the growing period.
+        /// </summary>
+        public MinMaxFromRestrictedListItem<Twelfth> GrowingPeriod { get; private set; }
+
+        /// <summary>
+        ///     All known hilliness (<see cref="Hilliness" />) from RimWorld.
+        /// </summary>
+        public ReadOnlyCollection<Hilliness> HillinessCollection => _hillinesses.AsReadOnly();
+
+        /// <summary>
+        ///     Filter Options (from the GUI window 'options' tab).
+        /// </summary>
+        public FilterOptions Options { get; }
+
+        /// <summary>
+        ///     Current order of the stones on the main GUI Window (as this choice order is important).
+        /// </summary>
+        public List<ThingDef> OrderedStoneDefs { get; } = new List<ThingDef>();
+
+        /// <summary>
+        ///     Used to load / save filters and options.
+        /// </summary>
+        public PresetManager PresetManager { get; }
+
+        /// <summary>
+        ///     Current user choices for the rain fall.
+        /// </summary>
+        public UsableMinMaxNumericItem<float> RainFall { get; } = new UsableMinMaxNumericItem<float>();
+
+        /// <summary>
+        ///     All river definitions (<see cref="RiverDef" />) from RimWorld.
+        /// </summary>
+        public ReadOnlyCollection<RiverDef> RiverDefs => _riverDefs.AsReadOnly();
+
+        /// <summary>
+        ///     All road definitions (<see cref="RoadDef" />) from RimWorld.
+        /// </summary>
+        public ReadOnlyCollection<RoadDef> RoadDefs => _roadDefs.AsReadOnly();
+
+        /// <summary>
+        ///     Current user choices for the river filtering.
+        /// </summary>
+        public Dictionary<RiverDef, ThreeStateItem> SelectedRiverDefs { get; } =
+            new Dictionary<RiverDef, ThreeStateItem>();
+
+        /// <summary>
+        ///     Current user choices for the roads filtering.
+        /// </summary>
+        public Dictionary<RoadDef, ThreeStateItem> SelectedRoadDefs { get; } =
+            new Dictionary<RoadDef, ThreeStateItem>();
+
+        /// <summary>
+        ///     Current user choices for the stone types filtering.
+        /// </summary>
+        public Dictionary<ThingDef, ThreeStateItem> SelectedStoneDefs { get; } =
+            new Dictionary<ThingDef, ThreeStateItem>();
+
+        /// <summary>
+        ///     All "stone" definitions from RimWorld.
+        /// </summary>
+        /// <remarks>
+        ///     Note that stone types (e.g Marble, Granite, etc. are <see cref="ThingDef" /> and have no particular
+        ///     definition).
+        /// </remarks>
+        public ReadOnlyCollection<ThingDef> StoneDefs => _stoneDefs.AsReadOnly();
+
+        /// <summary>
+        ///     The number of stones per tile to filter when the <see cref="StoneTypesNumberOnly" /> boolean is true.
+        /// </summary>
+        public int StoneTypesNumber
+        {
+            get { return _stoneTypesNumber; }
+            set
+            {
+                if (value == _stoneTypesNumber)
+                    return;
+
+                _stoneTypesNumber = value;
+                OnPropertyChanged(nameof(StoneTypesNumber));
             }
         }
 
@@ -158,78 +222,9 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     The number of stones per tile to filter when the <see cref="StoneTypesNumberOnly"/> boolean is true.
-        /// </summary>
-        public int StoneTypesNumber
-        {
-            get { return _stoneTypesNumber; }
-            set
-            {
-                if (value == _stoneTypesNumber)
-                    return;
-
-                _stoneTypesNumber = value;
-                OnPropertyChanged(nameof(StoneTypesNumber));
-            }
-        }
-
-        /// <summary>
-        ///     Current user choices for the roads filtering.
-        /// </summary>
-        public Dictionary<RoadDef, ThreeStateItem> SelectedRoadDefs { get; } =
-            new Dictionary<RoadDef, ThreeStateItem>();
-
-        /// <summary>
-        ///     Current user choices for the river filtering.
-        /// </summary>
-        public Dictionary<RiverDef, ThreeStateItem> SelectedRiverDefs { get; } =
-            new Dictionary<RiverDef, ThreeStateItem>();
-
-        /// <summary>
-        ///     Current user choices for the stone types filtering.
-        /// </summary>
-        public Dictionary<ThingDef, ThreeStateItem> SelectedStoneDefs { get; } =
-            new Dictionary<ThingDef, ThreeStateItem>();
-
-        /// <summary>
-        ///     Current order of the stones on the main GUI Window (as this choice order is important).
-        /// </summary>
-        public List<ThingDef> OrderedStoneDefs { get; } = new List<ThingDef>();
-
-        /// <summary>
-        ///     Current user choices for the current movement time.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> CurrentMovementTime { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
         ///     Current user choices for the summer movement time.
         /// </summary>
         public UsableMinMaxNumericItem<float> SummerMovementTime { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
-        ///     Current user choices for the winter movement time.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> WinterMovementTime { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
-        ///     Current user choices for the elevation.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> Elevation { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
-        ///     Current user choices for the time zone.
-        /// </summary>
-        public UsableMinMaxNumericItem<int> TimeZone { get; } = new UsableMinMaxNumericItem<int>();
-
-        /// <summary>
-        ///     Current user choices for the average temperature.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> AverageTemperature { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
-        ///     Current user choices for the winter temperature.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> WinterTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
         ///     Current user choices for the summer temperature.
@@ -237,19 +232,92 @@ namespace PrepareLanding
         public UsableMinMaxNumericItem<float> SummerTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
-        ///     Current user choices for the growing period.
+        ///     Current user choices for the time zone.
         /// </summary>
-        public MinMaxFromRestrictedListItem<Twelfth> GrowingPeriod { get; private set; }
+        public UsableMinMaxNumericItem<int> TimeZone { get; } = new UsableMinMaxNumericItem<int>();
 
         /// <summary>
-        ///     Current user choices for the rain fall.
+        ///     Current user choices for the winter movement time.
         /// </summary>
-        public UsableMinMaxNumericItem<float> RainFall { get; } = new UsableMinMaxNumericItem<float>();
+        public UsableMinMaxNumericItem<float> WinterMovementTime { get; } = new UsableMinMaxNumericItem<float>();
+
+        /// <summary>
+        ///     Current user choices for the winter temperature.
+        /// </summary>
+        public UsableMinMaxNumericItem<float> WinterTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
         ///     Other classes can subscribe to this event to be alerted when a user choice changed.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        ///     Tells whether all fields (user choice on the main window) are in their default sate or not.
+        /// </summary>
+        /// <returns>true if all user choices are in their default state, false otherwise.</returns>
+        public bool AreAllFieldsInDefaultSate()
+        {
+            if (_chosenBiome != null)
+                return false;
+
+            if (_chosenHilliness != Hilliness.Undefined)
+                return false;
+
+            if (_chosenCoastalTileState != MultiCheckboxState.Partial)
+                return false;
+
+            if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
+                return false;
+
+            if (!IsDefDictInDefaultState(SelectedRoadDefs))
+                return false;
+
+            if (!IsDefDictInDefaultState(SelectedRiverDefs))
+                return false;
+
+            if (!IsDefDictInDefaultState(SelectedStoneDefs))
+                return false;
+
+            if (_stoneTypesNumberOnly)
+                return false;
+
+            if (CurrentMovementTime.Use)
+                return false;
+
+            if (SummerMovementTime.Use)
+                return false;
+
+            if (WinterMovementTime.Use)
+                return false;
+
+            if (Elevation.Use)
+                return false;
+
+            if (TimeZone.Use)
+                return false;
+
+            if (AverageTemperature.Use)
+                return false;
+
+            if (WinterTemperature.Use)
+                return false;
+
+            if (SummerTemperature.Use)
+                return false;
+
+            if (GrowingPeriod.Use)
+                return false;
+
+            if (RainFall.Use)
+                return false;
+
+            return true;
+        }
+
+        public static bool IsDefDictInDefaultState<T>(Dictionary<T, ThreeStateItem> dict) where T : Def
+        {
+            return dict.All(def => def.Value.State == MultiCheckboxState.Partial);
+        }
 
         /// <summary>
         ///     Reset all fields (user choices on the GUI window) to their default state. Also clear all matching tiles.
@@ -308,170 +376,6 @@ namespace PrepareLanding
             InitUsableMinMaxNumericItem(RainFall, nameof(RainFall));
         }
 
-        /// <summary>
-        ///     Tells whether all fields (user choice on the main window) are in their default sate or not.
-        /// </summary>
-        /// <returns>true if all user choices are in their default state, false otherwise.</returns>
-        public bool AreAllFieldsInDefaultSate()
-        {
-            if (_chosenBiome != null)
-                return false;
-
-            if (_chosenHilliness != Hilliness.Undefined)
-                return false;
-
-            if (_chosenCoastalTileState != MultiCheckboxState.Partial)
-                return false;
-
-            if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
-                return false;
-            
-            if (!IsDefDictInDefaultState(SelectedRoadDefs))
-                return false;
-
-            if (!IsDefDictInDefaultState(SelectedRiverDefs))
-                return false;
-
-            if (!IsDefDictInDefaultState(SelectedStoneDefs))
-                return false;
-
-            if (_stoneTypesNumberOnly)
-                return false;
-
-            if (CurrentMovementTime.Use)
-                return false;
-
-            if (SummerMovementTime.Use)
-                return false;
-
-            if (WinterMovementTime.Use)
-                return false;
-
-            if (Elevation.Use)
-                return false;
-
-            if (TimeZone.Use)
-                return false;
-
-            if (AverageTemperature.Use)
-                return false;
-
-            if (WinterTemperature.Use)
-                return false;
-
-            if (SummerTemperature.Use)
-                return false;
-
-            if (GrowingPeriod.Use)
-                return false;
-
-            if (RainFall.Use)
-                return false;
-
-            return true;
-        }
-
-        public static bool IsDefDictInDefaultState<T>(Dictionary<T, ThreeStateItem> dict) where T : Def
-        {
-            return dict.All(def => def.Value.State == MultiCheckboxState.Partial);
-        }
-
-        /// <summary>
-        ///     Called when a new world map is generated: reset all fields (user choices on  the GUI window) to their default
-        ///     state.
-        /// </summary>
-        protected void ExecuteOnWorldGenerated()
-        {
-            if(Options.ResetAllFieldsOnNewGeneratedWorld)
-                ResetAllFields();
-        }
-
-        /// <summary>
-        ///     Called when an option changed.
-        /// </summary>
-        protected void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
-        {
-            // rebuild possible hilliness values if the option changed
-            if (eventArgs.PropertyName == nameof(Options.AllowImpassableHilliness))
-            {
-                _hillinesses = BuildHillinessValues();
-                _chosenHilliness = Hilliness.Undefined;
-            }
-        }
-
-        /// <summary>
-        ///     Called when RimWorld definitions (<see cref="Def" />) have been loaded: build definition lists (biomes, rivers,
-        ///     roads, stones, etc.)
-        /// </summary>
-        protected void ExecuteOnDefsLoaded()
-        {
-            // biome definitions list
-            _biomeDefs = BuildBiomeDefs();
-
-            // road definitions list
-            _roadDefs = BuildRoadDefs();
-
-            // river definitions list
-            _riverDefs = BuildRiverDefs();
-
-            // stone definitions list
-            _stoneDefs = BuildStoneDefs();
-
-            // build hilliness values
-            _hillinesses = BuildHillinessValues();
-        }
-
-        /// <summary>
-        ///     Initialize a <see cref="UsableMinMaxNumericItem{T}" /> item.
-        /// </summary>
-        /// <typeparam name="T">The type used by the <see cref="UsableMinMaxNumericItem{T}" />.</typeparam>
-        /// <param name="numericItem">An instance of <see cref="UsableMinMaxNumericItem{T}" /> to be initialized.</param>
-        /// <param name="propertyChangedName">The property name bound to the <see cref="UsableMinMaxNumericItem{T}" />.</param>
-        protected void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
-            string propertyChangedName) where T : struct, IComparable, IConvertible
-        {
-            numericItem.Use = false;
-            numericItem.PropertyChanged += delegate { OnPropertyChanged(propertyChangedName); };
-        }
-
-        /// <summary>
-        ///     Initialize a dictionary from a list of RimWorld definitions (<see cref="Def" />) where keys are <see cref="Def" />
-        ///     and values are <see cref="ThreeStateItem" />.
-        ///     The propertyChangedName makes it so that if a <see cref="ThreeStateItem" /> item changed an event is fired for the
-        ///     whole dictionary rather than the contained item.
-        /// </summary>
-        /// <typeparam name="T">The type of the items in the list parameter. <b>T</b> should be a RimWorld <see cref="Def" />.</typeparam>
-        /// <param name="initList">A list of <see cref="Def" /> (each entry will be used as a dictionary key).</param>
-        /// <param name="dictionary">The dictionary to be initialized.</param>
-        /// <param name="propertyChangedName">
-        ///     The bound property name (the name of the dictionary in this class). Each time a value
-        ///     in the dictionary is changed, this fire an event related to the dictionary name and not the contained values.
-        /// </param>
-        /// <param name="defaultSate">The default state of the <see cref="ThreeStateItem" />.</param>
-        protected void InitSelectedDictionary<T>(List<T> initList, Dictionary<T, ThreeStateItem> dictionary,
-            string propertyChangedName, MultiCheckboxState defaultSate = MultiCheckboxState.Partial)
-        {
-            dictionary.Clear();
-            foreach (var elementDef in initList)
-            {
-                var item = new ThreeStateItem(defaultSate);
-                item.PropertyChanged += delegate
-                {
-                    // cheat! rather than saying that a ThreeState item changed
-                    //  just pretend the whole dictionary has changed.
-                    // We don't need a finer grain control than that, as the dictionary will contain just a few elements.
-                    OnPropertyChanged(propertyChangedName);
-                };
-                dictionary.Add(elementDef, item);
-            }
-        }
-
-        protected ThreeStateItem InitThreeStateItem(string propertyChanedName,
-            MultiCheckboxState defaultState = MultiCheckboxState.Partial)
-        {
-            return new ThreeStateItem(defaultState);
-        }
-
         /* Definitions  building */
 
         /// <summary>
@@ -518,35 +422,6 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Build the stone definitions (<see cref="ThingDef" />) list.
-        /// </summary>
-        /// <returns>A list of all available RimWorld stone definitions (<see cref="ThingDef" />).</returns>
-        protected List<ThingDef> BuildStoneDefs()
-        {
-            return DefDatabase<ThingDef>.AllDefs.Where(WorldTileFilter.IsThingDefStone).ToList();
-        }
-
-        /// <summary>
-        ///     Build the road definitions (<see cref="RoadDef" />) list.
-        /// </summary>
-        /// <returns>A list of all available RimWorld road definitions (<see cref="RoadDef" />).</returns>
-        protected List<RoadDef> BuildRoadDefs()
-        {
-            var roads = DefDatabase<RoadDef>.AllDefsListForReading;
-            return roads;
-        }
-
-        /// <summary>
-        ///     Build the river definitions (<see cref="RiverDef" />) list.
-        /// </summary>
-        /// <returns>A list of all available RimWorld river definitions (<see cref="RiverDef" />).</returns>
-        protected List<RiverDef> BuildRiverDefs()
-        {
-            var rivers = DefDatabase<RiverDef>.AllDefsListForReading;
-            return rivers;
-        }
-
-        /// <summary>
         ///     Build the hilliness definitions (<see cref="Hilliness" />) list.
         /// </summary>
         /// <returns>A list of all available RimWorld hillinesses (<see cref="Hilliness" />).</returns>
@@ -567,6 +442,121 @@ namespace PrepareLanding
         }
 
         /// <summary>
+        ///     Build the river definitions (<see cref="RiverDef" />) list.
+        /// </summary>
+        /// <returns>A list of all available RimWorld river definitions (<see cref="RiverDef" />).</returns>
+        protected List<RiverDef> BuildRiverDefs()
+        {
+            var rivers = DefDatabase<RiverDef>.AllDefsListForReading;
+            return rivers;
+        }
+
+        /// <summary>
+        ///     Build the road definitions (<see cref="RoadDef" />) list.
+        /// </summary>
+        /// <returns>A list of all available RimWorld road definitions (<see cref="RoadDef" />).</returns>
+        protected List<RoadDef> BuildRoadDefs()
+        {
+            var roads = DefDatabase<RoadDef>.AllDefsListForReading;
+            return roads;
+        }
+
+        /// <summary>
+        ///     Build the stone definitions (<see cref="ThingDef" />) list.
+        /// </summary>
+        /// <returns>A list of all available RimWorld stone definitions (<see cref="ThingDef" />).</returns>
+        protected List<ThingDef> BuildStoneDefs()
+        {
+            return DefDatabase<ThingDef>.AllDefs.Where(WorldTileFilter.IsThingDefStone).ToList();
+        }
+
+        /// <summary>
+        ///     Called when RimWorld definitions (<see cref="Def" />) have been loaded: build definition lists (biomes, rivers,
+        ///     roads, stones, etc.)
+        /// </summary>
+        protected void ExecuteOnDefsLoaded()
+        {
+            // biome definitions list
+            _biomeDefs = BuildBiomeDefs();
+
+            // road definitions list
+            _roadDefs = BuildRoadDefs();
+
+            // river definitions list
+            _riverDefs = BuildRiverDefs();
+
+            // stone definitions list
+            _stoneDefs = BuildStoneDefs();
+
+            // build hilliness values
+            _hillinesses = BuildHillinessValues();
+        }
+
+        /// <summary>
+        ///     Called when a new world map is generated: reset all fields (user choices on  the GUI window) to their default
+        ///     state.
+        /// </summary>
+        protected void ExecuteOnWorldGenerated()
+        {
+            if (Options.ResetAllFieldsOnNewGeneratedWorld || !_firstResetDone)
+            {
+                _firstResetDone = true;
+                ResetAllFields();
+            }
+        }
+
+        /// <summary>
+        ///     Initialize a dictionary from a list of RimWorld definitions (<see cref="Def" />) where keys are <see cref="Def" />
+        ///     and values are <see cref="ThreeStateItem" />.
+        ///     The propertyChangedName makes it so that if a <see cref="ThreeStateItem" /> item changed an event is fired for the
+        ///     whole dictionary rather than the contained item.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the list parameter. <b>T</b> should be a RimWorld <see cref="Def" />.</typeparam>
+        /// <param name="initList">A list of <see cref="Def" /> (each entry will be used as a dictionary key).</param>
+        /// <param name="dictionary">The dictionary to be initialized.</param>
+        /// <param name="propertyChangedName">
+        ///     The bound property name (the name of the dictionary in this class). Each time a value
+        ///     in the dictionary is changed, this fire an event related to the dictionary name and not the contained values.
+        /// </param>
+        /// <param name="defaultSate">The default state of the <see cref="ThreeStateItem" />.</param>
+        protected void InitSelectedDictionary<T>(List<T> initList, Dictionary<T, ThreeStateItem> dictionary,
+            string propertyChangedName, MultiCheckboxState defaultSate = MultiCheckboxState.Partial)
+        {
+            dictionary.Clear();
+            foreach (var elementDef in initList)
+            {
+                var item = new ThreeStateItem(defaultSate);
+                item.PropertyChanged += delegate
+                {
+                    // cheat! rather than saying that a ThreeState item changed
+                    //  just pretend the whole dictionary has changed.
+                    // We don't need a finer grain control than that, as the dictionary will contain just a few elements.
+                    OnPropertyChanged(propertyChangedName);
+                };
+                dictionary.Add(elementDef, item);
+            }
+        }
+
+        protected ThreeStateItem InitThreeStateItem(string propertyChanedName,
+            MultiCheckboxState defaultState = MultiCheckboxState.Partial)
+        {
+            return new ThreeStateItem(defaultState);
+        }
+
+        /// <summary>
+        ///     Initialize a <see cref="UsableMinMaxNumericItem{T}" /> item.
+        /// </summary>
+        /// <typeparam name="T">The type used by the <see cref="UsableMinMaxNumericItem{T}" />.</typeparam>
+        /// <param name="numericItem">An instance of <see cref="UsableMinMaxNumericItem{T}" /> to be initialized.</param>
+        /// <param name="propertyChangedName">The property name bound to the <see cref="UsableMinMaxNumericItem{T}" />.</param>
+        protected void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
+            string propertyChangedName) where T : struct, IComparable, IConvertible
+        {
+            numericItem.Use = false;
+            numericItem.PropertyChanged += delegate { OnPropertyChanged(propertyChangedName); };
+        }
+
+        /// <summary>
         ///     Called when a property (user choice) has changed.
         /// </summary>
         /// <param name="propertyName">The name of the property that has changed.</param>
@@ -574,6 +564,19 @@ namespace PrepareLanding
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        ///     Called when an option changed.
+        /// </summary>
+        protected void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            // rebuild possible hilliness values if the option changed
+            if (eventArgs.PropertyName == nameof(Options.AllowImpassableHilliness))
+            {
+                _hillinesses = BuildHillinessValues();
+                _chosenHilliness = Hilliness.Undefined;
+            }
         }
 
         #region PRIVATE_FIELDS
@@ -617,7 +620,7 @@ namespace PrepareLanding
         private bool _stoneTypesNumberOnly;
 
         /// <summary>
-        ///     Number of stone types when filtering with <see cref="_stoneTypesNumberOnly"/>.
+        ///     Number of stone types when filtering with <see cref="_stoneTypesNumberOnly" />.
         /// </summary>
         private int _stoneTypesNumber = 2;
 
@@ -635,6 +638,12 @@ namespace PrepareLanding
         ///     All stone (rock types) definitions (<see cref="ThingDef" />) from RimWorld.
         /// </summary>
         private List<ThingDef> _stoneDefs;
+
+        /// <summary>
+        ///     Used to tell if the first reset has been done. It must be done once in the lifetime of the mod to at least
+        ///     initialize all fields.
+        /// </summary>
+        private bool _firstResetDone;
 
         #endregion PRIVATE_FIELDS
     }
