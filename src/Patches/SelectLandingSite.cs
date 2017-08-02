@@ -1,4 +1,4 @@
-﻿using PrepareLanding.Gui.Window;
+﻿using PrepareLanding.Core.Gui.Window;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -62,7 +62,7 @@ namespace PrepareLanding.Patches
                 #region INSERTED_CODE
 
                 // make sure the prepare landing window (or its minimized window) is closed when we go back
-                if (Find.WindowStack.IsOpen<PrepareLandingWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
+                if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
                 {
                     if(PrepareLanding.Instance.MainWindow != null)
                         PrepareLanding.Instance.MainWindow.ForceClose();
@@ -109,7 +109,7 @@ namespace PrepareLanding.Patches
 
                 // don't add a new window if the window is already there
                 if (PrepareLanding.Instance.MainWindow == null)
-                    PrepareLanding.Instance.MainWindow = new PrepareLandingWindow(PrepareLanding.Instance.UserData);
+                    PrepareLanding.Instance.MainWindow = new MainWindow(PrepareLanding.Instance.UserData);
 
                 PrepareLanding.Instance.MainWindow.Show();
             }
@@ -127,7 +127,7 @@ namespace PrepareLanding.Patches
                 #region INSERTED_CODE
 
                 // make sure the prepare landing window (or its minimized window) is closed when we go to the next window / game stage
-                if (Find.WindowStack.IsOpen<PrepareLandingWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
+                if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
                 {
                     if (PrepareLanding.Instance.MainWindow != null)
                         PrepareLanding.Instance.MainWindow.ForceClose();

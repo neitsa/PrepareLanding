@@ -7,9 +7,9 @@ namespace PrepareLanding.Filters
     {
         protected List<int> _filteredTiles = new List<int>();
 
-        protected PrepareLandingUserData UserData;
+        protected UserData UserData;
 
-        protected TileFilter(PrepareLandingUserData userData, string attachedProperty, FilterHeaviness heaviness)
+        protected TileFilter(UserData userData, string attachedProperty, FilterHeaviness heaviness)
         {
             UserData = userData;
             AttachedProperty = attachedProperty;

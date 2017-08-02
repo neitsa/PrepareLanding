@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
 using RimWorld.Planet;
 using UnityEngine;
@@ -31,7 +31,7 @@ namespace PrepareLanding
         ///     Class constructor.
         /// </summary>
         /// <param name="userData">An instance of the class used to keep user choice from the main GUI window.</param>
-        public WorldTileFilter(PrepareLandingUserData userData)
+        public WorldTileFilter(UserData userData)
         {
             // save user data and subscribe to the event that is fired when a property changed (so we know if something changed on the GUI).
             _userData = userData;
@@ -146,15 +146,15 @@ namespace PrepareLanding
         public ReadOnlyCollection<int> AllMatchingTiles => _matchingTileIds.AsReadOnly();
 
         /// <summary>
-        ///     AN instance of the filter logger (used on the GUI in the info tab). Tells some useful info to the end user.
-        /// </summary>
-        public FilterInfoLogger FilterInfoLogger { get; } = new FilterInfoLogger();
-
-        /// <summary>
         ///     All the tiles that are deemed as "valid". A <see cref="ReadOnlyCollection{T}" /> of
         ///     <see cref="_allValidTileIds" />.
         /// </summary>
         public ReadOnlyCollection<int> AllValidTilesReadOnly => _allValidTileIds.AsReadOnly();
+
+        /// <summary>
+        ///     AN instance of the filter logger (used on the GUI in the info tab). Tells some useful info to the end user.
+        /// </summary>
+        public FilterInfoLogger FilterInfoLogger { get; } = new FilterInfoLogger();
 
         /// <summary>
         ///     Clear all tiles that match a set of filters. Also clear the highlighted tiles on the world map.
@@ -264,11 +264,11 @@ namespace PrepareLanding
 
                 // check if anything was filtered
                 var filteredTiles = filter.FilteredTiles;
-                if (filteredTiles.Count == 0 && filter.IsFilterActive)
+                if ((filteredTiles.Count == 0) && filter.IsFilterActive)
                 {
                     var conjunctionMessage = ".";
                     if (usedFilters > 1)
-                        conjunctionMessage = $"(in conjunction with the previous { usedFilters - 1} filters)";
+                        conjunctionMessage = $"(in conjunction with the previous {usedFilters - 1} filters)";
 
                     FilterInfoLogger.AppendErrorMessage(
                         $"{filter.RunningDescription}: this filter resulted in 0 matching tiles{conjunctionMessage} Maybe the filtering was a little bit too harsh?",
@@ -358,15 +358,15 @@ namespace PrepareLanding
 
             // get all tiles with at least one river
             var allTilesWithRivers = _allValidTileIds.FindAll(
-                tileId => Find.World.grid[tileId].VisibleRivers != null &&
-                          Find.World.grid[tileId].VisibleRivers.Count != 0);
+                tileId => (Find.World.grid[tileId].VisibleRivers != null) &&
+                          (Find.World.grid[tileId].VisibleRivers.Count != 0));
             AllTilesWithRiver = new ReadOnlyCollection<int>(allTilesWithRivers);
             FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRivers.Count} tiles with at least one river.");
 
             // get all tiles with at least one road
             var allTilesWithRoads =
-                _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].VisibleRoads != null &&
-                                                   Find.World.grid[tileId].VisibleRoads.Count != 0);
+                _allValidTileIds.FindAll(tileId => (Find.World.grid[tileId].VisibleRoads != null) &&
+                                                   (Find.World.grid[tileId].VisibleRoads.Count != 0));
 
             AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
             FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
@@ -402,7 +402,7 @@ namespace PrepareLanding
             //  as it takes too much times with some filter, so it would be better to narrow down the filtering.
             if (Find.World.info.planetCoverage >= 0.5f)
                 if (!_userData.Options.DisablePreFilterCheck)
-                    if (_userData.ChosenBiome == null || _userData.ChosenHilliness == Hilliness.Undefined)
+                    if ((_userData.ChosenBiome == null) || (_userData.ChosenHilliness == Hilliness.Undefined))
                     {
                         FilterInfoLogger.AppendErrorMessage(
                             "No biome and no terrain selected for a Planet coverage >= 50%\n\tPlease select a biome and a terrain first.");
@@ -413,7 +413,7 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Called when a property from <see cref="PrepareLandingFilterOptions" /> has changed.
+        ///     Called when a property from <see cref="FilterOptions" /> has changed.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The argument of the event.</param>
@@ -422,14 +422,11 @@ namespace PrepareLanding
             //TODO: also use a dictionary and Action for this kind of event
             // options checks
             if (e.PropertyName == nameof(_userData.Options.AllowImpassableHilliness))
-            {
-                // rebuild the valid tiles list
                 PrefilterQueueLongEvent();
-            }
         }
 
         /// <summary>
-        ///     Called when a property from <see cref="PrepareLandingUserData" /> has changed.
+        ///     Called when a property from <see cref="UserData" /> has changed.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The argument of the event.</param>
@@ -455,7 +452,7 @@ namespace PrepareLanding
         #region PRIVATE_FIELDS
 
         /// <summary>
-        ///     Dictionary used to keep all filters. Key is a property name from <see cref="PrepareLandingUserData" />. Value is a
+        ///     Dictionary used to keep all filters. Key is a property name from <see cref="UserData" />. Value is a
         ///     <see cref="ITileFilter" /> instance.
         /// </summary>
         private readonly Dictionary<string, ITileFilter> _allFilters;
@@ -478,9 +475,9 @@ namespace PrepareLanding
         private readonly List<ITileFilter> _sortedFilters = new List<ITileFilter>();
 
         /// <summary>
-        ///     A <see cref="PrepareLandingUserData" /> instance used to keep user choices on the GUI.
+        ///     A <see cref="UserData" /> instance used to keep user choices on the GUI.
         /// </summary>
-        private readonly PrepareLandingUserData _userData;
+        private readonly UserData _userData;
 
         /// <summary>
         ///     A cache for filter heaviness. Key is the <see cref="TileFilter.SubjectThingDef" />, value is the filter heaviness (
@@ -510,17 +507,22 @@ namespace PrepareLanding
         /// <returns>true if the ThingDef describes a stone type, false otherwise.</returns>
         public static bool IsThingDefStone(ThingDef thingDef)
         {
-            return thingDef.category == ThingCategory.Building &&
+            return (thingDef.category == ThingCategory.Building) &&
                    thingDef.building.isNaturalRock &&
                    !thingDef.building.isResourceRock;
         }
 
+        /// <summary>
+        /// Tells whether a tile seems to be viable or not for a new settlement. This is a quick pass and not a deep method. 
+        /// </summary>
+        /// <param name="tileId">The identifier of the tile to check for viability.</param>
+        /// <returns>true if the tile is meant to be viable, false otherwise.</returns>
         public bool IsViableTile(int tileId)
         {
             var tile = Find.World.grid[tileId];
 
             var impassableTilesCondition = _userData.Options.AllowImpassableHilliness ||
-                                           tile.hilliness != Hilliness.Impassable;
+                                           (tile.hilliness != Hilliness.Impassable);
 
             // we must be able to build a base, the tile biome must be implemented and the tile itself must not be impassable
             // Side note on tile.WaterCovered: this doesn't work for sea ice biomes as elevation is < 0, but sea ice is a perfectly valid biome where to settle.

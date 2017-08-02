@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text;
 using JetBrains.Annotations;
-using PrepareLanding.Gui;
+using PrepareLanding.Core.Gui;
 using UnityEngine;
 using Verse;
 

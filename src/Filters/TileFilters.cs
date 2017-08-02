@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PrepareLanding.Extensions;
+using PrepareLanding.Core.Extensions;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -10,7 +10,7 @@ namespace PrepareLanding.Filters
 {
     public class TileFilterBiomes : TileFilter
     {
-        public TileFilterBiomes(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterBiomes(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -42,7 +42,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterHilliness : TileFilter
     {
-        public TileFilterHilliness(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterHilliness(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -68,7 +68,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterRoads : TileFilter
     {
-        public TileFilterRoads(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterRoads(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -148,7 +148,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterStones : TileFilter
     {
-        public TileFilterStones(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterStones(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -266,7 +266,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterRivers : TileFilter
     {
-        public TileFilterRivers(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterRivers(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -343,7 +343,7 @@ namespace PrepareLanding.Filters
 
     public abstract class TileFilterMovementTime : TileFilter
     {
-        protected TileFilterMovementTime(PrepareLandingUserData userData, string attachedProperty,
+        protected TileFilterMovementTime(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -414,7 +414,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterCurrentMovementTimes : TileFilterMovementTime
     {
-        public TileFilterCurrentMovementTimes(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterCurrentMovementTimes(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -430,7 +430,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterWinterMovementTimes : TileFilterMovementTime
     {
-        public TileFilterWinterMovementTimes(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterWinterMovementTimes(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -448,7 +448,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterSummerMovementTimes : TileFilterMovementTime
     {
-        public TileFilterSummerMovementTimes(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterSummerMovementTimes(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -467,7 +467,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterCoastalTiles : TileFilter
     {
-        public TileFilterCoastalTiles(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterCoastalTiles(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -524,7 +524,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterElevations : TileFilter
     {
-        public TileFilterElevations(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterElevations(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -560,7 +560,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterTimeZones : TileFilter
     {
-        public TileFilterTimeZones(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterTimeZones(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -596,7 +596,7 @@ namespace PrepareLanding.Filters
 
     public abstract class TileFilterTemperatures : TileFilter
     {
-        protected TileFilterTemperatures(PrepareLandingUserData userData, string attachedProperty,
+        protected TileFilterTemperatures(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -640,7 +640,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterAverageTemperatures : TileFilterTemperatures
     {
-        public TileFilterAverageTemperatures(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterAverageTemperatures(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -658,7 +658,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterWinterTemperatures : TileFilterTemperatures
     {
-        public TileFilterWinterTemperatures(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterWinterTemperatures(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -681,7 +681,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterSummerTemperatures : TileFilterTemperatures
     {
-        public TileFilterSummerTemperatures(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterSummerTemperatures(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -703,7 +703,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterGrowingPeriods : TileFilter
     {
-        public TileFilterGrowingPeriods(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterGrowingPeriods(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -750,7 +750,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterRainFalls : TileFilter
     {
-        public TileFilterRainFalls(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterRainFalls(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
@@ -786,7 +786,7 @@ namespace PrepareLanding.Filters
 
     public class TileFilterAnimalsCanGrazeNow : TileFilter
     {
-        public TileFilterAnimalsCanGrazeNow(PrepareLandingUserData userData, string attachedProperty,
+        public TileFilterAnimalsCanGrazeNow(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using HugsLib;
-using PrepareLanding.Gui.World;
+using PrepareLanding.Core.Gui.World;
 using PrepareLanding.Patches;
 using Verse;
 
@@ -16,7 +16,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Filter Options (from the GUI window 'options' tab).
         /// </summary>
-        private PrepareLandingFilterOptions _filterOptions;
+        private FilterOptions _filterOptions;
 
         /// <summary>
         ///     Main mod class constructor. Sets up the static instance.
@@ -36,7 +36,7 @@ namespace PrepareLanding
         /// <summary>
         ///     User choices on the GUI are kept in this instance.
         /// </summary>
-        public PrepareLandingUserData UserData { get; private set; }
+        public UserData UserData { get; private set; }
 
         /// <summary>
         ///     The filtering class instance used to filter tiles on the world map.
@@ -51,7 +51,7 @@ namespace PrepareLanding
         /// <summary>
         ///     The main GUI window instance.
         /// </summary>
-        public PrepareLandingWindow MainWindow { get; set; }
+        public MainWindow MainWindow { get; set; }
 
         //TODO see if this can be set to a "private set" rather than a public one
 
@@ -110,15 +110,15 @@ namespace PrepareLanding
             PatchWorldInterfaceUpdate.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
 
             // various options show on the 'option' tab on the GUI.
-            _filterOptions = new PrepareLandingFilterOptions();
+            _filterOptions = new FilterOptions();
 
             // main instance to keep user filter choices on the GUI.
-            UserData = new PrepareLandingUserData(_filterOptions);
+            UserData = new UserData(_filterOptions);
 
             TileFilter = new WorldTileFilter(UserData);
 
             // instantiate the main window now
-            MainWindow = new PrepareLandingWindow(UserData);
+            MainWindow = new MainWindow(UserData);
 
             // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter();
