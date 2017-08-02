@@ -1,5 +1,42 @@
 # General
 
+# Version 0.4.3
+**Released August 03, 2017**
+**`RimWorld Version: Alpha 17b`**
+
+What's New?
+===========
+
+* Still building upon [v0.4 release](https://github.com/neitsa/PrepareLanding/releases/tag/v0.4).
+* Fix a GUI layout problem when more than 5 stone types are present (issue #6).
+* Fix a problem when loading a preset where some states where not correctly set (issue #7).
+* The filters are not reset to their default state when going to a new world (they keep their previous state). (issue #9)
+
+Detailed Changelog
+==================
+
+Fixed Issues
+------------
+
+* Having more stone types than the vanilla game breaks the GUI layout. [issue #6: request by Oblitus]
+    - tested & fixed using Cupro's Stones mod.
+* Animals can graze now filter problem [issue #7: request by QuakeIV, Ozymandias]
+    - the code used the default state of the MultiCheckState enum, which is ON by default...
+* Do not reset filters when returning from map to map generation settings [issue #9: request by Oblitus]
+
+Future Plans
+============
+
+* Check if possible to actually set the tile properties according to user choices [issue #8]
+* Add filtering on most / least (max / min) tile features [issue #10]
+* Rework the tile highlighter [issue #11]
+* Add world map overlays for various features (temperature, rainfall, etc.) [issue #12]
+
+
+***
+
+# General
+
 # Version 0.4.2
 **Released August 01, 2017**
 **`RimWorld Version: Alpha 17b`**
