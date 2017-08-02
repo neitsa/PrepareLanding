@@ -63,11 +63,11 @@ namespace PrepareLanding
             DrawRiverTypesSelection();
             NewColumn();
             DrawMovementTime();
-            DrawStoneTypesSelection();
-            NewColumn();
-            DrawCoastalSelection();
             DrawElevationSelection();
             DrawTimeZoneSelection();
+            NewColumn();
+            DrawCoastalSelection();
+            DrawStoneTypesSelection();
             End();
         }
 
@@ -347,7 +347,8 @@ namespace PrepareLanding
                 SoundDefOf.TickHigh.PlayOneShotOnCamera();
             });
 
-            var maxHeight = InRect.height - ListingStandard.CurHeight;
+            var maxNumStones = (InRect.height - ListingStandard.CurHeight - DefaultGapLineHeight - DefaultElementHeight - 15f) / DefaultElementHeight;
+            var maxHeight = maxNumStones * DefaultElementHeight;
             var height = Mathf.Min(selectedStoneDefs.Count*DefaultElementHeight, maxHeight);
 
             if (!_userData.StoneTypesNumberOnly)
@@ -355,7 +356,7 @@ namespace PrepareLanding
                 // stone types, standard selection
 
                 var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count*DefaultElementHeight,
-                    ref _scrollPosStoneSelection);
+                    ref _scrollPosStoneSelection, DefaultScrollableViewShrinkWidth);
 
                 foreach (var currentOrderedStoneDef in orderedStoneDefs)
                 {
