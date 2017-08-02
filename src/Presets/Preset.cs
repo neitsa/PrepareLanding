@@ -433,7 +433,8 @@ namespace PrepareLanding.Presets
         private static MultiCheckboxState LoadThreeState(XContainer xParent, string containerName)
         {
             var xChild = xParent.Element(containerName);
-            return xChild == null ? default(MultiCheckboxState) : LoadEnum<MultiCheckboxState>(xChild, StateNode);
+            // note: if xChild is null do NOT return default(MultiCheckboxState) because the default state will be ON!
+            return xChild == null ? MultiCheckboxState.Partial : LoadEnum<MultiCheckboxState>(xChild, StateNode);
         }
 
         private static void LoadMinMaxFromRestrictedList<T>(XContainer xParent, string elementName,
