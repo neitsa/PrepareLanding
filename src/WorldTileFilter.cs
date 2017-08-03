@@ -152,7 +152,7 @@ namespace PrepareLanding
         public ReadOnlyCollection<int> AllValidTilesReadOnly => _allValidTileIds.AsReadOnly();
 
         /// <summary>
-        ///     AN instance of the filter logger (used on the GUI in the info tab). Tells some useful info to the end user.
+        ///     An instance of the filter logger (used on the GUI in the info tab). Tells some useful info to the end user.
         /// </summary>
         public FilterInfoLogger FilterInfoLogger { get; } = new FilterInfoLogger();
 
