@@ -1,6 +1,7 @@
 ﻿using System;
 using HugsLib;
 using PrepareLanding.Core.Gui.World;
+using PrepareLanding.GameProps;
 using PrepareLanding.Patches;
 using Verse;
 
@@ -47,6 +48,8 @@ namespace PrepareLanding
         ///     Allow highlighting filtered tiles on the world map.
         /// </summary>
         public TileHighlighter TileHighlighter { get; private set; }
+
+        public GameProperties GameProperties { get; private set; }
 
         /// <summary>
         ///     The main GUI window instance.
@@ -109,8 +112,10 @@ namespace PrepareLanding
             PatchWorldInterfaceOnGui.OnWorldInterfaceOnGui += WorldInterfaceOnGui;
             PatchWorldInterfaceUpdate.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
 
-            // various options show on the 'option' tab on the GUI.
+            // Holds various mod options (shown on the 'option' tab on the GUI).
             _filterOptions = new FilterOptions();
+
+            GameProperties = new GameProperties(_filterOptions);
 
             // main instance to keep user filter choices on the GUI.
             UserData = new UserData(_filterOptions);

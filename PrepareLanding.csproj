@@ -76,6 +76,9 @@
     <Compile Include="src\Filters\TileFilter.cs" />
     <Compile Include="src\Filters\TileFilters.cs" />
     <Compile Include="src\FilterInfoLogger.cs" />
+    <Compile Include="src\GameProps\DefProperties.cs" />
+    <Compile Include="src\GameProps\GameProperties.cs" />
+    <Compile Include="src\GameProps\WorldProperties.cs" />
     <Compile Include="src\MainWindow.cs" />
     <Compile Include="src\MonoController.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
