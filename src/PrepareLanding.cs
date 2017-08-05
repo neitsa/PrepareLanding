@@ -1,5 +1,6 @@
 ﻿using System;
 using HugsLib;
+using PrepareLanding.Core;
 using PrepareLanding.Core.Gui.World;
 using PrepareLanding.Patches;
 using Verse;
@@ -32,6 +33,8 @@ namespace PrepareLanding
         ///     Main static instance, holding references to useful class instances.
         /// </summary>
         public static PrepareLanding Instance { get; private set; }
+
+        public GameTicks GameTicks { get; private set; }
 
         /// <summary>
         ///     The filtering class instance used to filter tiles on the world map.
@@ -109,6 +112,9 @@ namespace PrepareLanding
             PatchWorldInterfaceOnGui.OnWorldInterfaceOnGui += WorldInterfaceOnGui;
             PatchWorldInterfaceUpdate.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
 
+            //
+            GameTicks = new GameTicks();
+
             // Holds various mod options (shown on the 'option' tab on the GUI).
             _filterOptions = new FilterOptions();
 
@@ -121,8 +127,6 @@ namespace PrepareLanding
 
             // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter(_filterOptions);
-            Instance.OnWorldInterfaceOnGui += TileHighlighter.HighlightedTileDrawerOnGui;
-            Instance.OnWorldInterfaceUpdate += TileHighlighter.HighlightedTileDrawerUpdate;
         }
 
         /// <summary>

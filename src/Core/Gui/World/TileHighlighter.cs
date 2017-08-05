@@ -14,21 +14,35 @@ namespace PrepareLanding.Core.Gui.World
         /// </summary>
         public const int MaxHighlightedTiles = 10000;
 
-        private const float MaxDistToCameraToDisplayLabel = 50f;
+        public const float DefaultTileHighlightingAlphaValue = 0.5f;
+
+        public const float DefaultBlinkDuration = 2.0f;
+
+        private const float MaxDistToCameraToDisplayLabel = 60f;
 
         private readonly FilterOptions _filterOptions;
 
         private readonly Material _defaultMaterial = new Material(WorldMaterials.SelectedTile);
 
-        private readonly List<HighlightedTile> _highlightedTiles = new List<HighlightedTile>();
+        public List<int> HighlightedTilesIds = new List<int>();
 
-        private Color _materialColor = Color.green;
+        private Color _materialHighlightingColor = Color.green;
+
+        public WorldLayer HighlightedTilesWorldLayer { get; set; }
+
+        public float BlinkDuration { get; set; }
+
+        public float BlinkTick => BlinkDuration / 60f;
 
         public TileHighlighter(FilterOptions filterOptions)
         {
             _filterOptions = filterOptions;
-            _defaultMaterial.color = TileColor;
+            _defaultMaterial.color = TileHighlightingColor;
             _filterOptions.PropertyChanged += OnOptionChanged;
+
+            PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
+
+            BlinkDuration = DefaultBlinkDuration;
         }
 
         public bool BypassMaxHighlightedTiles { get; set; }
@@ -39,43 +53,58 @@ namespace PrepareLanding.Core.Gui.World
 
         public bool ShowDebugTileId { get; set; }
 
-        public Color TileColor
+        public Color TileHighlightingColor
         {
-            get { return _materialColor; }
+            get { return _materialHighlightingColor; }
             set
             {
-                _materialColor = value;
-                _defaultMaterial.color = _materialColor;
+                _materialHighlightingColor = value;
+                _defaultMaterial.color = _materialHighlightingColor;
             }
+        }
+
+        public static Vector2 ScreenPos(int tileId)
+        {
+            var tileCenter = Find.WorldGrid.GetTileCenter(tileId);
+            return GenWorldUI.WorldToUIPosition(tileCenter);
+        }
+
+        public static bool VisibleForCamera(int tileId)
+        {
+            var rect = new Rect(0f, 0f, UI.screenWidth, UI.screenHeight);
+            return rect.Contains(ScreenPos(tileId));
+        }
+
+        public static float DistanceToCamera(int tileId)
+        {
+            var tileCenter = Find.WorldGrid.GetTileCenter(tileId);
+            return Vector3.Distance(Find.WorldCamera.transform.position, tileCenter);
         }
 
         public void HighlightedTileDrawerOnGui()
         {
+            if (DisableTileHighlighting)
+                return;
+
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleCenter;
             GUI.color = new Color(1f, 1f, 1f, 0.5f);
 
-            foreach (var tile in _highlightedTiles)
-                if (tile.DistanceToCamera <= MaxDistToCameraToDisplayLabel)
-                    tile.OnGui();
+            foreach (var tile in HighlightedTilesIds)
+            {
+                if(!VisibleForCamera(tile))
+                    continue;
+
+                if (!(DistanceToCamera(tile) <= MaxDistToCameraToDisplayLabel))
+                    continue;
+
+                var screenPos = ScreenPos(tile);
+                var rect = new Rect(screenPos.x - 20f, screenPos.y - 20f, 40f, 40f);
+                Verse.Widgets.Label(rect, ShowDebugTileId ? tile.ToString(): "X");
+            }
 
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
-        }
-
-        public void HighlightedTileDrawerUpdate()
-        {
-            if (DisableTileHighlighting)
-                return;
-
-            for (var i = 0; i < _highlightedTiles.Count; i++)
-                _highlightedTiles[i].Draw();
-        }
-
-        public void HighlightTile(int tile, Material mat, string text = null)
-        {
-            var debugTile = new HighlightedTile(tile, mat, text);
-            _highlightedTiles.Add(debugTile);
         }
 
         public void HighlightTileList(List<int> tileList)
@@ -95,19 +124,15 @@ namespace PrepareLanding.Core.Gui.World
                 return;
             }
 
-            foreach (var tileId in tileList)
-                HighlightTile(tileId, _defaultMaterial, ShowDebugTileId ? tileId.ToString() : "X");
+            HighlightedTilesIds.AddRange(tileList);
+
+            Find.World.renderer.SetDirty<WorldLayerHighlightedTiles>();
         }
 
         public void RemoveAllTiles()
         {
-            _highlightedTiles.Clear();
-        }
-
-        internal void HighlightTile(int tile, float colorPct = 0f, string text = null)
-        {
-            var highlightedTile = new HighlightedTile(tile, colorPct, text);
-            _highlightedTiles.Add(highlightedTile);
+            HighlightedTilesIds.Clear();
+            Find.World.renderer.SetDirty<WorldLayerHighlightedTiles>();
         }
 
         private void OnOptionChanged(object sender, PropertyChangedEventArgs e)
@@ -119,6 +144,7 @@ namespace PrepareLanding.Core.Gui.World
                     return;
                 case nameof(_filterOptions.DisableTileHighlighting):
                     DisableTileHighlighting = _filterOptions.DisableTileHighlighting;
+                    Find.World.renderer.SetDirty<WorldLayerHighlightedTiles>();
                     return;
                 case nameof(_filterOptions.BypassMaxHighlightedTiles):
                     BypassMaxHighlightedTiles = _filterOptions.BypassMaxHighlightedTiles;
@@ -143,10 +169,9 @@ namespace PrepareLanding.Core.Gui.World
 
             if (disposing)
             {
-                _highlightedTiles.Clear();
 
                 PrepareLanding.Instance.OnWorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
-                PrepareLanding.Instance.OnWorldInterfaceUpdate -= HighlightedTileDrawerUpdate;
+                //PrepareLanding.Instance.OnWorldInterfaceUpdate -= HighlightedTileDrawerUpdate;
                 _filterOptions.PropertyChanged -= OnOptionChanged;
             }
 

@@ -41,11 +41,12 @@ namespace PrepareLanding
         public override void Draw(Rect inRect)
         {
             Begin(inRect);
-            DrawOptions();
+            DrawFilterOptions();
+            DrawTileHighlighterOptions();
             End();
         }
 
-        protected virtual void DrawOptions()
+        protected virtual void DrawFilterOptions()
         {
             DrawEntryHeader("Filter Options", backgroundColor: Color.cyan);
 
@@ -61,19 +62,6 @@ namespace PrepareLanding
                 "Allow selection and filtering of impassable tiles.");
             _gameData.UserData.Options.AllowImpassableHilliness = allowImpassableHilliness;
 
-            //TODO: allow saving / reading the set of currently applied filters
-
-            // allow to show the debug tile ID on the highlighted tile (instead of 'X')
-            var showDebugTileId = _gameData.UserData.Options.ShowDebugTileId;
-            ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref showDebugTileId,
-                "Show the Debug Tile ID (instead of 'X') for the highlighted tiles.");
-            _gameData.UserData.Options.ShowDebugTileId = showDebugTileId;
-
-            var bypassMaxHighlightedTiles = _gameData.UserData.Options.BypassMaxHighlightedTiles;
-            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref bypassMaxHighlightedTiles,
-                $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
-            _gameData.UserData.Options.BypassMaxHighlightedTiles = bypassMaxHighlightedTiles;
-
             var disablePreFilterCheck = _gameData.UserData.Options.DisablePreFilterCheck;
             ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref disablePreFilterCheck,
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
@@ -83,16 +71,6 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Reset all filters on new world", ref resetAllFieldsOnNewGeneratedWorld,
                 "If ON, all filters are reset to their default state on a new generated world, otherwise the filters are kept in their previous state.");
             _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld = resetAllFieldsOnNewGeneratedWorld;
-
-            var disableTileHighligthing = _gameData.UserData.Options.DisableTileHighlighting;
-            ListingStandard.CheckboxLabeled("Disable Tile Highligthing", ref disableTileHighligthing,
-                "Disable tile highlighting altogether.");
-            _gameData.UserData.Options.DisableTileHighlighting = disableTileHighligthing;
-
-            var disableTileBlinking = _gameData.UserData.Options.DisableTileBlinking;
-            ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref disableTileBlinking,
-                "Disable tile blinking (\"breathing\") for filtered tiles on the world map.");
-            _gameData.UserData.Options.DisableTileBlinking = disableTileBlinking;
 
             var showFilterHeaviness = _gameData.UserData.Options.ShowFilterHeaviness;
             ListingStandard.CheckboxLabeled("Show Filter Heaviness", ref showFilterHeaviness,
@@ -122,6 +100,33 @@ namespace PrepareLanding
                     Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
                 }
             }
+        }
+
+        protected virtual void DrawTileHighlighterOptions()
+        {
+            DrawEntryHeader("Tile Highlighter Options", backgroundColor: Color.cyan);
+
+            var disableTileHighligthing = _gameData.UserData.Options.DisableTileHighlighting;
+            ListingStandard.CheckboxLabeled("Disable Tile Highlighting", ref disableTileHighligthing,
+                "Disable tile highlighting altogether.");
+            _gameData.UserData.Options.DisableTileHighlighting = disableTileHighligthing;
+
+            var disableTileBlinking = _gameData.UserData.Options.DisableTileBlinking;
+            ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref disableTileBlinking,
+                "Disable tile blinking (\"breathing\") for filtered tiles on the world map.");
+            _gameData.UserData.Options.DisableTileBlinking = disableTileBlinking;
+
+            // allow to show the debug tile ID on the highlighted tile
+            var showDebugTileId = _gameData.UserData.Options.ShowDebugTileId;
+            ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref showDebugTileId,
+                "Show the Debug Tile ID for the highlighted tiles.");
+            _gameData.UserData.Options.ShowDebugTileId = showDebugTileId;
+
+            var bypassMaxHighlightedTiles = _gameData.UserData.Options.BypassMaxHighlightedTiles;
+            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref bypassMaxHighlightedTiles,
+                $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
+            _gameData.UserData.Options.BypassMaxHighlightedTiles = bypassMaxHighlightedTiles;
+
         }
     }
 }
