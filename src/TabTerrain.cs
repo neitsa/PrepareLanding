@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
 using RimWorld;
@@ -241,10 +242,35 @@ namespace PrepareLanding
             var riverDefs = _gameData.DefData.RiverDefs;
             var selectedRiverDefs = _gameData.UserData.SelectedRiverDefs;
 
-            // Reset button: reset all entries to Off state
-            if (ListingStandard.ButtonText("Reset All"))
+            /*
+             * Buttons
+             */
+            const int numButtons = 3;
+            var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
+            if (buttonsRect.Count != numButtons)
+            {
+                Log.ErrorOnce($"[PrepareLanding] DrawRiverTypesSelection: couldn't get the right number of buttons: {numButtons}", 0x123acafe);
+                return;
+            }
+
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
                 foreach (var riverDefEntry in selectedRiverDefs)
                     riverDefEntry.Value.State = MultiCheckboxState.Partial;
+
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
+                foreach (var riverDefEntry in selectedRiverDefs)
+                    riverDefEntry.Value.State = MultiCheckboxState.On;
+
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
+                foreach (var riverDefEntry in selectedRiverDefs)
+                    riverDefEntry.Value.State = MultiCheckboxState.Off;
+
+            /*
+             * ScrollView
+             */
 
             var inLs = ListingStandard.BeginScrollView(4*DefaultElementHeight,
                 selectedRiverDefs.Count*DefaultElementHeight, ref _scrollPosRiverSelection);
@@ -284,11 +310,36 @@ namespace PrepareLanding
 
             var roadDefs = _gameData.DefData.RoadDefs;
             var selectedRoadDefs = _gameData.UserData.SelectedRoadDefs;
+            
+            /*
+             * Buttons
+             */
+            const int numButtons = 3;
+            var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
+            if (buttonsRect.Count != numButtons)
+            {
+                Log.ErrorOnce($"[PrepareLanding] DrawRoadTypesSelection: couldn't get the right number of buttons: {numButtons}", 0x1239cafe);
+                return;
+            }
 
-            // Reset button: reset all entries to Off state
-            if (ListingStandard.ButtonText("Reset All"))
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
                 foreach (var roadDefEntry in selectedRoadDefs)
                     roadDefEntry.Value.State = MultiCheckboxState.Partial;
+
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
+                foreach (var roadDefEntry in selectedRoadDefs)
+                    roadDefEntry.Value.State = MultiCheckboxState.On;
+
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
+                foreach (var roadDefEntry in selectedRoadDefs)
+                    roadDefEntry.Value.State = MultiCheckboxState.Off;
+
+            /*
+             * ScrollView
+             */
 
             var scrollViewHeight = selectedRoadDefs.Count*DefaultElementHeight;
             var inLs = ListingStandard.BeginScrollView(5*DefaultElementHeight, scrollViewHeight,
