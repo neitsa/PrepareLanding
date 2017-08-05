@@ -16,16 +16,19 @@ namespace PrepareLanding.Core.Gui.World
 
         private const float MaxDistToCameraToDisplayLabel = 50f;
 
+        private readonly FilterOptions _filterOptions;
+
         private readonly Material _defaultMaterial = new Material(WorldMaterials.SelectedTile);
 
         private readonly List<HighlightedTile> _highlightedTiles = new List<HighlightedTile>();
 
         private Color _materialColor = Color.green;
 
-        public TileHighlighter()
+        public TileHighlighter(FilterOptions filterOptions)
         {
+            _filterOptions = filterOptions;
             _defaultMaterial.color = TileColor;
-            PrepareLanding.Instance.UserData.Options.PropertyChanged += OnOptionChanged;
+            _filterOptions.PropertyChanged += OnOptionChanged;
         }
 
         public bool BypassMaxHighlightedTiles { get; set; }
@@ -111,17 +114,17 @@ namespace PrepareLanding.Core.Gui.World
         {
             switch (e.PropertyName)
             {
-                case nameof(PrepareLanding.Instance.UserData.Options.DisableTileBlinking):
-                    DisableTileBlinking = PrepareLanding.Instance.UserData.Options.DisableTileBlinking;
+                case nameof(_filterOptions.DisableTileBlinking):
+                    DisableTileBlinking = _filterOptions.DisableTileBlinking;
                     return;
-                case nameof(PrepareLanding.Instance.UserData.Options.DisableTileHighlighting):
-                    DisableTileHighlighting = PrepareLanding.Instance.UserData.Options.DisableTileHighlighting;
+                case nameof(_filterOptions.DisableTileHighlighting):
+                    DisableTileHighlighting = _filterOptions.DisableTileHighlighting;
                     return;
-                case nameof(PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles):
-                    BypassMaxHighlightedTiles = PrepareLanding.Instance.UserData.Options.BypassMaxHighlightedTiles;
+                case nameof(_filterOptions.BypassMaxHighlightedTiles):
+                    BypassMaxHighlightedTiles = _filterOptions.BypassMaxHighlightedTiles;
                     break;
-                case nameof(PrepareLanding.Instance.UserData.Options.ShowDebugTileId):
-                    ShowDebugTileId = PrepareLanding.Instance.UserData.Options.ShowDebugTileId;
+                case nameof(_filterOptions.ShowDebugTileId):
+                    ShowDebugTileId = _filterOptions.ShowDebugTileId;
                     break;
 
                 default:
@@ -144,7 +147,7 @@ namespace PrepareLanding.Core.Gui.World
 
                 PrepareLanding.Instance.OnWorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
                 PrepareLanding.Instance.OnWorldInterfaceUpdate -= HighlightedTileDrawerUpdate;
-                PrepareLanding.Instance.UserData.Options.PropertyChanged -= OnOptionChanged;
+                _filterOptions.PropertyChanged -= OnOptionChanged;
             }
 
             _disposedValue = true;
