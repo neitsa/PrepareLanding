@@ -11,17 +11,20 @@ namespace PrepareLanding
     {
         // split percentage for the 3 elements of the "go to tile" entry.
         private readonly List<float> _goToTileSplitPct = new List<float> {0.5f, 0.35f, 0.15f};
-        // hold user choices
-        private readonly UserData _userData;
+
+        // game data
+        private readonly GameData.GameData _gameData;
+
         // default tile number (for "go to tile").
         private int _tileNumber;
+
         // tile number, as string (for "go to tile")
         private string _tileNumberString = string.Empty;
 
-        public TabOptions(UserData userData, float columnSizePercent = 0.25f) :
+        public TabOptions(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            _userData = userData;
+            _gameData = gameData;
         }
 
         /// <summary>Gets whether the tab can be draw or not.</summary>
@@ -46,61 +49,61 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Filter Options", backgroundColor: Color.cyan);
 
-            var allowLiveFiltering = _userData.Options.AllowLiveFiltering;
+            var allowLiveFiltering = _gameData.UserData.Options.AllowLiveFiltering;
             ListingStandard.CheckboxLabeled("Allow Live Filtering", ref allowLiveFiltering,
                 "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
-            _userData.Options.AllowLiveFiltering = allowLiveFiltering;
+            _gameData.UserData.Options.AllowLiveFiltering = allowLiveFiltering;
 
             //TODO: allow unimplemented biomes
 
-            var allowImpassableHilliness = _userData.Options.AllowImpassableHilliness;
+            var allowImpassableHilliness = _gameData.UserData.Options.AllowImpassableHilliness;
             ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref allowImpassableHilliness,
                 "Allow selection and filtering of impassable tiles.");
-            _userData.Options.AllowImpassableHilliness = allowImpassableHilliness;
+            _gameData.UserData.Options.AllowImpassableHilliness = allowImpassableHilliness;
 
             //TODO: allow saving / reading the set of currently applied filters
 
             // allow to show the debug tile ID on the highlighted tile (instead of 'X')
-            var showDebugTileId = _userData.Options.ShowDebugTileId;
+            var showDebugTileId = _gameData.UserData.Options.ShowDebugTileId;
             ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref showDebugTileId,
                 "Show the Debug Tile ID (instead of 'X') for the highlighted tiles.");
-            _userData.Options.ShowDebugTileId = showDebugTileId;
+            _gameData.UserData.Options.ShowDebugTileId = showDebugTileId;
 
-            var bypassMaxHighlightedTiles = _userData.Options.BypassMaxHighlightedTiles;
+            var bypassMaxHighlightedTiles = _gameData.UserData.Options.BypassMaxHighlightedTiles;
             ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref bypassMaxHighlightedTiles,
                 $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
-            _userData.Options.BypassMaxHighlightedTiles = bypassMaxHighlightedTiles;
+            _gameData.UserData.Options.BypassMaxHighlightedTiles = bypassMaxHighlightedTiles;
 
-            var disablePreFilterCheck = _userData.Options.DisablePreFilterCheck;
+            var disablePreFilterCheck = _gameData.UserData.Options.DisablePreFilterCheck;
             ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref disablePreFilterCheck,
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
-            _userData.Options.DisablePreFilterCheck = disablePreFilterCheck;
+            _gameData.UserData.Options.DisablePreFilterCheck = disablePreFilterCheck;
 
-            var resetAllFieldsOnNewGeneratedWorld = _userData.Options.ResetAllFieldsOnNewGeneratedWorld;
+            var resetAllFieldsOnNewGeneratedWorld = _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld;
             ListingStandard.CheckboxLabeled("Reset all filters on new world", ref resetAllFieldsOnNewGeneratedWorld,
                 "If ON, all filters are reset to their default state on a new generated world, otherwise the filters are kept in their previous state.");
-            _userData.Options.ResetAllFieldsOnNewGeneratedWorld = resetAllFieldsOnNewGeneratedWorld;
+            _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld = resetAllFieldsOnNewGeneratedWorld;
 
-            var disableTileHighligthing = _userData.Options.DisableTileHighlighting;
+            var disableTileHighligthing = _gameData.UserData.Options.DisableTileHighlighting;
             ListingStandard.CheckboxLabeled("Disable Tile Highligthing", ref disableTileHighligthing,
                 "Disable tile highlighting altogether.");
-            _userData.Options.DisableTileHighlighting = disableTileHighligthing;
+            _gameData.UserData.Options.DisableTileHighlighting = disableTileHighligthing;
 
-            var disableTileBlinking = _userData.Options.DisableTileBlinking;
+            var disableTileBlinking = _gameData.UserData.Options.DisableTileBlinking;
             ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref disableTileBlinking,
                 "Disable tile blinking (\"breathing\") for filtered tiles on the world map.");
-            _userData.Options.DisableTileBlinking = disableTileBlinking;
+            _gameData.UserData.Options.DisableTileBlinking = disableTileBlinking;
 
-            var showFilterHeaviness = _userData.Options.ShowFilterHeaviness;
+            var showFilterHeaviness = _gameData.UserData.Options.ShowFilterHeaviness;
             ListingStandard.CheckboxLabeled("Show Filter Heaviness", ref showFilterHeaviness,
                 "Show filter heaviness (possible filter CPU calculation heaviness) on filter header in the GUI.");
-            _userData.Options.ShowFilterHeaviness = showFilterHeaviness;
+            _gameData.UserData.Options.ShowFilterHeaviness = showFilterHeaviness;
 
-            var allowInvalidTilesForNewSettlement = _userData.Options.AllowInvalidTilesForNewSettlement;
+            var allowInvalidTilesForNewSettlement = _gameData.UserData.Options.AllowInvalidTilesForNewSettlement;
             ListingStandard.CheckboxLabeled("Allow Invalid Tiles for New Settlement",
                 ref allowInvalidTilesForNewSettlement,
                 "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
-            _userData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
+            _gameData.UserData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
 
             var goToTileOptionRectSpace = ListingStandard.GetRect(30f);
             var rects = goToTileOptionRectSpace.SplitRectWidth(_goToTileSplitPct);
