@@ -1,16 +1,15 @@
 ﻿namespace PrepareLanding.GameData
 {
-    public class GameProperties
+    public class GameData
     {
-        public DefProperties DefProperties { get; }
+        public DefData DefData { get; }
 
-        public WorldProperties WorldProperties { get; }
+        public WorldData WorldData { get; }
 
-
-        public GameProperties(FilterOptions filterOptions)
+        public GameData(FilterOptions filterOptions)
         {
-            DefProperties = new DefProperties(filterOptions);
-            WorldProperties = new WorldProperties();
+            DefData = new DefData(filterOptions);
+            WorldData = new WorldData();
         }
     }
 }

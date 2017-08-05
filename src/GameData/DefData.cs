@@ -12,7 +12,7 @@ namespace PrepareLanding.GameData
     /// <summary>
     /// Holds various RimWorld definitions (<see cref="Verse.Def" />) that are used throughout the mod.
     /// </summary>
-    public class DefProperties
+    public class DefData
     {
         /// <summary>
         ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.
@@ -41,7 +41,7 @@ namespace PrepareLanding.GameData
 
         private readonly FilterOptions _filterOptions;
 
-        public DefProperties(FilterOptions filterOptions)
+        public DefData(FilterOptions filterOptions)
         {
             _filterOptions = filterOptions;
 

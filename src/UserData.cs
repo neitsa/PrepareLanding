@@ -306,7 +306,7 @@ namespace PrepareLanding
             _chosenCoastalTileState = MultiCheckboxState.Partial;
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
-            var defProps = PrepareLanding.Instance.GameProperties.DefProperties;
+            var defProps = PrepareLanding.Instance.GameData.DefData;
             InitSelectedDictionary(defProps.RoadDefs, SelectedRoadDefs, nameof(SelectedRoadDefs));
             InitSelectedDictionary(defProps.RiverDefs, SelectedRiverDefs, nameof(SelectedRiverDefs));
             InitSelectedDictionary(defProps.StoneDefs, SelectedStoneDefs, nameof(SelectedStoneDefs));

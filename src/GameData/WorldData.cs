@@ -1,6 +1,6 @@
 ﻿namespace PrepareLanding.GameData
 {
-    public class WorldProperties
+    public class WorldData
     {
     }
 }

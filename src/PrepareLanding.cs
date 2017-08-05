@@ -49,7 +49,7 @@ namespace PrepareLanding
         /// </summary>
         public TileHighlighter TileHighlighter { get; private set; }
 
-        public GameProperties GameProperties { get; private set; }
+        public GameData.GameData GameData { get; private set; }
 
         /// <summary>
         ///     The main GUI window instance.
@@ -115,7 +115,7 @@ namespace PrepareLanding
             // Holds various mod options (shown on the 'option' tab on the GUI).
             _filterOptions = new FilterOptions();
 
-            GameProperties = new GameProperties(_filterOptions);
+            GameData = new GameData.GameData(_filterOptions);
 
             // main instance to keep user filter choices on the GUI.
             UserData = new UserData(_filterOptions);
