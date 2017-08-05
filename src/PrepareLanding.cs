@@ -1,7 +1,7 @@
 ﻿using System;
 using HugsLib;
 using PrepareLanding.Core.Gui.World;
-using PrepareLanding.GameProps;
+using PrepareLanding.GameData;
 using PrepareLanding.Patches;
 using Verse;
 

@@ -1,4 +1,4 @@
-﻿namespace PrepareLanding.GameProps
+﻿namespace PrepareLanding.GameData
 {
     public class WorldProperties
     {

@@ -7,7 +7,7 @@ using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
-namespace PrepareLanding.GameProps
+namespace PrepareLanding.GameData
 {
     /// <summary>
     /// Holds various RimWorld definitions (<see cref="Verse.Def" />) that are used throughout the mod.
