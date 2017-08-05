@@ -59,6 +59,7 @@
     <Compile Include="src\Core\Extensions\StringExtensions.cs" />
     <Compile Include="src\Core\Extensions\TileExtensions.cs" />
     <Compile Include="src\Core\Extensions\TwelfthExtensions.cs" />
+    <Compile Include="src\Core\GameTicks.cs" />
     <Compile Include="src\Core\Gui\ButtonDescriptor.cs" />
     <Compile Include="src\Core\Gui\RichText.cs" />
     <Compile Include="src\Core\Gui\Tab\ITabGuiUtility.cs" />
@@ -67,8 +68,8 @@
     <Compile Include="src\Core\Gui\Widgets.cs" />
     <Compile Include="src\Core\Gui\Window\MinimizableWindow.cs" />
     <Compile Include="src\Core\Gui\Window\MinimizedWindow.cs" />
-    <Compile Include="src\Core\Gui\World\HighlightedTile.cs" />
     <Compile Include="src\Core\Gui\World\TileHighlighter.cs" />
+    <Compile Include="src\Core\Gui\World\WorldLayerHighlightedTiles.cs" />
     <Compile Include="src\DataItems.cs" />
     <Compile Include="src\Defs\MainButtonWorkerToggleWorld.cs" />
     <Compile Include="src\FilterOptions.cs" />

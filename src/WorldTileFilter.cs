@@ -327,7 +327,10 @@ namespace PrepareLanding
             }
 
             // now highlight filtered tiles
-            PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
+            LongEventHandler.ExecuteWhenFinished(delegate
+            {
+                PrepareLanding.Instance.TileHighlighter.HighlightTileList(_matchingTileIds);
+            });
         }
 
         /// <summary>
