@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using JetBrains.Annotations;
-using PrepareLanding.Presets;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -29,9 +28,6 @@ namespace PrepareLanding.GameData
 
             // register to the option changed event
             Options.PropertyChanged += OptionChanged;
-
-            // create the preset manager.
-            PresetManager = new PresetManager(this);
         }
 
         /// <summary>
@@ -127,11 +123,6 @@ namespace PrepareLanding.GameData
         ///     Current order of the stones on the main GUI Window (as this choice order is important).
         /// </summary>
         public List<ThingDef> OrderedStoneDefs { get; } = new List<ThingDef>();
-
-        /// <summary>
-        ///     Used to load / save filters and options.
-        /// </summary>
-        public PresetManager PresetManager { get; }
 
         /// <summary>
         ///     Current user choices for the rain fall.

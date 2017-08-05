@@ -129,7 +129,7 @@ namespace PrepareLanding
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
             {
-                var presetFilesCount = _gameData.UserData.PresetManager.AllPresetFiles.Count;
+                var presetFilesCount = _gameData.PresetManager.AllPresetFiles.Count;
                 _listDisplayStartIndex += MaxItemsToDisplay;
                 if (_listDisplayStartIndex > presetFilesCount)
                 {
@@ -141,7 +141,7 @@ namespace PrepareLanding
 
             var buttonListEnd = new ButtonDescriptor(">>", delegate
             {
-                var presetFilesCount = _gameData.UserData.PresetManager.AllPresetFiles.Count;
+                var presetFilesCount = _gameData.PresetManager.AllPresetFiles.Count;
                 var displayIndexStart = presetFilesCount - presetFilesCount%MaxItemsToDisplay;
                 if (displayIndexStart == _listDisplayStartIndex)
                     Messages.Message($"No more available items to display (max: {presetFilesCount}).",
@@ -288,7 +288,7 @@ namespace PrepareLanding
         private void LoadPreset()
         {
             if (!string.IsNullOrEmpty(_selectedFileName))
-                if (_gameData.UserData.PresetManager.LoadPreset(_selectedFileName, true))
+                if (_gameData.PresetManager.LoadPreset(_selectedFileName, true))
                     Messages.Message("Successfuly loaded the preset!", MessageSound.Benefit);
                 else
                     Messages.Message("Error: couldn't load the preset...", MessageSound.Negative);
@@ -300,7 +300,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Preset Files: Load mode", backgroundColor: Color.green);
 
-            var presetFiles = _gameData.UserData.PresetManager.AllPresetFiles;
+            var presetFiles = _gameData.PresetManager.AllPresetFiles;
             if (presetFiles == null)
             {
                 Log.ErrorOnce("[PrepareLanding] PresetManager.AllPresetFiles is null.", 0x1238cafe);
@@ -405,7 +405,7 @@ namespace PrepareLanding
 
             ListingStandard.TextEntryLabeled2("Preset Name:", _selectedFileName);
 
-            var preset = _gameData.UserData.PresetManager.PresetByPresetName(_selectedFileName);
+            var preset = _gameData.PresetManager.PresetByPresetName(_selectedFileName);
             if (preset == null)
                 return;
 
@@ -453,7 +453,7 @@ namespace PrepareLanding
                 else
                 {
                     _allowOverwriteExistingPreset = false;
-                    if (_gameData.UserData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave,
+                    if (_gameData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave,
                         _saveOptions))
                         Messages.Message("Successfuly saved the preset!", MessageSound.Benefit);
                     else
@@ -473,7 +473,7 @@ namespace PrepareLanding
 
             var fileNameTextRect = fileNameRect.RightPart(0.8f);
             if (string.IsNullOrEmpty(_selectedFileName))
-                _selectedFileName = _gameData.UserData.PresetManager.NextPresetFileName;
+                _selectedFileName = _gameData.PresetManager.NextPresetFileName;
 
             _selectedFileName = Widgets.TextField(fileNameTextRect, _selectedFileName);
 

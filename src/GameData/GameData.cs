@@ -1,4 +1,6 @@
-﻿namespace PrepareLanding.GameData
+﻿using PrepareLanding.Presets;
+
+namespace PrepareLanding.GameData
 {
     public class GameData
     {
@@ -17,6 +19,11 @@
         /// </summary>
         public UserData UserData { get; }
 
+        /// <summary>
+        ///     Used to load / save filters and options.
+        /// </summary>
+        public PresetManager PresetManager { get; }
+
         public GameData(FilterOptions filterOptions)
         {
             // Definitions (Def) from game. Won't change on a single game; might change between games by using other mods.
@@ -27,6 +34,9 @@
 
             // data specific to a single generated world.
             WorldData = new WorldData();
+
+            // create the preset manager.
+            PresetManager = new PresetManager(this);
         }
     }
 }
