@@ -8,28 +8,16 @@ namespace PrepareLanding.Core.Gui.World
 {
     public class WorldLayerHighlightedTiles : WorldLayer
     {
+        private readonly float _blinkTick;
         private readonly Material _defaultMaterial = new Material(WorldMaterials.SelectedTile);
 
         private readonly List<Vector3> _vertices = new List<Vector3>();
 
         private float _alpha;
-        protected override float Alpha => _alpha;
 
         private AlphaRampDirection _alphaRampDirection;
 
         private Color _materialColor = Color.green;
-
-        private readonly float _blinkTick;
-
-        public Color TileColor
-        {
-            get { return _materialColor; }
-            set
-            {
-                _materialColor = value;
-                _defaultMaterial.color = _materialColor;
-            }
-        }
 
         public WorldLayerHighlightedTiles()
         {
@@ -42,41 +30,27 @@ namespace PrepareLanding.Core.Gui.World
 
             PrepareLanding.Instance.TileHighlighter.HighlightedTilesWorldLayer = this;
 
+            // TODO: see if it's easier to unsubscribe if no tile highlighting.
             PrepareLanding.Instance.GameTicks.TicksIntervalElapsed += OnTicksIntervalElapsed;
             PrepareLanding.Instance.GameTicks.UpdateInterval = _blinkTick;
         }
 
-        public void SetAlpha(float alpha)
+        protected override float Alpha => _alpha;
+
+        public Color TileColor
         {
-            if (alpha > 1.0f)
-                alpha = 1.0f;
-
-            if (alpha < 0.0f)
-                alpha = 0.0f;
-
-            _alpha = alpha;
-        }
-
-        private void OnTicksIntervalElapsed()
-        {
-            if (PrepareLanding.Instance.TileHighlighter.DisableTileHighlighting)
+            get { return _materialColor; }
+            set
             {
-                _alpha = 0;
-                return;
+                _materialColor = value;
+                _defaultMaterial.color = _materialColor;
             }
-
-            if (PrepareLanding.Instance.TileHighlighter.DisableTileBlinking)
-                _alpha = TileHighlighter.DefaultTileHighlightingAlphaValue;
-            else
-                TileBreath();
         }
 
         public override IEnumerable Regenerate()
         {
             foreach (var result in base.Regenerate())
-            {
                 yield return result;
-            }
 
             foreach (var tileId in PrepareLanding.Instance.TileHighlighter.HighlightedTilesIds)
             {
@@ -93,14 +67,10 @@ namespace PrepareLanding.Core.Gui.World
                 while (currentIndex < maxCount)
                 {
                     if (currentIndex % 1000 == 0)
-                    {
                         yield return null;
-                    }
 
                     if (subMesh.verts.Count > 60000)
-                    {
                         subMesh = GetSubMesh(_defaultMaterial);
-                    }
 
                     subMesh.verts.Add(_vertices[currentIndex] + _vertices[currentIndex].normalized * 0.012f);
                     if (currentIndex < maxCount - 2)
@@ -114,6 +84,11 @@ namespace PrepareLanding.Core.Gui.World
 
                 FinalizeMesh(MeshParts.All);
             }
+        }
+
+        public void SetAlpha(float alpha)
+        {
+            _alpha = Mathf.Clamp(alpha, 0f, 1f);
         }
 
         protected virtual void TileBreath()
@@ -133,6 +108,20 @@ namespace PrepareLanding.Core.Gui.World
                 _alpha -= _blinkTick;
             else
                 _alpha += _blinkTick;
+        }
+
+        private void OnTicksIntervalElapsed()
+        {
+            if (PrepareLanding.Instance.TileHighlighter.DisableTileHighlighting)
+            {
+                _alpha = 0;
+                return;
+            }
+
+            if (PrepareLanding.Instance.TileHighlighter.DisableTileBlinking)
+                _alpha = TileHighlighter.DefaultTileHighlightingAlphaValue;
+            else
+                TileBreath();
         }
 
         private enum AlphaRampDirection
