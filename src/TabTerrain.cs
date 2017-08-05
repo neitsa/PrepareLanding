@@ -258,12 +258,12 @@ namespace PrepareLanding
                 foreach (var riverDefEntry in selectedRiverDefs)
                     riverDefEntry.Value.State = MultiCheckboxState.Partial;
 
-            // Reset button: reset all entries to Partial state
+            // All rivers
             if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
                 foreach (var riverDefEntry in selectedRiverDefs)
                     riverDefEntry.Value.State = MultiCheckboxState.On;
 
-            // Reset button: reset all entries to Partial state
+            // No rivers
             if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
                 foreach (var riverDefEntry in selectedRiverDefs)
                     riverDefEntry.Value.State = MultiCheckboxState.Off;
@@ -327,12 +327,12 @@ namespace PrepareLanding
                 foreach (var roadDefEntry in selectedRoadDefs)
                     roadDefEntry.Value.State = MultiCheckboxState.Partial;
 
-            // Reset button: reset all entries to Partial state
+            // all roads
             if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
                 foreach (var roadDefEntry in selectedRoadDefs)
                     roadDefEntry.Value.State = MultiCheckboxState.On;
 
-            // Reset button: reset all entries to Partial state
+            // no roads
             if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
                 foreach (var roadDefEntry in selectedRoadDefs)
                     roadDefEntry.Value.State = MultiCheckboxState.Off;
