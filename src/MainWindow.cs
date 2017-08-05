@@ -34,12 +34,8 @@ namespace PrepareLanding
 
         private readonly ButtonDescriptor _buttonCloseDescriptor;
 
-        private UserData _userData;
-
-        public MainWindow(UserData userData)
+        public MainWindow(GameData.GameData gameData)
         {
-            _userData = userData;
-
             doCloseButton = false; // explicitly disable close button, we'll draw it ourselves
             doCloseX = true;
             optionalTitle = "Prepare Landing";
@@ -50,12 +46,12 @@ namespace PrepareLanding
              * GUI utilities (tabs)
              */
             _tabGuiUtilities.Clear();
-            _tabGuiUtilities.Add(new TabTerrain(userData, 0.30f));
-            _tabGuiUtilities.Add(new TabTemperature(userData, 0.30f));
+            _tabGuiUtilities.Add(new TabTerrain(gameData, 0.30f));
+            _tabGuiUtilities.Add(new TabTemperature(gameData, 0.30f));
             _tabGuiUtilities.Add(new TabFilteredTiles(0.48f));
-            _tabGuiUtilities.Add(new TabInfo(userData, 0.48f));
-            _tabGuiUtilities.Add(new TabOptions(userData, 0.30f));
-            _tabGuiUtilities.Add(new TabLoadSave(userData, 0.48f));
+            _tabGuiUtilities.Add(new TabInfo(gameData, 0.48f));
+            _tabGuiUtilities.Add(new TabOptions(gameData, 0.30f));
+            _tabGuiUtilities.Add(new TabLoadSave(gameData, 0.48f));
 
             TabController.Clear();
             TabController.AddTabRange(_tabGuiUtilities);
@@ -85,7 +81,7 @@ namespace PrepareLanding
                 delegate
                 {
                     SoundDefOf.TickLow.PlayOneShotOnCamera();
-                    userData.ResetAllFields();
+                    gameData.UserData.ResetAllFields();
                 });
 
             var buttonMinimize = new ButtonDescriptor("Minimize",

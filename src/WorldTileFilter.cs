@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
+using PrepareLanding.GameData;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
@@ -433,7 +434,7 @@ namespace PrepareLanding
         private void OnUserDataPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // check if live filtering is allowed or not. If it's not allowed, we filter everything on the 'Filter' button push.
-            if (!PrepareLanding.Instance.UserData.Options.AllowLiveFiltering)
+            if (!_userData.Options.AllowLiveFiltering)
                 return;
 
             // defensive check to see if the filter exists.

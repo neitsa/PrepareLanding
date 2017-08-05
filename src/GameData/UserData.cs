@@ -9,7 +9,7 @@ using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
-namespace PrepareLanding
+namespace PrepareLanding.GameData
 {
     /// <summary>
     ///     Class used to keep user choices (from the main GUI window)

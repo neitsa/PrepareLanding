@@ -78,6 +78,7 @@
     <Compile Include="src\FilterInfoLogger.cs" />
     <Compile Include="src\GameData\DefData.cs" />
     <Compile Include="src\GameData\GameData.cs" />
+    <Compile Include="src\GameData\UserData.cs" />
     <Compile Include="src\GameData\WorldData.cs" />
     <Compile Include="src\MainWindow.cs" />
     <Compile Include="src\MonoController.cs" />
@@ -95,7 +96,6 @@
     <Compile Include="src\TabOptions.cs" />
     <Compile Include="src\TabTemperature.cs" />
     <Compile Include="src\TabTerrain.cs" />
-    <Compile Include="src\UserData.cs" />
     <Compile Include="src\WorldTileFilter.cs" />
   </ItemGroup>
   <ItemGroup />

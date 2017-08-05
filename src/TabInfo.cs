@@ -13,17 +13,17 @@ namespace PrepareLanding
         private readonly GUIStyle _styleFilterInfo;
         private readonly GUIStyle _styleWorldInfo;
 
-        private readonly UserData _userData;
+        private readonly GameData.GameData _gameData;
         private Vector2 _scrollPosFilterInfo;
 
         private Vector2 _scrollPosWorldInfo;
 
         private string _worldInfo;
 
-        public TabInfo(UserData userData, float columnSizePercent = 0.25f) :
+        public TabInfo(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            _userData = userData;
+            _gameData = gameData;
 
             // make new text styles
             _styleWorldInfo = new GUIStyle(Text.textAreaReadOnlyStyles[2])
@@ -77,7 +77,7 @@ namespace PrepareLanding
                 if (allValidTiles != null)
                 {
                     stringBuilder.AppendLine("Biomes: (number of tiles)");
-                    var biomes = _userData.BiomeDefs;
+                    var biomes = _gameData.DefData.BiomeDefs;
 
                     //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
                     //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;

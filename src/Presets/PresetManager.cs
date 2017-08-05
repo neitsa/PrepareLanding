@@ -17,11 +17,11 @@ namespace PrepareLanding.Presets
 
         private readonly Dictionary<string, Preset> _presetCache = new Dictionary<string, Preset>();
 
-        private readonly UserData _userData;
+        private readonly GameData.GameData _gameData;
 
-        public PresetManager(UserData userData)
+        public PresetManager(GameData.GameData gameData)
         {
-            _userData = userData;
+            _gameData = gameData;
 
             // just make sure the preset dir exists by calling the PresetFolder Property
             Log.Message($"[PrepareLanding] Preset folder is at: {PresetFolder}");
@@ -68,11 +68,11 @@ namespace PrepareLanding.Presets
                 return false;
 
             // disable live filtering as we are gonna change some filters on the fly
-            var liveFilterting = _userData.Options.AllowLiveFiltering;
-            _userData.Options.AllowLiveFiltering = false;
+            var liveFilterting = _gameData.UserData.Options.AllowLiveFiltering;
+            _gameData.UserData.Options.AllowLiveFiltering = false;
 
             // reset all filter states into their default state
-            _userData.ResetAllFields();
+            _gameData.UserData.ResetAllFields();
 
             try
             {
@@ -88,7 +88,7 @@ namespace PrepareLanding.Presets
                 else
                 {
                     // create the preset and load it
-                    preset = new Preset(presetName, _userData);
+                    preset = new Preset(presetName, _gameData);
                     preset.LoadPreset();
                     preset.LoadPresetInfo();
 
@@ -111,7 +111,7 @@ namespace PrepareLanding.Presets
             finally
             {
                 // re-enable live filtering.
-                _userData.Options.AllowLiveFiltering = liveFilterting;
+                _gameData.UserData.Options.AllowLiveFiltering = liveFilterting;
             }
 
             return successfulLoad;
@@ -131,7 +131,7 @@ namespace PrepareLanding.Presets
             {
                 // create the preset or load it if it already exists
                 var preset = !_presetCache.ContainsKey(presetName)
-                    ? new Preset(presetName, _userData)
+                    ? new Preset(presetName, _gameData)
                     : _presetCache[presetName];
 
                 preset.LoadPresetInfo();
@@ -166,7 +166,7 @@ namespace PrepareLanding.Presets
             try
             {
                 // create preset and start save
-                var preset = new Preset(presetName, _userData);
+                var preset = new Preset(presetName, _gameData);
                 preset.PresetInfo.Description = description;
                 preset.PresetInfo.Author = author;
                 preset.SavePreset(description, saveOptions);
@@ -238,7 +238,7 @@ namespace PrepareLanding.Presets
             foreach (var presetFile in AllPresetFiles)
             {
                 var presetName = Path.GetFileNameWithoutExtension(presetFile.Name);
-                var preset = new Preset(presetName, _userData);
+                var preset = new Preset(presetName, _gameData);
 
                 _presetCache.Add(presetName, preset);
                 LoadPresetInfo(presetName, true);

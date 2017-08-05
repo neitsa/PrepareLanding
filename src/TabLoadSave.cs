@@ -59,8 +59,8 @@ namespace PrepareLanding
         // gui style for the preset info text box.
         private readonly GUIStyle _stylePresetInfo;
 
-        // holds user choices
-        private readonly UserData _userData;
+        // game data
+        private readonly GameData.GameData _gameData;
 
         // wheter or not, if clicking on save, this overwrite the preset directly (true) or first display a warning.
         private bool _allowOverwriteExistingPreset;
@@ -93,10 +93,10 @@ namespace PrepareLanding
         // index of the selected preset in the preset list (load mode)
         private int _selectedItemIndex = -1;
 
-        public TabLoadSave(UserData userData, float columnSizePercent = 0.25f) :
+        public TabLoadSave(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            _userData = userData;
+            _gameData = gameData;
             LoadSaveMode = LoadSaveMode.Unknown;
 
             _stylePresetInfo = new GUIStyle(Text.textFieldStyles[1])
@@ -129,7 +129,7 @@ namespace PrepareLanding
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
             {
-                var presetFilesCount = _userData.PresetManager.AllPresetFiles.Count;
+                var presetFilesCount = _gameData.UserData.PresetManager.AllPresetFiles.Count;
                 _listDisplayStartIndex += MaxItemsToDisplay;
                 if (_listDisplayStartIndex > presetFilesCount)
                 {
@@ -141,7 +141,7 @@ namespace PrepareLanding
 
             var buttonListEnd = new ButtonDescriptor(">>", delegate
             {
-                var presetFilesCount = _userData.PresetManager.AllPresetFiles.Count;
+                var presetFilesCount = _gameData.UserData.PresetManager.AllPresetFiles.Count;
                 var displayIndexStart = presetFilesCount - presetFilesCount%MaxItemsToDisplay;
                 if (displayIndexStart == _listDisplayStartIndex)
                     Messages.Message($"No more available items to display (max: {presetFilesCount}).",
@@ -288,7 +288,7 @@ namespace PrepareLanding
         private void LoadPreset()
         {
             if (!string.IsNullOrEmpty(_selectedFileName))
-                if (_userData.PresetManager.LoadPreset(_selectedFileName, true))
+                if (_gameData.UserData.PresetManager.LoadPreset(_selectedFileName, true))
                     Messages.Message("Successfuly loaded the preset!", MessageSound.Benefit);
                 else
                     Messages.Message("Error: couldn't load the preset...", MessageSound.Negative);
@@ -300,7 +300,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Preset Files: Load mode", backgroundColor: Color.green);
 
-            var presetFiles = _userData.PresetManager.AllPresetFiles;
+            var presetFiles = _gameData.UserData.PresetManager.AllPresetFiles;
             if (presetFiles == null)
             {
                 Log.ErrorOnce("[PrepareLanding] PresetManager.AllPresetFiles is null.", 0x1238cafe);
@@ -405,7 +405,7 @@ namespace PrepareLanding
 
             ListingStandard.TextEntryLabeled2("Preset Name:", _selectedFileName);
 
-            var preset = _userData.PresetManager.PresetByPresetName(_selectedFileName);
+            var preset = _gameData.UserData.PresetManager.PresetByPresetName(_selectedFileName);
             if (preset == null)
                 return;
 
@@ -439,7 +439,7 @@ namespace PrepareLanding
 
         private void SavePreset(bool presetExistsProtectFromOverwrite)
         {
-            if (_userData.AreAllFieldsInDefaultSate())
+            if (_gameData.UserData.AreAllFieldsInDefaultSate())
                 Messages.Message("All filters seem to be in their default state", MessageSound.RejectInput);
             else
             {
@@ -453,7 +453,7 @@ namespace PrepareLanding
                 else
                 {
                     _allowOverwriteExistingPreset = false;
-                    if (_userData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave,
+                    if (_gameData.UserData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave,
                         _saveOptions))
                         Messages.Message("Successfuly saved the preset!", MessageSound.Benefit);
                     else
@@ -473,7 +473,7 @@ namespace PrepareLanding
 
             var fileNameTextRect = fileNameRect.RightPart(0.8f);
             if (string.IsNullOrEmpty(_selectedFileName))
-                _selectedFileName = _userData.PresetManager.NextPresetFileName;
+                _selectedFileName = _gameData.UserData.PresetManager.NextPresetFileName;
 
             _selectedFileName = Widgets.TextField(fileNameTextRect, _selectedFileName);
 

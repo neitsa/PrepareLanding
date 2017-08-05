@@ -20,8 +20,8 @@ namespace PrepareLanding
         // scroll bar position for stone selection
         private static Vector2 _scrollPosStoneSelection = Vector2.zero;
 
-        // user choices
-        private readonly UserData _userData;
+        // game data
+        private readonly GameData.GameData _gameData;
         // string buffer for "number of stones" selection 
         private string _bufferStringNumberOfStones;
 
@@ -31,12 +31,12 @@ namespace PrepareLanding
         /// <summary>
         ///     Filters Terrain tab constructor.
         /// </summary>
-        /// <param name="userData">Instance used to hold user choices.</param>
+        /// <param name="gameData">Instance of game data.</param>
         /// <param name="columnSizePercent">Size of a column (in percent of the tab).</param>
-        public TabTerrain(UserData userData, float columnSizePercent = 0.25f) :
+        public TabTerrain(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            _userData = userData;
+            _gameData = gameData;
         }
 
         /// <summary>Gets whether the tab can be draw or not.</summary>
@@ -108,7 +108,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Biome Types", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
-            var biomeDefs = _userData.BiomeDefs;
+            var biomeDefs = _gameData.DefData.BiomeDefs;
 
             // "Select" button
             if (ListingStandard.ButtonText("Select Biome"))
@@ -116,7 +116,7 @@ namespace PrepareLanding
                 var floatMenuOptions = new List<FloatMenuOption>();
 
                 // add a dummy 'Any' fake biome type. This sets the chosen biome to null.
-                Action actionClick = delegate { _userData.ChosenBiome = null; };
+                Action actionClick = delegate { _gameData.UserData.ChosenBiome = null; };
                 // tool-tip when hovering above the 'Any' biome name on the floating menu
                 Action mouseOverAction = delegate
                 {
@@ -132,7 +132,7 @@ namespace PrepareLanding
                 foreach (var currentBiomeDef in biomeDefs)
                 {
                     // clicking on the floating menu saves the selected biome
-                    actionClick = delegate { _userData.ChosenBiome = currentBiomeDef; };
+                    actionClick = delegate { _gameData.UserData.ChosenBiome = currentBiomeDef; };
                     // tool-tip when hovering above the biome name on the floating menu
                     mouseOverAction = delegate
                     {
@@ -158,18 +158,18 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _userData.ChosenBiome != null ? _userData.ChosenBiome.LabelCap : "Any";
+            var rightLabel = _gameData.UserData.ChosenBiome != null ? _gameData.UserData.ChosenBiome.LabelCap : "Any";
             ListingStandard.LabelDouble("Biome:", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;
 
             // display tool-tip over label
-            if (_userData.ChosenBiome != null)
+            if (_gameData.UserData.ChosenBiome != null)
             {
                 var currentRect = ListingStandard.GetRect(0f);
                 currentRect.height = currHeightAfter - currHeightBefore;
-                if (!string.IsNullOrEmpty(_userData.ChosenBiome.description))
-                    TooltipHandler.TipRegion(currentRect, _userData.ChosenBiome.description);
+                if (!string.IsNullOrEmpty(_gameData.UserData.ChosenBiome.description))
+                    TooltipHandler.TipRegion(currentRect, _gameData.UserData.ChosenBiome.description);
             }
         }
 
@@ -178,10 +178,10 @@ namespace PrepareLanding
             DrawEntryHeader("Coastal Tile", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
-            var tmpCheckState = _userData.ChosenCoastalTileState;
+            var tmpCheckState = _gameData.UserData.ChosenCoastalTileState;
             Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile:", ref tmpCheckState);
 
-            _userData.ChosenCoastalTileState = tmpCheckState;
+            _gameData.UserData.ChosenCoastalTileState = tmpCheckState;
         }
 
         protected void DrawElevationSelection()
@@ -190,7 +190,7 @@ namespace PrepareLanding
 
             // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
             // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
-            DrawUsableMinMaxNumericField(_userData.Elevation, "Elevation", -500f, 5000f);
+            DrawUsableMinMaxNumericField(_gameData.UserData.Elevation, "Elevation", -500f, 5000f);
         }
 
         protected virtual void DrawHillinessTypeSelection()
@@ -201,7 +201,7 @@ namespace PrepareLanding
             if (ListingStandard.ButtonText("Select Terrain"))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
-                foreach (var hillinessValue in _userData.HillinessCollection)
+                foreach (var hillinessValue in _gameData.DefData.HillinessCollection)
                 {
                     var label = "Any";
 
@@ -209,7 +209,7 @@ namespace PrepareLanding
                         label = hillinessValue.GetLabelCap();
 
                     var menuOption = new FloatMenuOption(label,
-                        delegate { _userData.ChosenHilliness = hillinessValue; });
+                        delegate { _gameData.UserData.ChosenHilliness = hillinessValue; });
                     floatMenuOptions.Add(menuOption);
                 }
 
@@ -218,8 +218,8 @@ namespace PrepareLanding
             }
 
             // note: RimWorld logs an error when .GetLabelCap() is used on Hilliness.Undefined
-            var rightLabel = _userData.ChosenHilliness != Hilliness.Undefined
-                ? _userData.ChosenHilliness.GetLabelCap()
+            var rightLabel = _gameData.UserData.ChosenHilliness != Hilliness.Undefined
+                ? _gameData.UserData.ChosenHilliness.GetLabelCap()
                 : "Any";
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
@@ -229,17 +229,17 @@ namespace PrepareLanding
             DrawEntryHeader("Movement Times (hours)", false,
                 backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
 
-            DrawUsableMinMaxNumericField(_userData.CurrentMovementTime, "Current Movement Time");
-            DrawUsableMinMaxNumericField(_userData.SummerMovementTime, "Summer Movement Time");
-            DrawUsableMinMaxNumericField(_userData.WinterMovementTime, "Winter Movement Time");
+            DrawUsableMinMaxNumericField(_gameData.UserData.CurrentMovementTime, "Current Movement Time");
+            DrawUsableMinMaxNumericField(_gameData.UserData.SummerMovementTime, "Summer Movement Time");
+            DrawUsableMinMaxNumericField(_gameData.UserData.WinterMovementTime, "Winter Movement Time");
         }
 
         protected virtual void DrawRiverTypesSelection()
         {
             DrawEntryHeader("River Types", backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
 
-            var riverDefs = _userData.RiverDefs;
-            var selectedRiverDefs = _userData.SelectedRiverDefs;
+            var riverDefs = _gameData.DefData.RiverDefs;
+            var selectedRiverDefs = _gameData.UserData.SelectedRiverDefs;
 
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset All"))
@@ -282,8 +282,8 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Road Types", backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
 
-            var roadDefs = _userData.RoadDefs;
-            var selectedRoadDefs = _userData.SelectedRoadDefs;
+            var roadDefs = _gameData.DefData.RoadDefs;
+            var selectedRoadDefs = _gameData.UserData.SelectedRoadDefs;
 
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset All"))
@@ -327,8 +327,8 @@ namespace PrepareLanding
         {
             DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
-            var selectedStoneDefs = _userData.SelectedStoneDefs;
-            var orderedStoneDefs = _userData.OrderedStoneDefs;
+            var selectedStoneDefs = _gameData.UserData.SelectedStoneDefs;
+            var orderedStoneDefs = _gameData.UserData.OrderedStoneDefs;
 
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset All"))
@@ -336,7 +336,7 @@ namespace PrepareLanding
                 foreach (var stoneDefEntry in selectedStoneDefs)
                     stoneDefEntry.Value.State = stoneDefEntry.Value.DefaultState;
 
-                _userData.StoneTypesNumberOnly = false;
+                _gameData.UserData.StoneTypesNumberOnly = false;
             }
 
             // re-orderable list group
@@ -351,7 +351,7 @@ namespace PrepareLanding
             var maxHeight = maxNumStones * DefaultElementHeight;
             var height = Mathf.Min(selectedStoneDefs.Count*DefaultElementHeight, maxHeight);
 
-            if (!_userData.StoneTypesNumberOnly)
+            if (!_gameData.UserData.StoneTypesNumberOnly)
             {
                 // stone types, standard selection
 
@@ -401,13 +401,13 @@ namespace PrepareLanding
             var leftRect = stoneTypesNumberRect.LeftPart(0.80f);
             var rightRect = stoneTypesNumberRect.RightPart(0.20f);
 
-            var filterByStoneNumber = _userData.StoneTypesNumberOnly;
+            var filterByStoneNumber = _gameData.UserData.StoneTypesNumberOnly;
             Verse.Widgets.CheckboxLabeled(leftRect, "Use # of stone types [2,3]:", ref filterByStoneNumber);
-            _userData.StoneTypesNumberOnly = filterByStoneNumber;
+            _gameData.UserData.StoneTypesNumberOnly = filterByStoneNumber;
 
-            var numberOfStones = _userData.StoneTypesNumber;
+            var numberOfStones = _gameData.UserData.StoneTypesNumber;
             Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _bufferStringNumberOfStones, 2, 3);
-            _userData.StoneTypesNumber = numberOfStones;
+            _gameData.UserData.StoneTypesNumber = numberOfStones;
 
             const string tooltipText =
                 "Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.";
@@ -418,7 +418,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Time Zone [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
 
-            DrawUsableMinMaxNumericField(_userData.TimeZone, "Time Zone", -12, 12);
+            DrawUsableMinMaxNumericField(_gameData.UserData.TimeZone, "Time Zone", -12, 12);
         }
     }
 }

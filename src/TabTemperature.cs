@@ -9,12 +9,12 @@ namespace PrepareLanding
 {
     public class TabTemperature : TabGuiUtility
     {
-        private readonly UserData _userData;
+        private readonly GameData.GameData _gameData;
 
-        public TabTemperature(UserData userData, float columnSizePercent = 0.25f) :
+        public TabTemperature(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            _userData = userData;
+            _gameData = gameData;
         }
 
         /// <summary>Gets whether the tab can be draw or not.</summary>
@@ -56,10 +56,10 @@ namespace PrepareLanding
             DrawEntryHeader("Animals", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
-            var tmpCheckState = _userData.ChosenAnimalsCanGrazeNowState;
+            var tmpCheckState = _gameData.UserData.ChosenAnimalsCanGrazeNowState;
             Widgets.CheckBoxLabeledMulti(rect, "Animals Can Graze Now:", ref tmpCheckState);
 
-            _userData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
+            _gameData.UserData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
         }
 
         protected void DrawGrowingPeriodSelection()
@@ -67,7 +67,7 @@ namespace PrepareLanding
             const string label = "Growing Period";
             DrawEntryHeader($"{label} (days)", backgroundColor: ColorFromFilterSubjectThingDef("Growing Periods"));
 
-            var boundField = _userData.GrowingPeriod;
+            var boundField = _gameData.UserData.GrowingPeriod;
 
             var tmpCheckedOn = boundField.Use;
 
@@ -116,7 +116,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Rain Fall (mm)", backgroundColor: ColorFromFilterSubjectThingDef("Rain Falls"));
 
-            DrawUsableMinMaxNumericField(_userData.RainFall, "Rain Fall");
+            DrawUsableMinMaxNumericField(_gameData.UserData.RainFall, "Rain Fall");
         }
 
         protected void DrawTemperaturesSelection()
@@ -124,11 +124,11 @@ namespace PrepareLanding
             DrawEntryHeader("Temperatures (Celsius)",
                 backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
 
-            DrawUsableMinMaxNumericField(_userData.AverageTemperature, "Average Temperature",
+            DrawUsableMinMaxNumericField(_gameData.UserData.AverageTemperature, "Average Temperature",
                 TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
-            DrawUsableMinMaxNumericField(_userData.WinterTemperature, "Winter Temperature",
+            DrawUsableMinMaxNumericField(_gameData.UserData.WinterTemperature, "Winter Temperature",
                 TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
-            DrawUsableMinMaxNumericField(_userData.SummerTemperature, "Summer Temperature",
+            DrawUsableMinMaxNumericField(_gameData.UserData.SummerTemperature, "Summer Temperature",
                 TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
         }
     }

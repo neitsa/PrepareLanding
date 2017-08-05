@@ -1,7 +1,6 @@
 ﻿using System;
 using HugsLib;
 using PrepareLanding.Core.Gui.World;
-using PrepareLanding.GameData;
 using PrepareLanding.Patches;
 using Verse;
 
@@ -35,11 +34,6 @@ namespace PrepareLanding
         public static PrepareLanding Instance { get; private set; }
 
         /// <summary>
-        ///     User choices on the GUI are kept in this instance.
-        /// </summary>
-        public UserData UserData { get; private set; }
-
-        /// <summary>
         ///     The filtering class instance used to filter tiles on the world map.
         /// </summary>
         public WorldTileFilter TileFilter { get; private set; }
@@ -49,6 +43,9 @@ namespace PrepareLanding
         /// </summary>
         public TileHighlighter TileHighlighter { get; private set; }
 
+        /// <summary>
+        ///     Holds various game data: some are game, user, or world specific.
+        /// </summary>
         public GameData.GameData GameData { get; private set; }
 
         /// <summary>
@@ -117,16 +114,13 @@ namespace PrepareLanding
 
             GameData = new GameData.GameData(_filterOptions);
 
-            // main instance to keep user filter choices on the GUI.
-            UserData = new UserData(_filterOptions);
-
-            TileFilter = new WorldTileFilter(UserData);
+            TileFilter = new WorldTileFilter(GameData.UserData);
 
             // instantiate the main window now
-            MainWindow = new MainWindow(UserData);
+            MainWindow = new MainWindow(GameData);
 
             // instantiate the tile highlighter
-            TileHighlighter = new TileHighlighter();
+            TileHighlighter = new TileHighlighter(_filterOptions);
             Instance.OnWorldInterfaceOnGui += TileHighlighter.HighlightedTileDrawerOnGui;
             Instance.OnWorldInterfaceUpdate += TileHighlighter.HighlightedTileDrawerUpdate;
         }
