@@ -92,6 +92,7 @@
     <Compile Include="src\Presets\PresetInfo.cs" />
     <Compile Include="src\Presets\PresetManager.cs" />
     <Compile Include="src\TabFilteredTiles.cs" />
+    <Compile Include="src\TabGodMode.cs" />
     <Compile Include="src\TabInfo.cs" />
     <Compile Include="src\TabLoadSave.cs" />
     <Compile Include="src\TabOptions.cs" />

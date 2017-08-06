@@ -52,6 +52,7 @@ namespace PrepareLanding
             _tabGuiUtilities.Add(new TabInfo(gameData, 0.48f));
             _tabGuiUtilities.Add(new TabOptions(gameData, 0.30f));
             _tabGuiUtilities.Add(new TabLoadSave(gameData, 0.48f));
+            _tabGuiUtilities.Add(new TabGodMode(gameData, 0.30f));
 
             TabController.Clear();
             TabController.AddTabRange(_tabGuiUtilities);
