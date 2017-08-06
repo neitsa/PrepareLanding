@@ -20,6 +20,11 @@ namespace PrepareLanding.GameData
         public UserData UserData { get; }
 
         /// <summary>
+        ///     User choices on the GUI God Mode tab are kept in this instance.
+        /// </summary>
+        public GodModeData GodModeData { get; }
+
+        /// <summary>
         ///     Used to load / save filters and options.
         /// </summary>
         public PresetManager PresetManager { get; }
@@ -29,13 +34,16 @@ namespace PrepareLanding.GameData
             // Definitions (Def) from game. Won't change on a single game; might change between games by using other mods.
             DefData = new DefData(filterOptions);
 
+            // holds user choices from the "god mode" tab.
+            GodModeData = new GodModeData(DefData);
+
             // holds user filter choices on the GUI.
             UserData = new UserData(filterOptions);
 
             // data specific to a single generated world.
             WorldData = new WorldData();
 
-            // create the preset manager.
+            // Preset manager (load and save presets).
             PresetManager = new PresetManager(this);
         }
     }

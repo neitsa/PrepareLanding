@@ -79,6 +79,7 @@
     <Compile Include="src\FilterInfoLogger.cs" />
     <Compile Include="src\GameData\DefData.cs" />
     <Compile Include="src\GameData\GameData.cs" />
+    <Compile Include="src\GameData\GodModeData.cs" />
     <Compile Include="src\GameData\UserData.cs" />
     <Compile Include="src\GameData\WorldData.cs" />
     <Compile Include="src\MainWindow.cs" />
