@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui;
 using RimWorld.Planet;
+using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
@@ -30,9 +32,22 @@ namespace PrepareLanding
 
         private Vector2 _scrollPosRiverSelection;
 
+        private readonly GUIStyle _styleTemperatureInfo;
+
+        private Vector2 _scrollPosTemperatureInfo;
+
+        public string TemperatureInfo { get; private set; }
+
         public TabGodMode(GameData.GameData gameData, float columnSizePercent) : base(columnSizePercent)
         {
             _gameData = gameData;
+
+            _styleTemperatureInfo = new GUIStyle(Text.textFieldStyles[1])
+            {
+                alignment = TextAnchor.UpperLeft,
+                wordWrap = true,
+                richText = true
+            };
         }
 
         /// <summary>A unique identifier for the Tab.</summary>
@@ -62,6 +77,8 @@ namespace PrepareLanding
             NewColumn();
             DrawRoadTypesSelection();
             DrawDebugContent();
+            NewColumn();
+            DrawTemperatureInfo();
             End();
         }
 
@@ -84,9 +101,10 @@ namespace PrepareLanding
             if (_gameData.GodModeData.SelectedTileId != tileId)
             {
                 _gameData.GodModeData.InitFromTileId(tileId);
+                LogTemperatureInfo(tileId);
             }
 
-            if (ListingStandard.ButtonText("Debug Test"))
+            if (ListingStandard.ButtonText("Set Tile"))
             {
                 if (Find.WorldObjects.AnyFactionBaseAt(tileId))
                 {
@@ -97,18 +115,6 @@ namespace PrepareLanding
 
                 var tile = Find.World.grid[tileId];
                 Log.Message(tile.ToString());
-                Log.Message($"Seasonal Temp: {Find.World.tileTemperatures.GetSeasonalTemp(tileId)}");
-                Log.Message($"GenTemperature.GetTemperatureAtTile: {GenTemperature.GetTemperatureAtTile(tileId)}");
-                var map = Current.Game.FindMap(tileId);
-                if (map != null)
-                {
-                    Log.Message($"Outdoor Temp: {Find.World.tileTemperatures.GetOutdoorTemp(tileId)}");
-                    map.mapTemperature.DebugLogTemps();
-                }
-                else
-                {
-                    Log.Message("Map is null");
-                }
 
                 /*
                  * setup tile
@@ -125,8 +131,6 @@ namespace PrepareLanding
                 tile.elevation = _gameData.GodModeData.Elevation;
 
                 tile.rainfall = _gameData.GodModeData.Rainfall;
-
-                LogTemperatureInfo(tileId);
             }
 
             if (ListingStandard.ButtonText("Test dirtying map"))
@@ -135,6 +139,19 @@ namespace PrepareLanding
                 // TODO: see if a long queued event is required
                 Find.World.renderer.SetAllLayersDirty();
             }
+        }
+
+        protected virtual void DrawTemperatureInfo()
+        {
+            DrawEntryHeader("Temperature Info", backgroundColor: Color.yellow);
+
+            if (TemperatureInfo.NullOrEmpty())
+                return;
+
+            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
+
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, TemperatureInfo, ref _scrollPosTemperatureInfo, _styleTemperatureInfo,
+                DefaultScrollableViewShrinkWidth);
         }
 
         protected virtual void DrawBiomeTypesSelection()  // TODO : factorize this function with the one from TabTerrain
@@ -213,9 +230,9 @@ namespace PrepareLanding
             var averageTemperature = _gameData.GodModeData.AverageTemperature;
             _chosenAverageTemperatureString = averageTemperature.ToString("F1", CultureInfo.InvariantCulture);
 
-            var temperatureRectSpace = ListingStandard.GetRect(30f);
+            var temperatureRectSpace = ListingStandard.GetRect(DefaultElementHeight);
             Widgets.Label(temperatureRectSpace.LeftPart(0.8f), $"Avg. Temp. (°C) [{TemperatureTuning.MinimumTemperature}, {TemperatureTuning.MaximumTemperature}]");
-            Widgets.TextFieldNumeric(temperatureRectSpace.RightPart(0.2f), ref averageTemperature, ref _chosenAverageTemperatureString, TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            Core.Gui.Widgets.TextFieldNumeric(temperatureRectSpace.RightPart(0.2f), ref averageTemperature, ref _chosenAverageTemperatureString, TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
             _gameData.GodModeData.AverageTemperature = averageTemperature;
         }
 
@@ -230,9 +247,9 @@ namespace PrepareLanding
             var rainFall = _gameData.GodModeData.Rainfall;
             _chosenRainfallString = rainFall.ToString("F0", CultureInfo.InvariantCulture);
 
-            var rainfallRectSpace = ListingStandard.GetRect(30f);
-            Widgets.Label(rainfallRectSpace.LeftPart(0.8f), $"Rainfall (mm) [{minRainfall}, {maxRainfall}]"); 
-            Widgets.TextFieldNumeric(rainfallRectSpace.RightPart(0.2f), ref rainFall, ref _chosenRainfallString, minRainfall, maxRainfall);
+            var rainfallRectSpace = ListingStandard.GetRect(DefaultElementHeight);
+            Widgets.Label(rainfallRectSpace.LeftPart(0.8f), $"Rainfall (mm) [{minRainfall}, {maxRainfall}]");
+            Core.Gui.Widgets.TextFieldNumeric(rainfallRectSpace.RightPart(0.2f), ref rainFall, ref _chosenRainfallString, minRainfall, maxRainfall);
 
             _gameData.GodModeData.Rainfall = rainFall;
         }
@@ -247,11 +264,11 @@ namespace PrepareLanding
             const float maxElevation = 5000f;
 
             var elevation = _gameData.GodModeData.Elevation;
-            _chosenElevationString = null;
+            _chosenElevationString = elevation.ToString("F0", CultureInfo.InvariantCulture);
 
-            var elevationRectSpace = ListingStandard.GetRect(30f);
+            var elevationRectSpace = ListingStandard.GetRect(DefaultElementHeight);
             Widgets.Label(elevationRectSpace.LeftPart(0.8f), $"Elevation (m) [{minElevation}, {maxElevation}]");
-            Widgets.TextFieldNumeric(elevationRectSpace.RightPart(0.2f), ref elevation, ref _chosenElevationString, minElevation, maxElevation);
+            Core.Gui.Widgets.TextFieldNumeric(elevationRectSpace.RightPart(0.2f), ref elevation, ref _chosenElevationString, minElevation, maxElevation);
 
             _gameData.GodModeData.Elevation = elevation;
         }
@@ -390,21 +407,34 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        private static void LogTemperatureInfo(int tileId, int absTicks = GenDate.TicksPerHour * GenDate.GameStartHourOfDay)
+        private void LogTemperatureInfo(int tileId, int absTicks = GenDate.TicksPerHour * GenDate.GameStartHourOfDay)
         {
-            if (Current.ProgramState == ProgramState.Playing)
-            {
-                Log.Message($"absTicks: {absTicks}");
-                Log.Message($"TicksAbs: {Find.TickManager.TicksAbs}");
-                Log.Message($"Num2: {Find.TickManager.TicksAbs - Find.TickManager.TicksAbs % 60000}");
-            }
+            // HACK: prevent a log error from RimWorld because some functions below will use Verse.TickManager.TickAbs
+            //    but it cannot be used if not playing (it's 0), so we set it to 1 here and reset it to 0 on exit.
+            if (Find.TickManager.gameStartAbsTick == 0 && Current.ProgramState != ProgramState.Playing)
+                Find.TickManager.gameStartAbsTick = 1;
+
+            var separator = "-".Repeat(60);
 
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("----- ** Debug Log Temp ** ------");
-            var num = Find.WorldGrid.LongLatOf(tileId).y;
-            stringBuilder.AppendLine("Latitude " + num);
-            stringBuilder.AppendLine("-----Temperature for each hour this day------");
-            stringBuilder.AppendLine("Hour    Temp    SunEffect");
+            stringBuilder.AppendLine("Temperature Info".RichTextBold().Chain(s => s.RichTextColor(Color.red)));
+            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.red)));
+
+            var vectorLongLat = Find.WorldGrid.LongLatOf(tileId);
+            var latitude = vectorLongLat.y;
+            var longitude = vectorLongLat.x;
+
+            stringBuilder.AppendLine($"Latitude: {latitude}");
+            stringBuilder.AppendLine($"Longitude: {longitude}");
+            stringBuilder.AppendLine();
+
+            /*
+             * Temperature for the current day
+             */
+
+            stringBuilder.AppendLine("Temperature for each hour this day".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+            stringBuilder.AppendLine("Hour    Temp    SunEffect".RichTextColor(Color.yellow));
             var num2 = absTicks  - absTicks % RimWorld.GenDate.TicksPerDay; // would give 0 on the 1st day
             for (var i = 0; i < 24; i++)
             {
@@ -415,15 +445,28 @@ namespace PrepareLanding
                 stringBuilder.AppendLine();
             }
             stringBuilder.AppendLine();
-            stringBuilder.AppendLine("-----Temperature for each twelfth this year------");
+
+            /*
+             * Temperature for the twelves of this year
+             */
+
+            stringBuilder.AppendLine("Temperature for each twelfth this year".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             for (var j = 0; j < 12; j++)
             {
                 var twelfth = (Twelfth)j;
                 var num3 = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
-                stringBuilder.AppendLine(string.Concat(twelfth.GetQuadrum(), "/", twelfth.GetSeason(num), " - ", twelfth.ToString(), " ", num3.ToString("F2")));
+                stringBuilder.AppendLine(string.Concat(twelfth.GetQuadrum(), "/", twelfth.GetSeason(latitude), " - ", twelfth.ToString(), " ", num3.ToString("F2")));
             }
             stringBuilder.AppendLine();
-            stringBuilder.AppendLine("-----Temperature for each day this year------");
+
+            /*
+             * Temperature for each day of the year
+             */
+
+            stringBuilder.AppendLine("Temperature for each day this year".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+
             stringBuilder.AppendLine("Tile avg: " + Find.World.grid[tileId].temperature + "°C");
             stringBuilder.AppendLine("Seasonal shift: " + GenTemperature.SeasonalShiftAmplitudeAt(tileId));
             stringBuilder.AppendLine("Equatorial distance: " + Find.WorldGrid.DistanceFromEquatorNormalized(tileId));
@@ -440,7 +483,11 @@ namespace PrepareLanding
                 stringBuilder.Append(Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3).ToString("F2"));
                 stringBuilder.AppendLine();
             }
-            Log.Message(stringBuilder.ToString());
+            
+            TemperatureInfo = stringBuilder.ToString();
+
+            if (Find.TickManager.gameStartAbsTick == 1)
+                Find.TickManager.gameStartAbsTick = 0;
         }
     }
 }
