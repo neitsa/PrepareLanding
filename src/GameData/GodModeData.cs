@@ -44,6 +44,15 @@ namespace PrepareLanding.GameData
             // initialize rivers
             foreach (var riverDef in _defData.RiverDefs)
                 SelectedRiverDefs.Add(riverDef, false);
+
+            // initialize stones
+            foreach (var stoneDef in _defData.StoneDefs)
+            {
+                SelectedStoneDefs.Add(stoneDef, false);
+                OrderedStoneDefs.Add(stoneDef);
+            }
+
+            OrderedStoneDefs.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
         }
 
         public void InitFromTileId(int tileId)
@@ -80,6 +89,114 @@ namespace PrepareLanding.GameData
                     SelectedRiverDefs[riverDef] = true;
                 }
             }
+
+            ResetSelectedStoneDefs();
+            foreach (var stoneDef in Find.World.NaturalRockTypesIn(tileId))
+            {              
+                if (SelectedStoneDefs.ContainsKey(stoneDef))
+                {
+                    SelectedStoneDefs[stoneDef] = true;
+                }
+            }
+        }
+
+        public bool SetupTile()
+        {
+            if (SelectedTileId < 0)
+                return false;
+
+            var tile = Find.World.grid[SelectedTileId];
+
+            /*
+             * Validity checks
+             */
+
+            var countTrue = SelectedStoneDefs.Values.Count(stoneDefValue => stoneDefValue);
+            if (countTrue < 2 || countTrue > 3)
+            {
+                Messages.Message($"Number of stones must be in the range: [{2}, {3}]", MessageSound.RejectInput);
+                return false;
+            }
+
+            if (HasSelectedRoadDefs && !Biome.allowRoads)
+            {
+                Messages.Message($"The selected biome ({Biome.LabelCap}) doesn't support roads.", MessageSound.RejectInput);
+                return false;
+            }
+
+            if (HasSelectedRiverDefs && !Biome.allowRivers)
+            {
+                Messages.Message($"The selected biome ({Biome.LabelCap}) doesn't support rivers.", MessageSound.RejectInput);
+                return false;
+            }
+
+            /*
+             * Setup tile
+             */
+
+            if (Biome != null)
+                tile.biome = Biome;
+
+            tile.temperature = AverageTemperature;
+
+            if (Hilliness != Hilliness.Undefined)
+                tile.hilliness = Hilliness;
+
+            tile.elevation = Elevation;
+
+            tile.rainfall = Rainfall;
+
+            SetupTileRoads(tile);
+
+            return true;
+        }
+
+        private void SetupTileRoads(Tile tile)
+        {
+            if (!tile.biome.allowRoads)
+                return;
+
+            if (tile.VisibleRoads != null)
+                tile.VisibleRoads.Clear();
+            else
+            {
+                tile.roads = new List<Tile.RoadLink>();
+            }
+
+            foreach (var keyValueRoadDef in SelectedRoadDefs)
+            {
+                if (!keyValueRoadDef.Value)
+                    continue;
+
+                var roadLink = new Tile.RoadLink
+                {
+                    road = keyValueRoadDef.Key,
+                    neighbor = -1 // BUG: this doesn't work, you need to have a valid neighbor; see RimWorld.Planet.WorldGenStep_Roads.GenerateRoadNetwork()
+                };
+
+                tile.VisibleRoads?.Add(roadLink);
+            }
+        }
+
+        private void SetupTileRivers(Tile tile)
+        {
+            if (!tile.biome.allowRivers)
+                return;
+
+            tile.VisibleRivers.Clear();
+            foreach (var keyValueRiverDef in SelectedRiverDefs)
+            {
+                if (!keyValueRiverDef.Value)
+                    continue;
+
+                var riverLink = new Tile.RiverLink
+                {
+                    river = keyValueRiverDef.Key,
+                    neighbor = -1 // BUG: this doesn't work, you need to have a valid neighbor; see RimWorld.Planet.WorldGenStep_Rivers.GenerateRivers()
+                };
+
+                tile.VisibleRivers.Add(riverLink);
+            }
         }
 
         public void ResetSelectedRoadDefs()
@@ -96,6 +213,15 @@ namespace PrepareLanding.GameData
             {
                 SelectedRiverDefs[riverDef] = false;
             }
+        }
+
+        public void ResetSelectedStoneDefs()
+        {
+            foreach (var stoneDef in SelectedStoneDefs.Keys.ToList())
+            {
+                SelectedStoneDefs[stoneDef] = false;
+            }
+            OrderedStoneDefs.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
         }
 
         /// <summary>
@@ -195,10 +321,17 @@ namespace PrepareLanding.GameData
             }
         }
 
+        public bool HasSelectedRoadDefs => SelectedRoadDefs.Any(r => r.Value);
+
+        public bool HasSelectedRiverDefs => SelectedRiverDefs.Any(r => r.Value);
+
         public Dictionary<RoadDef, bool> SelectedRoadDefs { get; } = new Dictionary<RoadDef, bool>();
-
-
+        
         public Dictionary<RiverDef, bool> SelectedRiverDefs { get; } = new Dictionary<RiverDef, bool>();
+
+        public Dictionary<ThingDef, bool> SelectedStoneDefs { get; } = new Dictionary<ThingDef, bool>();
+
+        public List<ThingDef> OrderedStoneDefs { get; } = new List<ThingDef>();
 
 
         public event PropertyChangedEventHandler PropertyChanged;

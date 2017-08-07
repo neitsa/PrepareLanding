@@ -10,6 +10,7 @@ using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using RimWorld.Planet;
+using Verse.Sound;
 using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
@@ -19,6 +20,10 @@ namespace PrepareLanding
         public const int MaxNumberOfRoads = 2;
 
         public const int MaxNumberOfRivers = 2;
+
+        public const int MinNumberOfStones = 2;
+
+        public const int MaxNumberOfStones = 3;
 
         private readonly GameData.GameData _gameData;
 
@@ -31,6 +36,10 @@ namespace PrepareLanding
         private Vector2 _scrollPosRoadSelection;
 
         private Vector2 _scrollPosRiverSelection;
+
+        private Vector2 _scrollPosStoneSelection;
+
+        private ThingDef _selectedStoneDef;
 
         private readonly GUIStyle _styleTemperatureInfo;
 
@@ -73,9 +82,15 @@ namespace PrepareLanding
             DrawHillinessTypeSelection();
             DrawElevationSelection();
             DrawRainfallSelection();
+#if DEBUG
             DrawRiverTypesSelection();
+#endif
             NewColumn();
+#if DEBUG
             DrawRoadTypesSelection();
+            DrawStoneTypesSelection();
+#endif
+
             DrawDebugContent();
             NewColumn();
             DrawTemperatureInfo();
@@ -84,7 +99,7 @@ namespace PrepareLanding
 
         private void DrawDebugContent()
         {
-            DrawEntryHeader("Debug", backgroundColor: ColorLibrary.RoyalPurple);
+            DrawEntryHeader("Tile Setup", backgroundColor: ColorLibrary.RoyalPurple);
 
             var tileId = Find.WorldSelector.selectedTile;
 
@@ -96,7 +111,7 @@ namespace PrepareLanding
                 return;
             }
 
-            ListingStandard.LabelDouble("SelTile: ", tileId.ToString());
+            ListingStandard.LabelDouble("Selected Tile: ", tileId.ToString());
 
             if (_gameData.GodModeData.SelectedTileId != tileId)
             {
@@ -113,31 +128,17 @@ namespace PrepareLanding
                     return;
                 }
 
-                var tile = Find.World.grid[tileId];
-                Log.Message(tile.ToString());
-
-                /*
-                 * setup tile
-                 */
-
-                if (_gameData.GodModeData.Biome != null)
-                    tile.biome = _gameData.GodModeData.Biome;
-
-                tile.temperature = _gameData.GodModeData.AverageTemperature;
-
-                if(_gameData.GodModeData.Hilliness != Hilliness.Undefined)
-                    tile.hilliness = _gameData.GodModeData.Hilliness;
-
-                tile.elevation = _gameData.GodModeData.Elevation;
-
-                tile.rainfall = _gameData.GodModeData.Rainfall;
+                _gameData.GodModeData.SetupTile();
             }
 
-            if (ListingStandard.ButtonText("Test dirtying map"))
+            if (ListingStandard.ButtonText("Redraw Map"))
             {
                 // TODO: just check the required layer, it might save time
-                // TODO: see if a long queued event is required
-                Find.World.renderer.SetAllLayersDirty();
+                LongEventHandler.QueueLongEvent(delegate
+                {
+                    Find.World.renderer.SetAllLayersDirty();
+                }, "GeneratingWorld", true, null);
+                
             }
         }
 
@@ -407,6 +408,63 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
+        protected virtual void DrawStoneTypesSelection()
+        {
+            DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
+
+            var selectedStoneDefs = _gameData.GodModeData.SelectedStoneDefs;
+            var orderedStoneDefs = _gameData.GodModeData.OrderedStoneDefs;
+
+            // Reset button: reset all entries to Off state
+            if (ListingStandard.ButtonText("Reset"))
+            {
+                _gameData.GodModeData.ResetSelectedStoneDefs();
+            }
+
+            // re-orderable list group
+            var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
+            {
+                orderedStoneDefs.ReorderElements(from, to);
+                SoundDefOf.TickHigh.PlayOneShotOnCamera();
+            });
+
+            var maxNumStones = (InRect.height - ListingStandard.CurHeight - DefaultGapLineHeight -
+                                DefaultElementHeight - 15f) / DefaultElementHeight;
+            var maxHeight = maxNumStones * DefaultElementHeight;
+            var height = Mathf.Min(selectedStoneDefs.Count * DefaultElementHeight, maxHeight);
+
+            // stone types, standard selection
+
+            var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count * DefaultElementHeight,
+                ref _scrollPosStoneSelection, DefaultScrollableViewShrinkWidth);
+
+            foreach (var currentOrderedStoneDef in orderedStoneDefs)
+            {
+                var itemRect = inLs.GetRect(DefaultElementHeight);
+
+                
+                var tmpState = selectedStoneDefs[currentOrderedStoneDef];
+                var selected = currentOrderedStoneDef == _selectedStoneDef;
+
+                if (Widgets.CheckboxLabeledSelectable(itemRect, currentOrderedStoneDef.LabelCap, ref selected,
+                    ref tmpState))
+                    _selectedStoneDef = currentOrderedStoneDef;
+
+                // if the state changed, update the item with the new state
+                if (tmpState != selectedStoneDefs[currentOrderedStoneDef])
+                {
+                    selectedStoneDefs[currentOrderedStoneDef] = tmpState;
+                }
+
+                ReorderableWidget.Reorderable(reorderableGroup, itemRect);
+
+                if(!string.IsNullOrEmpty(currentOrderedStoneDef.description))
+                    TooltipHandler.TipRegion(itemRect, currentOrderedStoneDef.description);
+            }
+
+            ListingStandard.EndScrollView(inLs);
+        }
+
         private void LogTemperatureInfo(int tileId, int absTicks = GenDate.TicksPerHour * GenDate.GameStartHourOfDay)
         {
             // HACK: prevent a log error from RimWorld because some functions below will use Verse.TickManager.TickAbs
@@ -426,6 +484,9 @@ namespace PrepareLanding
 
             stringBuilder.AppendLine($"Latitude: {latitude}");
             stringBuilder.AppendLine($"Longitude: {longitude}");
+            stringBuilder.AppendLine($"Equatorial distance: {Find.WorldGrid.DistanceFromEquatorNormalized(tileId)}");
+            stringBuilder.AppendLine($"Tile Temperature Average: {Find.World.grid[tileId].temperature} °C");
+            stringBuilder.AppendLine($"Seasonal shift: {GenTemperature.SeasonalShiftAmplitudeAt(tileId)} °C");
             stringBuilder.AppendLine();
 
             /*
@@ -435,8 +496,8 @@ namespace PrepareLanding
             stringBuilder.AppendLine("Temperature for each hour this day".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine("Hour    Temp    SunEffect".RichTextColor(Color.yellow));
-            var num2 = absTicks  - absTicks % RimWorld.GenDate.TicksPerDay; // would give 0 on the 1st day
-            for (var i = 0; i < 24; i++)
+            var num2 = absTicks  - absTicks % GenDate.TicksPerDay; // will give 0 on the 1st day
+            for (var i = 0; i < GenDate.HoursPerDay; i++)
             {
                 var absTick = num2 + i * GenDate.TicksPerHour;
                 stringBuilder.Append(i.ToString().PadRight(5));
@@ -452,11 +513,11 @@ namespace PrepareLanding
 
             stringBuilder.AppendLine("Temperature for each twelfth this year".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
-            for (var j = 0; j < 12; j++)
+            for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
             {
                 var twelfth = (Twelfth)j;
                 var num3 = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
-                stringBuilder.AppendLine(string.Concat(twelfth.GetQuadrum(), "/", twelfth.GetSeason(latitude), " - ", twelfth.ToString(), " ", num3.ToString("F2")));
+                stringBuilder.AppendLine($"{twelfth.GetQuadrum()} [{twelfth.GetSeason(latitude)}]: {twelfth} {num3:F2}");
             }
             stringBuilder.AppendLine();
 
@@ -467,12 +528,8 @@ namespace PrepareLanding
             stringBuilder.AppendLine("Temperature for each day this year".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
 
-            stringBuilder.AppendLine("Tile avg: " + Find.World.grid[tileId].temperature + "°C");
-            stringBuilder.AppendLine("Seasonal shift: " + GenTemperature.SeasonalShiftAmplitudeAt(tileId));
-            stringBuilder.AppendLine("Equatorial distance: " + Find.WorldGrid.DistanceFromEquatorNormalized(tileId));
-            stringBuilder.AppendLine();
             stringBuilder.AppendLine("Day  Lo   Hi   OffsetFromSeason RandomDailyVariation");
-            for (var k = 0; k < 60; k++)
+            for (var k = 0; k < GenDate.DaysPerYear; k++)
             {
                 var absTick2 = (int)(k * GenDate.TicksPerDay + 15000f); // 6th hour
                 var absTick3 = (int)(k * GenDate.TicksPerDay + 45000f); // 18th hour
