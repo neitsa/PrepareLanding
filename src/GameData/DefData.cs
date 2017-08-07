@@ -41,6 +41,11 @@ namespace PrepareLanding.GameData
 
         private readonly FilterOptions _filterOptions;
 
+        /// <summary>
+        ///     Methods can register to this event to be called when definitions (Defs) have been parsed and are available.
+        /// </summary>
+        public event Action DefParsed = delegate { };
+
         public DefData(FilterOptions filterOptions)
         {
             _filterOptions = filterOptions;
@@ -101,6 +106,9 @@ namespace PrepareLanding.GameData
 
             // build hilliness values
             _hillinesses = BuildHillinessValues();
+
+            // alert subscribers.
+            DefParsed?.Invoke();
         }
 
         /// <summary>

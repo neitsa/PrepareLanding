@@ -79,6 +79,7 @@
     <Compile Include="src\FilterInfoLogger.cs" />
     <Compile Include="src\GameData\DefData.cs" />
     <Compile Include="src\GameData\GameData.cs" />
+    <Compile Include="src\GameData\GodModeData.cs" />
     <Compile Include="src\GameData\UserData.cs" />
     <Compile Include="src\GameData\WorldData.cs" />
     <Compile Include="src\MainWindow.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="src\Presets\PresetInfo.cs" />
     <Compile Include="src\Presets\PresetManager.cs" />
     <Compile Include="src\TabFilteredTiles.cs" />
+    <Compile Include="src\TabGodMode.cs" />
     <Compile Include="src\TabInfo.cs" />
     <Compile Include="src\TabLoadSave.cs" />
     <Compile Include="src\TabOptions.cs" />
