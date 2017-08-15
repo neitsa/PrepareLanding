@@ -52,6 +52,7 @@ namespace PrepareLanding
             _tabGuiUtilities.Add(new TabInfo(gameData, 0.48f));
             _tabGuiUtilities.Add(new TabOptions(gameData, 0.30f));
             _tabGuiUtilities.Add(new TabLoadSave(gameData, 0.48f));
+            _tabGuiUtilities.Add(new TabOverlays(gameData, 0.50f));
             _tabGuiUtilities.Add(new TabGodMode(gameData, 0.30f));
 
             TabController.Clear();
@@ -256,7 +257,7 @@ namespace PrepareLanding
 
             // when the window is closed and it's not minimized, disable all highlighted tiles
             if (!Minimized)
-                PrepareLanding.Instance.TileHighlighter.RemoveAllTiles();
+                PrepareLanding.Instance.TileHighlighter.RemoveAllTiles(); // TODO: make an event for that: WindowClosed, and let subscribers do their stuff
         }
 
         protected void DoBottomsButtons(Rect inRect)

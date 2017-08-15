@@ -39,6 +39,20 @@ namespace PrepareLanding.Filters
         {
             return inputList.Count(tileId => Find.World.grid[tileId].biome == biome);
         }
+
+        public static List<int> TileIdsByBiome(BiomeDef biomeDef)
+        {
+            var outList = new List<int>();
+
+            var maxTiles = Find.World.grid.TilesCount;
+            for(var i = 0; i < maxTiles; i++)
+            {
+                if(Find.World.grid[i].biome == biomeDef)
+                    outList.Add(i);
+            }
+
+            return outList;
+        }
     }
 
     public class TileFilterHilliness : TileFilter

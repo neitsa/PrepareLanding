@@ -56,6 +56,7 @@
     <Compile Include="src\Core\Extensions\ListingStandardExtension.cs" />
     <Compile Include="src\Core\Extensions\MultiCheckboxStateExtension.cs" />
     <Compile Include="src\Core\Extensions\RectExtensions.cs" />
+    <Compile Include="src\Core\Extensions\Statistics.cs" />
     <Compile Include="src\Core\Extensions\StringExtensions.cs" />
     <Compile Include="src\Core\Extensions\TileExtensions.cs" />
     <Compile Include="src\Core\Extensions\TwelfthExtensions.cs" />
@@ -84,6 +85,9 @@
     <Compile Include="src\GameData\WorldData.cs" />
     <Compile Include="src\MainWindow.cs" />
     <Compile Include="src\MonoController.cs" />
+    <Compile Include="src\Overlays\Overlay.cs" />
+    <Compile Include="src\Overlays\TemperatureOverlay.cs" />
+    <Compile Include="src\Overlays\WorldLayerTemperature.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
     <Compile Include="src\Patches\SelectLandingSite.cs" />
@@ -97,8 +101,10 @@
     <Compile Include="src\TabInfo.cs" />
     <Compile Include="src\TabLoadSave.cs" />
     <Compile Include="src\TabOptions.cs" />
+    <Compile Include="src\TabOverlays.cs" />
     <Compile Include="src\TabTemperature.cs" />
     <Compile Include="src\TabTerrain.cs" />
+    <Compile Include="src\GameData\TemperatureData.cs" />
     <Compile Include="src\WorldTileFilter.cs" />
   </ItemGroup>
   <ItemGroup />
