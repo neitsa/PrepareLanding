@@ -1,10 +1,13 @@
-﻿using Verse;
+﻿using System.Collections.Generic;
+using PrepareLanding.Filters;
+using RimWorld;
+using Verse;
 
 namespace PrepareLanding.GameData
 {
     public class WorldData
     {
-        private DefData _defData;
+        private readonly DefData _defData;
 
         public TemperatureData TemperatureData { get; }
 
@@ -13,6 +16,8 @@ namespace PrepareLanding.GameData
         public float WorldCoverage { get; private set; }
 
         public int WorldSeed { get; private set; }
+
+        public Dictionary<BiomeDef, int> NumberOfTilesByBiome = new Dictionary<BiomeDef, int>();
 
         public WorldData(DefData defData)
         {
@@ -30,6 +35,13 @@ namespace PrepareLanding.GameData
             WorldSeedString = Find.World.info.seedString;
 
             WorldSeed = Find.World.info.Seed;
+
+            NumberOfTilesByBiome.Clear();
+            foreach (var biomeDef in _defData.BiomeDefs)
+            {
+                var count = TileFilterBiomes.NumberOfTilesByBiome(biomeDef);
+                NumberOfTilesByBiome.Add(biomeDef, count);
+            }
         }
     }
 }

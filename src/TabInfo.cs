@@ -73,22 +73,19 @@ namespace PrepareLanding
                     stringBuilder.AppendLine(
                         $"Tiles with Roads: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
 
-                var allValidTiles = PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly?.ToList();
-                if (allValidTiles != null)
+                stringBuilder.AppendLine("Biomes: (number of tiles)");
+                var biomes = _gameData.DefData.BiomeDefs;
+
+                //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
+                //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
+
+                foreach (var biome in biomes)
                 {
-                    stringBuilder.AppendLine("Biomes: (number of tiles)");
-                    var biomes = _gameData.DefData.BiomeDefs;
-
-                    //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
-                    //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
-
-                    foreach (var biome in biomes)
-                    {
-                        var count = TileFilterBiomes.NumberOfTilesByBiome(biome, allValidTiles);
-                        //stringBuilder.AppendLine($"    {biome.LabelCap.PadRight(longestBiomeName)} ➠ {count}");
-                        stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
-                    }
+                    var count = _gameData.WorldData.NumberOfTilesByBiome[biome];
+                    //stringBuilder.AppendLine($"    {biome.LabelCap.PadRight(longestBiomeName)} ➠ {count}");
+                    stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
                 }
+
             }
 
             return stringBuilder.ToString();

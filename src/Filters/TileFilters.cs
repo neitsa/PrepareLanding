@@ -40,6 +40,11 @@ namespace PrepareLanding.Filters
             return inputList.Count(tileId => Find.World.grid[tileId].biome == biome);
         }
 
+        public static int NumberOfTilesByBiome(BiomeDef biome)
+        {
+            return TileIdsByBiome(biome).Count;
+        }
+
         public static List<int> TileIdsByBiome(BiomeDef biomeDef)
         {
             var outList = new List<int>();
