@@ -1,25 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
 namespace PrepareLanding.Overlays
 {
-    
     public class WorldLayerTemperature : WorldLayer
     {
         private readonly List<Vector3> _vertices = new List<Vector3>();
 
         protected override float Alpha => 0.99f;
 
+        private Stopwatch sw;
+
         public WorldLayerTemperature()
         {
-            
+            sw = new Stopwatch();
         }
 
         public override IEnumerable Regenerate()
         {
+            sw.Start();
+
             foreach (var result in base.Regenerate())
                 yield return result;
 
@@ -77,9 +81,13 @@ namespace PrepareLanding.Overlays
 
                     currentIndex++;
                 }
-                FinalizeMesh(MeshParts.Tris | MeshParts.Verts);
+
+                FinalizeMesh(MeshParts.All);
             }
+
+            sw.Stop();
+            Log.Message($"[PrepareLanding] Time spent drawing in Regenerate: {sw.Elapsed}");
+            sw.Reset();
         }
     }
-    
 }

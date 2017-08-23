@@ -134,6 +134,13 @@ namespace PrepareLanding.GameData
             return colorList;
         }
 
+        /// <summary>
+        /// Create a <see cref="Texture2D"/> from a <see cref="Gradient"/>.
+        /// </summary>
+        /// <param name="gradient">The gradient from which to create the texture.</param>
+        /// <param name="width">Width of the resulting texture in pixels.</param>
+        /// <param name="height">Height of the resulting texture, in pixels.</param>
+        /// <returns>A <see cref="Texture2D"/>.</returns>
         public static Texture2D CreateGradientTexture(Gradient gradient, int width = 100, int height = 1)
         {
             // width, height, [red, green, blue, alpha], no mip-map and usual bilinear filter
@@ -151,7 +158,7 @@ namespace PrepareLanding.GameData
         }
 
         /// <summary>
-        ///     Create a solid (no alpha) gradient from a list of colors.
+        ///     Create a solid (no alpha) <see cref="Gradient"/> from a list of colors.
         /// </summary>
         /// <param name="colors">The list of colors to create the gradient (2 colors minimum).</param>
         /// <returns>The <see cref="Gradient" /> create from the given list of colors or null if less than 2 colors were given.</returns>
