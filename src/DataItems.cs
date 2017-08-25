@@ -52,18 +52,7 @@ namespace PrepareLanding
 
         public bool AllowOnPropertyChangedOnStrings { get; set; }
 
-        public T Min
-        {
-            get { return _min; }
-            set
-            {
-                if (EqualityComparer<T>.Default.Equals(_min, value))
-                    return;
-
-                _min = value;
-                OnPropertyChanged(nameof(Min));
-            }
-        }
+        public bool IsCorrectRange => Comparer<T>.Default.Compare(_min, _max) <= 0;
 
         public T Max
         {
@@ -75,34 +64,6 @@ namespace PrepareLanding
 
                 _max = value;
                 OnPropertyChanged(nameof(Max));
-            }
-        }
-
-        public bool Use
-        {
-            get { return _use; }
-            set
-            {
-                if (value == _use)
-                    return;
-
-                _use = value;
-                OnPropertyChanged(nameof(Use));
-            }
-        }
-
-        public string MinString
-        {
-            get { return _minString; }
-            set
-            {
-                if (value == _minString)
-                    return;
-
-                _minString = value;
-
-                if (AllowOnPropertyChangedOnStrings)
-                    OnPropertyChanged(nameof(MinString));
             }
         }
 
@@ -121,7 +82,46 @@ namespace PrepareLanding
             }
         }
 
-        public bool IsCorrectRange => Comparer<T>.Default.Compare(_min, _max) <= 0;
+        public T Min
+        {
+            get { return _min; }
+            set
+            {
+                if (EqualityComparer<T>.Default.Equals(_min, value))
+                    return;
+
+                _min = value;
+                OnPropertyChanged(nameof(Min));
+            }
+        }
+
+        public string MinString
+        {
+            get { return _minString; }
+            set
+            {
+                if (value == _minString)
+                    return;
+
+                _minString = value;
+
+                if (AllowOnPropertyChangedOnStrings)
+                    OnPropertyChanged(nameof(MinString));
+            }
+        }
+
+        public bool Use
+        {
+            get { return _use; }
+            set
+            {
+                if (value == _use)
+                    return;
+
+                _use = value;
+                OnPropertyChanged(nameof(Use));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -160,22 +160,6 @@ namespace PrepareLanding
             _max = max;
         }
 
-        public T Min
-        {
-            get { return _min; }
-            set
-            {
-                if (EqualityComparer<T>.Default.Equals(_min, value))
-                    return;
-
-                if (!_options.Contains(value))
-                    return;
-
-                _min = value;
-                OnPropertyChanged(nameof(Min));
-            }
-        }
-
         public T Max
         {
             get { return _max; }
@@ -192,6 +176,24 @@ namespace PrepareLanding
             }
         }
 
+        public T Min
+        {
+            get { return _min; }
+            set
+            {
+                if (EqualityComparer<T>.Default.Equals(_min, value))
+                    return;
+
+                if (!_options.Contains(value))
+                    return;
+
+                _min = value;
+                OnPropertyChanged(nameof(Min));
+            }
+        }
+
+        public ReadOnlyCollection<T> Options => _options.AsReadOnly();
+
         public bool Use
         {
             get { return _use; }
@@ -205,9 +207,85 @@ namespace PrepareLanding
             }
         }
 
-        public ReadOnlyCollection<T> Options => _options.AsReadOnly();
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public enum MostLeastFeature
+    {
+        None = 0,
+        Temperature = 1,
+        Rainfall = 2,
+        Elevation = 3
+    }
+
+    public enum MostLeastType
+    {
+        None = 0,
+        Most = 1,
+        Least = 2
+    }
+
+    public class MostLeastItem : INotifyPropertyChanged
+    {
+        private MostLeastFeature _feature;
+        private MostLeastType _featureType;
+        private int _numberOfItems;
+
+        public MostLeastFeature Feature
+        {
+            get { return _feature; }
+            set
+            {
+                if (value == _feature)
+                    return;
+
+                _feature = value;
+                OnPropertyChanged(nameof(Feature));
+            }
+        }
+
+        public MostLeastType FeatureType
+        {
+            get { return _featureType; }
+            set
+            {
+                if (value == _featureType)
+                    return;
+
+                _featureType = value;
+                OnPropertyChanged(nameof(FeatureType));
+            }
+        }
+
+        public bool IsInDefaultState => Feature == MostLeastFeature.None && FeatureType == MostLeastType.None;
+
+        public int NumberOfItems
+        {
+            get { return _numberOfItems; }
+            set
+            {
+                if (value == _numberOfItems)
+                    return;
+
+                _numberOfItems = value;
+                OnPropertyChanged(nameof(NumberOfItems));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public void Reset()
+        {
+            Feature = MostLeastFeature.None;
+            FeatureType = MostLeastType.None;
+            NumberOfItems = 0;
+        }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName)

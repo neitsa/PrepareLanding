@@ -52,7 +52,7 @@ namespace PrepareLanding.Overlays
                 if (tileId < 0)
                     continue;
 
-                var material = temperatureData.MaterialTemperatureFromTile(biome, tileId);
+                var material = temperatureData.MaterialFromTileFeature(biome, tileId);
 
                 var subMesh = GetSubMesh(material);
                 Find.World.grid.GetTileVertices(tileId, _vertices);
