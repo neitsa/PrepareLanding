@@ -124,7 +124,11 @@ namespace PrepareLanding
                     nameof(_userData.ChosenAnimalsCanGrazeNowState),
                     new TileFilterAnimalsCanGrazeNow(_userData, nameof(_userData.ChosenAnimalsCanGrazeNowState),
                         FilterHeaviness.Heavy)
-                } //TODO check heaviness
+                }, //TODO check heaviness
+                {
+                    nameof(_userData.MostLeastItem),
+                    new TileFilterMostLeastFeature(_userData, nameof(_userData.MostLeastItem), FilterHeaviness.Light)
+                }
             };
 
             // gather filters by their "heaviness": light filters are filters that will probably be fast (light on CPU cycles) 
@@ -265,7 +269,7 @@ namespace PrepareLanding
 
                 // check if anything was filtered
                 var filteredTiles = filter.FilteredTiles;
-                if ((filteredTiles.Count == 0) && filter.IsFilterActive)
+                if (filteredTiles.Count == 0 && filter.IsFilterActive)
                 {
                     var conjunctionMessage = ".";
                     if (usedFilters > 1)
@@ -362,15 +366,15 @@ namespace PrepareLanding
 
             // get all tiles with at least one river
             var allTilesWithRivers = _allValidTileIds.FindAll(
-                tileId => (Find.World.grid[tileId].VisibleRivers != null) &&
-                          (Find.World.grid[tileId].VisibleRivers.Count != 0));
+                tileId => Find.World.grid[tileId].VisibleRivers != null &&
+                          Find.World.grid[tileId].VisibleRivers.Count != 0);
             AllTilesWithRiver = new ReadOnlyCollection<int>(allTilesWithRivers);
             FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRivers.Count} tiles with at least one river.");
 
             // get all tiles with at least one road
             var allTilesWithRoads =
-                _allValidTileIds.FindAll(tileId => (Find.World.grid[tileId].VisibleRoads != null) &&
-                                                   (Find.World.grid[tileId].VisibleRoads.Count != 0));
+                _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].VisibleRoads != null &&
+                                                   Find.World.grid[tileId].VisibleRoads.Count != 0);
 
             AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
             FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
@@ -406,7 +410,7 @@ namespace PrepareLanding
             //  as it takes too much times with some filter, so it would be better to narrow down the filtering.
             if (Find.World.info.planetCoverage >= 0.5f)
                 if (!_userData.Options.DisablePreFilterCheck)
-                    if ((_userData.ChosenBiome == null) || (_userData.ChosenHilliness == Hilliness.Undefined))
+                    if (_userData.ChosenBiome == null || _userData.ChosenHilliness == Hilliness.Undefined)
                     {
                         FilterInfoLogger.AppendErrorMessage(
                             "No biome and no terrain selected for a Planet coverage >= 50%\n\tPlease select a biome and a terrain first.");
@@ -511,13 +515,13 @@ namespace PrepareLanding
         /// <returns>true if the ThingDef describes a stone type, false otherwise.</returns>
         public static bool IsThingDefStone(ThingDef thingDef)
         {
-            return (thingDef.category == ThingCategory.Building) &&
+            return thingDef.category == ThingCategory.Building &&
                    thingDef.building.isNaturalRock &&
                    !thingDef.building.isResourceRock;
         }
 
         /// <summary>
-        /// Tells whether a tile seems to be viable or not for a new settlement. This is a quick pass and not a deep method. 
+        ///     Tells whether a tile seems to be viable or not for a new settlement. This is a quick pass and not a deep method.
         /// </summary>
         /// <param name="tileId">The identifier of the tile to check for viability.</param>
         /// <returns>true if the tile is meant to be viable, false otherwise.</returns>
@@ -526,7 +530,7 @@ namespace PrepareLanding
             var tile = Find.World.grid[tileId];
 
             var impassableTilesCondition = _userData.Options.AllowImpassableHilliness ||
-                                           (tile.hilliness != Hilliness.Impassable);
+                                           tile.hilliness != Hilliness.Impassable;
 
             // we must be able to build a base, the tile biome must be implemented and the tile itself must not be impassable
             // Side note on tile.WaterCovered: this doesn't work for sea ice biomes as elevation is < 0, but sea ice is a perfectly valid biome where to settle.

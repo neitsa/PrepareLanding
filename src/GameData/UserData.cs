@@ -207,6 +207,8 @@ namespace PrepareLanding.GameData
         /// </summary>
         public UsableMinMaxNumericItem<float> WinterTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
+        public MostLeastItem MostLeastItem { get; } = new MostLeastItem();
+
         /// <summary>
         ///     Other classes can subscribe to this event to be alerted when a user choice changed.
         /// </summary>
@@ -270,6 +272,9 @@ namespace PrepareLanding.GameData
                 return false;
 
             if (RainFall.Use)
+                return false;
+
+            if (!MostLeastItem.IsInDefaultState)
                 return false;
 
             return true;
@@ -336,6 +341,8 @@ namespace PrepareLanding.GameData
             GrowingPeriod.Use = false;
 
             InitUsableMinMaxNumericItem(RainFall, nameof(RainFall));
+
+            MostLeastItem.Reset();
         }
 
         /// <summary>

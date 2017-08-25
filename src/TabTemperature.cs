@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
 using UnityEngine;
@@ -10,6 +12,10 @@ namespace PrepareLanding
     public class TabTemperature : TabGuiUtility
     {
         private readonly GameData.GameData _gameData;
+
+        private int _numberOfTilesForFeature = 1;
+
+        private string _numberOfTilesForFeatureString;
 
         public TabTemperature(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -41,6 +47,7 @@ namespace PrepareLanding
             DrawGrowingPeriodSelection();
             NewColumn();
             DrawRainfallSelection();
+            DrawMostLeastFeatureSelection();
 
             // "Animals Can Graze Now" relies on game ticks as VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt calls
             //   GenTemperature.GetTemperatureAtTile which calls GenTemperature.GetTemperatureFromSeasonAtTile
@@ -51,7 +58,7 @@ namespace PrepareLanding
             End();
         }
 
-        protected virtual void DrawAnimalsCanGrazeNowSelection()
+        private void DrawAnimalsCanGrazeNowSelection()
         {
             DrawEntryHeader("Animals", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
 
@@ -62,7 +69,7 @@ namespace PrepareLanding
             _gameData.UserData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
         }
 
-        protected void DrawGrowingPeriodSelection()
+        private void DrawGrowingPeriodSelection()
         {
             const string label = "Growing Period";
             DrawEntryHeader($"{label} (days)", backgroundColor: ColorFromFilterSubjectThingDef("Growing Periods"));
@@ -112,14 +119,14 @@ namespace PrepareLanding
             ListingStandard.LabelDouble($"Max. {label}:", boundField.Max.GrowingDaysString());
         }
 
-        protected virtual void DrawRainfallSelection()
+        private void DrawRainfallSelection()
         {
             DrawEntryHeader("Rain Fall (mm)", backgroundColor: ColorFromFilterSubjectThingDef("Rain Falls"));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.RainFall, "Rain Fall");
         }
 
-        protected void DrawTemperaturesSelection()
+        private void DrawTemperaturesSelection()
         {
             DrawEntryHeader("Temperatures (Celsius)",
                 backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
@@ -130,6 +137,71 @@ namespace PrepareLanding
                 TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
             DrawUsableMinMaxNumericField(_gameData.UserData.SummerTemperature, "Summer Temperature",
                 TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+        }
+
+        private void DrawMostLeastFeatureSelection()
+        {
+            DrawEntryHeader("Most / Least");
+
+            if (ListingStandard.ButtonText("Select Feature"))
+            {
+                var floatMenuOptions = new List<FloatMenuOption>();
+                foreach (var feature in Enum.GetValues(typeof(MostLeastFeature)).Cast<MostLeastFeature>())
+                {
+                    var menuOption = new FloatMenuOption(feature.ToString(),
+                        delegate { _gameData.UserData.MostLeastItem.Feature = feature; });
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                var floatMenu = new FloatMenu(floatMenuOptions, "Select Feature");
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            ListingStandard.GapLine(DefaultGapLineHeight);
+
+            var tilesNumberRect = ListingStandard.GetRect(DefaultElementHeight);
+            var leftRect = tilesNumberRect.LeftPart(0.80f);
+            var rightRect = tilesNumberRect.RightPart(0.20f);
+
+            Verse.Widgets.Label(leftRect, "Number of Tiles:");
+            Verse.Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForFeature, ref _numberOfTilesForFeatureString,
+                1, 10000);
+            _gameData.UserData.MostLeastItem.NumberOfItems = _numberOfTilesForFeature;
+
+            if (ListingStandard.ButtonText("Select Type"))
+            {
+                var floatMenuOptions = new List<FloatMenuOption>();
+                foreach (var featureType in Enum.GetValues(typeof(MostLeastType)).Cast<MostLeastType>())
+                {
+                    var menuOption = new FloatMenuOption(featureType.ToString(),
+                        delegate { _gameData.UserData.MostLeastItem.FeatureType = featureType; });
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                var floatMenu = new FloatMenu(floatMenuOptions, "Select Feature Type");
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            string text;
+            if (_gameData.UserData.MostLeastItem.Feature == MostLeastFeature.None)
+            {
+                text = "Select a Feature";
+            }
+            else if (_gameData.UserData.MostLeastItem.FeatureType == MostLeastType.None)
+            {
+                text = "Select a feature type";
+            }
+            else
+            {
+                var highestLowest = _gameData.UserData.MostLeastItem.FeatureType == MostLeastType.Most
+                    ? "highest"
+                    : "lowest";
+                var tiles = _gameData.UserData.MostLeastItem.NumberOfItems > 1 ? "tiles" : "tile";
+                text =
+                    $"Selecting {_gameData.UserData.MostLeastItem.NumberOfItems} {tiles} with the {highestLowest} {_gameData.UserData.MostLeastItem.Feature}";
+            }
+
+            ListingStandard.Label($"Result: {text}", DefaultElementHeight);
         }
     }
 }

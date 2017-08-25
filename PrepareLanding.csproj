@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Core\ColorUtils.cs" />
     <Compile Include="src\Core\Extensions\ListExtensions.cs" />
     <Compile Include="src\Core\Extensions\ListingStandardExtension.cs" />
     <Compile Include="src\Core\Extensions\MultiCheckboxStateExtension.cs" />
@@ -79,10 +80,13 @@
     <Compile Include="src\Filters\TileFilters.cs" />
     <Compile Include="src\FilterInfoLogger.cs" />
     <Compile Include="src\GameData\DefData.cs" />
+    <Compile Include="src\GameData\ElevationData.cs" />
     <Compile Include="src\GameData\GameData.cs" />
     <Compile Include="src\GameData\GodModeData.cs" />
+    <Compile Include="src\GameData\RainfallData.cs" />
     <Compile Include="src\GameData\UserData.cs" />
     <Compile Include="src\GameData\WorldData.cs" />
+    <Compile Include="src\GameData\WorldFeatureData.cs" />
     <Compile Include="src\MainWindow.cs" />
     <Compile Include="src\MonoController.cs" />
     <Compile Include="src\Overlays\Overlay.cs" />
