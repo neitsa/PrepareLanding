@@ -77,27 +77,36 @@ namespace PrepareLanding
         public override void Draw(Rect inRect)
         { 
             Begin(inRect);
+
+            var tileId = Find.WorldSelector.selectedTile;
+            if (tileId == -1)
+            {
+                NewColumn();
+                DrawTileSelection();
+                End();
+                return;
+            }
+
             DrawBiomeTypesSelection();
             DrawTemperatureSelection();
             DrawHillinessTypeSelection();
             DrawElevationSelection();
             DrawRainfallSelection();
-#if DEBUG
+#if GOD_MODE_SRR
             DrawRiverTypesSelection();
 #endif
             NewColumn();
-#if DEBUG
+#if GOD_MODE_SRR
             DrawRoadTypesSelection();
             DrawStoneTypesSelection();
 #endif
-
-            DrawDebugContent();
+            DrawTileSelection();
             NewColumn();
             DrawTemperatureInfo();
             End();
         }
 
-        private void DrawDebugContent()
+        private void DrawTileSelection()
         {
             DrawEntryHeader("Tile Setup", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -106,7 +115,7 @@ namespace PrepareLanding
             if (!Find.WorldSelector.AnyObjectOrTileSelected || tileId < 0)
             {
                 var labelRect = ListingStandard.GetRect(DefaultElementHeight);
-                Widgets.Label(labelRect, "Pick a tile first");
+                Widgets.Label(labelRect, "Pick a tile on world map!");
                 _gameData.GodModeData.SelectedTileId = -1;
                 return;
             }
