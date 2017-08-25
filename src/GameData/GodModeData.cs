@@ -108,9 +108,9 @@ namespace PrepareLanding.GameData
             var tile = Find.World.grid[SelectedTileId];
 
             /*
-             * Validity checks
+             * Validity checks for stones, rivers and roads
              */
-
+#if GOD_MODE_SRR
             var countTrue = SelectedStoneDefs.Values.Count(stoneDefValue => stoneDefValue);
             if (countTrue < 2 || countTrue > 3)
             {
@@ -129,7 +129,7 @@ namespace PrepareLanding.GameData
                 Messages.Message($"The selected biome ({Biome.LabelCap}) doesn't support rivers.", MessageSound.RejectInput);
                 return false;
             }
-
+#endif
             /*
              * Setup tile
              */
@@ -146,7 +146,10 @@ namespace PrepareLanding.GameData
 
             tile.rainfall = Rainfall;
 
+#if GOD_MODE_SRR
             SetupTileRoads(tile);
+            SetupTileRivers(tile);
+#endif
 
             return true;
         }
