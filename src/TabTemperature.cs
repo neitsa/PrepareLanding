@@ -141,9 +141,14 @@ namespace PrepareLanding
 
         private void DrawMostLeastFeatureSelection()
         {
-            DrawEntryHeader("Most / Least", backgroundColor: Color.green);
+            DrawEntryHeader("Most / Least", backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
-            if (ListingStandard.ButtonText("Select Feature"))
+            /*
+             * Select Feature
+             */
+            const string selectFeature = "Select Feature";
+
+            if (ListingStandard.ButtonText(selectFeature))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
                 foreach (var feature in Enum.GetValues(typeof(MostLeastFeature)).Cast<MostLeastFeature>())
@@ -153,10 +158,13 @@ namespace PrepareLanding
                     floatMenuOptions.Add(menuOption);
                 }
 
-                var floatMenu = new FloatMenu(floatMenuOptions, "Select Feature");
+                var floatMenu = new FloatMenu(floatMenuOptions, selectFeature);
                 Find.WindowStack.Add(floatMenu);
             }
 
+            /*
+             * Number of tiles to select.
+             */
             ListingStandard.GapLine(DefaultGapLineHeight);
 
             var tilesNumberRect = ListingStandard.GetRect(DefaultElementHeight);
@@ -168,7 +176,13 @@ namespace PrepareLanding
                 1, 10000);
             _gameData.UserData.MostLeastItem.NumberOfItems = _numberOfTilesForFeature;
 
-            if (ListingStandard.ButtonText("Select Type"))
+            /*
+             * Select Feature Type (most / least)
+             */
+
+            const string selectFeatureType = "Select Feature Type";
+
+            if (ListingStandard.ButtonText(selectFeatureType))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
                 foreach (var featureType in Enum.GetValues(typeof(MostLeastType)).Cast<MostLeastType>())
@@ -178,18 +192,21 @@ namespace PrepareLanding
                     floatMenuOptions.Add(menuOption);
                 }
 
-                var floatMenu = new FloatMenu(floatMenuOptions, "Select Feature Type");
+                var floatMenu = new FloatMenu(floatMenuOptions, selectFeatureType);
                 Find.WindowStack.Add(floatMenu);
             }
 
+            /*
+             * Result label
+             */
             string text;
             if (_gameData.UserData.MostLeastItem.Feature == MostLeastFeature.None)
             {
-                text = "Select a Feature";
+                text = $"Push \"{selectFeature}\" button first.";
             }
             else if (_gameData.UserData.MostLeastItem.FeatureType == MostLeastType.None)
             {
-                text = "Select a feature type";
+                text = $"Now use the \"{selectFeatureType}\" button.";
             }
             else
             {
@@ -201,7 +218,7 @@ namespace PrepareLanding
                     $"Selecting {_gameData.UserData.MostLeastItem.NumberOfItems} {tiles} with the {highestLowest} {_gameData.UserData.MostLeastItem.Feature}";
             }
 
-            ListingStandard.Label($"Result: {text}", DefaultElementHeight);
+            ListingStandard.Label($"Result: {text}", DefaultElementHeight * 2);
         }
     }
 }
