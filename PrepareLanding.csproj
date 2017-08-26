@@ -55,6 +55,7 @@
     <Compile Include="src\Core\ColorUtils.cs" />
     <Compile Include="src\Core\Extensions\ListExtensions.cs" />
     <Compile Include="src\Core\Extensions\ListingStandardExtension.cs" />
+    <Compile Include="src\Core\Extensions\MathExtensions.cs" />
     <Compile Include="src\Core\Extensions\MultiCheckboxStateExtension.cs" />
     <Compile Include="src\Core\Extensions\RectExtensions.cs" />
     <Compile Include="src\Core\Extensions\Statistics.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="src\Overlays\TemperatureOverlay.cs" />
     <Compile Include="src\Overlays\WorldLayerTemperature.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
+    <Compile Include="src\Patches\PatchNaturalRockTypesIn.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
     <Compile Include="src\Patches\SelectLandingSite.cs" />
     <Compile Include="src\PrepareLanding.cs" />

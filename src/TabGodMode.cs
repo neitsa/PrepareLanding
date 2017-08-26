@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Text;
-using PrepareLanding.Core.Gui.Tab;
-using RimWorld;
-using UnityEngine;
-using Verse;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
+using PrepareLanding.Core.Gui.Tab;
+using RimWorld;
 using RimWorld.Planet;
+using UnityEngine;
+using Verse;
 using Verse.Sound;
 using Widgets = Verse.Widgets;
 
@@ -27,25 +27,23 @@ namespace PrepareLanding
 
         private readonly GameData.GameData _gameData;
 
-        private string _chosenAverageTemperatureString;
+        private readonly GUIStyle _styleTemperatureInfo;
 
-        private string _chosenRainfallString;
+        private string _chosenAverageTemperatureString;
 
         private string _chosenElevationString;
 
-        private Vector2 _scrollPosRoadSelection;
+        private string _chosenRainfallString;
 
         private Vector2 _scrollPosRiverSelection;
 
+        private Vector2 _scrollPosRoadSelection;
+
         private Vector2 _scrollPosStoneSelection;
-
-        private ThingDef _selectedStoneDef;
-
-        private readonly GUIStyle _styleTemperatureInfo;
 
         private Vector2 _scrollPosTemperatureInfo;
 
-        public string TemperatureInfo { get; private set; }
+        private ThingDef _selectedStoneDef;
 
         public TabGodMode(GameData.GameData gameData, float columnSizePercent) : base(columnSizePercent)
         {
@@ -59,23 +57,25 @@ namespace PrepareLanding
             };
         }
 
+        /// <summary>Gets whether the tab can be drawn or not.</summary>
+        public override bool CanBeDrawn
+        {
+            get { return Prefs.DevMode && DebugSettings.godMode && (Current.ProgramState != ProgramState.Playing); }
+            set { }
+        }
+
         /// <summary>A unique identifier for the Tab.</summary>
         public override string Id => "GodMode";
 
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
         public override string Name => "God Mode";
 
-        /// <summary>Gets whether the tab can be drawn or not.</summary>
-        public override bool CanBeDrawn
-        {
-            get { return Prefs.DevMode && DebugSettings.godMode; }
-            set { }
-        }
+        public string TemperatureInfo { get; private set; }
 
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>
         public override void Draw(Rect inRect)
-        { 
+        {
             Begin(inRect);
 
             var tileId = Find.WorldSelector.selectedTile;
@@ -98,9 +98,9 @@ namespace PrepareLanding
             NewColumn();
 #if GOD_MODE_SRR
             DrawRoadTypesSelection();
-            DrawStoneTypesSelection();
 #endif
             DrawTileSelection();
+            DrawStoneTypesSelection();
             NewColumn();
             DrawTemperatureInfo();
             End();
@@ -142,14 +142,8 @@ namespace PrepareLanding
             }
 
             if (ListingStandard.ButtonText("Redraw Map"))
-            {
-                // TODO: just check the required layer, it might save time
-                LongEventHandler.QueueLongEvent(delegate
-                {
-                    Find.World.renderer.SetAllLayersDirty();
-                }, "GeneratingWorld", true, null);
-                
-            }
+                LongEventHandler.QueueLongEvent(delegate { Find.World.renderer.SetAllLayersDirty(); },
+                    "GeneratingWorld", true, null);
         }
 
         protected virtual void DrawTemperatureInfo()
@@ -161,11 +155,12 @@ namespace PrepareLanding
 
             var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
 
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, TemperatureInfo, ref _scrollPosTemperatureInfo, _styleTemperatureInfo,
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, TemperatureInfo, ref _scrollPosTemperatureInfo,
+                _styleTemperatureInfo,
                 DefaultScrollableViewShrinkWidth);
         }
 
-        protected virtual void DrawBiomeTypesSelection()  // TODO : factorize this function with the one from TabTerrain
+        protected virtual void DrawBiomeTypesSelection() // TODO : factorize this function with the one from TabTerrain
         {
             DrawEntryHeader("Biome Types", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -242,8 +237,12 @@ namespace PrepareLanding
             _chosenAverageTemperatureString = averageTemperature.ToString("F1", CultureInfo.InvariantCulture);
 
             var temperatureRectSpace = ListingStandard.GetRect(DefaultElementHeight);
-            Widgets.Label(temperatureRectSpace.LeftPart(0.8f), $"Avg. Temp. (°C) [{TemperatureTuning.MinimumTemperature}, {TemperatureTuning.MaximumTemperature}]");
-            Core.Gui.Widgets.TextFieldNumeric(temperatureRectSpace.RightPart(0.2f), ref averageTemperature, ref _chosenAverageTemperatureString, TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+            Widgets.Label(temperatureRectSpace.LeftPart(0.8f),
+                $"Avg. Temp. (°C) [{TemperatureTuning.MinimumTemperature}, {TemperatureTuning.MaximumTemperature}]");
+            Core.Gui.Widgets.TextFieldNumeric(temperatureRectSpace.RightPart(0.2f), ref averageTemperature,
+                ref _chosenAverageTemperatureString, TemperatureTuning.MinimumTemperature,
+                TemperatureTuning.MaximumTemperature);
+
             _gameData.GodModeData.AverageTemperature = averageTemperature;
         }
 
@@ -256,11 +255,12 @@ namespace PrepareLanding
             const float maxRainfall = 5000f;
 
             var rainFall = _gameData.GodModeData.Rainfall;
-            _chosenRainfallString = rainFall.ToString("F0", CultureInfo.InvariantCulture);
+            _chosenRainfallString = rainFall.ToString("F1", CultureInfo.InvariantCulture);
 
             var rainfallRectSpace = ListingStandard.GetRect(DefaultElementHeight);
             Widgets.Label(rainfallRectSpace.LeftPart(0.8f), $"Rainfall (mm) [{minRainfall}, {maxRainfall}]");
-            Core.Gui.Widgets.TextFieldNumeric(rainfallRectSpace.RightPart(0.2f), ref rainFall, ref _chosenRainfallString, minRainfall, maxRainfall);
+            Core.Gui.Widgets.TextFieldNumeric(rainfallRectSpace.RightPart(0.2f), ref rainFall,
+                ref _chosenRainfallString, minRainfall, maxRainfall);
 
             _gameData.GodModeData.Rainfall = rainFall;
         }
@@ -275,11 +275,12 @@ namespace PrepareLanding
             const float maxElevation = 5000f;
 
             var elevation = _gameData.GodModeData.Elevation;
-            _chosenElevationString = elevation.ToString("F0", CultureInfo.InvariantCulture);
+            _chosenElevationString = elevation.ToString("F1", CultureInfo.InvariantCulture);
 
             var elevationRectSpace = ListingStandard.GetRect(DefaultElementHeight);
             Widgets.Label(elevationRectSpace.LeftPart(0.8f), $"Elevation (m) [{minElevation}, {maxElevation}]");
-            Core.Gui.Widgets.TextFieldNumeric(elevationRectSpace.RightPart(0.2f), ref elevation, ref _chosenElevationString, minElevation, maxElevation);
+            Core.Gui.Widgets.TextFieldNumeric(elevationRectSpace.RightPart(0.2f), ref elevation,
+                ref _chosenElevationString, minElevation, maxElevation);
 
             _gameData.GodModeData.Elevation = elevation;
         }
@@ -322,9 +323,7 @@ namespace PrepareLanding
             var selectedRoadDefs = _gameData.GodModeData.SelectedRoadDefs;
 
             if (ListingStandard.ButtonText("Reset"))
-            {
                 _gameData.GodModeData.ResetSelectedRoadDefs();
-            }
 
             /*
              * ScrollView
@@ -351,7 +350,8 @@ namespace PrepareLanding
                         var countTrue = selectedRoadDefs.Values.Count(selectedRoadDefValue => selectedRoadDefValue);
                         if (countTrue >= MaxNumberOfRoads)
                         {
-                            Messages.Message($"Can't have more than {MaxNumberOfRoads} types of road per tile.", MessageSound.RejectInput);
+                            Messages.Message($"Can't have more than {MaxNumberOfRoads} types of road per tile.",
+                                MessageSound.RejectInput);
                             tmpState = false;
                         }
                     }
@@ -374,9 +374,7 @@ namespace PrepareLanding
             var selectedRiverDefs = _gameData.GodModeData.SelectedRiverDefs;
 
             if (ListingStandard.ButtonText("Reset"))
-            {
                 _gameData.GodModeData.ResetSelectedRiverDefs();
-            }
 
             /*
              * ScrollView
@@ -403,7 +401,8 @@ namespace PrepareLanding
                         var countTrue = selectedRiverDefs.Values.Count(selectedRiverDefValue => selectedRiverDefValue);
                         if (countTrue >= MaxNumberOfRivers)
                         {
-                            Messages.Message($"Can't have more than {MaxNumberOfRivers} types of river per tile.", MessageSound.RejectInput);
+                            Messages.Message($"Can't have more than {MaxNumberOfRivers} types of river per tile.",
+                                MessageSound.RejectInput);
                             tmpState = false;
                         }
                     }
@@ -427,9 +426,7 @@ namespace PrepareLanding
 
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset"))
-            {
                 _gameData.GodModeData.ResetSelectedStoneDefs();
-            }
 
             // re-orderable list group
             var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
@@ -452,7 +449,7 @@ namespace PrepareLanding
             {
                 var itemRect = inLs.GetRect(DefaultElementHeight);
 
-                
+
                 var tmpState = selectedStoneDefs[currentOrderedStoneDef];
                 var selected = currentOrderedStoneDef == _selectedStoneDef;
 
@@ -462,13 +459,11 @@ namespace PrepareLanding
 
                 // if the state changed, update the item with the new state
                 if (tmpState != selectedStoneDefs[currentOrderedStoneDef])
-                {
                     selectedStoneDefs[currentOrderedStoneDef] = tmpState;
-                }
 
                 ReorderableWidget.Reorderable(reorderableGroup, itemRect);
 
-                if(!string.IsNullOrEmpty(currentOrderedStoneDef.description))
+                if (!string.IsNullOrEmpty(currentOrderedStoneDef.description))
                     TooltipHandler.TipRegion(itemRect, currentOrderedStoneDef.description);
             }
 
@@ -503,15 +498,17 @@ namespace PrepareLanding
              * Temperature for the current day
              */
 
-            stringBuilder.AppendLine("Temperature for each hour this day".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+            stringBuilder.AppendLine("Temperature for each hour this day".RichTextBold()
+                .Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine("Hour    Temp    SunEffect".RichTextColor(Color.yellow));
-            var num2 = absTicks  - absTicks % GenDate.TicksPerDay; // will give 0 on the 1st day
+            var num2 = absTicks - absTicks % GenDate.TicksPerDay; // will give 0 on the 1st day
             for (var i = 0; i < GenDate.HoursPerDay; i++)
             {
                 var absTick = num2 + i * GenDate.TicksPerHour;
                 stringBuilder.Append(i.ToString().PadRight(5));
-                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick).ToString("F2").PadRight(8));
+                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick).ToString("F2")
+                    .PadRight(8));
                 stringBuilder.Append(GenTemperature.OffsetFromSunCycle(absTick, tileId).ToString("F2"));
                 stringBuilder.AppendLine();
             }
@@ -521,13 +518,15 @@ namespace PrepareLanding
              * Temperature for the twelves of this year
              */
 
-            stringBuilder.AppendLine("Temperature for each twelfth this year".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+            stringBuilder.AppendLine("Temperature for each twelfth this year".RichTextBold()
+                .Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
             {
-                var twelfth = (Twelfth)j;
+                var twelfth = (Twelfth) j;
                 var num3 = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
-                stringBuilder.AppendLine($"{twelfth.GetQuadrum()} [{twelfth.GetSeason(latitude)}]: {twelfth} {num3:F2}");
+                stringBuilder.AppendLine(
+                    $"{twelfth.GetQuadrum()} [{twelfth.GetSeason(latitude)}]: {twelfth} {num3:F2}");
             }
             stringBuilder.AppendLine();
 
@@ -535,22 +534,27 @@ namespace PrepareLanding
              * Temperature for each day of the year
              */
 
-            stringBuilder.AppendLine("Temperature for each day this year".RichTextBold().Chain(s => s.RichTextColor(Color.green)));
+            stringBuilder.AppendLine("Temperature for each day this year".RichTextBold()
+                .Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
 
             stringBuilder.AppendLine("Day  Lo   Hi   OffsetFromSeason RandomDailyVariation");
             for (var k = 0; k < GenDate.DaysPerYear; k++)
             {
-                var absTick2 = (int)(k * GenDate.TicksPerDay + 15000f); // 6th hour
-                var absTick3 = (int)(k * GenDate.TicksPerDay + 45000f); // 18th hour
+                var absTick2 = (int) (k * GenDate.TicksPerDay + 15000f); // 6th hour
+                var absTick3 = (int) (k * GenDate.TicksPerDay + 45000f); // 18th hour
                 stringBuilder.Append(k.ToString().PadRight(8));
-                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick2).ToString("F2").PadRight(11));
-                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick3).ToString("F2").PadRight(11));
-                stringBuilder.Append(GenTemperature.OffsetFromSeasonCycle(absTick3, tileId).ToString("F2").PadRight(11));
-                stringBuilder.Append(Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3).ToString("F2"));
+                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick2).ToString("F2")
+                    .PadRight(11));
+                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick3).ToString("F2")
+                    .PadRight(11));
+                stringBuilder.Append(GenTemperature.OffsetFromSeasonCycle(absTick3, tileId).ToString("F2")
+                    .PadRight(11));
+                stringBuilder.Append(Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3)
+                    .ToString("F2"));
                 stringBuilder.AppendLine();
             }
-            
+
             TemperatureInfo = stringBuilder.ToString();
 
             if (Find.TickManager.gameStartAbsTick == 1)
