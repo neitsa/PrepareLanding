@@ -136,7 +136,7 @@ namespace PrepareLanding
         public void WorldGenerated()
         {
             // disable all tiles that are currently highlighted
-            TileHighlighter.RemoveAllTiles();
+            TileHighlighter.RemoveAllTiles(); //TODO make the TileHighlighter subscribe to WorldGenerated and remove this method from here.
 
             // call onto subscribers to tell them that the world has been generated.
             OnWorldGenerated.Invoke();

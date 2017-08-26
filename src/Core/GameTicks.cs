@@ -3,20 +3,19 @@ using UnityEngine;
 
 namespace PrepareLanding.Core
 {
+    /// <summary>
+    ///     Class used for ticking values.
+    /// </summary>
     public class GameTicks
     {
         // FPS accumulated over the interval
         private float _accum;
 
-        // Left time for current interval
+        // tells whether or not the instance has subscribed to the WorldInterfaceUpdate event.
+        private bool _subscribedToWorldInterfaceUpdate;
+
+        // time left for current interval
         private float _timeLeft;
-
-        public GameTicks()
-        {
-            PrepareLanding.Instance.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
-        }
-
-        public float UpdateInterval { get; set; }
 
         /// <summary>
         ///     Number of frames drawn during the update interval.
@@ -24,16 +23,46 @@ namespace PrepareLanding.Core
         public int FramesDrawn { get; private set; }
 
         /// <summary>
+        ///     Interval (in seconds) at which the <see cref="TicksIntervalElapsed" /> event is fired.
+        /// </summary>
+        public float UpdateInterval { get; set; }
+
+        /// <summary>
         ///     Methods can register to this event to be called when the Update() method (while on the world map) is called.
         ///     See also <seealso cref="WorldInterfaceUpdate" />.
         /// </summary>
         public event Action TicksIntervalElapsed = delegate { };
 
-        public void ResetUpdateInterval()
+        /// <summary>
+        ///     Start the ticking engine.
+        /// </summary>
+        public void StartTicking()
         {
-            UpdateInterval = 0.0f;
+            if (_subscribedToWorldInterfaceUpdate)
+                return;
+
+            PrepareLanding.Instance.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
+
+            _subscribedToWorldInterfaceUpdate = true;
         }
 
+        /// <summary>
+        ///     Stop the ticking engine.
+        /// </summary>
+        public void StopTicking()
+        {
+            if (!_subscribedToWorldInterfaceUpdate)
+                return;
+
+            PrepareLanding.Instance.OnWorldInterfaceUpdate -= WorldInterfaceUpdate;
+
+            _subscribedToWorldInterfaceUpdate = false;
+        }
+
+        /// <summary>
+        ///     Called on each WorldInterfaceUpdate (from the game engine). It fires the <see cref="TicksIntervalElapsed" /> event
+        ///     if the <see cref="UpdateInterval" /> time interval as elapsed.
+        /// </summary>
         private void WorldInterfaceUpdate()
         {
             if (UpdateInterval == 0.0f)
@@ -42,7 +71,6 @@ namespace PrepareLanding.Core
             _timeLeft -= Time.deltaTime;
             _accum += Time.timeScale / Time.deltaTime;
             ++FramesDrawn;
-
 
             if (!(_timeLeft < 0.0f))
                 return;
