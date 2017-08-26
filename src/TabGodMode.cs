@@ -138,6 +138,7 @@ namespace PrepareLanding
                 }
 
                 _gameData.GodModeData.SetupTile();
+                LogTemperatureInfo(_gameData.GodModeData.SelectedTileId);
             }
 
             if (ListingStandard.ButtonText("Redraw Map"))
