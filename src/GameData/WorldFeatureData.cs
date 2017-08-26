@@ -247,5 +247,30 @@ namespace PrepareLanding.GameData
             var tilesTemp = FeatureByBiomes[biomeDef];
             return tilesTemp.Values.Min();
         }
+
+        public List<KeyValuePair<int, float>> WorldMinRange(int numberOfItems = 1)
+        {
+            if (numberOfItems < 1 || numberOfItems > WorldTilesFeatures.Count)
+            {
+                Log.Message($"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
+                return null;
+            }
+
+            // get the lowest world feature values: start at the beginning and fetch the requested number of tiles
+            return WorldTilesFeatures.GetRange(0, numberOfItems);
+        }
+
+        public List<KeyValuePair<int, float>> WorldMaxRange(int numberOfItems = 1)
+        {
+            if (numberOfItems < 1 || numberOfItems > WorldTilesFeatures.Count)
+            {
+                Log.Message($"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
+                return null;
+            }
+
+            // get the highest world feature values: fetch all the requested number of tiles up to the end
+            var start = WorldTilesFeatures.Count - numberOfItems;
+            return WorldTilesFeatures.GetRange(start, numberOfItems);
+        }
     }
 }

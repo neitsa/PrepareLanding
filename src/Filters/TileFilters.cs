@@ -871,27 +871,29 @@ namespace PrepareLanding.Filters
             if (worldFeature == null)
                 return;
 
+            // we want either most or least.
+            if (item.FeatureType == MostLeastType.None)
+                return;
+
             // get list of KeyValuePair with key being the tile ID and value being the tile feature for the whole world
             //    e.g List<KVP<int, float>> where int is tileId and float is temperature or rainfall
             var worldTilesAndFeatures = worldFeature.WorldTilesFeatures;
 
             // can't request more tiles than there are in the world
             if (UserData.MostLeastItem.NumberOfItems > worldTilesAndFeatures.Count)
+            {
+                Messages.Message(
+                    $"You are requesting more tiles than the number of available tiles (max: {worldTilesAndFeatures.Count})",
+                    MessageSound.RejectInput);
                 return;
+            }
 
-            // as KVP list is sorted, the minimum feature values (e.g temperatures) are at the beginning and the highest values are at the end.
-            List<KeyValuePair<int, float>> mostLeastTilesAndFeatures;
-            if (item.FeatureType == MostLeastType.Least)
-            {
-                // get the lowest world feature values: start at the beginning and fetch the requested number of tiles
-                mostLeastTilesAndFeatures = worldTilesAndFeatures.GetRange(0, UserData.MostLeastItem.NumberOfItems);
-            }
-            else
-            {
-                // get the highest world feature values: fetch all the requested number of tiles up to the end
-                var start = worldTilesAndFeatures.Count - UserData.MostLeastItem.NumberOfItems;
-                mostLeastTilesAndFeatures = worldTilesAndFeatures.GetRange(start, UserData.MostLeastItem.NumberOfItems);
-            }
+            // get a list of KVP where key is tile Id and value is the feature value (e.g temperature, rainfall, elevation)
+            var mostLeastTilesAndFeatures = item.FeatureType == MostLeastType.Least
+                ? worldFeature.WorldMinRange(UserData.MostLeastItem.NumberOfItems)
+                : worldFeature.WorldMaxRange(UserData.MostLeastItem.NumberOfItems);
+            if (mostLeastTilesAndFeatures == null)
+                return;
 
             // we still have a list of KVP, we just want the tiles
             var tileIds = mostLeastTilesAndFeatures.Select(kvp => kvp.Key);
