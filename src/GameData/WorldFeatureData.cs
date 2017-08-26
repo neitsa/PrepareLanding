@@ -48,11 +48,16 @@ namespace PrepareLanding.GameData
 
         public virtual string FeatureName => Feature.ToString();
 
+        public abstract string FeatureMeasureUnit { get; }
+
         public Dictionary<BiomeDef, List<float>> FeatureQuantaByBiomes { get; } =
             new Dictionary<BiomeDef, List<float>>();
 
         public List<Color> GradientColors { get; }
 
+        /// <summary>
+        /// Whole world ordered list of <see cref="KeyValuePair{TKey,TValue}"/> where the key is a tile ID and the value is the feature value.
+        /// </summary>
         public List<KeyValuePair<int, float>> WorldTilesFeatures { get; } = new List<KeyValuePair<int, float>>();
 
         protected abstract float TileFeatureValue(int tileId);

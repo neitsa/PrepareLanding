@@ -10,6 +10,8 @@ namespace PrepareLanding.GameData
 
         public override MostLeastFeature Feature => MostLeastFeature.Elevation;
 
+        public override string FeatureMeasureUnit => "m";
+
         protected override float TileFeatureValue(int tileId)
         {
             return Find.World.grid[tileId].elevation;

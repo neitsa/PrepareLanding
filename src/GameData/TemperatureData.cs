@@ -33,6 +33,8 @@ namespace PrepareLanding.GameData
 
         public override MostLeastFeature Feature => MostLeastFeature.Temperature;
 
+        public override string FeatureMeasureUnit => "°C";
+
         public Texture2D TemperatureGradientTexure => FeatureGradientTexure;
 
         public Dictionary<BiomeDef, Dictionary<int, float>> TemperaturesByBiomes => FeatureByBiomes;
