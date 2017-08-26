@@ -490,8 +490,8 @@ namespace PrepareLanding
             stringBuilder.AppendLine($"Latitude: {latitude}");
             stringBuilder.AppendLine($"Longitude: {longitude}");
             stringBuilder.AppendLine($"Equatorial distance: {Find.WorldGrid.DistanceFromEquatorNormalized(tileId)}");
-            stringBuilder.AppendLine($"Tile Temperature Average: {Find.World.grid[tileId].temperature} °C");
-            stringBuilder.AppendLine($"Seasonal shift: {GenTemperature.SeasonalShiftAmplitudeAt(tileId)} °C");
+            stringBuilder.AppendLine($"Tile average temperature: {Find.World.grid[tileId].temperature} °C");
+            stringBuilder.AppendLine($"Seasonal shift amplitude: {GenTemperature.SeasonalShiftAmplitudeAt(tileId)} °C");
             stringBuilder.AppendLine();
 
             /*
@@ -501,15 +501,14 @@ namespace PrepareLanding
             stringBuilder.AppendLine("Temperature for each hour this day".RichTextBold()
                 .Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
-            stringBuilder.AppendLine("Hour    Temp    SunEffect".RichTextColor(Color.yellow));
+            stringBuilder.AppendLine("Hour\tTemp\tSunEffect".RichTextColor(Color.yellow));
             var num2 = absTicks - absTicks % GenDate.TicksPerDay; // will give 0 on the 1st day
             for (var i = 0; i < GenDate.HoursPerDay; i++)
             {
                 var absTick = num2 + i * GenDate.TicksPerHour;
-                stringBuilder.Append(i.ToString().PadRight(5));
-                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick).ToString("F2")
-                    .PadRight(8));
-                stringBuilder.Append(GenTemperature.OffsetFromSunCycle(absTick, tileId).ToString("F2"));
+                stringBuilder.Append($"{i}");
+                stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick):F2}");
+                stringBuilder.Append($"\t{GenTemperature.OffsetFromSunCycle(absTick, tileId):F2}");
                 stringBuilder.AppendLine();
             }
             stringBuilder.AppendLine();
@@ -518,15 +517,15 @@ namespace PrepareLanding
              * Temperature for the twelves of this year
              */
 
-            stringBuilder.AppendLine("Temperature for each twelfth this year".RichTextBold()
+            stringBuilder.AppendLine("Average temperature for each twelfth this year".RichTextBold()
                 .Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
             for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
             {
                 var twelfth = (Twelfth) j;
-                var num3 = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
+                var averageTemperatureForTwelfth = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
                 stringBuilder.AppendLine(
-                    $"{twelfth.GetQuadrum()} [{twelfth.GetSeason(latitude)}]: {twelfth} {num3:F2}");
+                    $"{twelfth.GetQuadrum()} [{twelfth.GetSeason(latitude)}]: {twelfth} {averageTemperatureForTwelfth:F2}");
             }
             stringBuilder.AppendLine();
 
@@ -534,24 +533,28 @@ namespace PrepareLanding
              * Temperature for each day of the year
              */
 
-            stringBuilder.AppendLine("Temperature for each day this year".RichTextBold()
+            stringBuilder.AppendLine("Temperatures for each day this year".RichTextBold()
                 .Chain(s => s.RichTextColor(Color.green)));
             stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
 
-            stringBuilder.AppendLine("Day  Lo   Hi   OffsetFromSeason RandomDailyVariation");
+            stringBuilder.AppendLine("Legend:".RichTextColor(Color.cyan));
+            stringBuilder.AppendLine("\tDay: day of the year".RichTextColor(Color.cyan));
+            stringBuilder.AppendLine("\tLow: Lowest temp. for that day".RichTextColor(Color.cyan));
+            stringBuilder.AppendLine("\tHigh: Highest temp. for that day".RichTextColor(Color.cyan));
+            stringBuilder.AppendLine("\tOffS: Offset from Season cycle".RichTextColor(Color.cyan));
+            stringBuilder.AppendLine("\tRDV: Random Daily Variation".RichTextColor(Color.cyan));
+            stringBuilder.AppendLine(separator);
+
+            stringBuilder.AppendLine("Day\tLow\tHigh\tOffS\tRDV".RichTextColor(Color.magenta));
             for (var k = 0; k < GenDate.DaysPerYear; k++)
             {
                 var absTick2 = (int) (k * GenDate.TicksPerDay + 15000f); // 6th hour
                 var absTick3 = (int) (k * GenDate.TicksPerDay + 45000f); // 18th hour
-                stringBuilder.Append(k.ToString().PadRight(8));
-                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick2).ToString("F2")
-                    .PadRight(11));
-                stringBuilder.Append(Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick3).ToString("F2")
-                    .PadRight(11));
-                stringBuilder.Append(GenTemperature.OffsetFromSeasonCycle(absTick3, tileId).ToString("F2")
-                    .PadRight(11));
-                stringBuilder.Append(Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3)
-                    .ToString("F2"));
+                stringBuilder.Append($"{k}");
+                stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick2):F2}");
+                stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick3):F2}");
+                stringBuilder.Append($"\t{GenTemperature.OffsetFromSeasonCycle(absTick3, tileId):F2}");
+                stringBuilder.Append($"\t{Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3):F2}");
                 stringBuilder.AppendLine();
             }
 
