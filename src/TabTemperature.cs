@@ -141,7 +141,7 @@ namespace PrepareLanding
 
         private void DrawMostLeastFeatureSelection()
         {
-            DrawEntryHeader("Most / Least", backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("Most / Least Feature", backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             /*
              * Select Feature
@@ -171,7 +171,7 @@ namespace PrepareLanding
             var leftRect = tilesNumberRect.LeftPart(0.80f);
             var rightRect = tilesNumberRect.RightPart(0.20f);
 
-            Verse.Widgets.Label(leftRect, "Number of Tiles:");
+            Verse.Widgets.Label(leftRect, "Number of Tiles [1, 10000]:");
             Verse.Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForFeature, ref _numberOfTilesForFeatureString,
                 1, 10000);
             _gameData.UserData.MostLeastItem.NumberOfItems = _numberOfTilesForFeature;
