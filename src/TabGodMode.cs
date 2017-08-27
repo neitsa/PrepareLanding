@@ -137,6 +137,8 @@ namespace PrepareLanding
                     return;
                 }
 
+                PrepareLanding.Instance.TileFilter.ClearMatchingTiles();
+
                 _gameData.GodModeData.SetupTile();
                 LogTemperatureInfo(_gameData.GodModeData.SelectedTileId);
             }
