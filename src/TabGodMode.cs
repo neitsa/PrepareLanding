@@ -45,6 +45,8 @@ namespace PrepareLanding
 
         private ThingDef _selectedStoneDef;
 
+        private bool _redrawMapEnabled;
+
         public TabGodMode(GameData.GameData gameData, float columnSizePercent) : base(columnSizePercent)
         {
             _gameData = gameData;
@@ -55,6 +57,13 @@ namespace PrepareLanding
                 wordWrap = true,
                 richText = true
             };
+
+            PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
+        }
+
+        private void WorldGenerated()
+        {
+            _redrawMapEnabled = false;
         }
 
         /// <summary>Gets whether the tab can be drawn or not.</summary>
@@ -139,13 +148,19 @@ namespace PrepareLanding
 
                 PrepareLanding.Instance.TileFilter.ClearMatchingTiles();
 
-                _gameData.GodModeData.SetupTile();
+                _redrawMapEnabled = _gameData.GodModeData.SetupTile();
                 LogTemperatureInfo(_gameData.GodModeData.SelectedTileId);
             }
 
             if (ListingStandard.ButtonText("Redraw Map"))
-                LongEventHandler.QueueLongEvent(delegate { Find.World.renderer.SetAllLayersDirty(); },
-                    "GeneratingWorld", true, null);
+            {
+                if(_redrawMapEnabled)
+                    LongEventHandler.QueueLongEvent(delegate { Find.World.renderer.SetAllLayersDirty(); },
+                        "GeneratingWorld", true, null);
+                else
+                    Messages.Message("You need to change a tile first to be able to redraw the map.", MessageSound.RejectInput);
+
+            }
         }
 
         protected virtual void DrawTemperatureInfo()
