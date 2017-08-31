@@ -78,5 +78,33 @@ namespace PrepareLanding.GameData
             Log.Error($"[PrepareLanding] asked for '{feature}' but couldn't find it...");
             return null;
         }
+
+        public static int DateToTicks(int quadrumDay, Quadrum quadrum, int year)
+        {
+            if (quadrumDay >= GenDate.DaysPerQuadrum)
+            {
+                Log.Error($"[PrepareLanding] Called DateToTicks with wrong quadrumDay: {quadrumDay}.");
+                return 0;
+            }
+
+            var numDays = ((int) quadrum * GenDate.DaysPerQuadrum) + quadrumDay;
+            return DateToTicks(numDays, year);
+        }
+
+        public static int DateToTicks(int dayOfYear, int year, bool yearEllapsedSinceStart = false)
+        {
+            if (dayOfYear >= GenDate.DaysPerYear)
+            {
+                Log.Error($"[PrepareLanding] Called DateToTicks with wrong dayOfYear: {dayOfYear}.");
+                return 0;
+            }
+
+            var dayTicks = dayOfYear * GenDate.TicksPerDay;
+
+            var yearTicks = (year - (yearEllapsedSinceStart ? 0 : GenDate.DefaultStartingYear)) * GenDate.TicksPerYear;
+            var result = dayTicks + yearTicks;
+
+            return result;
+        }
     }
 }

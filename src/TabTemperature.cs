@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
+using PrepareLanding.Core.Gui.Window;
+using PrepareLanding.GameData;
+using RimWorld;
 using UnityEngine;
 using Verse;
-using Widgets = PrepareLanding.Core.Gui.Widgets;
 
 namespace PrepareLanding
 {
@@ -16,6 +18,8 @@ namespace PrepareLanding
         private int _numberOfTilesForFeature = 1;
 
         private string _numberOfTilesForFeatureString;
+
+        private int _selectedTileIdForTemperatureForecast = -1;
 
         public TabTemperature(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -55,7 +59,103 @@ namespace PrepareLanding
             // All in all: better not calling it during the "select landing site" page.
             if (GenScene.InPlayScene)
                 DrawAnimalsCanGrazeNowSelection();
+
+            DrawTemperatureForecast();
             End();
+        }
+
+        private void DrawTemperatureForecast()
+        {
+            DrawEntryHeader("Temperature Forecast", backgroundColor: ColorLibrary.GrassGreen);
+
+            var tileId = Find.WorldSelector.selectedTile;
+
+            if (!Find.WorldSelector.AnyObjectOrTileSelected || tileId < 0)
+            {
+                var labelRect = ListingStandard.GetRect(DefaultElementHeight);
+                Widgets.Label(labelRect, "Pick a tile on world map!");
+                _selectedTileIdForTemperatureForecast = -1;
+                return;
+            }
+
+            ListingStandard.LabelDouble("Selected Tile: ", tileId.ToString());
+            if (_selectedTileIdForTemperatureForecast != tileId)
+                _selectedTileIdForTemperatureForecast = tileId;
+
+            if (ListingStandard.ButtonText("View"))
+            {
+                //TODO: change ticks to a selected user time
+
+                /*
+                 * Forecast for hours of day
+                 */
+                var temperaturesForHoursOfDay =
+                    TemperatureData.TemperaturesForDay(_selectedTileIdForTemperatureForecast, 1);
+                var temperaturesForHoursGetters = new List<ColumnData<TemperatureForecastForDay>>
+                {
+                    new ColumnData<TemperatureForecastForDay>("Hour", "Hour of Day", tffd => $"{tffd.Hour}"),
+                    new ColumnData<TemperatureForecastForDay>("Temp", "Outdoor Temperature",
+                        tffd => $"{tffd.OutdoorTemperature:F1}"),
+                    //new ColumnData<TemperatureForecastForDay>("RandomVar", "Daily Random Variation", tffd => $"{tffd.DailyRandomVariation:F1}"),
+                    new ColumnData<TemperatureForecastForDay>("OffDRV", "Offset from Daily Random Variation",
+                        tffd => $"{tffd.OffsetFromDailyRandomVariation:F1}"),
+                    new ColumnData<TemperatureForecastForDay>("OffSeason", "Offset from Season Average",
+                        tffd => $"{tffd.OffsetFromSeasonCycle:F1}"),
+                    new ColumnData<TemperatureForecastForDay>("SunEff", "Offset from Sun Cycle",
+                        tffd => $"{tffd.OffsetFromSunCycle:F1}")
+                };
+                var tableViewTempForDay =
+                    new TableView<TemperatureForecastForDay>(temperaturesForHoursOfDay, temperaturesForHoursGetters);
+
+                /*
+                 * Forecast for twelves of year.
+                 */
+                var tempsForTwelves = TemperatureData.TemperaturesForTwelfth(_selectedTileIdForTemperatureForecast);
+                var twelvesGetters = new List<ColumnData<TemperatureForecastForTwelfth>>
+                {
+                    new ColumnData<TemperatureForecastForTwelfth>("Quadrum", "Quadrum of Year",
+                        tfft => $"{tfft.Twelfth.GetQuadrum()}"),
+                    new ColumnData<TemperatureForecastForTwelfth>("Season", "Season of Year",
+                        tfft => $"{tfft.Twelfth.GetSeason(tfft.Latitude)}"),
+                    new ColumnData<TemperatureForecastForTwelfth>("Twelfth", "Twelfth of Year",
+                        tfft => $"{tfft.Twelfth}"),
+                    new ColumnData<TemperatureForecastForTwelfth>("Avg. Temp", "Average Temperature for Twelfth",
+                        tfft => $"{tfft.AverageTemperatureForTwelfth:F2}")
+                };
+                var tableViewTempForTwelves =
+                    new TableView<TemperatureForecastForTwelfth>(tempsForTwelves, twelvesGetters);
+
+                /*
+                 * Forecast for days or year
+                 */
+                var tempsForDaysOfYear = TemperatureData.TemperaturesForYear(_selectedTileIdForTemperatureForecast, 1);
+                var temperaturesForDaysOfYearGetters = new List<ColumnData<TemperatureForecastForYear>>
+                {
+                    new ColumnData<TemperatureForecastForYear>("Day", "Day of Year", tffy => $"{tffy.Day}"),
+                    new ColumnData<TemperatureForecastForYear>("Min", "MinimumTemperature of Day",
+                        tffy => $"{tffy.MinTemp:F2}"),
+                    new ColumnData<TemperatureForecastForYear>("Max", "Maximum Temperature of Day",
+                        tffy => $"{tffy.MaxTemp:F2}"),
+                    new ColumnData<TemperatureForecastForYear>("OffSeason", "Offset from Season Average",
+                        tffy => $"{tffy.OffsetFromSeasonCycle:F2}"),
+                    new ColumnData<TemperatureForecastForYear>("OffDRV", "Offset from Daily Random Variation",
+                        tffy => $"{tffy.OffsetFromDailyRandomVariation:F2}")
+                };
+                var tableViewTempForYear =
+                    new TableView<TemperatureForecastForYear>(tempsForDaysOfYear, temperaturesForDaysOfYearGetters);
+
+                /*
+                 * Window and views
+                 */
+                var temperatureWindow = new TableWindow(0.33f);
+
+                temperatureWindow.ClearTables();
+                temperatureWindow.AddTable(tableViewTempForDay);
+                temperatureWindow.AddTable(tableViewTempForTwelves);
+                temperatureWindow.AddTable(tableViewTempForYear);
+
+                Find.WindowStack.Add(temperatureWindow);
+            }
         }
 
         private void DrawAnimalsCanGrazeNowSelection()
@@ -64,7 +164,7 @@ namespace PrepareLanding
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _gameData.UserData.ChosenAnimalsCanGrazeNowState;
-            Widgets.CheckBoxLabeledMulti(rect, "Animals Can Graze Now:", ref tmpCheckState);
+            Core.Gui.Widgets.CheckBoxLabeledMulti(rect, "Animals Can Graze Now:", ref tmpCheckState);
 
             _gameData.UserData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
         }
@@ -121,22 +221,30 @@ namespace PrepareLanding
 
         private void DrawRainfallSelection()
         {
-            DrawEntryHeader("Rain Fall (mm)", backgroundColor: ColorFromFilterSubjectThingDef("Rain Falls"));
+            // Max rainfall is defined as private in RimWorld.Planet.WorldMaterials.RainfallMax
+            const float rainfallMin = 0f;
+            const float rainfallMax = 5000f;
 
-            DrawUsableMinMaxNumericField(_gameData.UserData.RainFall, "Rain Fall");
+            DrawEntryHeader($"Rain Fall (mm) [{rainfallMin}, {rainfallMax}]",
+                backgroundColor: ColorFromFilterSubjectThingDef("Rain Falls"));
+
+            DrawUsableMinMaxNumericField(_gameData.UserData.RainFall, "Rain Fall", rainfallMin, rainfallMax);
         }
 
         private void DrawTemperaturesSelection()
         {
-            DrawEntryHeader("Temperatures (Celsius)",
+            const float tempMin = TemperatureTuning.MinimumTemperature;
+            const float tempMax = TemperatureTuning.MaximumTemperature;
+
+            DrawEntryHeader($"Temperatures (°C) [{tempMin}, {tempMax}]",
                 backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.AverageTemperature, "Average Temperature",
-                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+                tempMin, tempMax);
             DrawUsableMinMaxNumericField(_gameData.UserData.WinterTemperature, "Winter Temperature",
-                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+                tempMin, tempMax);
             DrawUsableMinMaxNumericField(_gameData.UserData.SummerTemperature, "Summer Temperature",
-                TemperatureTuning.MinimumTemperature, TemperatureTuning.MaximumTemperature);
+                tempMin, tempMax);
         }
 
         private void DrawMostLeastFeatureSelection()
@@ -171,8 +279,8 @@ namespace PrepareLanding
             var leftRect = tilesNumberRect.LeftPart(0.80f);
             var rightRect = tilesNumberRect.RightPart(0.20f);
 
-            Verse.Widgets.Label(leftRect, "Number of Tiles [1, 10000]:");
-            Verse.Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForFeature, ref _numberOfTilesForFeatureString,
+            Widgets.Label(leftRect, "Number of Tiles [1, 10000]:");
+            Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForFeature, ref _numberOfTilesForFeatureString,
                 1, 10000);
             _gameData.UserData.MostLeastItem.NumberOfItems = _numberOfTilesForFeature;
 

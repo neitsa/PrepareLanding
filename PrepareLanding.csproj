@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_OVERLAYS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -71,6 +71,7 @@
     <Compile Include="src\Core\Gui\Widgets.cs" />
     <Compile Include="src\Core\Gui\Window\MinimizableWindow.cs" />
     <Compile Include="src\Core\Gui\Window\MinimizedWindow.cs" />
+    <Compile Include="src\Core\Gui\Window\TableWindow.cs" />
     <Compile Include="src\Core\Gui\World\TileHighlighter.cs" />
     <Compile Include="src\Core\Gui\World\WorldLayerHighlightedTiles.cs" />
     <Compile Include="src\DataItems.cs" />

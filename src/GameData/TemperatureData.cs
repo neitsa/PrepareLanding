@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Overlays;
@@ -9,6 +10,99 @@ using Verse;
 
 namespace PrepareLanding.GameData
 {
+    public class TemperatureForecastForDay
+    {
+        public TemperatureForecastForDay(int tileId, int ticks, int hour)
+        {
+            TileId = tileId;
+            Ticks = ticks;
+            Hour = hour;
+
+            OutdoorTemperature = Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, Ticks);
+            OffsetFromSunCycle = GenTemperature.OffsetFromSunCycle(Ticks, TileId);
+            OffsetFromDailyRandomVariation = Find.World.tileTemperatures.OffsetFromDailyRandomVariation(TileId,
+                Ticks);
+            OffsetFromSeasonCycle = GenTemperature.OffsetFromSeasonCycle(Ticks, tileId);
+
+            var tile = Find.WorldGrid[TileId];
+            DailyRandomVariation = tile.temperature -
+                                   (OffsetFromSeasonCycle + OffsetFromDailyRandomVariation + OffsetFromSunCycle);
+        }
+
+        public float DailyRandomVariation { get; }
+
+        public int Hour { get; }
+
+        public float OffsetFromDailyRandomVariation { get; }
+
+        public float OffsetFromSeasonCycle { get; }
+
+        public float OffsetFromSunCycle { get; }
+
+        public float OutdoorTemperature { get; }
+
+        public int Ticks { get; }
+
+        public int TileId { get; }
+    }
+
+    public class TemperatureForecastForTwelfth
+    {
+        public TemperatureForecastForTwelfth(int tileId, Twelfth twelfth)
+        {
+            Latitude = Find.WorldGrid.LongLatOf(tileId).y;
+            Twelfth = twelfth;
+
+            AverageTemperatureForTwelfth = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
+        }
+
+        public float AverageTemperatureForTwelfth { get; }
+
+        public float Latitude { get; }
+
+        public Twelfth Twelfth { get; }
+    }
+
+    public class TemperatureForecastForYear
+    {
+        public TemperatureForecastForYear(int tileId, int ticks, int day)
+        {
+            Day = day;
+            /*
+             * Get min & max temperatures for the day
+             */
+            var tempsForHourOfDay = new List<float>(GenDate.HoursPerDay);
+            for (var hour = 0; hour < GenDate.HoursPerDay; hour++)
+            {
+                var hourTicks = ticks + hour * GenDate.TicksPerHour;
+                var temp = Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, hourTicks);
+                tempsForHourOfDay.Add(temp);
+            }
+
+            // get min & max from list of temperatures for the day
+            MinTemp = tempsForHourOfDay.Min();
+            MaxTemp = tempsForHourOfDay.Max();
+
+            // get number of ticks for the maximum temperature
+            var ticksForMaxTemp = ticks + tempsForHourOfDay.IndexOf(MaxTemp) * GenDate.TicksPerHour;
+
+            OffsetFromSeasonCycle = GenTemperature.OffsetFromSeasonCycle(ticksForMaxTemp, tileId);
+
+            OffsetFromDailyRandomVariation =
+                Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, ticksForMaxTemp);
+        }
+
+        public int Day { get; }
+
+        public float MaxTemp { get; }
+
+        public float MinTemp { get; }
+
+        public float OffsetFromDailyRandomVariation { get; }
+
+        public float OffsetFromSeasonCycle { get; }
+    }
+
     public class TemperatureData : WorldFeatureData
     {
         private bool _allowDrawOverlay;
@@ -39,13 +133,95 @@ namespace PrepareLanding.GameData
 
         public Dictionary<BiomeDef, Dictionary<int, float>> TemperaturesByBiomes => FeatureByBiomes;
 
-        public bool TickManagerHasTickAbs => Find.TickManager.gameStartAbsTick == 0;
+        public static bool TickManagerHasTickAbs => Find.TickManager.gameStartAbsTick != 0;
 
         public List<KeyValuePair<int, float>> WorldTilesTemperatures => WorldTilesFeatures;
 
         protected override float TileFeatureValue(int tileId)
         {
             return Find.World.grid[tileId].temperature;
+        }
+
+        private static void PushTickAbs()
+        {
+            if (!TickManagerHasTickAbs)
+                Find.TickManager.gameStartAbsTick = 1;
+        }
+
+        private static void PopTickAbs()
+        {
+            if (Find.TickManager.gameStartAbsTick == 1)
+                Find.TickManager.gameStartAbsTick = 0;
+        }
+
+        public static List<TemperatureForecastForDay> TemperaturesForDay(int tileId, int ticks)
+        {
+            if (tileId < 0)
+            {
+                Log.Error($"[PrepareLanding] TemperaturesForDay: wrong tile id: {tileId}.");
+                return null;
+            }
+
+            var temperatures = new List<TemperatureForecastForDay>(GenDate.HoursPerDay);
+
+            PushTickAbs();
+
+            try
+            {
+                var dayTicks = ticks - ticks % GenDate.TicksPerDay;
+                for (var i = 0; i < GenDate.HoursPerDay; i++)
+                {
+                    var absTick = dayTicks + i * GenDate.TicksPerHour;
+                    var forecast = new TemperatureForecastForDay(tileId, absTick, i);
+                    temperatures.Add(forecast);
+                }
+            }
+            finally
+            {
+                PopTickAbs();
+            }
+
+            return temperatures;
+        }
+
+        public static List<TemperatureForecastForTwelfth> TemperaturesForTwelfth(int tileId)
+        {
+            if (tileId < 0)
+            {
+                Log.Error($"[PrepareLanding] TemperaturesForTwelfth: wrong tile id: {tileId}.");
+                return null;
+            }
+
+            var temperatures = new List<TemperatureForecastForTwelfth>(GenDate.TwelfthsPerYear);
+
+            for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
+            {
+                var forecast = new TemperatureForecastForTwelfth(tileId, (Twelfth) j);
+                temperatures.Add(forecast);
+            }
+
+            return temperatures;
+        }
+
+        public static List<TemperatureForecastForYear> TemperaturesForYear(int tileId, int ticks)
+        {
+            PushTickAbs();
+            var temperatures = new List<TemperatureForecastForYear>(GenDate.DaysPerYear);
+            try
+            {
+                for (var dayIndex = 0; dayIndex < GenDate.DaysPerYear; dayIndex++)
+                {
+                    var dayTicks = ticks + dayIndex * GenDate.TicksPerDay;
+                    var forecast = new TemperatureForecastForYear(tileId, dayTicks, dayIndex);
+                    temperatures.Add(forecast);
+                }
+            }
+            finally
+            {
+                PopTickAbs();
+            }
+
+            return temperatures;
         }
 
 #if DEBUG
