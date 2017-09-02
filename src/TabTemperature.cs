@@ -80,8 +80,7 @@ namespace PrepareLanding
             }
 
             ListingStandard.LabelDouble("Selected Tile: ", tileId.ToString());
-            if (_selectedTileIdForTemperatureForecast != tileId)
-                _selectedTileIdForTemperatureForecast = tileId;
+            _selectedTileIdForTemperatureForecast = tileId;
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
@@ -158,82 +157,88 @@ namespace PrepareLanding
              * Forecast
              */
             if (ListingStandard.ButtonText("View Temperature Forecast"))
+                ViewTemperatureForecast(_selectedTileIdForTemperatureForecast, _dateTicks);
+        }
+
+        public static void ViewTemperatureForecast(int tileId, int dateTicks)
+        {
+            /*
+             * Forecast for twelves of year.
+             */
+            var tempsForTwelves = TemperatureData.TemperaturesForTwelfth(tileId);
+            var twelvesGetters = new List<ColumnData<TemperatureForecastForTwelfth>>
             {
-                /*
-                 * Forecast for twelves of year.
-                 */
-                var tempsForTwelves = TemperatureData.TemperaturesForTwelfth(_selectedTileIdForTemperatureForecast);
-                var twelvesGetters = new List<ColumnData<TemperatureForecastForTwelfth>>
-                {
-                    new ColumnData<TemperatureForecastForTwelfth>("Quadrum", "Quadrum of Year",
-                        tfft => $"{tfft.Twelfth.GetQuadrum()}"),
-                    new ColumnData<TemperatureForecastForTwelfth>("Season", "Season of Year",
-                        tfft => $"{tfft.Twelfth.GetSeason(tfft.Latitude)}"),
-                    new ColumnData<TemperatureForecastForTwelfth>("Twelfth", "Twelfth of Year",
-                        tfft => $"{tfft.Twelfth}"),
-                    new ColumnData<TemperatureForecastForTwelfth>("Avg. Temp", "Average Temperature for Twelfth",
-                        tfft => $"{tfft.AverageTemperatureForTwelfth:F2}")
-                };
-                var tableViewTempForTwelves =
-                    new TableView<TemperatureForecastForTwelfth>("Forecast For Twelves", tempsForTwelves,
-                        twelvesGetters);
+                new ColumnData<TemperatureForecastForTwelfth>("Quadrum", "Quadrum of Year",
+                    tfft => $"{tfft.Twelfth.GetQuadrum()}"),
+                new ColumnData<TemperatureForecastForTwelfth>("Season", "Season of Year",
+                    tfft => $"{tfft.Twelfth.GetSeason(tfft.Latitude)}"),
+                new ColumnData<TemperatureForecastForTwelfth>("Twelfth", "Twelfth of Year",
+                    tfft => $"{tfft.Twelfth}"),
+                new ColumnData<TemperatureForecastForTwelfth>("Avg. Temp", "Average Temperature for Twelfth",
+                    tfft => $"{tfft.AverageTemperatureForTwelfth:F2}")
+            };
+            var tableViewTempForTwelves =
+                new TableView<TemperatureForecastForTwelfth>("Forecast For Twelves", tempsForTwelves,
+                    twelvesGetters);
 
-                /*
-                 * Forecast for hours of day
-                 */
-                var temperaturesForHoursOfDay =
-                    TemperatureData.TemperaturesForDay(_selectedTileIdForTemperatureForecast, _dateTicks);
-                var temperaturesForHoursGetters = new List<ColumnData<TemperatureForecastForDay>>
-                {
-                    new ColumnData<TemperatureForecastForDay>("Hour", "Hour of Day", tffd => $"{tffd.Hour}"),
-                    new ColumnData<TemperatureForecastForDay>("Temp", "Outdoor Temperature",
-                        tffd => $"{tffd.OutdoorTemperature:F1}"),
-                    //new ColumnData<TemperatureForecastForDay>("RandomVar", "Daily Random Variation", tffd => $"{tffd.DailyRandomVariation:F1}"),
-                    new ColumnData<TemperatureForecastForDay>("OffDRV", "Offset from Daily Random Variation",
-                        tffd => $"{tffd.OffsetFromDailyRandomVariation:F1}"),
-                    new ColumnData<TemperatureForecastForDay>("OffSeason", "Offset from Season Average",
-                        tffd => $"{tffd.OffsetFromSeasonCycle:F1}"),
-                    new ColumnData<TemperatureForecastForDay>("SunEff", "Offset from Sun Cycle",
-                        tffd => $"{tffd.OffsetFromSunCycle:F1}")
-                };
-                var tableViewTempForDay =
-                    new TableView<TemperatureForecastForDay>($"Forecast for {GenDate.HoursPerDay} Hours [{dateString}]",
-                        temperaturesForHoursOfDay,
-                        temperaturesForHoursGetters);
 
-                /*
-                 * Forecast for days or year
-                 */
-                var tempsForDaysOfYear =
-                    TemperatureData.TemperaturesForYear(_selectedTileIdForTemperatureForecast, _dateTicks);
-                var temperaturesForDaysOfYearGetters = new List<ColumnData<TemperatureForecastForYear>>
-                {
-                    new ColumnData<TemperatureForecastForYear>("Day", "Day of Year", tffy => $"{tffy.Day}"),
-                    new ColumnData<TemperatureForecastForYear>("Min", "Minimum Temperature of Day",
-                        tffy => $"{tffy.MinTemp:F2}"),
-                    new ColumnData<TemperatureForecastForYear>("Max", "Maximum Temperature of Day",
-                        tffy => $"{tffy.MaxTemp:F2}"),
-                    new ColumnData<TemperatureForecastForYear>("OffSeason", "Offset from Season Average",
-                        tffy => $"{tffy.OffsetFromSeasonCycle:F2}"),
-                    new ColumnData<TemperatureForecastForYear>("OffDRV", "Offset from Daily Random Variation",
-                        tffy => $"{tffy.OffsetFromDailyRandomVariation:F2}")
-                };
-                var tableViewTempForYear =
-                    new TableView<TemperatureForecastForYear>("Forecast for Next Year", tempsForDaysOfYear,
-                        temperaturesForDaysOfYearGetters);
+            var dateString = GenDate.DateReadoutStringAt(dateTicks, Find.WorldGrid.LongLatOf(tileId));
 
-                /*
-                 * Window and views
-                 */
-                var temperatureWindow = new TableWindow(_selectedTileIdForTemperatureForecast, _dateTicks, 0.33f);
+            /*
+             * Forecast for hours of day
+             */
+            var temperaturesForHoursOfDay =
+                TemperatureData.TemperaturesForDay(tileId, dateTicks);
+            var temperaturesForHoursGetters = new List<ColumnData<TemperatureForecastForDay>>
+            {
+                new ColumnData<TemperatureForecastForDay>("Hour", "Hour of Day", tffd => $"{tffd.Hour}"),
+                new ColumnData<TemperatureForecastForDay>("Temp", "Outdoor Temperature",
+                    tffd => $"{tffd.OutdoorTemperature:F1}"),
+                //new ColumnData<TemperatureForecastForDay>("RandomVar", "Daily Random Variation", tffd => $"{tffd.DailyRandomVariation:F1}"),
+                new ColumnData<TemperatureForecastForDay>("OffDRV", "Offset from Daily Random Variation",
+                    tffd => $"{tffd.OffsetFromDailyRandomVariation:F1}"),
+                new ColumnData<TemperatureForecastForDay>("OffSeason", "Offset from Season Average",
+                    tffd => $"{tffd.OffsetFromSeasonCycle:F1}"),
+                new ColumnData<TemperatureForecastForDay>("SunEff", "Offset from Sun Cycle",
+                    tffd => $"{tffd.OffsetFromSunCycle:F1}")
+            };
+            var tableViewTempForDay =
+                new TableView<TemperatureForecastForDay>($"Forecast for {GenDate.HoursPerDay} Hours [{dateString}]",
+                    temperaturesForHoursOfDay,
+                    temperaturesForHoursGetters);
 
-                temperatureWindow.ClearTables();
-                temperatureWindow.AddTable(tableViewTempForDay);
-                temperatureWindow.AddTable(tableViewTempForTwelves);
-                temperatureWindow.AddTable(tableViewTempForYear);
+            /*
+             * Forecast for days or year
+             */
+            var tempsForDaysOfYear =
+                TemperatureData.TemperaturesForYear(tileId, dateTicks);
+            var temperaturesForDaysOfYearGetters = new List<ColumnData<TemperatureForecastForYear>>
+            {
+                new ColumnData<TemperatureForecastForYear>("Day", "Day of Year", tffy => $"{tffy.Day}"),
+                new ColumnData<TemperatureForecastForYear>("Min", "Minimum Temperature of Day",
+                    tffy => $"{tffy.MinTemp:F2}"),
+                new ColumnData<TemperatureForecastForYear>("Max", "Maximum Temperature of Day",
+                    tffy => $"{tffy.MaxTemp:F2}"),
+                new ColumnData<TemperatureForecastForYear>("OffSeason", "Offset from Season Average",
+                    tffy => $"{tffy.OffsetFromSeasonCycle:F2}"),
+                new ColumnData<TemperatureForecastForYear>("OffDRV", "Offset from Daily Random Variation",
+                    tffy => $"{tffy.OffsetFromDailyRandomVariation:F2}")
+            };
+            var tableViewTempForYear =
+                new TableView<TemperatureForecastForYear>("Forecast for Next Year", tempsForDaysOfYear,
+                    temperaturesForDaysOfYearGetters);
 
-                Find.WindowStack.Add(temperatureWindow);
-            }
+            /*
+             * Window and views
+             */
+            var temperatureWindow = new TableWindow(tileId, dateTicks, 0.33f);
+
+            temperatureWindow.ClearTables();
+            temperatureWindow.AddTable(tableViewTempForDay);
+            temperatureWindow.AddTable(tableViewTempForTwelves);
+            temperatureWindow.AddTable(tableViewTempForYear);
+
+            Find.WindowStack.Add(temperatureWindow);
         }
 
         private void DrawAnimalsCanGrazeNowSelection()
