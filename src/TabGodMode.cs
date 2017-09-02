@@ -6,6 +6,7 @@ using System.Text;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
+using PrepareLanding.GameData;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -35,6 +36,8 @@ namespace PrepareLanding
 
         private string _chosenRainfallString;
 
+        private bool _redrawMapEnabled;
+
         private Vector2 _scrollPosRiverSelection;
 
         private Vector2 _scrollPosRoadSelection;
@@ -44,8 +47,6 @@ namespace PrepareLanding
         private Vector2 _scrollPosTemperatureInfo;
 
         private ThingDef _selectedStoneDef;
-
-        private bool _redrawMapEnabled;
 
         public TabGodMode(GameData.GameData gameData, float columnSizePercent) : base(columnSizePercent)
         {
@@ -61,15 +62,10 @@ namespace PrepareLanding
             PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
         }
 
-        private void WorldGenerated()
-        {
-            _redrawMapEnabled = false;
-        }
-
         /// <summary>Gets whether the tab can be drawn or not.</summary>
         public override bool CanBeDrawn
         {
-            get { return Prefs.DevMode && DebugSettings.godMode && (Current.ProgramState != ProgramState.Playing); }
+            get { return Prefs.DevMode && DebugSettings.godMode && Current.ProgramState != ProgramState.Playing; }
             set { }
         }
 
@@ -80,6 +76,11 @@ namespace PrepareLanding
         public override string Name => "God Mode";
 
         public string TemperatureInfo { get; private set; }
+
+        private void WorldGenerated()
+        {
+            _redrawMapEnabled = false;
+        }
 
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>
@@ -132,10 +133,7 @@ namespace PrepareLanding
             ListingStandard.LabelDouble("Selected Tile: ", tileId.ToString());
 
             if (_gameData.GodModeData.SelectedTileId != tileId)
-            {
                 _gameData.GodModeData.InitFromTileId(tileId);
-                LogTemperatureInfo(tileId);
-            }
 
             if (ListingStandard.ButtonText("Set Tile"))
             {
@@ -153,35 +151,33 @@ namespace PrepareLanding
                 // but could be cleaned with RimWorld.Planet.TileTemperaturesComp.ClearCaches() but that would invalidate *all* caches...
 
                 _redrawMapEnabled = _gameData.GodModeData.SetupTile();
-                LogTemperatureInfo(_gameData.GodModeData.SelectedTileId);
             }
 
             var heightBefore = ListingStandard.StartCaptureHeight();
             if (ListingStandard.ButtonText("Redraw Map"))
-            {
-                if(_redrawMapEnabled)
+                if (_redrawMapEnabled)
                     LongEventHandler.QueueLongEvent(delegate { Find.World.renderer.SetAllLayersDirty(); },
                         "GeneratingWorld", true, null);
                 else
-                    Messages.Message("You need to change a tile first to be able to redraw the map.", MessageSound.RejectInput);
-
-            }
+                    Messages.Message("You need to change a tile first to be able to redraw the map.",
+                        MessageSound.RejectInput);
             var tooltipRect = ListingStandard.EndCaptureHeight(heightBefore);
-            TooltipHandler.TipRegion(tooltipRect, "[Warning: this redraws the map entirely; use it only when you have finished *all* your modifications.]");
+            TooltipHandler.TipRegion(tooltipRect,
+                "[Warning: this redraws the map entirely; use it only when you have finished *all* your modifications.]");
         }
 
         protected virtual void DrawTemperatureInfo()
         {
             DrawEntryHeader("Temperature Info", backgroundColor: Color.yellow);
 
-            if (TemperatureInfo.NullOrEmpty())
-                return;
-
-            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
-
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, TemperatureInfo, ref _scrollPosTemperatureInfo,
-                _styleTemperatureInfo,
-                DefaultScrollableViewShrinkWidth);
+            /*
+             * Forecast
+             */
+            if (ListingStandard.ButtonText("View Temperature Forecast"))
+            {
+                var tileId = _gameData.GodModeData.SelectedTileId;
+                TabTemperature.ViewTemperatureForecast(tileId, WorldData.NowToTicks(tileId));
+            }
         }
 
         protected virtual void DrawBiomeTypesSelection() // TODO : factorize this function with the one from TabTerrain
@@ -547,7 +543,8 @@ namespace PrepareLanding
             for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
             {
                 var twelfth = (Twelfth) j;
-                var averageTemperatureForTwelfth = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
+                var averageTemperatureForTwelfth =
+                    Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
                 stringBuilder.AppendLine(
                     $"{twelfth.GetQuadrum()} [{twelfth.GetSeason(latitude)}]: {twelfth} {averageTemperatureForTwelfth:F2}");
             }
@@ -578,7 +575,8 @@ namespace PrepareLanding
                 stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick2):F2}");
                 stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick3):F2}");
                 stringBuilder.Append($"\t{GenTemperature.OffsetFromSeasonCycle(absTick3, tileId):F2}");
-                stringBuilder.Append($"\t{Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3):F2}");
+                stringBuilder.Append(
+                    $"\t{Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3):F2}");
                 stringBuilder.AppendLine();
             }
 
