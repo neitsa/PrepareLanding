@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui.Tab;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -9,27 +10,36 @@ namespace PrepareLanding.Core.Gui.Window
 {
     public class ColumnData<T>
     {
-        public string HeaderLabel { get; }
-
-        public string ToolTip { get; }
-
-        public Func<T, string> DataGetter { get; }
-
-        public Color? ColumnTextColor { get; set; }
-
-        public Color? ColumnBackgroundColor { get; set; }
-
         public ColumnData(string header, string tooltip, Func<T, string> getter)
         {
             HeaderLabel = header;
             ToolTip = tooltip;
             DataGetter = getter;
         }
+
+        public Color? ColumnBackgroundColor { get; set; }
+
+        public Color? ColumnTextColor { get; set; }
+
+        public Func<T, string> DataGetter { get; }
+        public string HeaderLabel { get; }
+
+        public string ToolTip { get; }
     }
 
     public interface ITableView
     {
-        void DrawTableContent(Rect inRect, Listing_Standard ls);
+        string Name { get; }
+
+        int NumColumns { get; }
+
+        int NumRows { get; }
+
+        float TableHeight { get; }
+
+        float TableWidth { get; }
+
+        void DrawTableContent(Rect inRect);
     }
 
     public class TableView<T> : ITableView
@@ -40,17 +50,19 @@ namespace PrepareLanding.Core.Gui.Window
 
         private const float LineSpace = 3f;
 
-        private Vector2 _scrollPosition = Vector2.zero;
-
         // _columnsText[columnIndex][rowIndex]
         private readonly List<List<string>> _columnsText;
 
-        private readonly List<string> _tooltips;
-
         private readonly List<float> _columnWidthList;
 
-        public TableView(IEnumerable<T> dataSources, IEnumerable<ColumnData<T>> getters)
+        private readonly List<string> _tooltips;
+
+        private Vector2 _scrollPosition = Vector2.zero;
+
+        public TableView(string name, IEnumerable<T> dataSources, IEnumerable<ColumnData<T>> getters)
         {
+            Name = name;
+
             var getterList = getters.ToList();
             var dataSourceList = dataSources.ToList();
 
@@ -77,18 +89,16 @@ namespace PrepareLanding.Core.Gui.Window
              * Cells text
              */
             for (var rowIndex = 0; rowIndex < numRows; rowIndex++)
+            for (var columnIndex = 0; columnIndex < numColums; columnIndex++)
             {
-                for (var columnIndex = 0; columnIndex < numColums; columnIndex++)
-                {
-                    var text = getterList[columnIndex].DataGetter(dataSourceList[rowIndex]);
-                    var rows = _columnsText[columnIndex];
-                    rows.Add(text);
-                }
+                var text = getterList[columnIndex].DataGetter(dataSourceList[rowIndex]);
+                var rows = _columnsText[columnIndex];
+                rows.Add(text);
             }
 
             NumRows = _columnsText[0].Count;
             NumColumns = _columnsText.Count;
-            TableHeight = (NumRows * RowHeight) + (NumRows * 2 * LineSpace);
+            TableHeight = NumRows * RowHeight + NumRows * 2 * LineSpace;
 
             /*
              * Get width for each column
@@ -102,18 +112,18 @@ namespace PrepareLanding.Core.Gui.Window
                     var text = _columnsText[columnIndex][rowIndex];
                     var currentTextWidth = Text.CalcSize(text).x;
                     if (currentTextWidth > maxTextWidth)
-                    {
                         maxTextWidth = currentTextWidth;
-                    }
                 }
                 _columnWidthList.Add(maxTextWidth + ColExtraWidth);
             }
 
             // table width
-            TableWidth = _columnWidthList.Sum() + (NumColumns * 2 * LineSpace);
+            TableWidth = _columnWidthList.Sum() + NumColumns * 2 * LineSpace;
         }
 
-        public int NumRows { get;  }
+        public string Name { get; }
+
+        public int NumRows { get; }
 
         public int NumColumns { get; }
 
@@ -121,17 +131,13 @@ namespace PrepareLanding.Core.Gui.Window
 
         public float TableWidth { get; }
 
-        public void DrawTableContent(Rect inRect, Listing_Standard ls)
+        public void DrawTableContent(Rect inRect)
         {
             Text.Font = GameFont.Tiny;
             inRect.yMax -= 60f;
 
-            Listing_Standard innerLs = null;
-            var viewRect = new Rect(0f, 0f, inRect.width - 16f, TableHeight);
-            if (ls == null)
-                Verse.Widgets.BeginScrollView(inRect, ref _scrollPosition, viewRect);
-            else
-                innerLs = ls.BeginScrollView(inRect.height - 60f, TableHeight, ref _scrollPosition, 16f);
+            var viewRect = new Rect(0f, 0f, inRect.width - 16f, TableHeight + 5f);
+            Verse.Widgets.BeginScrollView(inRect, ref _scrollPosition, viewRect);
 
             /*
              * Draw content
@@ -149,18 +155,16 @@ namespace PrepareLanding.Core.Gui.Window
 
                     var rect = new Rect(xValue, yValue, _columnWidthList[columnIndex], RowHeight);
                     var mouseOverRect = rect;
-                    mouseOverRect.xMin -= 999f;
-                    mouseOverRect.xMax += 999f;
+                    mouseOverRect.x = 0f;
+                    mouseOverRect.width = TableWidth;
                     if (Mouse.IsOver(mouseOverRect) || columnIndex % 2 == 0)
-                    {
                         Verse.Widgets.DrawHighlight(rect);
-                    }
                     TooltipHandler.TipRegion(rect, _tooltips[columnIndex]);
 
                     var textAnchor = Text.Anchor;
                     Text.Anchor = TextAnchor.MiddleCenter;
                     var contentColor = GUI.contentColor;
-                    if(columnIndex%2 == 0)
+                    if (columnIndex % 2 == 0)
                         GUI.contentColor = Color.magenta;
 
                     Verse.Widgets.Label(rect, _columnsText[columnIndex][rowIndex]);
@@ -176,10 +180,7 @@ namespace PrepareLanding.Core.Gui.Window
             DrawVerticalLine(NumColumns, xValue, TableHeight);
             DrawHorizontalLine(0, NumRows, yValue, TableWidth);
 
-            if(ls == null)
-                Verse.Widgets.EndScrollView();
-            else
-                ls.EndScrollView(innerLs);
+            Verse.Widgets.EndScrollView();
         }
 
         private float DrawVerticalLine(int columnIndex, float xValue, float tableHeight)
@@ -200,11 +201,8 @@ namespace PrepareLanding.Core.Gui.Window
             if (rowIndex != 0)
                 yValue += LineSpace;
 
-            if(columnIndex == 0)
-            {
-                // horizontal line (whole table)
+            if (columnIndex == 0)
                 Verse.Widgets.DrawLineHorizontal(0, yValue, tableWidth);
-            }
 
             yValue += LineSpace;
 
@@ -214,18 +212,18 @@ namespace PrepareLanding.Core.Gui.Window
 
     public class TableWindow : Verse.Window
     {
-        protected readonly Listing_Standard ListingStandard;
-
-        public float ColumnSizePerCent { get; }
-
-        public override Vector2 InitialSize => new Vector2(1024f, 768f);
-
-        public Rect InRect { get; protected set; }
+        private readonly int _dateTicks;
 
         private readonly List<ITableView> _tables = new List<ITableView>();
 
-        public TableWindow(float columnSizePct = 1.0f)
+        private readonly int _tileId;
+        protected readonly Listing_Standard ListingStandard;
+
+        public TableWindow(int tileId, int dateTicks, float columnSizePct = 1.0f)
         {
+            _tileId = tileId;
+            _dateTicks = dateTicks;
+
             doCloseX = true;
             doCloseButton = true;
 
@@ -234,21 +232,9 @@ namespace PrepareLanding.Core.Gui.Window
             ListingStandard = new Listing_Standard();
         }
 
-        public void Begin(Rect inRect)
-        {
-            InRect = inRect;
+        public float ColumnSizePerCent { get; }
 
-            // set up column size
-            ListingStandard.ColumnWidth = inRect.width * ColumnSizePerCent;
-
-            // begin Rect position
-            ListingStandard.Begin(InRect);
-        }
-
-        public void End()
-        {
-            ListingStandard.End();
-        }
+        public override Vector2 InitialSize => new Vector2(1024f, 768f);
 
         public void AddTable(ITableView table)
         {
@@ -260,24 +246,91 @@ namespace PrepareLanding.Core.Gui.Window
             _tables.Clear();
         }
 
+        private void Begin(Rect inRect, bool useColumnSizePct = true)
+        {
+            //InRect = inRect;
+
+            // set up column size
+            ListingStandard.ColumnWidth = inRect.width * (useColumnSizePct ? ColumnSizePerCent : 1f);
+
+            // begin Rect position
+            ListingStandard.Begin(inRect);
+        }
+
+        private void End()
+        {
+            ListingStandard.End();
+        }
+
         public override void DoWindowContents(Rect inRect)
         {
-            Begin(inRect);
+            var previousRect = inRect;
+            for (var tableViewIndex = 0; tableViewIndex < _tables.Count; tableViewIndex++)
+            {
+                var rectTable = new Rect(inRect);
+                if (tableViewIndex > 0)
+                    rectTable.x = _tables[tableViewIndex - 1].TableWidth + previousRect.x + 25f;
+                rectTable.width = _tables[tableViewIndex].TableWidth + 20f;
 
-            var r1 = ListingStandard.GetRect(inRect.height);
-            _tables[1].DrawTableContent(r1, null);
+                Begin(rectTable, false);
+                DrawEntryHeader(_tables[tableViewIndex].Name, false, true, Color.magenta);
+                rectTable.yMin = ListingStandard.CurHeight;
+                End();
 
-            ListingStandard.NewColumn();
+                _tables[tableViewIndex].DrawTableContent(rectTable);
 
-            var r2 = ListingStandard.GetRect(inRect.height);
-            _tables[0].DrawTableContent(r2, null);
+                // right under the small table
+                if (tableViewIndex == 1)
+                {
+                    rectTable.y += _tables[tableViewIndex].TableHeight;
+                    Begin(rectTable, false);
+                    DrawTileInfo();
+                    End();
+                }
 
-            ListingStandard.NewColumn();
+                previousRect = rectTable;
+            }
+        }
 
-            var r3 = ListingStandard.GetRect(inRect.height);
-            _tables[2].DrawTableContent(r3, null);
+        private void DrawTileInfo()
+        {
+            DrawEntryHeader("Tile Specs", backgroundColor: Color.magenta);
 
-            End();
+            var vectorLongLat = Find.WorldGrid.LongLatOf(_tileId);
+            var latitude = vectorLongLat.y;
+            var longitude = vectorLongLat.x;
+
+            ListingStandard.Label($"Date: {GenDate.DateReadoutStringAt(_dateTicks, vectorLongLat)}");
+            ListingStandard.Label($"Tile ID: {_tileId}");
+            ListingStandard.Label(
+                $"Latitude - Longitude: {latitude.ToStringLatitude()} - {longitude.ToStringLongitude()}");
+            ListingStandard.Label($"Equatorial distance: {Find.WorldGrid.DistanceFromEquatorNormalized(_tileId)}");
+            ListingStandard.Label($"Tile average temperature: {Find.World.grid[_tileId].temperature} °C");
+            ListingStandard.Label($"Seasonal shift amplitude: {GenTemperature.SeasonalShiftAmplitudeAt(_tileId)} °C");
+        }
+
+        protected virtual void DrawEntryHeader(string entryLabel, bool useStartingGap = true,
+            bool useFollowingGap = false, Color? backgroundColor = null, float colorAlpha = 0.2f)
+        {
+            if (useStartingGap)
+                ListingStandard.Gap(12f);
+
+            var textHeight = Text.CalcHeight(entryLabel, ListingStandard.ColumnWidth);
+            var r = ListingStandard.GetRect(0f);
+            r.height = textHeight;
+
+            var bgColor = backgroundColor.GetValueOrDefault(TabGuiUtility.MenuSectionBgFillColor);
+            if (backgroundColor != null)
+                bgColor.a = colorAlpha;
+
+            Verse.Widgets.DrawBoxSolid(r, bgColor);
+
+            ListingStandard.Label($"{entryLabel}", 30f);
+
+            ListingStandard.GapLine(6f);
+
+            if (useFollowingGap)
+                ListingStandard.Gap();
         }
     }
 }

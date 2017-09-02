@@ -14,12 +14,19 @@ namespace PrepareLanding
     public class TabTemperature : TabGuiUtility
     {
         private readonly GameData.GameData _gameData;
+        private int _dateTicks = 1;
+
+        private int _dayOfQuadrum;
+        private string _dayOfQuadrumString;
 
         private int _numberOfTilesForFeature = 1;
 
         private string _numberOfTilesForFeatureString;
+        private Quadrum _quadrum;
 
         private int _selectedTileIdForTemperatureForecast = -1;
+        private int _year;
+        private string _yearString;
 
         public TabTemperature(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -52,21 +59,15 @@ namespace PrepareLanding
             NewColumn();
             DrawRainfallSelection();
             DrawMostLeastFeatureSelection();
-
-            // "Animals Can Graze Now" relies on game ticks as VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt calls
-            //   GenTemperature.GetTemperatureAtTile which calls GenTemperature.GetTemperatureFromSeasonAtTile
-            //  This last function takes GenTicks.TicksAbs as argument but the results are not consistent between calls...
-            // All in all: better not calling it during the "select landing site" page.
-            if (GenScene.InPlayScene)
-                DrawAnimalsCanGrazeNowSelection();
-
+            DrawAnimalsCanGrazeNowSelection();
+            NewColumn();
             DrawTemperatureForecast();
             End();
         }
 
         private void DrawTemperatureForecast()
         {
-            DrawEntryHeader("Temperature Forecast", backgroundColor: ColorLibrary.GrassGreen);
+            DrawEntryHeader("Temperature Forecast", backgroundColor: Color.magenta);
 
             var tileId = Find.WorldSelector.selectedTile;
 
@@ -82,31 +83,82 @@ namespace PrepareLanding
             if (_selectedTileIdForTemperatureForecast != tileId)
                 _selectedTileIdForTemperatureForecast = tileId;
 
-            if (ListingStandard.ButtonText("View"))
+            ListingStandard.GapLine(DefaultGapLineHeight);
+
+            /*
+             * Day / Quadrum / Year selector
+             */
+            var backupAnchor = Text.Anchor;
+            Text.Anchor = TextAnchor.MiddleLeft;
+
+            // day
+            var daySelector = ListingStandard.GetRect(30f);
+            var dayLabelRect = daySelector.LeftPart(0.70f);
+            var dayFieldRect = daySelector.RightPart(0.30f);
+            Widgets.Label(dayLabelRect, "Quadrum Day [1, 15]: ");
+            Widgets.TextFieldNumeric(dayFieldRect, ref _dayOfQuadrum, ref _dayOfQuadrumString, 1,
+                GenDate.DaysPerQuadrum);
+
+            ListingStandard.Gap(6f);
+
+            // quadrum
+            var quadrumRect = ListingStandard.GetRect(30f);
+            var quadrumButtonRect = quadrumRect.LeftHalf();
+            if (Widgets.ButtonText(quadrumButtonRect, "Select Quadrum"))
             {
-                //TODO: change ticks to a selected user time
+                // get all possible enumeration values for hilliness
+                var quadrumList = Enum.GetValues(typeof(Quadrum)).Cast<Quadrum>().ToList();
 
-                /*
-                 * Forecast for hours of day
-                 */
-                var temperaturesForHoursOfDay =
-                    TemperatureData.TemperaturesForDay(_selectedTileIdForTemperatureForecast, 1);
-                var temperaturesForHoursGetters = new List<ColumnData<TemperatureForecastForDay>>
+                var floatMenuOptions = new List<FloatMenuOption>();
+                foreach (var quadrum in quadrumList)
                 {
-                    new ColumnData<TemperatureForecastForDay>("Hour", "Hour of Day", tffd => $"{tffd.Hour}"),
-                    new ColumnData<TemperatureForecastForDay>("Temp", "Outdoor Temperature",
-                        tffd => $"{tffd.OutdoorTemperature:F1}"),
-                    //new ColumnData<TemperatureForecastForDay>("RandomVar", "Daily Random Variation", tffd => $"{tffd.DailyRandomVariation:F1}"),
-                    new ColumnData<TemperatureForecastForDay>("OffDRV", "Offset from Daily Random Variation",
-                        tffd => $"{tffd.OffsetFromDailyRandomVariation:F1}"),
-                    new ColumnData<TemperatureForecastForDay>("OffSeason", "Offset from Season Average",
-                        tffd => $"{tffd.OffsetFromSeasonCycle:F1}"),
-                    new ColumnData<TemperatureForecastForDay>("SunEff", "Offset from Sun Cycle",
-                        tffd => $"{tffd.OffsetFromSunCycle:F1}")
-                };
-                var tableViewTempForDay =
-                    new TableView<TemperatureForecastForDay>(temperaturesForHoursOfDay, temperaturesForHoursGetters);
+                    if (quadrum == Quadrum.Undefined)
+                        continue;
 
+                    var label = quadrum.Label();
+
+                    var menuOption = new FloatMenuOption(label,
+                        delegate { _quadrum = quadrum; });
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                var floatMenu = new FloatMenu(floatMenuOptions, "Select Quadrum");
+                Find.WindowStack.Add(floatMenu);
+            }
+            var quadrumLabelRect = quadrumRect.RightHalf();
+            Widgets.Label(quadrumLabelRect, _quadrum.ToString());
+
+            ListingStandard.Gap(6f);
+
+            // year
+            var yearSelector = ListingStandard.GetRect(30f);
+            var yearLabelRect = yearSelector.LeftPart(0.7f);
+            var yearFieldRect = yearSelector.RightPart(0.3f);
+            Widgets.Label(yearLabelRect, $"Year [{GenDate.DefaultStartingYear}, {GenDate.DefaultStartingYear + 50}]: ");
+            Widgets.TextFieldNumeric(yearFieldRect, ref _year, ref _yearString, GenDate.DefaultStartingYear,
+                GenDate.DefaultStartingYear + 50);
+
+            // translate day, quadrum and year to ticks
+            _dateTicks = WorldData.DateToTicks(_dayOfQuadrum - 1, _quadrum, _year);
+
+            // date display
+            var dateNowRect = ListingStandard.GetRect(30f);
+            var labelDateLeftRect = dateNowRect.LeftPart(0.20f);
+            Widgets.Label(labelDateLeftRect, "Date: ");
+            var labelDateRightRect = dateNowRect.RightPart(0.60f);
+            var dateString = GenDate.DateReadoutStringAt(_dateTicks,
+                Find.WorldGrid.LongLatOf(_selectedTileIdForTemperatureForecast));
+            Widgets.Label(labelDateRightRect, dateString);
+
+            Text.Anchor = backupAnchor;
+
+            ListingStandard.GapLine(DefaultGapLineHeight);
+
+            /*
+             * Forecast
+             */
+            if (ListingStandard.ButtonText("View Temperature Forecast"))
+            {
                 /*
                  * Forecast for twelves of year.
                  */
@@ -123,16 +175,41 @@ namespace PrepareLanding
                         tfft => $"{tfft.AverageTemperatureForTwelfth:F2}")
                 };
                 var tableViewTempForTwelves =
-                    new TableView<TemperatureForecastForTwelfth>(tempsForTwelves, twelvesGetters);
+                    new TableView<TemperatureForecastForTwelfth>("Forecast For Twelves", tempsForTwelves,
+                        twelvesGetters);
+
+                /*
+                 * Forecast for hours of day
+                 */
+                var temperaturesForHoursOfDay =
+                    TemperatureData.TemperaturesForDay(_selectedTileIdForTemperatureForecast, _dateTicks);
+                var temperaturesForHoursGetters = new List<ColumnData<TemperatureForecastForDay>>
+                {
+                    new ColumnData<TemperatureForecastForDay>("Hour", "Hour of Day", tffd => $"{tffd.Hour}"),
+                    new ColumnData<TemperatureForecastForDay>("Temp", "Outdoor Temperature",
+                        tffd => $"{tffd.OutdoorTemperature:F1}"),
+                    //new ColumnData<TemperatureForecastForDay>("RandomVar", "Daily Random Variation", tffd => $"{tffd.DailyRandomVariation:F1}"),
+                    new ColumnData<TemperatureForecastForDay>("OffDRV", "Offset from Daily Random Variation",
+                        tffd => $"{tffd.OffsetFromDailyRandomVariation:F1}"),
+                    new ColumnData<TemperatureForecastForDay>("OffSeason", "Offset from Season Average",
+                        tffd => $"{tffd.OffsetFromSeasonCycle:F1}"),
+                    new ColumnData<TemperatureForecastForDay>("SunEff", "Offset from Sun Cycle",
+                        tffd => $"{tffd.OffsetFromSunCycle:F1}")
+                };
+                var tableViewTempForDay =
+                    new TableView<TemperatureForecastForDay>($"Forecast for {GenDate.HoursPerDay} Hours [{dateString}]",
+                        temperaturesForHoursOfDay,
+                        temperaturesForHoursGetters);
 
                 /*
                  * Forecast for days or year
                  */
-                var tempsForDaysOfYear = TemperatureData.TemperaturesForYear(_selectedTileIdForTemperatureForecast, 1);
+                var tempsForDaysOfYear =
+                    TemperatureData.TemperaturesForYear(_selectedTileIdForTemperatureForecast, _dateTicks);
                 var temperaturesForDaysOfYearGetters = new List<ColumnData<TemperatureForecastForYear>>
                 {
                     new ColumnData<TemperatureForecastForYear>("Day", "Day of Year", tffy => $"{tffy.Day}"),
-                    new ColumnData<TemperatureForecastForYear>("Min", "MinimumTemperature of Day",
+                    new ColumnData<TemperatureForecastForYear>("Min", "Minimum Temperature of Day",
                         tffy => $"{tffy.MinTemp:F2}"),
                     new ColumnData<TemperatureForecastForYear>("Max", "Maximum Temperature of Day",
                         tffy => $"{tffy.MaxTemp:F2}"),
@@ -142,12 +219,13 @@ namespace PrepareLanding
                         tffy => $"{tffy.OffsetFromDailyRandomVariation:F2}")
                 };
                 var tableViewTempForYear =
-                    new TableView<TemperatureForecastForYear>(tempsForDaysOfYear, temperaturesForDaysOfYearGetters);
+                    new TableView<TemperatureForecastForYear>("Forecast for Next Year", tempsForDaysOfYear,
+                        temperaturesForDaysOfYearGetters);
 
                 /*
                  * Window and views
                  */
-                var temperatureWindow = new TableWindow(0.33f);
+                var temperatureWindow = new TableWindow(_selectedTileIdForTemperatureForecast, _dateTicks, 0.33f);
 
                 temperatureWindow.ClearTables();
                 temperatureWindow.AddTable(tableViewTempForDay);
