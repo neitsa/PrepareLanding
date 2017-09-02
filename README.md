@@ -1,6 +1,6 @@
 | Type  | Value |
 | :---: | :---: |
-| Build Status  | ![Build status](https://ci.appveyor.com/api/projects/status/0t0v36hpor8l68l5?svg=true)](https://ci.appveyor.com/project/neitsa/preparelanding) |
+| Build Status  | [![Build status](https://ci.appveyor.com/api/projects/status/0t0v36hpor8l68l5?svg=true)](https://ci.appveyor.com/project/neitsa/preparelanding) |
 | RimWorld Version | ![RimWorld Version](https://img.shields.io/badge/RimWorld-A17b-brightgreen.svg) |
 
 PrepareLanding
