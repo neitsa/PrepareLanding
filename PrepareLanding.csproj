@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_OVERLAYS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -52,13 +52,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Core\ColorUtils.cs" />
     <Compile Include="src\Core\Extensions\ListExtensions.cs" />
     <Compile Include="src\Core\Extensions\ListingStandardExtension.cs" />
+    <Compile Include="src\Core\Extensions\MathExtensions.cs" />
     <Compile Include="src\Core\Extensions\MultiCheckboxStateExtension.cs" />
     <Compile Include="src\Core\Extensions\RectExtensions.cs" />
+    <Compile Include="src\Core\Extensions\Statistics.cs" />
     <Compile Include="src\Core\Extensions\StringExtensions.cs" />
     <Compile Include="src\Core\Extensions\TileExtensions.cs" />
     <Compile Include="src\Core\Extensions\TwelfthExtensions.cs" />
+    <Compile Include="src\Core\GameTicks.cs" />
     <Compile Include="src\Core\Gui\ButtonDescriptor.cs" />
     <Compile Include="src\Core\Gui\RichText.cs" />
     <Compile Include="src\Core\Gui\Tab\ITabGuiUtility.cs" />
@@ -67,8 +71,9 @@
     <Compile Include="src\Core\Gui\Widgets.cs" />
     <Compile Include="src\Core\Gui\Window\MinimizableWindow.cs" />
     <Compile Include="src\Core\Gui\Window\MinimizedWindow.cs" />
-    <Compile Include="src\Core\Gui\World\HighlightedTile.cs" />
+    <Compile Include="src\Core\Gui\Window\TableWindow.cs" />
     <Compile Include="src\Core\Gui\World\TileHighlighter.cs" />
+    <Compile Include="src\Core\Gui\World\WorldLayerHighlightedTiles.cs" />
     <Compile Include="src\DataItems.cs" />
     <Compile Include="src\Defs\MainButtonWorkerToggleWorld.cs" />
     <Compile Include="src\FilterOptions.cs" />
@@ -76,9 +81,21 @@
     <Compile Include="src\Filters\TileFilter.cs" />
     <Compile Include="src\Filters\TileFilters.cs" />
     <Compile Include="src\FilterInfoLogger.cs" />
+    <Compile Include="src\GameData\DefData.cs" />
+    <Compile Include="src\GameData\ElevationData.cs" />
+    <Compile Include="src\GameData\GameData.cs" />
+    <Compile Include="src\GameData\GodModeData.cs" />
+    <Compile Include="src\GameData\RainfallData.cs" />
+    <Compile Include="src\GameData\UserData.cs" />
+    <Compile Include="src\GameData\WorldData.cs" />
+    <Compile Include="src\GameData\WorldFeatureData.cs" />
     <Compile Include="src\MainWindow.cs" />
     <Compile Include="src\MonoController.cs" />
+    <Compile Include="src\Overlays\Overlay.cs" />
+    <Compile Include="src\Overlays\TemperatureOverlay.cs" />
+    <Compile Include="src\Overlays\WorldLayerTemperature.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
+    <Compile Include="src\Patches\PatchNaturalRockTypesIn.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
     <Compile Include="src\Patches\SelectLandingSite.cs" />
     <Compile Include="src\PrepareLanding.cs" />
@@ -87,20 +104,22 @@
     <Compile Include="src\Presets\PresetInfo.cs" />
     <Compile Include="src\Presets\PresetManager.cs" />
     <Compile Include="src\TabFilteredTiles.cs" />
+    <Compile Include="src\TabGodMode.cs" />
     <Compile Include="src\TabInfo.cs" />
     <Compile Include="src\TabLoadSave.cs" />
     <Compile Include="src\TabOptions.cs" />
+    <Compile Include="src\TabOverlays.cs" />
     <Compile Include="src\TabTemperature.cs" />
     <Compile Include="src\TabTerrain.cs" />
-    <Compile Include="src\UserData.cs" />
+    <Compile Include="src\GameData\TemperatureData.cs" />
     <Compile Include="src\WorldTileFilter.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
-if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) I:\rimworld_debug\RimWorld --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
-if $(ConfigurationName) == Release xcopy $(TargetPath) $(ProjectDir)output\PrepareLanding\Assemblies</PostBuildEvent>
+if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) k:\rimworld_debug\RimWorld --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
+if $(ConfigurationName) == Release xcopy /y $(TargetPath) $(ProjectDir)output\PrepareLanding\Assemblies</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -2,7 +2,6 @@
 using System.Text;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
-using PrepareLanding.Filters;
 using UnityEngine;
 using Verse;
 
@@ -10,23 +9,22 @@ namespace PrepareLanding
 {
     public class TabInfo : TabGuiUtility
     {
+        private readonly GameData.GameData _gameData;
         private readonly GUIStyle _styleFilterInfo;
         private readonly GUIStyle _styleWorldInfo;
-
-        private readonly UserData _userData;
         private Vector2 _scrollPosFilterInfo;
 
         private Vector2 _scrollPosWorldInfo;
 
         private string _worldInfo;
 
-        public TabInfo(UserData userData, float columnSizePercent = 0.25f) :
+        public TabInfo(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
         {
-            _userData = userData;
+            _gameData = gameData;
 
             // make new text styles
-            _styleWorldInfo = new GUIStyle(Text.textAreaReadOnlyStyles[2])
+            _styleWorldInfo = new GUIStyle(Text.textAreaReadOnlyStyles[1])
             {
                 alignment = TextAnchor.UpperLeft,
                 wordWrap = true,
@@ -44,14 +42,14 @@ namespace PrepareLanding
             PrepareLanding.Instance.TileFilter.OnPrefilterDone += RebuildWorldInfo;
         }
 
-        public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
+        /// <summary>Gets whether the tab can be draw or not.</summary>
+        public override bool CanBeDrawn { get; set; } = true;
 
         public override string Id => "WorldInfo";
 
         public override string Name => "World Info";
 
-        /// <summary>Gets whether the tab can be draw or not.</summary>
-        public override bool CanBeDrawn { get; set; } = true;
+        public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
 
         public string BuildWorldInfo()
         {
@@ -73,23 +71,40 @@ namespace PrepareLanding
                     stringBuilder.AppendLine(
                         $"Tiles with Roads: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
 
-                var allValidTiles = PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly?.ToList();
-                if (allValidTiles != null)
+                stringBuilder.AppendLine("Biomes: (number of tiles)");
+                var biomes = _gameData.DefData.BiomeDefs;
+
+                //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
+                //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
+
+                foreach (var biome in biomes)
                 {
-                    stringBuilder.AppendLine("Biomes: (number of tiles)");
-                    var biomes = _userData.BiomeDefs;
-
-                    //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
-                    //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
-
-                    foreach (var biome in biomes)
-                    {
-                        var count = TileFilterBiomes.NumberOfTilesByBiome(biome, allValidTiles);
-                        //stringBuilder.AppendLine($"    {biome.LabelCap.PadRight(longestBiomeName)} ➠ {count}");
-                        stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
-                    }
+                    var count = _gameData.WorldData.NumberOfTilesByBiome[biome];
+                    //stringBuilder.AppendLine($"    {biome.LabelCap.PadRight(longestBiomeName)} ➠ {count}");
+                    stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
                 }
             }
+
+            /*
+             * Highest / lowest value for all features.
+             */
+
+            foreach (var feature in _gameData.WorldData.WorldFeatures)
+            {
+                var featureName = feature.FeatureName;
+                stringBuilder.AppendLine(featureName);
+
+                var lowestFeatureKvp = feature.WorldTilesFeatures.First();
+                var vectorLongLat = Find.WorldGrid.LongLatOf(lowestFeatureKvp.Key);
+                stringBuilder.AppendLine(
+                    $"\tWorld Lowest {featureName}: {lowestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {lowestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+
+                var highestFeatureKvp = feature.WorldTilesFeatures.Last();
+                vectorLongLat = Find.WorldGrid.LongLatOf(highestFeatureKvp.Key);
+                stringBuilder.AppendLine(
+                    $"\tWorld Highest {featureName}: {highestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {highestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+            }
+
 
             return stringBuilder.ToString();
         }
@@ -126,15 +141,10 @@ namespace PrepareLanding
         {
             DrawEntryHeader("World Info", backgroundColor: Color.yellow);
 
-            var maxHeight = InRect.height - ListingStandard.CurHeight - 30f;
-            var scrollHeight = Text.CalcHeight(WorldInfo, ListingStandard.ColumnWidth);
-            scrollHeight = Mathf.Max(maxHeight, scrollHeight);
+            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
 
-            var innerLs = ListingStandard.BeginScrollView(maxHeight, scrollHeight, ref _scrollPosWorldInfo);
-
-            GUI.TextField(innerLs.GetRect(maxHeight), WorldInfo, _styleWorldInfo);
-
-            ListingStandard.EndScrollView(innerLs);
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, WorldInfo, ref _scrollPosWorldInfo, _styleWorldInfo,
+                16f);
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using HugsLib;
+using PrepareLanding.Core;
 using PrepareLanding.Core.Gui.World;
 using PrepareLanding.Patches;
 using Verse;
@@ -33,10 +34,7 @@ namespace PrepareLanding
         /// </summary>
         public static PrepareLanding Instance { get; private set; }
 
-        /// <summary>
-        ///     User choices on the GUI are kept in this instance.
-        /// </summary>
-        public UserData UserData { get; private set; }
+        public GameTicks GameTicks { get; private set; }
 
         /// <summary>
         ///     The filtering class instance used to filter tiles on the world map.
@@ -47,6 +45,11 @@ namespace PrepareLanding
         ///     Allow highlighting filtered tiles on the world map.
         /// </summary>
         public TileHighlighter TileHighlighter { get; private set; }
+
+        /// <summary>
+        ///     Holds various game data: some are game, user, or world specific.
+        /// </summary>
+        public GameData.GameData GameData { get; private set; }
 
         /// <summary>
         ///     The main GUI window instance.
@@ -109,21 +112,21 @@ namespace PrepareLanding
             PatchWorldInterfaceOnGui.OnWorldInterfaceOnGui += WorldInterfaceOnGui;
             PatchWorldInterfaceUpdate.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
 
-            // various options show on the 'option' tab on the GUI.
+            //
+            GameTicks = new GameTicks();
+
+            // Holds various mod options (shown on the 'option' tab on the GUI).
             _filterOptions = new FilterOptions();
 
-            // main instance to keep user filter choices on the GUI.
-            UserData = new UserData(_filterOptions);
+            GameData = new GameData.GameData(_filterOptions);
 
-            TileFilter = new WorldTileFilter(UserData);
+            TileFilter = new WorldTileFilter(GameData.UserData);
 
             // instantiate the main window now
-            MainWindow = new MainWindow(UserData);
+            MainWindow = new MainWindow(GameData);
 
             // instantiate the tile highlighter
-            TileHighlighter = new TileHighlighter();
-            Instance.OnWorldInterfaceOnGui += TileHighlighter.HighlightedTileDrawerOnGui;
-            Instance.OnWorldInterfaceUpdate += TileHighlighter.HighlightedTileDrawerUpdate;
+            TileHighlighter = new TileHighlighter(_filterOptions);
         }
 
         /// <summary>
@@ -133,7 +136,7 @@ namespace PrepareLanding
         public void WorldGenerated()
         {
             // disable all tiles that are currently highlighted
-            TileHighlighter.RemoveAllTiles();
+            TileHighlighter.RemoveAllTiles(); //TODO make the TileHighlighter subscribe to WorldGenerated and remove this method from here.
 
             // call onto subscribers to tell them that the world has been generated.
             OnWorldGenerated.Invoke();

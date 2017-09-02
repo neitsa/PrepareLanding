@@ -4,16 +4,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using JetBrains.Annotations;
-using PrepareLanding.Presets;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
-namespace PrepareLanding
+namespace PrepareLanding.GameData
 {
     /// <summary>
-    ///     Class used to keep user choices (from the main GUI window) and various definitions (<see cref="Verse.Def" />) that
-    ///     are used throughout the mod.
+    ///     Class used to keep user choices (from the main GUI window)
     /// </summary>
     public class UserData : INotifyPropertyChanged
     {
@@ -22,9 +20,6 @@ namespace PrepareLanding
         /// </summary>
         public UserData(FilterOptions options)
         {
-            // get alerted when RimWorld has loaded its definition (Defs) files
-            PrepareLanding.Instance.OnDefsLoaded += ExecuteOnDefsLoaded;
-
             // get alerted when RimWorld has finished generating the world
             PrepareLanding.Instance.OnWorldGenerated += ExecuteOnWorldGenerated;
 
@@ -33,20 +28,12 @@ namespace PrepareLanding
 
             // register to the option changed event
             Options.PropertyChanged += OptionChanged;
-
-            // create the preset manager.
-            PresetManager = new PresetManager(this);
         }
 
         /// <summary>
         ///     Current user choices for the average temperature.
         /// </summary>
         public UsableMinMaxNumericItem<float> AverageTemperature { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
-        ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.
-        /// </summary>
-        public ReadOnlyCollection<BiomeDef> BiomeDefs => _biomeDefs.AsReadOnly();
 
         /// <summary>
         ///     Current user choice for the "Animal Can Graze Now" state.
@@ -128,11 +115,6 @@ namespace PrepareLanding
         public MinMaxFromRestrictedListItem<Twelfth> GrowingPeriod { get; private set; }
 
         /// <summary>
-        ///     All known hilliness (<see cref="Hilliness" />) from RimWorld.
-        /// </summary>
-        public ReadOnlyCollection<Hilliness> HillinessCollection => _hillinesses.AsReadOnly();
-
-        /// <summary>
         ///     Filter Options (from the GUI window 'options' tab).
         /// </summary>
         public FilterOptions Options { get; }
@@ -143,24 +125,10 @@ namespace PrepareLanding
         public List<ThingDef> OrderedStoneDefs { get; } = new List<ThingDef>();
 
         /// <summary>
-        ///     Used to load / save filters and options.
-        /// </summary>
-        public PresetManager PresetManager { get; }
-
-        /// <summary>
         ///     Current user choices for the rain fall.
         /// </summary>
         public UsableMinMaxNumericItem<float> RainFall { get; } = new UsableMinMaxNumericItem<float>();
 
-        /// <summary>
-        ///     All river definitions (<see cref="RiverDef" />) from RimWorld.
-        /// </summary>
-        public ReadOnlyCollection<RiverDef> RiverDefs => _riverDefs.AsReadOnly();
-
-        /// <summary>
-        ///     All road definitions (<see cref="RoadDef" />) from RimWorld.
-        /// </summary>
-        public ReadOnlyCollection<RoadDef> RoadDefs => _roadDefs.AsReadOnly();
 
         /// <summary>
         ///     Current user choices for the river filtering.
@@ -180,14 +148,7 @@ namespace PrepareLanding
         public Dictionary<ThingDef, ThreeStateItem> SelectedStoneDefs { get; } =
             new Dictionary<ThingDef, ThreeStateItem>();
 
-        /// <summary>
-        ///     All "stone" definitions from RimWorld.
-        /// </summary>
-        /// <remarks>
-        ///     Note that stone types (e.g Marble, Granite, etc. are <see cref="ThingDef" /> and have no particular
-        ///     definition).
-        /// </remarks>
-        public ReadOnlyCollection<ThingDef> StoneDefs => _stoneDefs.AsReadOnly();
+
 
         /// <summary>
         ///     The number of stones per tile to filter when the <see cref="StoneTypesNumberOnly" /> boolean is true.
@@ -245,6 +206,8 @@ namespace PrepareLanding
         ///     Current user choices for the winter temperature.
         /// </summary>
         public UsableMinMaxNumericItem<float> WinterTemperature { get; } = new UsableMinMaxNumericItem<float>();
+
+        public MostLeastItem MostLeastItem { get; } = new MostLeastItem();
 
         /// <summary>
         ///     Other classes can subscribe to this event to be alerted when a user choice changed.
@@ -311,6 +274,9 @@ namespace PrepareLanding
             if (RainFall.Use)
                 return false;
 
+            if (!MostLeastItem.IsInDefaultState)
+                return false;
+
             return true;
         }
 
@@ -336,9 +302,10 @@ namespace PrepareLanding
             _chosenCoastalTileState = MultiCheckboxState.Partial;
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
-            InitSelectedDictionary(_roadDefs, SelectedRoadDefs, nameof(SelectedRoadDefs));
-            InitSelectedDictionary(_riverDefs, SelectedRiverDefs, nameof(SelectedRiverDefs));
-            InitSelectedDictionary(_stoneDefs, SelectedStoneDefs, nameof(SelectedStoneDefs));
+            var defProps = PrepareLanding.Instance.GameData.DefData;
+            InitSelectedDictionary(defProps.RoadDefs, SelectedRoadDefs, nameof(SelectedRoadDefs));
+            InitSelectedDictionary(defProps.RiverDefs, SelectedRiverDefs, nameof(SelectedRiverDefs));
+            InitSelectedDictionary(defProps.StoneDefs, SelectedStoneDefs, nameof(SelectedStoneDefs));
 
             // patch for the fact that OrderedDictionary<TKey, TValue> doesn't exist in .NET...
             // The list is reorder-able but the dictionary is not. We need to keep the order because it is important.
@@ -374,122 +341,8 @@ namespace PrepareLanding
             GrowingPeriod.Use = false;
 
             InitUsableMinMaxNumericItem(RainFall, nameof(RainFall));
-        }
 
-        /* Definitions  building */
-
-        /// <summary>
-        ///     Build the biome definitions (<see cref="BiomeDef" />) list.
-        /// </summary>
-        /// <param name="allowUnimplemented">Tells whether or not unimplemented biomes are allowed.</param>
-        /// <param name="allowCantBuildBase">Tells whether or not biomes that do not allow bases to be built are allowed.</param>
-        /// <returns>A list of all available RimWorld biome definitions (<see cref="BiomeDef" />).</returns>
-        protected List<BiomeDef> BuildBiomeDefs(bool allowUnimplemented = false, bool allowCantBuildBase = false)
-        {
-            var biomeDefsList = new List<BiomeDef>();
-            foreach (var biomeDef in DefDatabase<BiomeDef>.AllDefsListForReading)
-            {
-                BiomeDef currentBiomeDef = null;
-
-                if (biomeDef.implemented)
-                    currentBiomeDef = biomeDef;
-                else if (!biomeDef.implemented && allowUnimplemented)
-                    currentBiomeDef = biomeDef;
-
-                if (biomeDef.canBuildBase)
-                {
-                    if (!biomeDefsList.Contains(biomeDef))
-                        currentBiomeDef = biomeDef;
-                }
-                else if (!biomeDef.canBuildBase && allowCantBuildBase)
-                {
-                    if (!biomeDefsList.Contains(biomeDef))
-                        currentBiomeDef = biomeDef;
-                }
-                else if (!biomeDef.canBuildBase && !allowCantBuildBase)
-                {
-                    if (biomeDefsList.Contains(biomeDef))
-                        biomeDefsList.Remove(biomeDef);
-
-                    currentBiomeDef = null;
-                }
-
-                if (currentBiomeDef != null)
-                    biomeDefsList.Add(currentBiomeDef);
-            }
-
-            return biomeDefsList.OrderBy(biome => biome.LabelCap).ToList();
-        }
-
-        /// <summary>
-        ///     Build the hilliness definitions (<see cref="Hilliness" />) list.
-        /// </summary>
-        /// <returns>A list of all available RimWorld hillinesses (<see cref="Hilliness" />).</returns>
-        protected List<Hilliness> BuildHillinessValues()
-        {
-            // get all possible enumeration values for hilliness
-            var hillinesses = Enum.GetValues(typeof(Hilliness)).Cast<Hilliness>().ToList();
-
-            // check if impassable tiles are allowed
-            if (Options.AllowImpassableHilliness)
-                return hillinesses;
-
-            // remove impassable hilliness if not asked specifically for it.
-            if (!hillinesses.Remove(Hilliness.Impassable))
-                Log.Message("[PrepareLanding] Couldn't remove Impassable hilliness.");
-
-            return hillinesses;
-        }
-
-        /// <summary>
-        ///     Build the river definitions (<see cref="RiverDef" />) list.
-        /// </summary>
-        /// <returns>A list of all available RimWorld river definitions (<see cref="RiverDef" />).</returns>
-        protected List<RiverDef> BuildRiverDefs()
-        {
-            var rivers = DefDatabase<RiverDef>.AllDefsListForReading;
-            return rivers;
-        }
-
-        /// <summary>
-        ///     Build the road definitions (<see cref="RoadDef" />) list.
-        /// </summary>
-        /// <returns>A list of all available RimWorld road definitions (<see cref="RoadDef" />).</returns>
-        protected List<RoadDef> BuildRoadDefs()
-        {
-            var roads = DefDatabase<RoadDef>.AllDefsListForReading;
-            return roads;
-        }
-
-        /// <summary>
-        ///     Build the stone definitions (<see cref="ThingDef" />) list.
-        /// </summary>
-        /// <returns>A list of all available RimWorld stone definitions (<see cref="ThingDef" />).</returns>
-        protected List<ThingDef> BuildStoneDefs()
-        {
-            return DefDatabase<ThingDef>.AllDefs.Where(WorldTileFilter.IsThingDefStone).ToList();
-        }
-
-        /// <summary>
-        ///     Called when RimWorld definitions (<see cref="Def" />) have been loaded: build definition lists (biomes, rivers,
-        ///     roads, stones, etc.)
-        /// </summary>
-        protected void ExecuteOnDefsLoaded()
-        {
-            // biome definitions list
-            _biomeDefs = BuildBiomeDefs();
-
-            // road definitions list
-            _roadDefs = BuildRoadDefs();
-
-            // river definitions list
-            _riverDefs = BuildRiverDefs();
-
-            // stone definitions list
-            _stoneDefs = BuildStoneDefs();
-
-            // build hilliness values
-            _hillinesses = BuildHillinessValues();
+            MostLeastItem.Reset();
         }
 
         /// <summary>
@@ -512,18 +365,18 @@ namespace PrepareLanding
         ///     whole dictionary rather than the contained item.
         /// </summary>
         /// <typeparam name="T">The type of the items in the list parameter. <b>T</b> should be a RimWorld <see cref="Def" />.</typeparam>
-        /// <param name="initList">A list of <see cref="Def" /> (each entry will be used as a dictionary key).</param>
+        /// <param name="initCollection">A collection of <see cref="Def" /> (each entry will be used as a dictionary key).</param>
         /// <param name="dictionary">The dictionary to be initialized.</param>
         /// <param name="propertyChangedName">
         ///     The bound property name (the name of the dictionary in this class). Each time a value
         ///     in the dictionary is changed, this fire an event related to the dictionary name and not the contained values.
         /// </param>
         /// <param name="defaultSate">The default state of the <see cref="ThreeStateItem" />.</param>
-        protected void InitSelectedDictionary<T>(List<T> initList, Dictionary<T, ThreeStateItem> dictionary,
+        protected void InitSelectedDictionary<T>(ReadOnlyCollection<T> initCollection, Dictionary<T, ThreeStateItem> dictionary,
             string propertyChangedName, MultiCheckboxState defaultSate = MultiCheckboxState.Partial)
         {
             dictionary.Clear();
-            foreach (var elementDef in initList)
+            foreach (var elementDef in initCollection)
             {
                 var item = new ThreeStateItem(defaultSate);
                 item.PropertyChanged += delegate
@@ -571,24 +424,14 @@ namespace PrepareLanding
         /// </summary>
         protected void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
         {
-            // rebuild possible hilliness values if the option changed
+            // reset the chosen Hilliness if the option changed
             if (eventArgs.PropertyName == nameof(Options.AllowImpassableHilliness))
             {
-                _hillinesses = BuildHillinessValues();
                 _chosenHilliness = Hilliness.Undefined;
             }
         }
 
         #region PRIVATE_FIELDS
-
-        private bool _allowCantBuildBase;
-        private bool _allowUnimplementedBiomes;
-
-        /// <summary>
-        ///     All biome definitions (<see cref="BiomeDef" />) from RimWorld.
-        /// </summary>
-        private List<BiomeDef> _biomeDefs;
-
         /// <summary>
         ///     Current user choice for the "Animal Can Graze Now" state.
         /// </summary>
@@ -610,11 +453,6 @@ namespace PrepareLanding
         private Hilliness _chosenHilliness;
 
         /// <summary>
-        ///     List of all RimWorld hillinesses.
-        /// </summary>
-        private List<Hilliness> _hillinesses;
-
-        /// <summary>
         ///     If true, filter only tiles with only a given number of stone types.
         /// </summary>
         private bool _stoneTypesNumberOnly;
@@ -623,21 +461,6 @@ namespace PrepareLanding
         ///     Number of stone types when filtering with <see cref="_stoneTypesNumberOnly" />.
         /// </summary>
         private int _stoneTypesNumber = 2;
-
-        /// <summary>
-        ///     All river definitions (<see cref="RiverDef" />) from RimWorld.
-        /// </summary>
-        private List<RiverDef> _riverDefs;
-
-        /// <summary>
-        ///     All road definitions (<see cref="RoadDef" />) from RimWorld.
-        /// </summary>
-        private List<RoadDef> _roadDefs;
-
-        /// <summary>
-        ///     All stone (rock types) definitions (<see cref="ThingDef" />) from RimWorld.
-        /// </summary>
-        private List<ThingDef> _stoneDefs;
 
         /// <summary>
         ///     Used to tell if the first reset has been done. It must be done once in the lifetime of the mod to at least

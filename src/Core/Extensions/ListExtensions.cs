@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Verse;
 
 namespace PrepareLanding.Core.Extensions
 {
@@ -47,6 +48,39 @@ namespace PrepareLanding.Core.Extensions
                     return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Re-order elements in a list.
+        /// </summary>
+        /// <typeparam name="T">type of elements in the list.</typeparam>
+        /// <param name="index">The old index of the element to move.</param>
+        /// <param name="newIndex">The new index of the element to move.</param>
+        /// <param name="elementsList">The list of elements.</param>
+        public static void ReorderElements<T>(this IList<T> elementsList, int index, int newIndex)
+        {
+            if ((index == newIndex) || (index < 0))
+            {
+                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}");
+                return;
+            }
+
+            if (elementsList.Count == 0)
+            {
+                Log.Message("[PrepareLanding] ReorderElements: elementsList count is 0.");
+                return;
+            }
+
+            if ((index >= elementsList.Count) || (newIndex >= elementsList.Count))
+            {
+                Log.Message(
+                    $"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}; elemntsList.Count: {elementsList.Count}");
+                return;
+            }
+
+            var item = elementsList[index];
+            elementsList.RemoveAt(index);
+            elementsList.Insert(newIndex, item);
         }
     }
 }

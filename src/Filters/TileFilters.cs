@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
+using PrepareLanding.GameData;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -15,9 +17,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Biomes";
-
         public override bool IsFilterActive => UserData.ChosenBiome != null;
+
+        public override string SubjectThingDef => "Biomes";
 
         public override void Filter(List<int> inputList)
         {
@@ -38,6 +40,23 @@ namespace PrepareLanding.Filters
         {
             return inputList.Count(tileId => Find.World.grid[tileId].biome == biome);
         }
+
+        public static int NumberOfTilesByBiome(BiomeDef biome)
+        {
+            return TileIdsByBiome(biome).Count;
+        }
+
+        public static List<int> TileIdsByBiome(BiomeDef biomeDef)
+        {
+            var outList = new List<int>();
+
+            var maxTiles = Find.World.grid.TilesCount;
+            for (var i = 0; i < maxTiles; i++)
+                if (Find.World.grid[i].biome == biomeDef)
+                    outList.Add(i);
+
+            return outList;
+        }
     }
 
     public class TileFilterHilliness : TileFilter
@@ -47,9 +66,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Terrains";
-
         public override bool IsFilterActive => UserData.ChosenHilliness != Hilliness.Undefined;
+
+        public override string SubjectThingDef => "Terrains";
 
         public override void Filter(List<int> inputList)
         {
@@ -73,8 +92,6 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Roads";
-
         public override bool IsFilterActive
         {
             get
@@ -83,6 +100,8 @@ namespace PrepareLanding.Filters
                 return roadDefs.Any(entry => entry.Value.State != MultiCheckboxState.Partial);
             }
         }
+
+        public override string SubjectThingDef => "Roads";
 
         public override void Filter(List<int> inputList)
         {
@@ -153,16 +172,17 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Stones";
-
         public override bool IsFilterActive
         {
             get
             {
                 var stoneDefs = UserData.SelectedStoneDefs;
-                return stoneDefs.Any(entry => entry.Value.State != MultiCheckboxState.Partial) || UserData.StoneTypesNumberOnly;
+                return stoneDefs.Any(entry => entry.Value.State != MultiCheckboxState.Partial) ||
+                       UserData.StoneTypesNumberOnly;
             }
         }
+
+        public override string SubjectThingDef => "Stones";
 
         public override void Filter(List<int> inputList)
         {
@@ -176,11 +196,9 @@ namespace PrepareLanding.Filters
             {
                 var numberOfStones = UserData.StoneTypesNumber;
                 foreach (var tileId in inputList)
-                {
                     // get number of stone types in the tile
-                    if(Find.World.NaturalRockTypesIn(tileId).Count() == numberOfStones)
+                    if (Find.World.NaturalRockTypesIn(tileId).Count() == numberOfStones)
                         _filteredTiles.Add(tileId);
-                }
 
                 return;
             }
@@ -271,8 +289,6 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Rivers";
-
         public override bool IsFilterActive
         {
             get
@@ -281,6 +297,8 @@ namespace PrepareLanding.Filters
                 return stoneDefs.Any(entry => entry.Value.State != MultiCheckboxState.Partial);
             }
         }
+
+        public override string SubjectThingDef => "Rivers";
 
         public override void Filter(List<int> inputList)
         {
@@ -419,8 +437,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Current Movement Times";
         public override bool IsFilterActive => UserData.CurrentMovementTime.Use;
+
+        public override string SubjectThingDef => "Current Movement Times";
 
         protected override float YearPct(int tileId)
         {
@@ -435,8 +454,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Winter Movement Times";
         public override bool IsFilterActive => UserData.WinterMovementTime.Use;
+
+        public override string SubjectThingDef => "Winter Movement Times";
 
         protected override float YearPct(int tileId)
         {
@@ -453,9 +473,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Summer Movement Times";
-
         public override bool IsFilterActive => UserData.SummerMovementTime.Use;
+
+        public override string SubjectThingDef => "Summer Movement Times";
 
         protected override float YearPct(int tileId)
         {
@@ -472,9 +492,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Coastal Tiles";
-
         public override bool IsFilterActive => UserData.ChosenCoastalTileState != MultiCheckboxState.Partial;
+
+        public override string SubjectThingDef => "Coastal Tiles";
 
         public override void Filter(List<int> inputList)
         {
@@ -529,9 +549,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Elevations";
-
         public override bool IsFilterActive => UserData.Elevation.Use;
+
+        public override string SubjectThingDef => "Elevations";
 
         public override void Filter(List<int> inputList)
         {
@@ -565,9 +585,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Time Zones";
-
         public override bool IsFilterActive => UserData.TimeZone.Use;
+
+        public override string SubjectThingDef => "Time Zones";
 
 
         public override void Filter(List<int> inputList)
@@ -645,9 +665,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Average Temperatures";
-
         public override bool IsFilterActive => UserData.AverageTemperature.Use;
+
+        public override string SubjectThingDef => "Average Temperatures";
 
         protected override float TemperatureForTile(int tileId)
         {
@@ -663,9 +683,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Winter Temperatures";
-
         public override bool IsFilterActive => UserData.WinterTemperature.Use;
+
+        public override string SubjectThingDef => "Winter Temperatures";
 
         protected override float TemperatureForTile(int tileId)
         {
@@ -686,9 +706,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Summer Temperatures";
-
         public override bool IsFilterActive => UserData.SummerTemperature.Use;
+
+        public override string SubjectThingDef => "Summer Temperatures";
 
         protected override float TemperatureForTile(int tileId)
         {
@@ -708,9 +728,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Growing Periods";
-
         public override bool IsFilterActive => UserData.GrowingPeriod.Use;
+
+        public override string SubjectThingDef => "Growing Periods";
 
         public override void Filter(List<int> inputList)
         {
@@ -755,9 +775,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Rain Falls";
-
         public override bool IsFilterActive => UserData.RainFall.Use;
+
+        public override string SubjectThingDef => "Rain Falls";
 
         public override void Filter(List<int> inputList)
         {
@@ -791,9 +811,9 @@ namespace PrepareLanding.Filters
         {
         }
 
-        public override string SubjectThingDef => "Animals Can Graze Now";
-
         public override bool IsFilterActive => UserData.ChosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial;
+
+        public override string SubjectThingDef => "Animals Can Graze Now";
 
         public override void Filter(List<int> inputList)
         {
@@ -809,17 +829,86 @@ namespace PrepareLanding.Filters
                 return;
             }
 
-            foreach (var tileId in inputList)
+            try
             {
-                var canGrazeNow = VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt(tileId);
-                if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.On)
-                    if (canGrazeNow)
-                        _filteredTiles.Add(tileId);
+                GameTicks.PushTickAbs();
+                foreach (var tileId in inputList)
+                {
+                    var canGrazeNow = VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt(tileId);
+                    if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.On)
+                        if (canGrazeNow)
+                            _filteredTiles.Add(tileId);
 
-                if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.Off)
-                    if (!canGrazeNow)
-                        _filteredTiles.Add(tileId);
+                    if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.Off)
+                        if (!canGrazeNow)
+                            _filteredTiles.Add(tileId);
+                }
             }
+            finally
+            {
+                GameTicks.PopTickAbs();
+            }
+        }
+    }
+
+    public class TileFilterMostLeastFeature : TileFilter
+    {
+        public TileFilterMostLeastFeature(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(
+            userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override bool IsFilterActive => !UserData.MostLeastItem.IsInDefaultState;
+
+        public override string SubjectThingDef => $"MostLeastFeature: {UserData.MostLeastItem.Feature}";
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            if (Enumerable.Any(PrepareLanding.Instance.GameData.WorldData.WorldFeatures,
+                worldFeature => worldFeature.Feature == UserData.MostLeastItem.Feature))
+                FilterFeature(UserData.MostLeastItem);
+        }
+
+        private void FilterFeature(MostLeastItem item)
+        {
+            var worldFeature = PrepareLanding.Instance.GameData.WorldData.WorldFeatureDataByFeature(item.Feature);
+            if (worldFeature == null)
+                return;
+
+            // we want either most or least.
+            if (item.FeatureType == MostLeastType.None)
+                return;
+
+            // get list of KeyValuePair with key being the tile ID and value being the tile feature for the whole world
+            //    e.g List<KVP<int, float>> where int is tileId and float is temperature or rainfall
+            var worldTilesAndFeatures = worldFeature.WorldTilesFeatures;
+
+            // can't request more tiles than there are in the world
+            if (UserData.MostLeastItem.NumberOfItems > worldTilesAndFeatures.Count)
+            {
+                Messages.Message(
+                    $"You are requesting more tiles than the number of available tiles (max: {worldTilesAndFeatures.Count})",
+                    MessageSound.RejectInput);
+                return;
+            }
+
+            // get a list of KVP where key is tile Id and value is the feature value (e.g temperature, rainfall, elevation)
+            var mostLeastTilesAndFeatures = item.FeatureType == MostLeastType.Least
+                ? worldFeature.WorldMinRange(UserData.MostLeastItem.NumberOfItems)
+                : worldFeature.WorldMaxRange(UserData.MostLeastItem.NumberOfItems);
+            if (mostLeastTilesAndFeatures == null)
+                return;
+
+            // we still have a list of KVP, we just want the tiles
+            var tileIds = mostLeastTilesAndFeatures.Select(kvp => kvp.Key);
+
+            // add them to the filtered tiles list.
+            _filteredTiles.AddRange(tileIds);
         }
     }
 }

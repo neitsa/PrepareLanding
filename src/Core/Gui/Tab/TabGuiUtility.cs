@@ -112,7 +112,7 @@ namespace PrepareLanding.Core.Gui.Tab
 
         public static Color ColorFromFilterSubjectThingDef(string filterName)
         {
-            if (!PrepareLanding.Instance.UserData.Options.ShowFilterHeaviness)
+            if (!PrepareLanding.Instance.GameData.UserData.Options.ShowFilterHeaviness)
                 return MenuSectionBgFillColor;
 
             Color result;

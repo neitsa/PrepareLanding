@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.Linq;
+using PrepareLanding.GameData;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -10,12 +11,12 @@ namespace PrepareLanding.Presets
 {
     public class Preset
     {
-        private readonly UserData _userData;
+        private readonly GameData.GameData _gameData;
 
-        public Preset(string presetName, UserData userData)
+        public Preset(string presetName, GameData.GameData gameData)
         {
             PresetName = presetName;
-            _userData = userData;
+            _gameData = gameData;
             PresetInfo = new PresetInfo();
         }
 
@@ -45,31 +46,31 @@ namespace PrepareLanding.Presets
             if (xTerrain == null)
                 return;
 
-            _userData.ChosenBiome = LoadDef<BiomeDef>(xTerrain, "Biome") as BiomeDef;
-            _userData.ChosenHilliness = LoadEnum<Hilliness>(xTerrain, "Hilliness");
-            LoadMultiThreeStates(xTerrain, "Roads", "Road", _userData.SelectedRoadDefs);
-            LoadMultiThreeStates(xTerrain, "Rivers", "River", _userData.SelectedRiverDefs);
-            LoadUsableMinMax(xTerrain, "CurrentMovementTime", _userData.CurrentMovementTime);
-            LoadUsableMinMax(xTerrain, "SummerMovementTime", _userData.SummerMovementTime);
-            LoadUsableMinMax(xTerrain, "WinterMovementTime", _userData.WinterMovementTime);
+            _gameData.UserData.ChosenBiome = LoadDef<BiomeDef>(xTerrain, "Biome") as BiomeDef;
+            _gameData.UserData.ChosenHilliness = LoadEnum<Hilliness>(xTerrain, "Hilliness");
+            LoadMultiThreeStates(xTerrain, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
+            LoadMultiThreeStates(xTerrain, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
+            LoadUsableMinMax(xTerrain, "CurrentMovementTime", _gameData.UserData.CurrentMovementTime);
+            LoadUsableMinMax(xTerrain, "SummerMovementTime", _gameData.UserData.SummerMovementTime);
+            LoadUsableMinMax(xTerrain, "WinterMovementTime", _gameData.UserData.WinterMovementTime);
             if (xTerrain.Element("StoneTypesNumberOnly") == null)
             {
-                LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _userData.SelectedStoneDefs,
-                    _userData.OrderedStoneDefs);
+                LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _gameData.UserData.SelectedStoneDefs,
+                    _gameData.UserData.OrderedStoneDefs);
             }
             else
             {
-                LoadBoolean(xTerrain, "StoneTypesNumberOnly", b => _userData.StoneTypesNumberOnly = b);
-                if (_userData.StoneTypesNumberOnly)
+                LoadBoolean(xTerrain, "StoneTypesNumberOnly", b => _gameData.UserData.StoneTypesNumberOnly = b);
+                if (_gameData.UserData.StoneTypesNumberOnly)
                 {
                     int stoneTypesNumber;
                     Load(xTerrain, "StoneTypesNumber", out stoneTypesNumber);
-                    _userData.StoneTypesNumber = stoneTypesNumber;
+                    _gameData.UserData.StoneTypesNumber = stoneTypesNumber;
                 }
             }
-            _userData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
-            LoadUsableMinMax(xTerrain, "Elevation", _userData.Elevation);
-            LoadUsableMinMax(xTerrain, "TimeZone", _userData.TimeZone);
+            _gameData.UserData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
+            LoadUsableMinMax(xTerrain, "Elevation", _gameData.UserData.Elevation);
+            LoadUsableMinMax(xTerrain, "TimeZone", _gameData.UserData.TimeZone);
 
 
             // temperature
@@ -77,12 +78,13 @@ namespace PrepareLanding.Presets
             if (xTemperature == null)
                 return;
 
-            LoadUsableMinMax(xTemperature, "AverageTemperature", _userData.AverageTemperature);
-            LoadUsableMinMax(xTemperature, "SummerTemperature", _userData.SummerTemperature);
-            LoadUsableMinMax(xTemperature, "WinterTemperature", _userData.WinterTemperature);
-            LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", _userData.GrowingPeriod);
-            LoadUsableMinMax(xTemperature, "RainFall", _userData.RainFall);
-            _userData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
+            LoadUsableMinMax(xTemperature, "AverageTemperature", _gameData.UserData.AverageTemperature);
+            LoadUsableMinMax(xTemperature, "SummerTemperature", _gameData.UserData.SummerTemperature);
+            LoadUsableMinMax(xTemperature, "WinterTemperature", _gameData.UserData.WinterTemperature);
+            LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
+            LoadUsableMinMax(xTemperature, "RainFall", _gameData.UserData.RainFall);
+            _gameData.UserData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
+            LoadMostLeastItem(xTemperature, "MostLeastFeature", _gameData.UserData.MostLeastItem);
 
             /*
              * Options
@@ -95,17 +97,17 @@ namespace PrepareLanding.Presets
             if (!loadOptions)
                 return;
 
-            LoadBoolean(xOptions, "AllowImpassableHilliness", b => _userData.Options.AllowImpassableHilliness = b);
+            LoadBoolean(xOptions, "AllowImpassableHilliness", b => _gameData.UserData.Options.AllowImpassableHilliness = b);
             LoadBoolean(xOptions, "AllowInvalidTilesForNewSettlement",
-                b => _userData.Options.AllowInvalidTilesForNewSettlement = b);
-            LoadBoolean(xOptions, "AllowLiveFiltering", b => _userData.Options.AllowLiveFiltering = b);
-            LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => _userData.Options.BypassMaxHighlightedTiles = b);
-            LoadBoolean(xOptions, "DisablePreFilterCheck", b => _userData.Options.DisablePreFilterCheck = b);
-            LoadBoolean(xOptions, "ResetAllFieldsOnNewGeneratedWorld", b => _userData.Options.ResetAllFieldsOnNewGeneratedWorld = b);
-            LoadBoolean(xOptions, "DisableTileHighlighting", b => _userData.Options.DisableTileHighlighting = b);
-            LoadBoolean(xOptions, "DisableTileBlinking", b => _userData.Options.DisableTileBlinking = b);
-            LoadBoolean(xOptions, "ShowDebugTileId", b => _userData.Options.ShowDebugTileId = b);
-            LoadBoolean(xOptions, "ShowFilterHeaviness", b => _userData.Options.ShowFilterHeaviness = b);
+                b => _gameData.UserData.Options.AllowInvalidTilesForNewSettlement = b);
+            LoadBoolean(xOptions, "AllowLiveFiltering", b => _gameData.UserData.Options.AllowLiveFiltering = b);
+            LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => _gameData.UserData.Options.BypassMaxHighlightedTiles = b);
+            LoadBoolean(xOptions, "DisablePreFilterCheck", b => _gameData.UserData.Options.DisablePreFilterCheck = b);
+            LoadBoolean(xOptions, "ResetAllFieldsOnNewGeneratedWorld", b => _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld = b);
+            LoadBoolean(xOptions, "DisableTileHighlighting", b => _gameData.UserData.Options.DisableTileHighlighting = b);
+            LoadBoolean(xOptions, "DisableTileBlinking", b => _gameData.UserData.Options.DisableTileBlinking = b);
+            LoadBoolean(xOptions, "ShowDebugTileId", b => _gameData.UserData.Options.ShowDebugTileId = b);
+            LoadBoolean(xOptions, "ShowFilterHeaviness", b => _gameData.UserData.Options.ShowFilterHeaviness = b);
         }
 
         public void LoadPresetInfo()
@@ -140,37 +142,38 @@ namespace PrepareLanding.Presets
                 var xTerrainFilters = new XElement(TerrainNode);
                 xFilter.Add(xTerrainFilters);
 
-                SaveDef(xTerrainFilters, "Biome", _userData.ChosenBiome);
-                SaveHilliness(xTerrainFilters, "Hilliness", _userData.ChosenHilliness);
-                SaveMultiThreeStates(xTerrainFilters, "Roads", "Road", _userData.SelectedRoadDefs);
-                SaveMultiThreeStates(xTerrainFilters, "Rivers", "River", _userData.SelectedRiverDefs);
-                SaveUsableMinMax(xTerrainFilters, "CurrentMovementTime", _userData.CurrentMovementTime);
-                SaveUsableMinMax(xTerrainFilters, "SummerMovementTime", _userData.SummerMovementTime);
-                SaveUsableMinMax(xTerrainFilters, "WinterMovementTime", _userData.WinterMovementTime);
-                if (_userData.StoneTypesNumberOnly)
+                SaveDef(xTerrainFilters, "Biome", _gameData.UserData.ChosenBiome);
+                SaveHilliness(xTerrainFilters, "Hilliness", _gameData.UserData.ChosenHilliness);
+                SaveMultiThreeStates(xTerrainFilters, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
+                SaveMultiThreeStates(xTerrainFilters, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
+                SaveUsableMinMax(xTerrainFilters, "CurrentMovementTime", _gameData.UserData.CurrentMovementTime);
+                SaveUsableMinMax(xTerrainFilters, "SummerMovementTime", _gameData.UserData.SummerMovementTime);
+                SaveUsableMinMax(xTerrainFilters, "WinterMovementTime", _gameData.UserData.WinterMovementTime);
+                if (_gameData.UserData.StoneTypesNumberOnly)
                 {
-                    SaveBoolean(xTerrainFilters, "StoneTypesNumberOnly", _userData.StoneTypesNumberOnly);
-                    Save(xTerrainFilters, "StoneTypesNumber", _userData.StoneTypesNumber);
+                    SaveBoolean(xTerrainFilters, "StoneTypesNumberOnly", _gameData.UserData.StoneTypesNumberOnly);
+                    Save(xTerrainFilters, "StoneTypesNumber", _gameData.UserData.StoneTypesNumber);
                 }
                 else
                 {
-                    SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _userData.SelectedStoneDefs,
-                        _userData.OrderedStoneDefs);
+                    SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _gameData.UserData.SelectedStoneDefs,
+                        _gameData.UserData.OrderedStoneDefs);
                 }
-                SaveThreeState(xTerrainFilters, "CoastalTile", _userData.ChosenCoastalTileState);
-                SaveUsableMinMax(xTerrainFilters, "Elevation", _userData.Elevation);
-                SaveUsableMinMax(xTerrainFilters, "TimeZone", _userData.TimeZone);
+                SaveThreeState(xTerrainFilters, "CoastalTile", _gameData.UserData.ChosenCoastalTileState);
+                SaveUsableMinMax(xTerrainFilters, "Elevation", _gameData.UserData.Elevation);
+                SaveUsableMinMax(xTerrainFilters, "TimeZone", _gameData.UserData.TimeZone);
 
                 // Temperature
                 var xTemperatureFilters = new XElement("Temperature");
                 xFilter.Add(xTemperatureFilters);
 
-                SaveUsableMinMax(xTemperatureFilters, "AverageTemperature", _userData.AverageTemperature);
-                SaveUsableMinMax(xTemperatureFilters, "SummerTemperature", _userData.SummerTemperature);
-                SaveUsableMinMax(xTemperatureFilters, "WinterTemperature", _userData.WinterTemperature);
-                SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", _userData.GrowingPeriod);
-                SaveUsableMinMax(xTemperatureFilters, "RainFall", _userData.RainFall);
-                SaveThreeState(xTerrainFilters, "AnimalsCanGrazeNow", _userData.ChosenAnimalsCanGrazeNowState);
+                SaveUsableMinMax(xTemperatureFilters, "AverageTemperature", _gameData.UserData.AverageTemperature);
+                SaveUsableMinMax(xTemperatureFilters, "SummerTemperature", _gameData.UserData.SummerTemperature);
+                SaveUsableMinMax(xTemperatureFilters, "WinterTemperature", _gameData.UserData.WinterTemperature);
+                SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
+                SaveUsableMinMax(xTemperatureFilters, "RainFall", _gameData.UserData.RainFall);
+                SaveThreeState(xTerrainFilters, "AnimalsCanGrazeNow", _gameData.UserData.ChosenAnimalsCanGrazeNowState);
+                SaveMostLeastItem(xTemperatureFilters, "MostLeastFeature", _gameData.UserData.MostLeastItem);
 
                 /*
                  * Options
@@ -181,17 +184,17 @@ namespace PrepareLanding.Presets
                 // save options if specifically asked for
                 if (saveOptions)
                 {
-                    SaveBoolean(xOption, "AllowImpassableHilliness", _userData.Options.AllowImpassableHilliness);
+                    SaveBoolean(xOption, "AllowImpassableHilliness", _gameData.UserData.Options.AllowImpassableHilliness);
                     SaveBoolean(xOption, "AllowInvalidTilesForNewSettlement",
-                        _userData.Options.AllowInvalidTilesForNewSettlement);
-                    SaveBoolean(xOption, "AllowLiveFiltering", _userData.Options.AllowLiveFiltering);
-                    SaveBoolean(xOption, "BypassMaxHighlightedTiles", _userData.Options.BypassMaxHighlightedTiles);
-                    SaveBoolean(xOption, "DisablePreFilterCheck", _userData.Options.DisablePreFilterCheck);
-                    SaveBoolean(xOption, "ResetAllFieldsOnNewGeneratedWorld", _userData.Options.ResetAllFieldsOnNewGeneratedWorld);
-                    SaveBoolean(xOption, "DisableTileHighlighting", _userData.Options.DisableTileHighlighting);
-                    SaveBoolean(xOption, "DisableTileBlinking", _userData.Options.DisableTileBlinking);
-                    SaveBoolean(xOption, "ShowDebugTileId", _userData.Options.ShowDebugTileId);
-                    SaveBoolean(xOption, "ShowFilterHeaviness", _userData.Options.ShowFilterHeaviness);
+                        _gameData.UserData.Options.AllowInvalidTilesForNewSettlement);
+                    SaveBoolean(xOption, "AllowLiveFiltering", _gameData.UserData.Options.AllowLiveFiltering);
+                    SaveBoolean(xOption, "BypassMaxHighlightedTiles", _gameData.UserData.Options.BypassMaxHighlightedTiles);
+                    SaveBoolean(xOption, "DisablePreFilterCheck", _gameData.UserData.Options.DisablePreFilterCheck);
+                    SaveBoolean(xOption, "ResetAllFieldsOnNewGeneratedWorld", _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld);
+                    SaveBoolean(xOption, "DisableTileHighlighting", _gameData.UserData.Options.DisableTileHighlighting);
+                    SaveBoolean(xOption, "DisableTileBlinking", _gameData.UserData.Options.DisableTileBlinking);
+                    SaveBoolean(xOption, "ShowDebugTileId", _gameData.UserData.Options.ShowDebugTileId);
+                    SaveBoolean(xOption, "ShowFilterHeaviness", _gameData.UserData.Options.ShowFilterHeaviness);
                 }
 
                 // save the document
@@ -252,6 +255,13 @@ namespace PrepareLanding.Presets
 
         private const string UseNode = "Use";
 
+        // most/least 
+        private const string MostLeastItemFeatureNode = "Feature";
+
+        private const string MostLeastItemFeatureTypeNode = "FeatureType";
+
+        private const string MostLeastItemNumberOfItemsNode = "NumberOfItems";
+
         // def
         private const string DefNameNode = "defName";
 
@@ -271,26 +281,26 @@ namespace PrepareLanding.Presets
             switch (typeof(T).Name)
             {
                 case nameof(BiomeDef):
-                    foreach (var biomeDef in _userData.BiomeDefs)
+                    foreach (var biomeDef in _gameData.DefData.BiomeDefs)
                         if (string.Equals(biomeDef.defName, xFoundElement.Value, StringComparison.OrdinalIgnoreCase))
                             return biomeDef;
                     break;
 
                 case nameof(RoadDef):
-                    foreach (var roadDef in _userData.RoadDefs)
+                    foreach (var roadDef in _gameData.DefData.RoadDefs)
                         if (string.Equals(roadDef.defName, xFoundElement.Value, StringComparison.OrdinalIgnoreCase))
                             return roadDef;
                     break;
 
                 case nameof(RiverDef):
-                    foreach (var riverDef in _userData.RiverDefs)
+                    foreach (var riverDef in _gameData.DefData.RiverDefs)
                         if (string.Equals(riverDef.defName, xFoundElement.Value, StringComparison.OrdinalIgnoreCase))
                             return riverDef;
                     break;
 
                 case nameof(ThingDef):
                     // TODO: be wary that multiple things might be ThinDef, so better check if its a stone before parsing StoneDefs.
-                    foreach (var stoneDef in _userData.StoneDefs)
+                    foreach (var stoneDef in _gameData.DefData.StoneDefs)
                         if (string.Equals(stoneDef.defName, xFoundElement.Value, StringComparison.OrdinalIgnoreCase))
                             return stoneDef;
                     break;
@@ -496,6 +506,24 @@ namespace PrepareLanding.Presets
             }
         }
 
+        private static void LoadMostLeastItem(XContainer xParent, string elementName, MostLeastItem item)
+        {
+            var xFoundElement = xParent.Element(elementName);
+            if (xFoundElement == null)
+                return;
+
+            var feature = LoadEnum<MostLeastFeature>(xFoundElement, MostLeastItemFeatureNode);
+            var featureType = LoadEnum<MostLeastType>(xFoundElement, MostLeastItemFeatureTypeNode);
+
+            int numItems;
+            if (!Load(xFoundElement, MostLeastItemNumberOfItemsNode, out numItems))
+                return;
+
+            item.Feature = feature;
+            item.FeatureType = featureType;
+            item.NumberOfItems = numItems;
+        }
+
         internal static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
         {
             bool value;
@@ -613,6 +641,19 @@ namespace PrepareLanding.Presets
             xElement.Add(new XElement(UseNode, item.Use));
             xElement.Add(new XElement(MinNode, item.Min.ToString(CultureInfo.InvariantCulture)));
             xElement.Add(new XElement(MaxNode, item.Max.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        private static void SaveMostLeastItem(XContainer xRoot, string elementName, MostLeastItem item)
+        {
+            if (item.IsInDefaultState)
+                return;
+
+            var xElement = new XElement(elementName);
+            xRoot.Add(xElement);
+
+            xElement.Add(new XElement(MostLeastItemFeatureNode, item.Feature.ToString()));
+            xElement.Add(new XElement(MostLeastItemFeatureTypeNode, item.FeatureType.ToString()));
+            xElement.Add(new XElement(MostLeastItemNumberOfItemsNode, item.NumberOfItems));
         }
 
         private static void Save<T>(XContainer xParent, string elementName, T value) where T : IConvertible

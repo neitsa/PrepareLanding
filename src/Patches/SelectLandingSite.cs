@@ -109,7 +109,7 @@ namespace PrepareLanding.Patches
 
                 // don't add a new window if the window is already there
                 if (PrepareLanding.Instance.MainWindow == null)
-                    PrepareLanding.Instance.MainWindow = new MainWindow(PrepareLanding.Instance.UserData);
+                    PrepareLanding.Instance.MainWindow = new MainWindow(PrepareLanding.Instance.GameData);
 
                 PrepareLanding.Instance.MainWindow.Show();
             }

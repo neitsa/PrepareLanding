@@ -80,7 +80,16 @@ namespace PrepareLanding.Core.Gui.Tab
             var tabRecordsToDraw = _tabGuiUtilities.Where(tab => tab.CanBeDrawn)
                 .Select(tab =>
                 {
-                    tab.TabRecord.selected = SelectedTab == tab;
+                    /* fix for god mode: if god mode is selected in world map and then you settle your colony 
+                     * and then you click on the world button, you end up having 'God mode' selected, 
+                     * which can't be displayed while playing */
+                    if (!SelectedTab.CanBeDrawn)
+                        SetPreviousTabAsSelectedTab(); // try to get the previously displayed tab
+                    if (!SelectedTab.CanBeDrawn)
+                        SetSelectedTabById("Terrain"); // fallback to terrain
+                    /* end fix */
+
+                        tab.TabRecord.selected = SelectedTab == tab;
                     return tab.TabRecord;
                 });
 
