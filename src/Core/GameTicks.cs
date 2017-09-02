@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Verse;
 
 namespace PrepareLanding.Core
 {
@@ -8,6 +9,10 @@ namespace PrepareLanding.Core
     /// </summary>
     public class GameTicks
     {
+        private static int _savedTickAbs;
+
+        private static int _newTickAbs;
+
         // FPS accumulated over the interval
         private float _accum;
 
@@ -21,6 +26,8 @@ namespace PrepareLanding.Core
         ///     Number of frames drawn during the update interval.
         /// </summary>
         public int FramesDrawn { get; private set; }
+
+        public static bool TickManagerHasTickAbs => Find.TickManager.gameStartAbsTick != 0;
 
         /// <summary>
         ///     Interval (in seconds) at which the <see cref="TicksIntervalElapsed" /> event is fired.
@@ -80,6 +87,25 @@ namespace PrepareLanding.Core
             FramesDrawn = 0;
 
             TicksIntervalElapsed?.Invoke();
+        }
+
+        public static void PushTickAbs(int ticks = 1)
+        {
+            if (TickManagerHasTickAbs)
+                return;
+
+            _newTickAbs = ticks;
+            _savedTickAbs = Find.TickManager.gameStartAbsTick;
+            Find.TickManager.gameStartAbsTick = ticks;
+        }
+
+        public static void PopTickAbs()
+        {
+            if (Current.ProgramState == ProgramState.Playing)
+                return;
+
+            if (Find.TickManager.gameStartAbsTick == _newTickAbs)
+                Find.TickManager.gameStartAbsTick = _savedTickAbs;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Overlays;
 using RimWorld;
@@ -133,27 +134,12 @@ namespace PrepareLanding.GameData
 
         public Dictionary<BiomeDef, Dictionary<int, float>> TemperaturesByBiomes => FeatureByBiomes;
 
-        public static bool TickManagerHasTickAbs => Find.TickManager.gameStartAbsTick != 0;
-
         public List<KeyValuePair<int, float>> WorldTilesTemperatures => WorldTilesFeatures;
 
         protected override float TileFeatureValue(int tileId)
         {
             return Find.World.grid[tileId].temperature;
         }
-
-        private static void PushTickAbs()
-        {
-            if (!TickManagerHasTickAbs)
-                Find.TickManager.gameStartAbsTick = 1;
-        }
-
-        private static void PopTickAbs()
-        {
-            if (Find.TickManager.gameStartAbsTick == 1)
-                Find.TickManager.gameStartAbsTick = 0;
-        }
-
         public static List<TemperatureForecastForDay> TemperaturesForDay(int tileId, int ticks)
         {
             if (tileId < 0)
@@ -164,7 +150,7 @@ namespace PrepareLanding.GameData
 
             var temperatures = new List<TemperatureForecastForDay>(GenDate.HoursPerDay);
 
-            PushTickAbs();
+            GameTicks.PushTickAbs();
 
             try
             {
@@ -178,7 +164,7 @@ namespace PrepareLanding.GameData
             }
             finally
             {
-                PopTickAbs();
+                GameTicks.PopTickAbs();
             }
 
             return temperatures;
@@ -194,10 +180,20 @@ namespace PrepareLanding.GameData
 
             var temperatures = new List<TemperatureForecastForTwelfth>(GenDate.TwelfthsPerYear);
 
-            for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
+            GameTicks.PushTickAbs();
+
+            try
             {
-                var forecast = new TemperatureForecastForTwelfth(tileId, (Twelfth) j);
-                temperatures.Add(forecast);
+
+                for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
+                {
+                    var forecast = new TemperatureForecastForTwelfth(tileId, (Twelfth) j);
+                    temperatures.Add(forecast);
+                }
+            }
+            finally
+            {
+                GameTicks.PopTickAbs();
             }
 
             return temperatures;
@@ -205,7 +201,7 @@ namespace PrepareLanding.GameData
 
         public static List<TemperatureForecastForYear> TemperaturesForYear(int tileId, int ticks)
         {
-            PushTickAbs();
+            GameTicks.PushTickAbs();
             var temperatures = new List<TemperatureForecastForYear>(GenDate.DaysPerYear);
             try
             {
@@ -218,7 +214,7 @@ namespace PrepareLanding.GameData
             }
             finally
             {
-                PopTickAbs();
+                GameTicks.PopTickAbs();
             }
 
             return temperatures;
