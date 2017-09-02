@@ -148,6 +148,10 @@ namespace PrepareLanding
 
                 PrepareLanding.Instance.TileFilter.ClearMatchingTiles();
 
+                //TODO: you need to clear the temperature cache for the tile, otherwise it's wrong after being changed...
+                // see RimWorld.Planet.TileTemperaturesComp.RetrieveCachedData for the cache itself. It's private...
+                // but could be cleaned with RimWorld.Planet.TileTemperaturesComp.ClearCaches() but that would invalidate *all* caches...
+
                 _redrawMapEnabled = _gameData.GodModeData.SetupTile();
                 LogTemperatureInfo(_gameData.GodModeData.SelectedTileId);
             }
