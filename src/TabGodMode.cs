@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using PrepareLanding.Core.Extensions;
-using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.GameData;
 using RimWorld;
@@ -12,7 +10,6 @@ using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
-using Widgets = Verse.Widgets;
 
 namespace PrepareLanding
 {
@@ -28,8 +25,6 @@ namespace PrepareLanding
 
         private readonly GameData.GameData _gameData;
 
-        private readonly GUIStyle _styleTemperatureInfo;
-
         private string _chosenAverageTemperatureString;
 
         private string _chosenElevationString;
@@ -44,20 +39,11 @@ namespace PrepareLanding
 
         private Vector2 _scrollPosStoneSelection;
 
-        private Vector2 _scrollPosTemperatureInfo;
-
         private ThingDef _selectedStoneDef;
 
         public TabGodMode(GameData.GameData gameData, float columnSizePercent) : base(columnSizePercent)
         {
             _gameData = gameData;
-
-            _styleTemperatureInfo = new GUIStyle(Text.textFieldStyles[1])
-            {
-                alignment = TextAnchor.UpperLeft,
-                wordWrap = true,
-                richText = true
-            };
 
             PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
         }
@@ -74,8 +60,6 @@ namespace PrepareLanding
 
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
         public override string Name => "God Mode";
-
-        public string TemperatureInfo { get; private set; }
 
         private void WorldGenerated()
         {
@@ -488,102 +472,6 @@ namespace PrepareLanding
             }
 
             ListingStandard.EndScrollView(inLs);
-        }
-
-        private void LogTemperatureInfo(int tileId, int absTicks = GenDate.TicksPerHour * GenDate.GameStartHourOfDay)
-        {
-            // HACK: prevent a log error from RimWorld because some functions below will use Verse.TickManager.TickAbs
-            //    but it cannot be used if not playing (it's 0), so we set it to 1 here and reset it to 0 on exit.
-            if (Find.TickManager.gameStartAbsTick == 0 && Current.ProgramState != ProgramState.Playing)
-                Find.TickManager.gameStartAbsTick = 1;
-
-            var separator = "-".Repeat(60);
-
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Temperature Info".RichTextBold().Chain(s => s.RichTextColor(Color.red)));
-            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.red)));
-
-            var vectorLongLat = Find.WorldGrid.LongLatOf(tileId);
-            var latitude = vectorLongLat.y;
-            var longitude = vectorLongLat.x;
-
-            stringBuilder.AppendLine($"Latitude: {latitude}");
-            stringBuilder.AppendLine($"Longitude: {longitude}");
-            stringBuilder.AppendLine($"Equatorial distance: {Find.WorldGrid.DistanceFromEquatorNormalized(tileId)}");
-            stringBuilder.AppendLine($"Tile average temperature: {Find.World.grid[tileId].temperature} °C");
-            stringBuilder.AppendLine($"Seasonal shift amplitude: {GenTemperature.SeasonalShiftAmplitudeAt(tileId)} °C");
-            stringBuilder.AppendLine();
-
-            /*
-             * Temperature for the current day
-             */
-
-            stringBuilder.AppendLine("Temperature for each hour this day".RichTextBold()
-                .Chain(s => s.RichTextColor(Color.green)));
-            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
-            stringBuilder.AppendLine("Hour\tTemp\tSunEffect".RichTextColor(Color.yellow));
-            var num2 = absTicks - absTicks % GenDate.TicksPerDay; // will give 0 on the 1st day
-            for (var i = 0; i < GenDate.HoursPerDay; i++)
-            {
-                var absTick = num2 + i * GenDate.TicksPerHour;
-                stringBuilder.Append($"{i}");
-                stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick):F2}");
-                stringBuilder.Append($"\t{GenTemperature.OffsetFromSunCycle(absTick, tileId):F2}");
-                stringBuilder.AppendLine();
-            }
-            stringBuilder.AppendLine();
-
-            /*
-             * Temperature for the twelves of this year
-             */
-
-            stringBuilder.AppendLine("Average temperature for each twelfth this year".RichTextBold()
-                .Chain(s => s.RichTextColor(Color.green)));
-            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
-            for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
-            {
-                var twelfth = (Twelfth) j;
-                var averageTemperatureForTwelfth =
-                    Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
-                stringBuilder.AppendLine(
-                    $"{twelfth.GetQuadrum()} [{twelfth.GetSeason(latitude)}]: {twelfth} {averageTemperatureForTwelfth:F2}");
-            }
-            stringBuilder.AppendLine();
-
-            /*
-             * Temperature for each day of the year
-             */
-
-            stringBuilder.AppendLine("Temperatures for each day this year".RichTextBold()
-                .Chain(s => s.RichTextColor(Color.green)));
-            stringBuilder.AppendLine(separator.RichTextBold().Chain(s => s.RichTextColor(Color.green)));
-
-            stringBuilder.AppendLine("Legend:".RichTextColor(Color.cyan));
-            stringBuilder.AppendLine("\tDay: day of the year".RichTextColor(Color.cyan));
-            stringBuilder.AppendLine("\tLow: Lowest temp. for that day".RichTextColor(Color.cyan));
-            stringBuilder.AppendLine("\tHigh: Highest temp. for that day".RichTextColor(Color.cyan));
-            stringBuilder.AppendLine("\tOffS: Offset from Season cycle".RichTextColor(Color.cyan));
-            stringBuilder.AppendLine("\tRDV: Random Daily Variation".RichTextColor(Color.cyan));
-            stringBuilder.AppendLine(separator);
-
-            stringBuilder.AppendLine("Day\tLow\tHigh\tOffS\tRDV".RichTextColor(Color.magenta));
-            for (var k = 0; k < GenDate.DaysPerYear; k++)
-            {
-                var absTick2 = (int) (k * GenDate.TicksPerDay + 15000f); // 6th hour
-                var absTick3 = (int) (k * GenDate.TicksPerDay + 45000f); // 18th hour
-                stringBuilder.Append($"{k}");
-                stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick2):F2}");
-                stringBuilder.Append($"\t{Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, absTick3):F2}");
-                stringBuilder.Append($"\t{GenTemperature.OffsetFromSeasonCycle(absTick3, tileId):F2}");
-                stringBuilder.Append(
-                    $"\t{Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, absTick3):F2}");
-                stringBuilder.AppendLine();
-            }
-
-            TemperatureInfo = stringBuilder.ToString();
-
-            if (Find.TickManager.gameStartAbsTick == 1)
-                Find.TickManager.gameStartAbsTick = 0;
         }
     }
 }
