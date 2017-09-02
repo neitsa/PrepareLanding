@@ -358,6 +358,7 @@ namespace PrepareLanding
             var rightRect = tilesNumberRect.RightPart(0.20f);
 
             Widgets.Label(leftRect, "Number of Tiles [1, 10000]:");
+            _numberOfTilesForFeature = _gameData.UserData.MostLeastItem.NumberOfItems;
             Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForFeature, ref _numberOfTilesForFeatureString,
                 1, 10000);
             _gameData.UserData.MostLeastItem.NumberOfItems = _numberOfTilesForFeature;

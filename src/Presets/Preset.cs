@@ -84,6 +84,7 @@ namespace PrepareLanding.Presets
             LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
             LoadUsableMinMax(xTemperature, "RainFall", _gameData.UserData.RainFall);
             _gameData.UserData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
+            LoadMostLeastItem(xTemperature, "MostLeastFeature", _gameData.UserData.MostLeastItem);
 
             /*
              * Options
@@ -172,6 +173,7 @@ namespace PrepareLanding.Presets
                 SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
                 SaveUsableMinMax(xTemperatureFilters, "RainFall", _gameData.UserData.RainFall);
                 SaveThreeState(xTerrainFilters, "AnimalsCanGrazeNow", _gameData.UserData.ChosenAnimalsCanGrazeNowState);
+                SaveMostLeastItem(xTemperatureFilters, "MostLeastFeature", _gameData.UserData.MostLeastItem);
 
                 /*
                  * Options
@@ -252,6 +254,13 @@ namespace PrepareLanding.Presets
         private const string MaxNode = "Max";
 
         private const string UseNode = "Use";
+
+        // most/least 
+        private const string MostLeastItemFeatureNode = "Feature";
+
+        private const string MostLeastItemFeatureTypeNode = "FeatureType";
+
+        private const string MostLeastItemNumberOfItemsNode = "NumberOfItems";
 
         // def
         private const string DefNameNode = "defName";
@@ -497,6 +506,24 @@ namespace PrepareLanding.Presets
             }
         }
 
+        private static void LoadMostLeastItem(XContainer xParent, string elementName, MostLeastItem item)
+        {
+            var xFoundElement = xParent.Element(elementName);
+            if (xFoundElement == null)
+                return;
+
+            var feature = LoadEnum<MostLeastFeature>(xFoundElement, MostLeastItemFeatureNode);
+            var featureType = LoadEnum<MostLeastType>(xFoundElement, MostLeastItemFeatureTypeNode);
+
+            int numItems;
+            if (!Load(xFoundElement, MostLeastItemNumberOfItemsNode, out numItems))
+                return;
+
+            item.Feature = feature;
+            item.FeatureType = featureType;
+            item.NumberOfItems = numItems;
+        }
+
         internal static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
         {
             bool value;
@@ -614,6 +641,19 @@ namespace PrepareLanding.Presets
             xElement.Add(new XElement(UseNode, item.Use));
             xElement.Add(new XElement(MinNode, item.Min.ToString(CultureInfo.InvariantCulture)));
             xElement.Add(new XElement(MaxNode, item.Max.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        private static void SaveMostLeastItem(XContainer xRoot, string elementName, MostLeastItem item)
+        {
+            if (item.IsInDefaultState)
+                return;
+
+            var xElement = new XElement(elementName);
+            xRoot.Add(xElement);
+
+            xElement.Add(new XElement(MostLeastItemFeatureNode, item.Feature.ToString()));
+            xElement.Add(new XElement(MostLeastItemFeatureTypeNode, item.FeatureType.ToString()));
+            xElement.Add(new XElement(MostLeastItemNumberOfItemsNode, item.NumberOfItems));
         }
 
         private static void Save<T>(XContainer xParent, string elementName, T value) where T : IConvertible
