@@ -432,10 +432,6 @@ namespace PrepareLanding.GameData
         }
 
         #region PRIVATE_FIELDS
-
-        private bool _allowCantBuildBase;
-        private bool _allowUnimplementedBiomes;
-
         /// <summary>
         ///     Current user choice for the "Animal Can Graze Now" state.
         /// </summary>
