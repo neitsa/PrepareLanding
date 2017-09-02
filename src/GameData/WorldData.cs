@@ -87,7 +87,7 @@ namespace PrepareLanding.GameData
                 return 0;
             }
 
-            var numDays = ((int) quadrum * GenDate.DaysPerQuadrum) + quadrumDay;
+            var numDays = (int) quadrum * GenDate.DaysPerQuadrum + quadrumDay;
             return DateToTicks(numDays, year);
         }
 
@@ -105,6 +105,18 @@ namespace PrepareLanding.GameData
             var result = dayTicks + yearTicks;
 
             return result;
+        }
+
+        public static int NowToTicks(int tileId)
+        {
+            var day = GenLocalDate.DayOfYear(tileId);
+            var year = GenLocalDate.Year(tileId);
+
+            var ticks = DateToTicks(day, year);
+            if (ticks == 0)
+                ticks = 1;
+
+            return ticks;
         }
     }
 }
