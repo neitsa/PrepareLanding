@@ -97,12 +97,12 @@ namespace PrepareLanding
                 var lowestFeatureKvp = feature.WorldTilesFeatures.First();
                 var vectorLongLat = Find.WorldGrid.LongLatOf(lowestFeatureKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Lowest {featureName}: {lowestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit} [tile: {lowestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Lowest {featureName}: {lowestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {lowestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
 
                 var highestFeatureKvp = feature.WorldTilesFeatures.Last();
                 vectorLongLat = Find.WorldGrid.LongLatOf(highestFeatureKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Highest {featureName}: {highestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit} [tile: {highestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Highest {featureName}: {highestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {highestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
             }
 
 
