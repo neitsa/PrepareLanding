@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.GameData;
 using RimWorld;
@@ -828,16 +829,24 @@ namespace PrepareLanding.Filters
                 return;
             }
 
-            foreach (var tileId in inputList)
+            try
             {
-                var canGrazeNow = VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt(tileId);
-                if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.On)
-                    if (canGrazeNow)
-                        _filteredTiles.Add(tileId);
+                GameTicks.PushTickAbs();
+                foreach (var tileId in inputList)
+                {
+                    var canGrazeNow = VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt(tileId);
+                    if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.On)
+                        if (canGrazeNow)
+                            _filteredTiles.Add(tileId);
 
-                if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.Off)
-                    if (!canGrazeNow)
-                        _filteredTiles.Add(tileId);
+                    if (UserData.ChosenAnimalsCanGrazeNowState == MultiCheckboxState.Off)
+                        if (!canGrazeNow)
+                            _filteredTiles.Add(tileId);
+                }
+            }
+            finally
+            {
+                GameTicks.PopTickAbs();
             }
         }
     }
