@@ -156,6 +156,7 @@ namespace PrepareLanding
                 LogTemperatureInfo(_gameData.GodModeData.SelectedTileId);
             }
 
+            var heightBefore = ListingStandard.StartCaptureHeight();
             if (ListingStandard.ButtonText("Redraw Map"))
             {
                 if(_redrawMapEnabled)
@@ -165,6 +166,8 @@ namespace PrepareLanding
                     Messages.Message("You need to change a tile first to be able to redraw the map.", MessageSound.RejectInput);
 
             }
+            var tooltipRect = ListingStandard.EndCaptureHeight(heightBefore);
+            TooltipHandler.TipRegion(tooltipRect, "[Warning: this redraws the map entirely; use it only when you have finished *all* your modifications.]");
         }
 
         protected virtual void DrawTemperatureInfo()
