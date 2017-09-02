@@ -272,7 +272,7 @@ namespace PrepareLanding
              */
 
             var inLs = ListingStandard.BeginScrollView(4*DefaultElementHeight,
-                selectedRiverDefs.Count*DefaultElementHeight, ref _scrollPosRiverSelection);
+                selectedRiverDefs.Count*DefaultElementHeight, ref _scrollPosRiverSelection, DefaultScrollableViewShrinkWidth);
 
             // display river elements
             foreach (var riverDef in riverDefs)
@@ -341,8 +341,8 @@ namespace PrepareLanding
              */
 
             var scrollViewHeight = selectedRoadDefs.Count*DefaultElementHeight;
-            var inLs = ListingStandard.BeginScrollView(5*DefaultElementHeight, scrollViewHeight,
-                ref _scrollPosRoadSelection);
+            var inLs = ListingStandard.BeginScrollView(5 * DefaultElementHeight, scrollViewHeight,
+                ref _scrollPosRoadSelection, DefaultScrollableViewShrinkWidth);
 
             // display road elements
             foreach (var roadDef in roadDefs)
