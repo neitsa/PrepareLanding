@@ -1,3 +1,59 @@
+# Version 0.5.0
+**Released September 02, 2017**
+**`RimWorld Version: Alpha 17b`**
+
+# General
+
+What's New?
+===========
+
+The [online manual](https://neitsa.github.io/games/rimworld/preparelanding/) has been rewritten to account for the latest changes.
+
+* [**Important**]  Most / Least Feature filter ([see manual](https://neitsa.github.io/games/rimworld/preparelanding/temperature_tab.html#most-least-feature))
+    - Allows to filter on the following highest / lowest world characteristics:
+        - Elevation
+        - Rainfall
+        - Temperature
+* [**Important**] God Mode ([see manual](https://neitsa.github.io/games/rimworld/preparelanding/god_mode_tab.html))
+    - Allows player to change tiles' characteristics on the world map
+        - Biome
+        - Average Temperature
+        - Terrain (Hilliness)
+        - Elevation
+        - Rainfall
+        - Stone Types
+* [**Important**] Temperature Forecast ([see manual](https://neitsa.github.io/games/rimworld/preparelanding/temperature_tab.html#temperature-forecast))
+* Less clicking for River and Road filters, they now have 3 buttons (Reset, All, None)
+* Fixed a bug when there were more rivers than in Vanilla
+    - Also fixed for Roads Filter
+* Internal
+    - Huge code refactoring
+    - TileHighlighter now uses RimWorld's WorldLayer class
+        - It takes a little bit more time to draw the highlighted tiles but,
+        - It is less laggy and less demanding on smaller computers
+    - Code and data for drawing map overlays is implemented (but not activated yet)
+
+Detailed Changelog
+==================
+
+Fixed Issues
+------------
+
+* Add filtering on most / least (max / min) tile features [issue #10: requested by Barky, Zapleek]
+* Rework the tile Highlighter [issue #11]
+* Add must/must not have road/river" regardless of type. [issue #15: request by WorkingClassHero]
+* Long list of rivers breaks the GUI layout [issue #17: request by elwooha6]
+
+Future Plans
+============
+
+* Check if possible to actually set the tile properties according to user choices [issue #8]
+    - 6 feature planned on 8 have been implemented (see God Mode)
+* Add world map overlays for various features (temperature, rainfall, etc.) [issue #12]
+    - Code & data are there but it is too slow at the moment to be released.
+	
+***
+
 # General
 
 # Version 0.4.3
