@@ -83,12 +83,51 @@ namespace PrepareLanding
                 "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
             _gameData.UserData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
 
+            GoToTileOption();
+
+#if DEBUG_TEST_COORDINATES
+            GoToCoordinatesOption();
+#endif
+
+        }
+
+        private void GoToCoordinatesOption()
+        {
+            if (!ListingStandard.ButtonText("Test Coord"))
+                return;
+
+            if (_tileNumber < 0)
+                return;
+
+            var tileCenter = GetTileCenter(_tileNumber);
+            var x = Mathf.Atan2(tileCenter.x, -tileCenter.z) * 57.29578f;
+            var y = Mathf.Asin(tileCenter.y / 100f) * 57.29578f;
+            Log.Message($"TileId: {_tileNumber}; TileCenter: {tileCenter}; x: {x}; y: {y}");
+        }
+
+        private static Vector3 GetTileCenter(int tileId)
+        {
+            var worldGrid = Find.WorldGrid;
+            var num = (tileId + 1 >= worldGrid.tileIDToVerts_offsets.Count) ? worldGrid.verts.Count : worldGrid.tileIDToVerts_offsets[tileId + 1];
+            var a = Vector3.zero;
+            var num2 = 0;
+            for (var i = worldGrid.tileIDToVerts_offsets[tileId]; i < num; i++)
+            {
+                a += worldGrid.verts[i];
+                num2++;
+            }
+            return a / num2;
+        }
+
+        private void GoToTileOption()
+        {
             var goToTileOptionRectSpace = ListingStandard.GetRect(30f);
             var rects = goToTileOptionRectSpace.SplitRectWidth(_goToTileSplitPct);
-            Widgets.Label(rects[0], "Go to Tile:");
-            Widgets.TextFieldNumeric(rects[1], ref _tileNumber, ref _tileNumberString, -1, 300000);
+            var maxTileId = Find.WorldGrid.TilesCount - 1;
+            Widgets.Label(rects[0], $"Go to Tile [0, {maxTileId}]:");
+            Widgets.TextFieldNumeric(rects[1], ref _tileNumber, ref _tileNumberString, 0, maxTileId);
             if (Widgets.ButtonText(rects[2], "Go!"))
-            { 
+            {
                 if ((_tileNumber < 0) || (_tileNumber >= Find.WorldGrid.TilesCount))
                 {
                     Messages.Message($"Out of Range: {_tileNumber}; Range: [0, {Find.WorldGrid.TilesCount}).",
@@ -126,7 +165,6 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref bypassMaxHighlightedTiles,
                 $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
             _gameData.UserData.Options.BypassMaxHighlightedTiles = bypassMaxHighlightedTiles;
-
         }
     }
 }

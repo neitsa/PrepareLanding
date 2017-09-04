@@ -13,17 +13,6 @@ namespace PrepareLanding.Patches
     /// </summary>
     public class SelectLandingSite : Page_SelectLandingSite
     {
-        public override void PostOpen()
-        {
-            base.PostOpen();
-            // HACK 
-            // if you look at RimWorld.Scenario.GetFirstConfigPage() you'll see that the Page_SelectLandingSite() constructor
-            // is called right after the Page_CreateWorldParams() as been executed (in fact after the Page_CreateWorldParams.CanDoNext() 
-            // can return, as it uses an asynchronous action to generate the world). So we know for sure that when the PreOpen() method of 
-            // this class is called the world map has been already generated!
-            PrepareLanding.Instance.WorldGenerated();
-        }
-
         public override void ExtraOnGUI()
         {
             Text.Anchor = TextAnchor.UpperCenter;

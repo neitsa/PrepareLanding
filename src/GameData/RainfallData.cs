@@ -14,7 +14,7 @@ namespace PrepareLanding.GameData
         public override MostLeastFeature Feature => MostLeastFeature.Rainfall;
         public override string FeatureMeasureUnit => "mm";
 
-        public Texture2D RainfallGradientTexure => FeatureGradientTexure;
+        public Texture2D RainfallGradientTexure => FeatureGradientTexture;
 
         public Dictionary<BiomeDef, Dictionary<int, float>> RainFallsByBiomes => FeatureByBiomes;
 

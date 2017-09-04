@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using PrepareLanding.Core.Gui.Tab;
-using PrepareLanding.Filters;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -18,18 +15,18 @@ namespace PrepareLanding
             _gameData = gameData;
         }
 
-        /// <summary>A unique identifier for the Tab.</summary>
-        public override string Id => "Overlays";
-
-        /// <summary>The name of the tab (that is actually displayed at its top).</summary>
-        public override string Name => "Overlays";
-
         /// <summary>Gets whether the tab can be drawn or not.</summary>
         public override bool CanBeDrawn
         {
             get { return true; }
             set { }
         }
+
+        /// <summary>A unique identifier for the Tab.</summary>
+        public override string Id => "Overlays";
+
+        /// <summary>The name of the tab (that is actually displayed at its top).</summary>
+        public override string Name => "Overlays";
 
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>
@@ -57,14 +54,10 @@ namespace PrepareLanding
             var clearOverlayButtonRect = buttonsRect.RightHalf();
 
             if (Widgets.ButtonText(drawOverlayButtonRect, "Draw Overlay"))
-            {
                 _gameData.WorldData.TemperatureData.AllowDrawOverlay = true;
-            }
 
             if (Widgets.ButtonText(clearOverlayButtonRect, "Clear Overlay"))
-            {
                 _gameData.WorldData.TemperatureData.AllowDrawOverlay = false;
-            }
 
 #if DEBUG
             if (ListingStandard.ButtonText("DebugLog"))
@@ -72,10 +65,9 @@ namespace PrepareLanding
                 _gameData.WorldData.TemperatureData.DebugLog();
             }
 #endif
-
         }
 
-        protected virtual void DrawBiomeTypesSelection()  // TODO : factorize this function with the one from TabTerrain
+        protected virtual void DrawBiomeTypesSelection() // TODO : factorize this function with the one from TabTerrain
         {
             DrawEntryHeader("Biome Types", backgroundColor: ColorLibrary.BurntOrange);
 
@@ -129,7 +121,9 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _gameData.WorldData.TemperatureData.Biome != null ? _gameData.WorldData.TemperatureData.Biome.LabelCap : "Any";
+            var rightLabel = _gameData.WorldData.TemperatureData.Biome != null
+                ? _gameData.WorldData.TemperatureData.Biome.LabelCap
+                : "Any";
             ListingStandard.LabelDouble("Biome:", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;
