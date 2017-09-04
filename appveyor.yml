@@ -10,7 +10,7 @@
   #---------------------------------#
 
   # version format (you need to bump it when changing version)
-  version: 0.5.0-{build}-{branch}
+  version: 0.5.1-{build}-{branch}
 
   # branches
   branches:
