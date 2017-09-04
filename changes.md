@@ -1,3 +1,28 @@
+# Version 0.5.1
+**Released September 04, 2017**
+**`RimWorld Version: Alpha 17b`**
+
+**HotFix Release for v0.5**
+
+# General
+
+What's New?
+===========
+
+* Fixed a nasty bug when loading a save and clicking on the "world" button.
+
+Detailed Changelog
+==================
+
+Fixed Issues
+------------
+
+* bug when loading a save and going directly to the world
+    - The problem was related to events that didn't tell the mod that the world was generated.
+    - Fixed by changing the internal event that handle properly the world generation.
+
+***
+
 # Version 0.5.0
 **Released September 02, 2017**
 **`RimWorld Version: Alpha 17b`**
