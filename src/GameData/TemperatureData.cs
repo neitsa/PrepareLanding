@@ -130,7 +130,7 @@ namespace PrepareLanding.GameData
 
         public override string FeatureMeasureUnit => "°C";
 
-        public Texture2D TemperatureGradientTexure => FeatureGradientTexure;
+        public Texture2D TemperatureGradientTexure => FeatureGradientTexture;
 
         public Dictionary<BiomeDef, Dictionary<int, float>> TemperaturesByBiomes => FeatureByBiomes;
 

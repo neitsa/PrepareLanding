@@ -25,6 +25,8 @@ namespace PrepareLanding.GameData
         public readonly Dictionary<BiomeDef, List<Material>> MaterialSamplesByBiomes =
             new Dictionary<BiomeDef, List<Material>>();
 
+        private Texture2D _featureGradientTexture;
+
         protected WorldFeatureData(DefData defData)
         {
             DefData = defData;
@@ -44,11 +46,26 @@ namespace PrepareLanding.GameData
         public Dictionary<BiomeDef, Dictionary<int, float>> FeatureByBiomes { get; } =
             new Dictionary<BiomeDef, Dictionary<int, float>>();
 
-        public Texture2D FeatureGradientTexure { get; private set; }
+        public Texture2D FeatureGradientTexture
+        {
+            get
+            {
+                if (_featureGradientTexture == null)
+                    _featureGradientTexture = ColorUtils.CreateGradientTexture(_colorGradient);
 
-        public virtual string FeatureName => Feature.ToString();
+                return _featureGradientTexture;
+            }
+
+            private set
+            {
+                if (_featureGradientTexture != null && value != _featureGradientTexture)
+                    _featureGradientTexture = value;
+            }
+        }
 
         public abstract string FeatureMeasureUnit { get; }
+
+        public virtual string FeatureName => Feature.ToString();
 
         public Dictionary<BiomeDef, List<float>> FeatureQuantaByBiomes { get; } =
             new Dictionary<BiomeDef, List<float>>();
@@ -56,7 +73,8 @@ namespace PrepareLanding.GameData
         public List<Color> GradientColors { get; }
 
         /// <summary>
-        /// Whole world ordered list of <see cref="KeyValuePair{TKey,TValue}"/> where the key is a tile ID and the value is the feature value.
+        ///     Whole world ordered list of <see cref="KeyValuePair{TKey,TValue}" /> where the key is a tile ID and the value is
+        ///     the feature value.
         /// </summary>
         public List<KeyValuePair<int, float>> WorldTilesFeatures { get; } = new List<KeyValuePair<int, float>>();
 
@@ -70,10 +88,6 @@ namespace PrepareLanding.GameData
             ColorSamplesByBiomes.Clear();
             MaterialSamplesByBiomes.Clear();
             WorldTilesFeatures.Clear();
-
-            // generate a gradient if there is none
-            if (FeatureGradientTexure == null)
-                FeatureGradientTexure = ColorUtils.CreateGradientTexture(_colorGradient);
 
             // and now fetch all feature related data
             FetchAllFeatureData();
@@ -101,7 +115,9 @@ namespace PrepareLanding.GameData
             TilesFeatureByBiome(biomeDef);
             QuantizeFeatureForBiome(biomeDef);
             GenerateColorSamples(biomeDef);
-            GenerateMaterialByBiome(biomeDef);
+            // Can't do the following here on some occasions (i.e Load a save without going to the select landing page).
+            // because this would load materials on another thread than the main thread.
+            //GenerateMaterialByBiome(biomeDef); 
         }
 
         public void TilesFeatureByBiome(BiomeDef biomeDef)
@@ -178,6 +194,8 @@ namespace PrepareLanding.GameData
         public Material MaterialFromTileFeature(BiomeDef biome, int tileId)
         {
             var quantaIndex = FindQuantaIndex(biome, tileId);
+            if (MaterialSamplesByBiomes.Count == 0)
+                GenerateMaterialByBiome(biome);
 
             var material = MaterialSamplesByBiomes[biome][quantaIndex];
 
@@ -252,7 +270,8 @@ namespace PrepareLanding.GameData
         {
             if (numberOfItems < 1 || numberOfItems > WorldTilesFeatures.Count)
             {
-                Log.Message($"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
+                Log.Message(
+                    $"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
                 return null;
             }
 
@@ -264,7 +283,8 @@ namespace PrepareLanding.GameData
         {
             if (numberOfItems < 1 || numberOfItems > WorldTilesFeatures.Count)
             {
-                Log.Message($"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
+                Log.Message(
+                    $"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
                 return null;
             }
 
