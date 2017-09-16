@@ -7,24 +7,24 @@ namespace PrepareLanding.Patches
     [HarmonyPatch(typeof(WorldInterface), "WorldInterfaceOnGUI")]
     public static class PatchWorldInterfaceOnGui
     {
-        public static event Action OnWorldInterfaceOnGui = delegate { };
+        public static event Action WorldInterfaceOnGui = delegate { };
 
         [HarmonyPostfix]
         public static void WorldInterfaceOnGuiPostFix()
         {
-            OnWorldInterfaceOnGui.Invoke();
+            WorldInterfaceOnGui.Invoke();
         }
     }
 
     [HarmonyPatch(typeof(WorldInterface), "WorldInterfaceUpdate")]
     public static class PatchWorldInterfaceUpdate
     {
-        public static event Action OnWorldInterfaceUpdate = delegate { };
+        public static event Action WorldInterfaceUpdate = delegate { };
 
         [HarmonyPostfix]
         public static void WorldInterfaceUpdatePostFix()
         {
-            OnWorldInterfaceUpdate.Invoke();
+            WorldInterfaceUpdate.Invoke();
         }
     }
 }

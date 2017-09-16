@@ -6,13 +6,13 @@ namespace PrepareLanding
     [StaticConstructorOnStartup]
     internal class MonoController : MonoBehaviour
     {
-        public static readonly string GameObjectName = "PrepareLandingMonoController";
+        private const string GameObjectName = "PrepareLandingMonoController";
 
         public static MonoController Instance { get; private set; }
 
         static MonoController()
         {
-            Log.Message("PrepareLandingMonoController Initialization");
+            Log.Message("[PrepareLanding] MonoController Initialization");
             var gameObject = new GameObject(GameObjectName);
 
             DontDestroyOnLoad(gameObject);
@@ -30,7 +30,7 @@ namespace PrepareLanding
 
         public virtual void Start()
         {
-            Log.Message("PrepareLandingMonoController Start");
+            Log.Message("[PrepareLanding] MonoController Start");
             enabled = false;
         }
 
@@ -41,7 +41,7 @@ namespace PrepareLanding
 
             Instance = null;
 
-            Log.Message("Unloaded PrepareLandingMonoController");
+            Log.Message("[PrepareLanding] MonoController OnDestroy");
         }
     }
 }

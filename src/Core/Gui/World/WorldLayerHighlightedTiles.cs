@@ -66,6 +66,9 @@ namespace PrepareLanding.Core.Gui.World
             foreach (var result in base.Regenerate())
                 yield return result;
 
+            if (PrepareLanding.Instance.TileHighlighter.HighlightedTilesIds.Count == 0)
+                yield break;
+
             foreach (var tileId in PrepareLanding.Instance.TileHighlighter.HighlightedTilesIds)
             {
                 if (tileId < 0)

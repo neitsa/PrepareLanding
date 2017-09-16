@@ -21,7 +21,7 @@ namespace PrepareLanding.GameData
         public UserData(FilterOptions options)
         {
             // get alerted when RimWorld has finished generating the world
-            PrepareLanding.Instance.OnWorldGenerated += ExecuteOnWorldGenerated;
+            PrepareLanding.Instance.EventHandler.WorldGenerated += ExecuteOnWorldGenerated;
 
             // save options
             Options = options;

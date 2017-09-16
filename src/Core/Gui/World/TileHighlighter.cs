@@ -62,7 +62,8 @@ namespace PrepareLanding.Core.Gui.World
             _defaultMaterial.color = TileHighlightingColor;
             _filterOptions.PropertyChanged += OnOptionChanged;
 
-            PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
+            PrepareLanding.Instance.EventHandler.WorldAboutToBeGenerated += RemoveAllTiles;
+            PrepareLanding.Instance.EventHandler.WorldInterfaceOnGui += HighlightedTileDrawerOnGui;
 
             BlinkDuration = DefaultBlinkDuration;
         }
@@ -155,6 +156,9 @@ namespace PrepareLanding.Core.Gui.World
         public void HighlightedTileDrawerOnGui()
         {
             if (DisableTileHighlighting)
+                return;
+
+            if (HighlightedTilesIds.Count == 0)
                 return;
 
             Text.Font = GameFont.Tiny;
@@ -267,7 +271,7 @@ namespace PrepareLanding.Core.Gui.World
                 PrepareLanding.Instance.GameTicks.StopTicking();
 
                 // un-subscribe to  events.
-                PrepareLanding.Instance.OnWorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
+                PrepareLanding.Instance.EventHandler.WorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
                 _filterOptions.PropertyChanged -= OnOptionChanged;
             }
 

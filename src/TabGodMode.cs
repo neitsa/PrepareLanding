@@ -45,7 +45,7 @@ namespace PrepareLanding
         {
             _gameData = gameData;
 
-            PrepareLanding.Instance.OnWorldGenerated += WorldGenerated;
+            PrepareLanding.Instance.EventHandler.WorldGenerated += WorldGenerated;
         }
 
         /// <summary>Gets whether the tab can be drawn or not.</summary>

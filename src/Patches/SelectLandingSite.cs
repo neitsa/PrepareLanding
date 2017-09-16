@@ -24,7 +24,7 @@ namespace PrepareLanding.Patches
         /// <summary>
         ///     This is a rip of the DoCustomButtons() function in RimWorld.Page_SelectLandingSite with a new button.
         /// </summary>
-        public void DoCustomButtons()
+        private void DoCustomButtons()
         {
             // HACK : changed the number of buttons from '5 : 4' to '6 : 5' as we add a button
             var num = !TutorSystem.TutorialMode ? 6 : 5;

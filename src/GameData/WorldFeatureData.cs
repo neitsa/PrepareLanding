@@ -31,7 +31,7 @@ namespace PrepareLanding.GameData
         {
             DefData = defData;
 
-            PrepareLanding.Instance.OnWorldGenerated += OnWorldGenerated;
+            PrepareLanding.Instance.EventHandler.WorldGenerated += ExecuteOnWorldGenerated;
 
             // Cocorico!
             GradientColors = new List<Color> {Color.blue, Color.white, Color.red};
@@ -80,7 +80,7 @@ namespace PrepareLanding.GameData
 
         protected abstract float TileFeatureValue(int tileId);
 
-        private void OnWorldGenerated()
+        private void ExecuteOnWorldGenerated()
         {
             // clear dictionaries and lists
             FeatureByBiomes.Clear();

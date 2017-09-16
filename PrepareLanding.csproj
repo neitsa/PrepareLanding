@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEBUG_OVERLAYS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_OVERLAYS; DEBUG_TEST_COORDINATES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -94,7 +94,7 @@
     <Compile Include="src\Overlays\Overlay.cs" />
     <Compile Include="src\Overlays\TemperatureOverlay.cs" />
     <Compile Include="src\Overlays\WorldLayerTemperature.cs" />
-    <Compile Include="src\Patches\PatchRegenerateAllLayersNow.cs" />
+    <Compile Include="src\Patches\PatchGenerateWorld.cs" />
     <Compile Include="src\Patches\PatchScenario.cs" />
     <Compile Include="src\Patches\PatchNaturalRockTypesIn.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
@@ -104,6 +104,7 @@
     <Compile Include="src\Presets\Preset.cs" />
     <Compile Include="src\Presets\PresetInfo.cs" />
     <Compile Include="src\Presets\PresetManager.cs" />
+    <Compile Include="src\RimWorldEventHandler.cs" />
     <Compile Include="src\TabFilteredTiles.cs" />
     <Compile Include="src\TabGodMode.cs" />
     <Compile Include="src\TabInfo.cs" />
