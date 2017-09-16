@@ -15,7 +15,7 @@ namespace PrepareLanding.GameData
         {
             _defData = defData;
 
-            PrepareLanding.Instance.OnWorldGenerated += OnWorldGenerated;
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += ExecuteOnWorldGeneratedOrLoaded;
 
             TemperatureData = new TemperatureData(defData);
             RainfallData = new RainfallData(defData);
@@ -41,7 +41,7 @@ namespace PrepareLanding.GameData
 
         public string WorldSeedString { get; private set; }
 
-        private void OnWorldGenerated()
+        private void ExecuteOnWorldGeneratedOrLoaded()
         {
             WorldCoverage = Find.World.PlanetCoverage;
 

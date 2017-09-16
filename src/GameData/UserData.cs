@@ -21,7 +21,7 @@ namespace PrepareLanding.GameData
         public UserData(FilterOptions options)
         {
             // get alerted when RimWorld has finished generating the world
-            PrepareLanding.Instance.OnWorldGenerated += ExecuteOnWorldGenerated;
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += ExecuteOnWorldGeneratedOrLoaded;
 
             // save options
             Options = options;
@@ -349,7 +349,7 @@ namespace PrepareLanding.GameData
         ///     Called when a new world map is generated: reset all fields (user choices on  the GUI window) to their default
         ///     state.
         /// </summary>
-        protected void ExecuteOnWorldGenerated()
+        protected void ExecuteOnWorldGeneratedOrLoaded()
         {
             if (Options.ResetAllFieldsOnNewGeneratedWorld || !_firstResetDone)
             {

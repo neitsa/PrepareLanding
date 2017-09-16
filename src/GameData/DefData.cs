@@ -51,7 +51,7 @@ namespace PrepareLanding.GameData
             _filterOptions = filterOptions;
 
             // get alerted when RimWorld has loaded its definition (Defs) files
-            PrepareLanding.Instance.OnDefsLoaded += ExecuteOnDefsLoaded;
+            PrepareLanding.Instance.EventHandler.DefsLoaded += ExecuteOnDefsLoaded;
 
             // register to the option changed event
             _filterOptions.PropertyChanged += OptionChanged;

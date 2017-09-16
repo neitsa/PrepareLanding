@@ -140,6 +140,7 @@ namespace PrepareLanding.GameData
         {
             return Find.World.grid[tileId].temperature;
         }
+
         public static List<TemperatureForecastForDay> TemperaturesForDay(int tileId, int ticks)
         {
             if (tileId < 0)
@@ -184,7 +185,6 @@ namespace PrepareLanding.GameData
 
             try
             {
-
                 for (var j = 0; j < GenDate.TwelfthsPerYear; j++)
                 {
                     var forecast = new TemperatureForecastForTwelfth(tileId, (Twelfth) j);

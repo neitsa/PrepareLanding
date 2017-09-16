@@ -103,6 +103,21 @@ namespace PrepareLanding
             var x = Mathf.Atan2(tileCenter.x, -tileCenter.z) * 57.29578f;
             var y = Mathf.Asin(tileCenter.y / 100f) * 57.29578f;
             Log.Message($"TileId: {_tileNumber}; TileCenter: {tileCenter}; x: {x}; y: {y}");
+
+            // finding back vector3 components from longitude and latitude
+            var longitude = x;
+            var latitude = y;
+
+            var theta = Mathf.Deg2Rad * longitude; // Azimuth angle (0 <= theta <= 2 * pi)
+            var latRad = Mathf.Deg2Rad * latitude;
+            var compY = Mathf.Sin(latRad);
+            var phi = Mathf.Acos(compY); // Zenith angle (0 <= phi <= pi)
+            var compX = Mathf.Sin(phi) * Mathf.Sin(theta);
+            var compZ = Mathf.Sin(phi) * Mathf.Cos(theta);
+            // multiply by north pole magnitude (it's the same as multiplying by the radius of the world sphere which is 100)
+            var vec = new Vector3(compX, compY, -compZ) * Find.WorldGrid.NorthPolePos.magnitude;
+            Log.Message($"Vec: {vec}");
+
         }
 
         private static Vector3 GetTileCenter(int tileId)

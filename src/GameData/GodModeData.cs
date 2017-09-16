@@ -37,7 +37,7 @@ namespace PrepareLanding.GameData
             _defData.DefParsed += InitDefs;
 
             // get alerted when a new world is generated
-            PrepareLanding.Instance.OnWorldGenerated += OnWorldGenerated;
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += ExecuteOnWorldGeneratedOrLoaded;
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace PrepareLanding.GameData
             return true;
         }
 
-        private void OnWorldGenerated()
+        private void ExecuteOnWorldGeneratedOrLoaded()
         {
             PatchNaturalRockTypesIn.ClearStoneReplacements();
         }

@@ -36,7 +36,7 @@ namespace PrepareLanding.Core
 
         /// <summary>
         ///     Methods can register to this event to be called when the Update() method (while on the world map) is called.
-        ///     See also <seealso cref="WorldInterfaceUpdate" />.
+        ///     See also <seealso cref="ExecuteOnWorldInterfaceUpdate" />.
         /// </summary>
         public event Action TicksIntervalElapsed = delegate { };
 
@@ -48,7 +48,7 @@ namespace PrepareLanding.Core
             if (_subscribedToWorldInterfaceUpdate)
                 return;
 
-            PrepareLanding.Instance.OnWorldInterfaceUpdate += WorldInterfaceUpdate;
+            PrepareLanding.Instance.EventHandler.WorldInterfaceUpdate += ExecuteOnWorldInterfaceUpdate;
 
             _subscribedToWorldInterfaceUpdate = true;
         }
@@ -61,7 +61,7 @@ namespace PrepareLanding.Core
             if (!_subscribedToWorldInterfaceUpdate)
                 return;
 
-            PrepareLanding.Instance.OnWorldInterfaceUpdate -= WorldInterfaceUpdate;
+            PrepareLanding.Instance.EventHandler.WorldInterfaceUpdate -= ExecuteOnWorldInterfaceUpdate;
 
             _subscribedToWorldInterfaceUpdate = false;
         }
@@ -70,7 +70,7 @@ namespace PrepareLanding.Core
         ///     Called on each WorldInterfaceUpdate (from the game engine). It fires the <see cref="TicksIntervalElapsed" /> event
         ///     if the <see cref="UpdateInterval" /> time interval as elapsed.
         /// </summary>
-        private void WorldInterfaceUpdate()
+        private void ExecuteOnWorldInterfaceUpdate()
         {
             if (UpdateInterval == 0.0f)
                 return;

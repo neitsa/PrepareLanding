@@ -41,8 +41,8 @@ namespace PrepareLanding
             // register to option property changed
             _userData.Options.PropertyChanged += OnOptionPropertyChanged;
 
-            // be alerted when the world map is generated.
-            PrepareLanding.Instance.OnWorldGenerated += PrefilterQueueLongEvent;
+            // be alerted when the world map is generated or loaded.
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += PrefilterQueueLongEvent;
 
             // instantiate all existing filters
             _allFilters = new Dictionary<string, ITileFilter>
@@ -347,6 +347,8 @@ namespace PrepareLanding
 
             var separator = "-".Repeat(80);
             FilterInfoLogger.AppendMessage($"{separator}\nPreFiltering\n{separator}", textColor: Color.cyan);
+
+            ClearMatchingTiles();
 
             // clear all valid tile ids
             _allValidTileIds.Clear();

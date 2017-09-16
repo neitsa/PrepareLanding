@@ -62,7 +62,8 @@ namespace PrepareLanding.Core.Gui.World
             _defaultMaterial.color = TileHighlightingColor;
             _filterOptions.PropertyChanged += OnOptionChanged;
 
-            PrepareLanding.Instance.OnWorldInterfaceOnGui += HighlightedTileDrawerOnGui;
+            PrepareLanding.Instance.EventHandler.WorldAboutToBeGenerated += RemoveAllTiles;
+            PrepareLanding.Instance.EventHandler.WorldInterfaceOnGui += HighlightedTileDrawerOnGui;
 
             BlinkDuration = DefaultBlinkDuration;
         }
@@ -157,6 +158,9 @@ namespace PrepareLanding.Core.Gui.World
             if (DisableTileHighlighting)
                 return;
 
+            if (HighlightedTilesIds.Count == 0)
+                return;
+
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleCenter;
             GUI.color = new Color(1f, 1f, 1f, 0.5f);
@@ -218,7 +222,8 @@ namespace PrepareLanding.Core.Gui.World
             HighlightedTilesIds.Clear();
 
             // set the world layer has being dirty, forcing a redraw.
-            Find.World.renderer.SetDirty<WorldLayerHighlightedTiles>();
+            if(Find.World != null)
+                Find.World.renderer.SetDirty<WorldLayerHighlightedTiles>();
 
             // Stop the tick handler from ticking. It should alleviate the game engine (from continuously ticking).
             PrepareLanding.Instance.GameTicks.StopTicking();
@@ -267,7 +272,7 @@ namespace PrepareLanding.Core.Gui.World
                 PrepareLanding.Instance.GameTicks.StopTicking();
 
                 // un-subscribe to  events.
-                PrepareLanding.Instance.OnWorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
+                PrepareLanding.Instance.EventHandler.WorldInterfaceOnGui -= HighlightedTileDrawerOnGui;
                 _filterOptions.PropertyChanged -= OnOptionChanged;
             }
 
