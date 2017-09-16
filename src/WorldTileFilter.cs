@@ -41,8 +41,8 @@ namespace PrepareLanding
             // register to option property changed
             _userData.Options.PropertyChanged += OnOptionPropertyChanged;
 
-            // be alerted when the world map is generated.
-            PrepareLanding.Instance.EventHandler.WorldGenerated += PrefilterQueueLongEvent;
+            // be alerted when the world map is generated or loaded.
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += PrefilterQueueLongEvent;
 
             // instantiate all existing filters
             _allFilters = new Dictionary<string, ITileFilter>

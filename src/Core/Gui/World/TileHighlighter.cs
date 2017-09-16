@@ -222,7 +222,8 @@ namespace PrepareLanding.Core.Gui.World
             HighlightedTilesIds.Clear();
 
             // set the world layer has being dirty, forcing a redraw.
-            Find.World.renderer.SetDirty<WorldLayerHighlightedTiles>();
+            if(Find.World != null)
+                Find.World.renderer.SetDirty<WorldLayerHighlightedTiles>();
 
             // Stop the tick handler from ticking. It should alleviate the game engine (from continuously ticking).
             PrepareLanding.Instance.GameTicks.StopTicking();

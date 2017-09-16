@@ -45,7 +45,7 @@ namespace PrepareLanding
         {
             _gameData = gameData;
 
-            PrepareLanding.Instance.EventHandler.WorldGenerated += WorldGenerated;
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += ExecuteOnWorldGeneratedOrLoaded;
         }
 
         /// <summary>Gets whether the tab can be drawn or not.</summary>
@@ -61,7 +61,7 @@ namespace PrepareLanding
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
         public override string Name => "God Mode";
 
-        private void WorldGenerated()
+        private void ExecuteOnWorldGeneratedOrLoaded()
         {
             _redrawMapEnabled = false;
         }
