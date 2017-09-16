@@ -1,5 +1,5 @@
 # Version 0.5.1
-**Released September 04, 2017**
+**Released September 16, 2017**
 **`RimWorld Version: Alpha 17b`**
 
 **HotFix Release for v0.5**
@@ -10,6 +10,7 @@ What's New?
 ===========
 
 * Fixed a nasty bug when loading a save and clicking on the "world" button.
+* Fixed a rare bug condition related to loading a new world.
 
 Detailed Changelog
 ==================
@@ -20,6 +21,15 @@ Fixed Issues
 * bug when loading a save and going directly to the world
     - The problem was related to events that didn't tell the mod that the world was generated.
     - Fixed by changing the internal event that handle properly the world generation.
+    
+* Rare bug condition when loading a new world:
+    1. Generate a new world and filter some tiles
+    2. Go back to main menu and load a save
+    3. From the save, go to the world and filter some tiles
+    4. Exit from the save to the main menu
+    5. Generate a new world
+    6. PrepareLanding didn't see that the world has changed and kept references to tiles from the previous world
+    * --> Reworked completely the way rimworld events (e.g. World loaded or World Generated) are handled in the mod.
 
 ***
 
