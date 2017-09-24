@@ -84,6 +84,22 @@ namespace PrepareLanding.GameData
         }
 
         /// <summary>
+        ///     Current user choice for the tiles coastal state.
+        /// </summary>
+        public MultiCheckboxState ChosenCoastalLakeTileState
+        {
+            get { return _coastalLakeTileState; }
+            set
+            {
+                if (value == _coastalLakeTileState)
+                    return;
+
+                _coastalLakeTileState = value;
+                OnPropertyChanged(nameof(ChosenCoastalLakeTileState));
+            }
+        }
+
+        /// <summary>
         ///     Current user selected hilliness.
         /// </summary>
         public Hilliness ChosenHilliness
@@ -229,6 +245,9 @@ namespace PrepareLanding.GameData
             if (_chosenCoastalTileState != MultiCheckboxState.Partial)
                 return false;
 
+            if (_coastalLakeTileState != MultiCheckboxState.Partial)
+                return false;
+
             if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
                 return false;
 
@@ -300,6 +319,7 @@ namespace PrepareLanding.GameData
             _chosenBiome = null;
             _chosenHilliness = Hilliness.Undefined;
             _chosenCoastalTileState = MultiCheckboxState.Partial;
+            _coastalLakeTileState = MultiCheckboxState.Partial;
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
             var defProps = PrepareLanding.Instance.GameData.DefData;
@@ -446,6 +466,11 @@ namespace PrepareLanding.GameData
         ///     The currently selected coastal tile state.
         /// </summary>
         private MultiCheckboxState _chosenCoastalTileState = MultiCheckboxState.Partial;
+
+        /// <summary>
+        ///     Whether we should filter for coastal tiles (only for lakes!)
+        /// </summary>
+        private MultiCheckboxState _coastalLakeTileState = MultiCheckboxState.Partial;
 
         /// <summary>
         ///     The currently selected hilliness state.

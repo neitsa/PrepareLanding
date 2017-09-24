@@ -542,6 +542,102 @@ namespace PrepareLanding.Filters
         }
     }
 
+    public class TileFilterCoastalLakeTiles : TileFilter
+    {
+        private static readonly List<Rot4> TmpLakeDirs = new List<Rot4>();
+
+        private static readonly List<int> TmpNeighbors = new List<int>();
+
+        public TileFilterCoastalLakeTiles(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override bool IsFilterActive => UserData.ChosenCoastalLakeTileState != MultiCheckboxState.Partial;
+
+        public override string SubjectThingDef => "Coastal Lake Tiles";
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            switch (UserData.ChosenCoastalLakeTileState)
+            {
+                case MultiCheckboxState.On:
+                    // gather all tiles that are coastal tiles
+                    foreach (var tileId in inputList)
+                        if (IsCoastalLakeTile(tileId))
+                            _filteredTiles.Add(tileId);
+                    break;
+                case MultiCheckboxState.Off:
+                    // get only tiles that are *not* coastal tiles
+                    foreach (var tileId in inputList)
+                        if (!IsCoastalLakeTile(tileId))
+                            _filteredTiles.Add(tileId);
+                    break;
+
+                case MultiCheckboxState.Partial:
+                    // consider it as "I don't care if it's coastal or not", so: all tiles match
+                    _filteredTiles.AddRange(inputList);
+                    break;
+
+                default:
+                    // shouldn't happen but... anyway...
+                    Log.Error("Unknown case for MultiCheckboxState.");
+                    break;
+            }
+        }
+
+        /// <summary>
+        ///     Check if a <see cref="Tile" /> is a coastal tile of a lake (works <b>only</b> for lakes).
+        /// </summary>
+        /// <param name="tileId">The ID of the tile to check.</param>
+        /// <returns>true if the tile is a coastal tile of a lake, false otherwise.</returns>
+        public static bool IsCoastalLakeTile(int tileId)
+        {
+            var rot = CoastDirectionAt(tileId);
+            return rot.IsValid;
+        }
+
+        public static Rot4 CoastDirectionAt(int tileId)
+        {
+            var tile = Find.World.grid[tileId];
+            if (!tile.biome.canBuildBase)
+            {
+                return Rot4.Invalid;
+            }
+            TmpLakeDirs.Clear();
+            Find.World.grid.GetTileNeighbors(tileId, TmpNeighbors);
+            var i = 0;
+            var count = TmpNeighbors.Count;
+            while (i < count)
+            {
+                var tile2 = Find.World.grid[TmpNeighbors[i]];
+                if (tile2.biome == BiomeDefOf.Lake)
+                {
+                    var rotFromTo = Find.World.grid.GetRotFromTo(tileId, TmpNeighbors[i]);
+                    if (!TmpLakeDirs.Contains(rotFromTo))
+                    {
+                        TmpLakeDirs.Add(rotFromTo);
+                    }
+                }
+                i++;
+            }
+            if (TmpLakeDirs.Count == 0)
+            {
+                return Rot4.Invalid;
+            }
+            Rand.PushState();
+            Rand.Seed = tileId;
+            var index = Rand.Range(0, TmpLakeDirs.Count);
+            Rand.PopState();
+            return TmpLakeDirs[index];
+        }
+    }
+
     public class TileFilterElevations : TileFilter
     {
         public TileFilterElevations(UserData userData, string attachedProperty,

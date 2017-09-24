@@ -69,6 +69,7 @@ namespace PrepareLanding.Presets
                 }
             }
             _gameData.UserData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
+            _gameData.UserData.ChosenCoastalLakeTileState = LoadThreeState(xTerrain, "CoastalLakeTile");
             LoadUsableMinMax(xTerrain, "Elevation", _gameData.UserData.Elevation);
             LoadUsableMinMax(xTerrain, "TimeZone", _gameData.UserData.TimeZone);
 
@@ -160,6 +161,7 @@ namespace PrepareLanding.Presets
                         _gameData.UserData.OrderedStoneDefs);
                 }
                 SaveThreeState(xTerrainFilters, "CoastalTile", _gameData.UserData.ChosenCoastalTileState);
+                SaveThreeState(xTerrainFilters, "CoastalLakeTile", _gameData.UserData.ChosenCoastalLakeTileState);
                 SaveUsableMinMax(xTerrainFilters, "Elevation", _gameData.UserData.Elevation);
                 SaveUsableMinMax(xTerrainFilters, "TimeZone", _gameData.UserData.TimeZone);
 

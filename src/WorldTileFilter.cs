@@ -89,6 +89,11 @@ namespace PrepareLanding
                         FilterHeaviness.Light)
                 },
                 {
+                    nameof(_userData.ChosenCoastalLakeTileState),
+                    new TileFilterCoastalLakeTiles(_userData, nameof(_userData.ChosenCoastalLakeTileState),
+                        FilterHeaviness.Light)
+                },
+                {
                     nameof(_userData.Elevation),
                     new TileFilterElevations(_userData, nameof(_userData.Elevation), FilterHeaviness.Heavy)
                 },

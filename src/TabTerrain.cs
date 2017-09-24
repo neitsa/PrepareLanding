@@ -177,11 +177,21 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Coastal Tile", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
 
+            // coastal tiles (sea)
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _gameData.UserData.ChosenCoastalTileState;
-            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile:", ref tmpCheckState);
+            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (sea):", ref tmpCheckState);
 
             _gameData.UserData.ChosenCoastalTileState = tmpCheckState;
+
+            ListingStandard.Gap(6f);
+
+            // coastal tiles (lake)
+            rect = ListingStandard.GetRect(DefaultElementHeight);
+            tmpCheckState = _gameData.UserData.ChosenCoastalLakeTileState;
+            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (lake):", ref tmpCheckState);
+
+            _gameData.UserData.ChosenCoastalLakeTileState = tmpCheckState;
         }
 
         protected void DrawElevationSelection()
