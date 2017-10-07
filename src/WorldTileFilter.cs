@@ -197,7 +197,7 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        /// Get a random settle-able tile from the filtered tiles.
+        ///     Get a random settle-able tile from the filtered tiles.
         /// </summary>
         /// <returns>A random tile ID (or Tile.Invalid if no tile could be found).</returns>
         public int RandomFilteredTile()
@@ -215,31 +215,25 @@ namespace PrepareLanding
 
                 int tileId;
                 if ((from _ in Enumerable.Range(0, minRange)
-                    select Rand.Range(0, _matchingTileIds.Count)).TryRandomElementByWeight(delegate (int x)
+                    select Rand.Range(0, _matchingTileIds.Count)).TryRandomElementByWeight(delegate(int x)
                 {
                     var tile = Find.WorldGrid[x];
 
                     if (!PrepareLanding.Instance.GameData.UserData.Options.AllowImpassableHilliness &&
                         tile.hilliness == Hilliness.Impassable)
-                    {
                         return 0f;
-                    }
 
                     if (!tile.biome.canBuildBase || !tile.biome.implemented)
-                    {
                         return 0f;
-                    }
+
                     if (!tile.biome.canAutoChoose)
-                    {
                         return 0f;
-                    }
+
                     return tile.biome.factionBaseSelectionWeight;
                 }, out tileId))
                 {
                     if (TileFinder.IsValidTileForNewSettlement(tileId))
-                    {
                         return tileId;
-                    }
                 }
             }
 
