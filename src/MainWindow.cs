@@ -95,6 +95,13 @@ namespace PrepareLanding
                     Minimize();
                 });
 
+            var buttonSelectRandomSite = new ButtonDescriptor("Select Random", delegate
+            {
+                SoundDefOf.Click.PlayOneShotOnCamera();
+                Find.WorldInterface.SelectedTile = PrepareLanding.Instance.TileFilter.RandomFilteredTile();
+                Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
+            });
+
             _buttonCloseDescriptor = new ButtonDescriptor("CloseButton".Translate(),
                 delegate
                 {
@@ -111,7 +118,7 @@ namespace PrepareLanding
 
 
             _bottomButtonsDescriptorList =
-                new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, _buttonCloseDescriptor};
+                new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonSelectRandomSite, buttonMinimize, _buttonCloseDescriptor};
 
             #endregion BOTTOM_BUTTONS
 

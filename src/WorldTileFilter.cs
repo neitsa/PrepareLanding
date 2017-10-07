@@ -197,6 +197,58 @@ namespace PrepareLanding
         }
 
         /// <summary>
+        /// Get a random settle-able tile from the filtered tiles.
+        /// </summary>
+        /// <returns>A random tile ID (or Tile.Invalid if no tile could be found).</returns>
+        public int RandomFilteredTile()
+        {
+            if (_matchingTileIds.Count == 0)
+            {
+                Messages.Message("Please filter tiles first.", MessageSound.RejectInput);
+                return Tile.Invalid;
+            }
+
+            var minTries = Math.Min(_matchingTileIds.Count, 500);
+            for (var i = 0; i < minTries; i++)
+            {
+                var minRange = Math.Min(_matchingTileIds.Count, 100);
+
+                int tileId;
+                if ((from _ in Enumerable.Range(0, minRange)
+                    select Rand.Range(0, _matchingTileIds.Count)).TryRandomElementByWeight(delegate (int x)
+                {
+                    var tile = Find.WorldGrid[x];
+
+                    if (!PrepareLanding.Instance.GameData.UserData.Options.AllowImpassableHilliness &&
+                        tile.hilliness == Hilliness.Impassable)
+                    {
+                        return 0f;
+                    }
+
+                    if (!tile.biome.canBuildBase || !tile.biome.implemented)
+                    {
+                        return 0f;
+                    }
+                    if (!tile.biome.canAutoChoose)
+                    {
+                        return 0f;
+                    }
+                    return tile.biome.factionBaseSelectionWeight;
+                }, out tileId))
+                {
+                    if (TileFinder.IsValidTileForNewSettlement(tileId))
+                    {
+                        return tileId;
+                    }
+                }
+            }
+
+            Messages.Message("Failed to find a valid base tile.", MessageSound.RejectInput);
+            Log.Error("[PrepareLanding] Failed to find a valid base tile.");
+            return Tile.Invalid;
+        }
+
+        /// <summary>
         ///     Given the <see cref="TileFilter.SubjectThingDef" /> from a filter, returns the filter heaviness.
         /// </summary>
         /// <param name="subjectThingDef">The <see cref="TileFilter.SubjectThingDef" /> from a filter.</param>
@@ -226,7 +278,7 @@ namespace PrepareLanding
         ///     Main workhorse method that does the actual tile filtering. <see cref="Filter" /> is actually a wrapper around this
         ///     method.
         /// </summary>
-        protected void FilterTiles()
+        private void FilterTiles()
         {
             // do a preventive check before filtering anything
             if (!FilterPreCheck())
@@ -346,7 +398,7 @@ namespace PrepareLanding
         ///     Do a pre-filtering of tiles on the world map. Mostly used to gather "valid" tiles (that is, tiles that are
         ///     settleable).
         /// </summary>
-        protected void Prefilter()
+        private void Prefilter()
         {
             Log.Message($"[PrepareLanding] Prefilter: {Find.WorldGrid.tiles.Count} tiles in WorldGrid.tiles");
 
@@ -392,7 +444,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Called when the world map has been generated. We use it to pre-filter valid tiles.
         /// </summary>
-        protected void PrefilterQueueLongEvent()
+        private void PrefilterQueueLongEvent()
         {
             LongEventHandler.QueueLongEvent(Prefilter,
                 $"[{"PrepareLanding".Translate()}] {"PreFilteringWorldTiles".Translate()}", true, null);
