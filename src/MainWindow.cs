@@ -98,7 +98,11 @@ namespace PrepareLanding
             var buttonSelectRandomSite = new ButtonDescriptor("Select Random", delegate
             {
                 SoundDefOf.Click.PlayOneShotOnCamera();
-                Find.WorldInterface.SelectedTile = PrepareLanding.Instance.TileFilter.RandomFilteredTile();
+                var tileId = PrepareLanding.Instance.TileFilter.RandomFilteredTile();
+                if (tileId == Tile.Invalid)
+                    return;
+
+                Find.WorldInterface.SelectedTile = tileId;
                 Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
             });
 

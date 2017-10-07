@@ -208,14 +208,15 @@ namespace PrepareLanding
                 return Tile.Invalid;
             }
 
+            var random = new System.Random();
+
             var minTries = Math.Min(_matchingTileIds.Count, 500);
             for (var i = 0; i < minTries; i++)
             {
                 var minRange = Math.Min(_matchingTileIds.Count, 100);
 
                 int tileId;
-                if ((from _ in Enumerable.Range(0, minRange)
-                    select Rand.Range(0, _matchingTileIds.Count)).TryRandomElementByWeight(delegate(int x)
+                if ((from _ in Enumerable.Range(0, minRange) select _matchingTileIds[random.Next(_matchingTileIds.Count)]).TryRandomElementByWeight(delegate(int x)
                 {
                     var tile = Find.WorldGrid[x];
 
