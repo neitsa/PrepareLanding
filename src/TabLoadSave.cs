@@ -5,6 +5,7 @@ using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Presets;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Steam;
@@ -124,7 +125,7 @@ namespace PrepareLanding
                 if (_listDisplayStartIndex >= MaxItemsToDisplay)
                     _listDisplayStartIndex -= MaxItemsToDisplay;
                 else
-                    Messages.Message("Reached start of item list.", MessageSound.RejectInput);
+                    Messages.Message("Reached start of item list.", MessageTypeDefOf.RejectInput);
             }, "Go to previous list page.");
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
@@ -134,7 +135,7 @@ namespace PrepareLanding
                 if (_listDisplayStartIndex > presetFilesCount)
                 {
                     Messages.Message($"No more available items to display (max: {presetFilesCount}).",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
                     _listDisplayStartIndex -= MaxItemsToDisplay;
                 }
             }, "Go to next list page.");
@@ -145,7 +146,7 @@ namespace PrepareLanding
                 var displayIndexStart = presetFilesCount - presetFilesCount%MaxItemsToDisplay;
                 if (displayIndexStart == _listDisplayStartIndex)
                     Messages.Message($"No more available items to display (max: {presetFilesCount}).",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
 
                 _listDisplayStartIndex = displayIndexStart;
             }, "Go to end of list.");
@@ -289,11 +290,11 @@ namespace PrepareLanding
         {
             if (!string.IsNullOrEmpty(_selectedFileName))
                 if (_gameData.PresetManager.LoadPreset(_selectedFileName, true))
-                    Messages.Message("Successfuly loaded the preset!", MessageSound.Benefit);
+                    Messages.Message("Successfully loaded the preset!", MessageTypeDefOf.PositiveEvent);
                 else
-                    Messages.Message("Error: couldn't load the preset...", MessageSound.Negative);
+                    Messages.Message("Error: couldn't load the preset...", MessageTypeDefOf.NegativeEvent);
             else
-                Messages.Message("Pick a preset first.", MessageSound.Negative);
+                Messages.Message("Pick a preset first.", MessageTypeDefOf.NegativeEvent);
         }
 
         protected void DrawLoadPresetList(Rect inRect)
@@ -440,7 +441,7 @@ namespace PrepareLanding
         private void SavePreset(bool presetExistsProtectFromOverwrite)
         {
             if (_gameData.UserData.AreAllFieldsInDefaultSate())
-                Messages.Message("All filters seem to be in their default state", MessageSound.RejectInput);
+                Messages.Message("All filters seem to be in their default state", MessageTypeDefOf.RejectInput);
             else
             {
                 if (presetExistsProtectFromOverwrite)
@@ -448,16 +449,16 @@ namespace PrepareLanding
                     _allowOverwriteExistingPreset = true;
                     Messages.Message(
                         "Click again on the \"Save\" button to confirm the overwrite of the existing preset.",
-                        MessageSound.Standard);
+                        MessageTypeDefOf.NeutralEvent);
                 }
                 else
                 {
                     _allowOverwriteExistingPreset = false;
                     if (_gameData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave,
                         _saveOptions))
-                        Messages.Message("Successfuly saved the preset!", MessageSound.Benefit);
+                        Messages.Message("Successfully saved the preset!", MessageTypeDefOf.PositiveEvent);
                     else
-                        Messages.Message("Error: couldn't save the preset...", MessageSound.Negative);
+                        Messages.Message("Error: couldn't save the preset...", MessageTypeDefOf.NegativeEvent);
                 }
             }
         }

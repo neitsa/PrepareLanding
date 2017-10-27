@@ -2,6 +2,7 @@
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.World;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -146,7 +147,7 @@ namespace PrepareLanding
                 if ((_tileNumber < 0) || (_tileNumber >= Find.WorldGrid.TilesCount))
                 {
                     Messages.Message($"Out of Range: {_tileNumber}; Range: [0, {Find.WorldGrid.TilesCount}).",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
                 }
                 else
                 {

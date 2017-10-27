@@ -989,7 +989,7 @@ namespace PrepareLanding.Filters
             {
                 Messages.Message(
                     $"You are requesting more tiles than the number of available tiles (max: {worldTilesAndFeatures.Count})",
-                    MessageSound.RejectInput);
+                    MessageTypeDefOf.RejectInput);
                 return;
             }
 

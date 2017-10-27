@@ -18,60 +18,69 @@ namespace PrepareLanding.Patches
             Text.Anchor = TextAnchor.UpperCenter;
             DrawPageTitle(new Rect(0f, 5f, UI.screenWidth, 300f));
             Text.Anchor = TextAnchor.UpperLeft;
-            DoCustomButtons();
+            DoCustomBottomButtons();
         }
 
         /// <summary>
-        ///     This is a rip of the DoCustomButtons() function in RimWorld.Page_SelectLandingSite with a new button.
+        ///     This is a rip of the DoCustomBottomButtons() function in RimWorld.Page_SelectLandingSite with a new button.
         /// </summary>
-        private void DoCustomButtons()
+        private void DoCustomBottomButtons()
         {
-            // HACK : changed the number of buttons from '5 : 4' to '6 : 5' as we add a button
-            var num = !TutorSystem.TutorialMode ? 6 : 5;
+            var num = (!TutorSystem.TutorialMode) ? 5 : 4;
             int num2;
             if (num >= 4 && UI.screenWidth < 1340f)
+            {
                 num2 = 2;
+            }
             else
+            {
                 num2 = 1;
-            var num3 = Mathf.CeilToInt(num / (float) num2);
+            }
+            var num3 = Mathf.CeilToInt(num / (float)num2);
             var num4 = BottomButSize.x * num3 + 10f * (num3 + 1);
             var num5 = num2 * BottomButSize.y + 10f * (num2 + 1);
             var rect = new Rect((UI.screenWidth - num4) / 2f, UI.screenHeight - num5 - 4f, num4, num5);
-            if (Find.WindowStack.IsOpen<WorldInspectPane>() && rect.x < InspectPaneUtility.PaneSize.x + 4f)
-                rect.x = InspectPaneUtility.PaneSize.x + 4f;
+            var worldInspectPane = Find.WindowStack.WindowOfType<WorldInspectPane>();
+            if (worldInspectPane != null && rect.x < InspectPaneUtility.PaneWidthFor(worldInspectPane) + 4f)
+            {
+                rect.x = InspectPaneUtility.PaneWidthFor(worldInspectPane) + 4f;
+            }
             Widgets.DrawWindowBackground(rect);
             var num6 = rect.xMin + 10f;
             var num7 = rect.yMin + 10f;
             Text.Font = GameFont.Small;
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Back".Translate()) &&
-                CanDoBack())
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Back".Translate()))
             {
-                /* ADDED CODE */
-
-                #region INSERTED_CODE
-
-                // make sure the prepare landing window (or its minimized window) is closed when we go back
-                if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
+                if (CanDoBack())
                 {
-                    if(PrepareLanding.Instance.MainWindow != null)
-                        PrepareLanding.Instance.MainWindow.ForceClose();
+                    /* ADDED CODE */
+
+                    #region INSERTED_CODE
+
+                    // make sure the prepare landing window (or its minimized window) is closed when we go back
+                    if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
+                    {
+                        if (PrepareLanding.Instance.MainWindow != null)
+                            PrepareLanding.Instance.MainWindow.ForceClose();
+                    }
+
+                    #endregion
+
+                    /* END ADDED CODE*/
+
+                    DoBack();
                 }
-
-                #endregion
-
-                /* END ADDED CODE*/
-
-                DoBack();
             }
             num6 += BottomButSize.x + 10f;
             if (!TutorSystem.TutorialMode)
             {
                 if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Advanced".Translate()))
+                {
                     Find.WindowStack.Add(new Dialog_AdvancedGameConfig(Find.WorldInterface.SelectedTile));
+                }
                 num6 += BottomButSize.x + 10f;
             }
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y),
-                "SelectRandomSite".Translate()))
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "SelectRandomSite".Translate()))
             {
                 SoundDefOf.Click.PlayOneShotOnCamera();
                 Find.WorldInterface.SelectedTile = TileFinder.RandomStartingTile();
@@ -83,54 +92,32 @@ namespace PrepareLanding.Patches
                 num6 = rect.xMin + 10f;
                 num7 += BottomButSize.y + 10f;
             }
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y),
-                "WorldFactionsTab".Translate()))
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "WorldFactionsTab".Translate()))
+            {
                 Find.WindowStack.Add(new Dialog_FactionDuringLanding());
-            num6 += BottomButSize.x + 10f;
-
-            /* inserted button code */
-
-            #region INSERTED_CODE
-
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Prepare Landing"))
-            {
-                Log.Message("[PrepareLanding] Page button pressed!");
-
-                // don't add a new window if the window is already there
-                if (PrepareLanding.Instance.MainWindow == null)
-                    PrepareLanding.Instance.MainWindow = new MainWindow(PrepareLanding.Instance.GameData);
-
-                PrepareLanding.Instance.MainWindow.Show();
             }
             num6 += BottomButSize.x + 10f;
-
-            #endregion INSERTED_CODE
-
-            /* end of inserted code */
-
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()) &&
-                CanDoNext())
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()))
             {
-                /* ADDED CODE */
-
-                #region INSERTED_CODE
-
-                // make sure the prepare landing window (or its minimized window) is closed when we go to the next window / game stage
-                if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
+                if (CanDoNext())
                 {
-                    if (PrepareLanding.Instance.MainWindow != null)
-                        PrepareLanding.Instance.MainWindow.ForceClose();
+                    /* ADDED CODE */
+                    #region INSERTED_CODE
+
+                    // make sure the prepare landing window (or its minimized window) is closed when we go to the next window / game stage
+                    if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
+                    {
+                        if (PrepareLanding.Instance.MainWindow != null)
+                            PrepareLanding.Instance.MainWindow.ForceClose();
+                    }
+
+                    #endregion
+                    /* END ADDED CODE*/
+
+                    DoNext();
                 }
-
-                #endregion
-
-                /* END ADDED CODE*/
-
-                // go to next window
-                DoNext();
             }
-
-            //num6 += BottomButSize.x + 10f;
+            num6 += BottomButSize.x + 10f;
             GenUI.AbsorbClicksInRect(rect);
         }
     }
