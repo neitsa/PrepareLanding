@@ -12,10 +12,9 @@ tools/*.dll
 tools/*.exe
 
 # ignore required project dependencies
-libs/*/*.dll
-libs/*/*.xml
-libs/*.txt
-
+libs/*
+libs/*
+!libs/*.md
 # ==============================================================================
 # Python / JetBrains PyCharm
 # ==============================================================================
