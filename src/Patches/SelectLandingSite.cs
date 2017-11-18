@@ -26,7 +26,8 @@ namespace PrepareLanding.Patches
         /// </summary>
         private void DoCustomBottomButtons()
         {
-            var num = (!TutorSystem.TutorialMode) ? 5 : 4;
+            // HACK : changed the number of buttons from '5 : 4' to '6 : 5' as we add a button
+            var num = (!TutorSystem.TutorialMode) ? 6 : 5;
             int num2;
             if (num >= 4 && UI.screenWidth < 1340f)
             {
@@ -97,6 +98,26 @@ namespace PrepareLanding.Patches
                 Find.WindowStack.Add(new Dialog_FactionDuringLanding());
             }
             num6 += BottomButSize.x + 10f;
+
+            #region INSERTED_CODE
+
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Prepare Landing"))
+            {
+                Log.Message("[PrepareLanding] Page button pressed!");
+
+                // don't add a new window if the window is already there
+                if (PrepareLanding.Instance.MainWindow == null)
+                    PrepareLanding.Instance.MainWindow = new MainWindow(PrepareLanding.Instance.GameData);
+
+                PrepareLanding.Instance.MainWindow.Show();
+            }
+            num6 += BottomButSize.x + 10f;
+
+            #endregion INSERTED_CODE
+
+            /* end of inserted code */
+
+
             if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()))
             {
                 if (CanDoNext())
