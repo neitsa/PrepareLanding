@@ -123,7 +123,7 @@ namespace PrepareLanding
             {
                 if (Find.WorldObjects.AnyFactionBaseAt(tileId))
                 {
-                    Messages.Message("You're not allowed to change a faction tile.", MessageSound.RejectInput);
+                    Messages.Message("You're not allowed to change a faction tile.", MessageTypeDefOf.RejectInput);
                     _gameData.GodModeData.SelectedTileId = -1;
                     return;
                 }
@@ -144,7 +144,7 @@ namespace PrepareLanding
                         "GeneratingWorld", true, null);
                 else
                     Messages.Message("You need to change a tile first to be able to redraw the map.",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
             var tooltipRect = ListingStandard.EndCaptureHeight(heightBefore);
             TooltipHandler.TipRegion(tooltipRect,
                 "[Warning: this redraws the map entirely; use it only when you have finished *all* your modifications.]");
@@ -355,7 +355,7 @@ namespace PrepareLanding
                         if (countTrue >= MaxNumberOfRoads)
                         {
                             Messages.Message($"Can't have more than {MaxNumberOfRoads} types of road per tile.",
-                                MessageSound.RejectInput);
+                                MessageTypeDefOf.RejectInput);
                             tmpState = false;
                         }
                     }
@@ -406,7 +406,7 @@ namespace PrepareLanding
                         if (countTrue >= MaxNumberOfRivers)
                         {
                             Messages.Message($"Can't have more than {MaxNumberOfRivers} types of river per tile.",
-                                MessageSound.RejectInput);
+                                MessageTypeDefOf.RejectInput);
                             tmpState = false;
                         }
                     }

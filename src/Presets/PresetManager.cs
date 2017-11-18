@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using RimWorld;
 using Verse;
 
 namespace PrepareLanding.Presets
@@ -103,7 +104,7 @@ namespace PrepareLanding.Presets
             }
             catch (Exception e)
             {
-                Messages.Message("[PrepareLanding] Error loading preset.", MessageSound.RejectInput);
+                Messages.Message("[PrepareLanding] Error loading preset.", MessageTypeDefOf.RejectInput);
                 Log.Error($"Failed to load preset file '{filePath}'. Error:\n\t{e}\n\t{e.Message}");
 
                 successfulLoad = false;
@@ -138,7 +139,7 @@ namespace PrepareLanding.Presets
             }
             catch (Exception e)
             {
-                Messages.Message("[PrepareLanding] Error loading preset info.", MessageSound.RejectInput);
+                Messages.Message("[PrepareLanding] Error loading preset info.", MessageTypeDefOf.RejectInput);
                 Log.Error($"[PrepareLanding] LoadPresetInfo error: {e}");
                 throw;
             }
@@ -159,7 +160,7 @@ namespace PrepareLanding.Presets
                 if (_presetCache[presetName].PresetInfo.IsTemplate)
                 {
                     Messages.Message("[PrepareLanding] It is not allowed to overwrite a template preset.",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
                     return false;
                 }
 
@@ -196,7 +197,7 @@ namespace PrepareLanding.Presets
                 if (_presetCache.ContainsKey(presetName))
                     _presetCache.Remove(presetName);
 
-                Messages.Message("[PrepareLanding] Failed to save preset file.", MessageSound.RejectInput);
+                Messages.Message("[PrepareLanding] Failed to save preset file.", MessageTypeDefOf.RejectInput);
                 Log.Error($"[PrepareLanding] Failed to save preset file '{filePath}'. error:\n\t{e}\n\t{e.Message}");
 
                 successfulSave = false;

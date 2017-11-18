@@ -10,7 +10,7 @@
   #---------------------------------#
 
   # version format (you need to bump it when changing version)
-  version: 0.5.1-{build}-{branch}
+  version: 0.6.0-{build}-{branch}
 
   # branches
   branches:
@@ -50,7 +50,7 @@
   # environment variables
   environment:
     DLL_ARCH_PASS: # RimWorld DLLs archive password (secured)
-      secure: m0qPdh03pFIYhw0c3YzLFQO/4SKmx6hA+KuXlZbIUAI=
+      secure: TYvQsvft4cGEHRyIhPrRYlCxkQzOl9zQS8GpF5S6D2I=
 
   matrix:
     # set this flag to immediately finish build once one of the jobs fails.
@@ -97,9 +97,9 @@
     #
     # Download required assemblies DLLs
     #
-    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib/releases/download/v3.1.2/HugsLib_3.1.2.zip --download_path %DOWNLOAD_FOLDER%
-    - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
-    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_17b.7z --download_path %DOWNLOAD_FOLDER%
+    #- cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib/releases/download/v3.1.2/HugsLib_3.1.2.zip --download_path %DOWNLOAD_FOLDER%
+    #- cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_18.7z --download_path %DOWNLOAD_FOLDER%
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -p%DLL_ARCH_PASS% -e *.dll
     - cmd: dir %LIBS_FOLDER%
 

@@ -2,6 +2,7 @@
 using System.Text;
 using JetBrains.Annotations;
 using PrepareLanding.Core.Gui;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -36,7 +37,7 @@ namespace PrepareLanding
                 var shortMessage = shortRimWorldMessage == null ? "" : $": {shortRimWorldMessage}";
                 Messages.Message(
                     $"[PrepareLanding] A filter error occurred{shortMessage}\nPlease see the \"{tabName}\" tab for an error description.",
-                    MessageSound.RejectInput);
+                    MessageTypeDefOf.RejectInput);
             }
 
             if (sendToLog)

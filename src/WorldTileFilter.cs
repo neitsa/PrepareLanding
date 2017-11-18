@@ -7,6 +7,7 @@ using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
 using PrepareLanding.GameData;
+using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
@@ -204,7 +205,7 @@ namespace PrepareLanding
         {
             if (_matchingTileIds.Count == 0)
             {
-                Messages.Message("Please filter tiles first.", MessageSound.RejectInput);
+                Messages.Message("Please filter tiles first.", MessageTypeDefOf.RejectInput);
                 return Tile.Invalid;
             }
 
@@ -238,7 +239,7 @@ namespace PrepareLanding
                 }
             }
 
-            Messages.Message("Failed to find a valid base tile.", MessageSound.RejectInput);
+            Messages.Message("Failed to find a valid base tile.", MessageTypeDefOf.RejectInput);
             Log.Error("[PrepareLanding] Failed to find a valid base tile.");
             return Tile.Invalid;
         }

@@ -27,7 +27,7 @@ namespace PrepareLanding.GameData
         /// <summary>
         ///     Used to load / save filters and options.
         /// </summary>
-        public PresetManager PresetManager { get; }
+        public PresetManager PresetManager { get; internal set; }
 
         public GameData(FilterOptions filterOptions)
         {
@@ -44,7 +44,7 @@ namespace PrepareLanding.GameData
             WorldData = new WorldData(DefData);
 
             // Preset manager (load and save presets).
-            PresetManager = new PresetManager(this);
+            //PresetManager = new PresetManager(this);
         }
     }
 }

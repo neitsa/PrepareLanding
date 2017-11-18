@@ -175,7 +175,7 @@ namespace PrepareLanding
 
         protected virtual void DrawCoastalSelection()
         {
-            DrawEntryHeader("Coastal Tile", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
+            DrawEntryHeader("Coastal Tiles", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
 
             // coastal tiles (sea)
             var rect = ListingStandard.GetRect(DefaultElementHeight);
