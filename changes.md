@@ -11,6 +11,9 @@ What's New?
 
 * Fixed code for Beta 18 support.
 * Added a new filter: 
+    - "Coastal Tile (Lake)" in terrain tab (see. "Coastal Tiles")
+        - A Lake is at most 18 tiles surrounded by land. More than that is considered a sea / ocean.
+    - The previous behavior is now "Coastal Tile (sea)".
 
 Detailed Changelog
 ==================
