@@ -39,7 +39,7 @@ namespace PrepareLanding
                 if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 else
-                    Messages.Message("Reached start of tile list.", MessageSound.RejectInput);
+                    Messages.Message("Reached start of tile list.", MessageTypeDefOf.RejectInput);
             }, "Go to previous list page.");
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
@@ -49,7 +49,7 @@ namespace PrepareLanding
                 if (_tileDisplayIndexStart > matchingTilesCount)
                 {
                     Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 }
             }, "Go to next list page.");
@@ -60,7 +60,7 @@ namespace PrepareLanding
                 var tileDisplayIndexStart = matchingTilesCount - matchingTilesCount % MaxDisplayedTileWhenMinimized;
                 if (tileDisplayIndexStart == _tileDisplayIndexStart)
                     Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
 
                 _tileDisplayIndexStart = tileDisplayIndexStart;
             }, "Go to end of list.");

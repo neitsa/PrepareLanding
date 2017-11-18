@@ -38,6 +38,10 @@
       <HintPath>libs\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>libs\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="HugsLib">
       <HintPath>libs\HugsLib.dll</HintPath>
       <Private>False</Private>
@@ -120,7 +124,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
-if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) k:\rimworld_debug\RimWorld --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
+if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) k:\rimworld_debug\RimWorld_a18 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
 if $(ConfigurationName) == Release xcopy /y $(TargetPath) $(ProjectDir)output\PrepareLanding\Assemblies</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

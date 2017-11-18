@@ -171,7 +171,7 @@ namespace PrepareLanding
                 new ColumnData<TemperatureForecastForTwelfth>("Quadrum", "Quadrum of Year",
                     tfft => $"{tfft.Twelfth.GetQuadrum()}"),
                 new ColumnData<TemperatureForecastForTwelfth>("Season", "Season of Year",
-                    tfft => $"{tfft.Twelfth.GetSeason(tfft.Latitude)}"),
+                    tfft => $"{tfft.Twelfth.GetQuadrum().GetSeason(tfft.Latitude)}"),
                 new ColumnData<TemperatureForecastForTwelfth>("Twelfth", "Twelfth of Year",
                     tfft => $"{tfft.Twelfth}"),
                 new ColumnData<TemperatureForecastForTwelfth>("Avg. Temp", "Average Temperature for Twelfth",

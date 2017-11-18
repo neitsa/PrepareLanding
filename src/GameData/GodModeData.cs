@@ -232,7 +232,7 @@ namespace PrepareLanding.GameData
             var countTrue = SelectedStoneDefs.Values.Count(stoneDefValue => stoneDefValue);
             if (countTrue < 2 || countTrue > 3)
             {
-                Messages.Message($"Number of stones must be in the range: [{2}, {3}]", MessageSound.RejectInput);
+                Messages.Message($"Number of stones must be in the range: [{2}, {3}]", MessageTypeDefOf.RejectInput);
                 return false;
             }
 

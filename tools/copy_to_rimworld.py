@@ -68,7 +68,14 @@ def main(args):
     if not dir_exists(mod_dir):
         print("Provided mod path '{}' doesn't exists or is not a directory."
               .format(mod_dir), file=sys.stderr)
-        return -1
+        print("Trying to create it", file=sys.stderr)
+        try:
+            os.makedirs(mod_dir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                print("Couldn't create directory '{}'.".format(mod_dir), file=sys.stderr)
+                return -1
+        
 
     # check that we have an output dir
     if args.output_dir:

@@ -1,7 +1,7 @@
 | Type  | Value |
 | :---: | :---: |
 | Build Status  | [![Build status](https://ci.appveyor.com/api/projects/status/0t0v36hpor8l68l5?svg=true)](https://ci.appveyor.com/project/neitsa/preparelanding) |
-| RimWorld Version | ![RimWorld Version](https://img.shields.io/badge/RimWorld-A17b-brightgreen.svg) |
+| RimWorld Version | ![RimWorld Version Beta 18](https://img.shields.io/badge/RimWorld-Beta%2018-brightgreen.svg) |
 
 PrepareLanding
 ==============
@@ -9,6 +9,8 @@ PrepareLanding
 **PrepareLanding** is a mod for the [RimWorld](https://rimworldgame.com/) game by [Ludeon studios](https://ludeon.com/blog/). It allows players to carefully choose their landing site before actually starting their colony.
 
 As of version 0.5 you can also change some of the tiles characteristics.
+
+Current RimWorld version supported: ![RimWorld Version Beta 18](https://img.shields.io/badge/RimWorld-Beta%2018-brightgreen.svg)
 
 Installation
 ------------

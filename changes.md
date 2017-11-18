@@ -1,3 +1,42 @@
+***
+
+# Version 0.6.0
+**Released November 18, 2017**
+**`RimWorld Version: Beta 18`**
+
+# General
+
+What's New?
+===========
+
+* Fixed code for Beta 18 support.
+* Added a new filter: 
+    - "Coastal Tile (Lake)" in terrain tab (see. "Coastal Tiles")
+        - A Lake is at most 18 tiles surrounded by land. More than that is considered a sea / ocean.
+    - The previous behavior is now "Coastal Tile (sea)".
+
+Detailed Changelog
+==================
+
+Fixed Issues
+------------
+
+* None
+
+Future Plans
+============
+
+TODO for next release (v0.6.1 or v0.7)
+
+* Better Beta 18 support:
+    - Add filter: average disease frequency
+    - Add filter for tiles with special feature (e.g. Caves)
+    - Add possibility to filter only tiles in a named location on the world map
+	
+***
+
+
+
 # Version 0.5.1
 **Released September 16, 2017**
 **`RimWorld Version: Alpha 17b`**

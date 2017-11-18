@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("PrepareLanding")]
-[assembly: AssemblyDescription("A RimWorld Alpha 17 mod")]
+[assembly: AssemblyDescription("A RimWorld Beta 18 mod")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("neitsa")]
 [assembly: AssemblyProduct("PrepareLanding")]
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.5.1.0")]
-[assembly: AssemblyFileVersion("0.5.1.0")]
+[assembly: AssemblyVersion("0.6.0.0")]
+[assembly: AssemblyFileVersion("0.6.0.0")]

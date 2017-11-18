@@ -95,6 +95,17 @@ namespace PrepareLanding
                     Minimize();
                 });
 
+            var buttonSelectRandomSite = new ButtonDescriptor("Select Random", delegate
+            {
+                SoundDefOf.Click.PlayOneShotOnCamera();
+                var tileId = PrepareLanding.Instance.TileFilter.RandomFilteredTile();
+                if (tileId == Tile.Invalid)
+                    return;
+
+                Find.WorldInterface.SelectedTile = tileId;
+                Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
+            });
+
             _buttonCloseDescriptor = new ButtonDescriptor("CloseButton".Translate(),
                 delegate
                 {
@@ -111,7 +122,7 @@ namespace PrepareLanding
 
 
             _bottomButtonsDescriptorList =
-                new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonMinimize, _buttonCloseDescriptor};
+                new List<ButtonDescriptor> {buttonFilterTiles, buttonResetFilters, buttonSelectRandomSite, buttonMinimize, _buttonCloseDescriptor};
 
             #endregion BOTTOM_BUTTONS
 
@@ -132,7 +143,7 @@ namespace PrepareLanding
                 if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 else
-                    Messages.Message("Reached start of tile list.", MessageSound.RejectInput);
+                    Messages.Message("Reached start of tile list.", MessageTypeDefOf.RejectInput);
             }, "Go to previous list page.");
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
@@ -142,7 +153,7 @@ namespace PrepareLanding
                 if (_tileDisplayIndexStart > matchingTilesCount)
                 {
                     Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 }
             }, "Go to next list page.");
@@ -153,7 +164,7 @@ namespace PrepareLanding
                 var tileDisplayIndexStart = matchingTilesCount - matchingTilesCount % MaxDisplayedTileWhenMinimized;
                 if (tileDisplayIndexStart == _tileDisplayIndexStart)
                     Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
-                        MessageSound.RejectInput);
+                        MessageTypeDefOf.RejectInput);
 
                 _tileDisplayIndexStart = tileDisplayIndexStart;
             }, "Go to end of list.");

@@ -1,6 +1,7 @@
 ﻿using HugsLib;
 using PrepareLanding.Core;
 using PrepareLanding.Core.Gui.World;
+using PrepareLanding.Presets;
 using Verse;
 
 //TODO: general TODO -> translate all GUI strings.
@@ -25,6 +26,25 @@ namespace PrepareLanding
             Logger.Message("In constructor.");
             if (Instance == null)
                 Instance = this;
+
+            // initialize events
+            EventHandler = new RimWorldEventHandler();
+
+            // instance used to keep track of (or override) game ticks.
+            GameTicks = new GameTicks();
+
+            // Holds various mod options (shown on the 'option' tab on the GUI).
+            _filterOptions = new FilterOptions();
+
+            GameData = new GameData.GameData(_filterOptions);
+
+            TileFilter = new WorldTileFilter(GameData.UserData);
+
+            // instantiate the main window now
+            MainWindow = new MainWindow(GameData);
+
+            // instantiate the tile highlighter
+            TileHighlighter = new TileHighlighter(_filterOptions);
         }
 
         /// <summary>
@@ -88,24 +108,8 @@ namespace PrepareLanding
         {
             Logger.Message("Initializing.");
 
-            // initialize events
-            EventHandler = new RimWorldEventHandler();
-
-            // instance used to keep track of (or override) game ticks.
-            GameTicks = new GameTicks();
-
-            // Holds various mod options (shown on the 'option' tab on the GUI).
-            _filterOptions = new FilterOptions();
-
-            GameData = new GameData.GameData(_filterOptions);
-
-            TileFilter = new WorldTileFilter(GameData.UserData);
-
-            // instantiate the main window now
-            MainWindow = new MainWindow(GameData);
-
-            // instantiate the tile highlighter
-            TileHighlighter = new TileHighlighter(_filterOptions);
+            var presetManager = new PresetManager(GameData);
+            GameData.PresetManager = presetManager;
         }
 
         /// <inheritdoc />
