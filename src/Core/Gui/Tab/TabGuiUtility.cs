@@ -62,7 +62,7 @@ namespace PrepareLanding.Core.Gui.Tab
             ListingStandard.NewColumn();
         }
 
-        protected virtual void DrawEntryHeader(string entryLabel, bool useStartingGap = true,
+        protected void DrawEntryHeader(string entryLabel, bool useStartingGap = true,
             bool useFollowingGap = false, Color? backgroundColor = null, float colorAlpha = 0.2f)
         {
             if (useStartingGap)
@@ -86,7 +86,7 @@ namespace PrepareLanding.Core.Gui.Tab
                 ListingStandard.Gap(DefaultGapHeight);
         }
 
-        protected virtual void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label,
+        protected void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label,
             float min = 0f, float max = 1E+09f) where T: struct , IComparable, IConvertible
         {
             var tmpCheckedOn = numericItem.Use;
@@ -98,14 +98,14 @@ namespace PrepareLanding.Core.Gui.Tab
             var minValue = numericItem.Min;
             var minValueString = numericItem.MinString;
             var minValueLabelRect = ListingStandard.GetRect(DefaultElementHeight);
-            Widgets.TextFieldNumericLabeled(minValueLabelRect, "Min: ", ref minValue, ref minValueString, min, max);
+            Verse.Widgets.TextFieldNumericLabeled(minValueLabelRect, "Min: ", ref minValue, ref minValueString, min, max);
             numericItem.Min = minValue;
             numericItem.MinString = minValueString;
 
             var maxValue = numericItem.Max;
             var maxValueString = numericItem.MaxString;
             var maxValueLabelRect = ListingStandard.GetRect(DefaultElementHeight);
-            Widgets.TextFieldNumericLabeled(maxValueLabelRect, "Max: ", ref maxValue, ref maxValueString, min, max);
+            Verse.Widgets.TextFieldNumericLabeled(maxValueLabelRect, "Max: ", ref maxValue, ref maxValueString, min, max);
             numericItem.Max = maxValue;
             numericItem.MaxString = maxValueString;
         }

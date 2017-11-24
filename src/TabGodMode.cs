@@ -243,7 +243,7 @@ namespace PrepareLanding
             var temperatureRectSpace = ListingStandard.GetRect(DefaultElementHeight);
             Widgets.Label(temperatureRectSpace.LeftPart(0.8f),
                 $"Avg. Temp. (°C) [{TemperatureTuning.MinimumTemperature}, {TemperatureTuning.MaximumTemperature}]");
-            Core.Gui.Widgets.TextFieldNumeric(temperatureRectSpace.RightPart(0.2f), ref averageTemperature,
+            Widgets.TextFieldNumeric(temperatureRectSpace.RightPart(0.2f), ref averageTemperature,
                 ref _chosenAverageTemperatureString, TemperatureTuning.MinimumTemperature,
                 TemperatureTuning.MaximumTemperature);
 
@@ -263,7 +263,7 @@ namespace PrepareLanding
 
             var rainfallRectSpace = ListingStandard.GetRect(DefaultElementHeight);
             Widgets.Label(rainfallRectSpace.LeftPart(0.8f), $"Rainfall (mm) [{minRainfall}, {maxRainfall}]");
-            Core.Gui.Widgets.TextFieldNumeric(rainfallRectSpace.RightPart(0.2f), ref rainFall,
+            Widgets.TextFieldNumeric(rainfallRectSpace.RightPart(0.2f), ref rainFall,
                 ref _chosenRainfallString, minRainfall, maxRainfall);
 
             _gameData.GodModeData.Rainfall = rainFall;
@@ -283,7 +283,7 @@ namespace PrepareLanding
 
             var elevationRectSpace = ListingStandard.GetRect(DefaultElementHeight);
             Widgets.Label(elevationRectSpace.LeftPart(0.8f), $"Elevation (m) [{minElevation}, {maxElevation}]");
-            Core.Gui.Widgets.TextFieldNumeric(elevationRectSpace.RightPart(0.2f), ref elevation,
+            Widgets.TextFieldNumeric(elevationRectSpace.RightPart(0.2f), ref elevation,
                 ref _chosenElevationString, minElevation, maxElevation);
 
             _gameData.GodModeData.Elevation = elevation;
