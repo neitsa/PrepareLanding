@@ -132,6 +132,11 @@ namespace PrepareLanding
                         FilterHeaviness.Heavy)
                 }, //TODO check heaviness
                 {
+                    nameof(_userData.HasCaveState),
+                    new TileFilterHasCave(_userData, nameof(_userData.HasCaveState),
+                        FilterHeaviness.Light)
+                },
+                {
                     nameof(_userData.MostLeastItem),
                     new TileFilterMostLeastFeature(_userData, nameof(_userData.MostLeastItem), FilterHeaviness.Light)
                 }
@@ -458,6 +463,14 @@ namespace PrepareLanding
             {
                 FilterInfoLogger.AppendErrorMessage(
                     "All filters are in their default state, please select at least one filter.");
+                return false;
+            }
+
+            // can't have 'cave' filter ON with hilliness less than large hills (see RimWorld.Planet.World.HasCaves)
+            if (_userData.HasCaveState == MultiCheckboxState.On & (_userData.ChosenHilliness < Hilliness.LargeHills & _userData.ChosenHilliness != Hilliness.Undefined))
+            {
+                FilterInfoLogger.AppendErrorMessage(
+                    $"There can be no caves with the chosen terrain type. Choose at least {Hilliness.LargeHills.GetLabelCap()}.");
                 return false;
             }
 

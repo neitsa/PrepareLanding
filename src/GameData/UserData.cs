@@ -52,6 +52,22 @@ namespace PrepareLanding.GameData
         }
 
         /// <summary>
+        ///     Current user choice for the "Has Cave" state.
+        /// </summary>
+        public MultiCheckboxState HasCaveState
+        {
+            get { return _hasCaveState; }
+            set
+            {
+                if (value == _hasCaveState)
+                    return;
+
+                _hasCaveState = value;
+                OnPropertyChanged(nameof(HasCaveState));
+            }
+        }
+
+        /// <summary>
         ///     Current user selected biome.
         /// </summary>
         public BiomeDef ChosenBiome
@@ -249,6 +265,9 @@ namespace PrepareLanding.GameData
                 return false;
 
             if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
+                return false;
+
+            if (_hasCaveState != MultiCheckboxState.Partial)
                 return false;
 
             if (!IsDefDictInDefaultState(SelectedRoadDefs))
@@ -456,6 +475,11 @@ namespace PrepareLanding.GameData
         ///     Current user choice for the "Animal Can Graze Now" state.
         /// </summary>
         private MultiCheckboxState _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
+
+        /// <summary>
+        ///     Current user choice for the "Has cave" state.
+        /// </summary>
+        private MultiCheckboxState _hasCaveState = MultiCheckboxState.Partial;
 
         /// <summary>
         ///     The currently selected biome.

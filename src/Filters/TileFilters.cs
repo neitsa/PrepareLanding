@@ -947,6 +947,45 @@ namespace PrepareLanding.Filters
         }
     }
 
+    public class TileFilterHasCave : TileFilter
+    {
+        public TileFilterHasCave(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override bool IsFilterActive => UserData.HasCaveState != MultiCheckboxState.Partial;
+
+        public override string SubjectThingDef => "Has Cave";
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            // partial state means "I don't care if they can graze now or not", so all tiles match
+            if (UserData.HasCaveState == MultiCheckboxState.Partial)
+            {
+                _filteredTiles.AddRange(inputList);
+                return;
+            }
+
+            foreach (var tileId in inputList)
+            {
+                var hasCave = Find.World.HasCaves(tileId);
+                if (UserData.HasCaveState == MultiCheckboxState.On)
+                    if (hasCave)
+                        _filteredTiles.Add(tileId);
+
+                if (UserData.HasCaveState == MultiCheckboxState.Off)
+                    if (!hasCave)
+                        _filteredTiles.Add(tileId);
+            }
+        }
+    }
+
     public class TileFilterMostLeastFeature : TileFilter
     {
         public TileFilterMostLeastFeature(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(
