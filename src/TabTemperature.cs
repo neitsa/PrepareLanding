@@ -6,6 +6,7 @@ using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.Window;
 using PrepareLanding.GameData;
 using RimWorld;
+using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
@@ -60,6 +61,7 @@ namespace PrepareLanding
             DrawRainfallSelection();
             DrawMostLeastFeatureSelection();
             DrawAnimalsCanGrazeNowSelection();
+            DrawCaveSelection();
             NewColumn();
             DrawTemperatureForecast();
             End();
@@ -250,6 +252,20 @@ namespace PrepareLanding
             Core.Gui.Widgets.CheckBoxLabeledMulti(rect, "Animals Can Graze Now:", ref tmpCheckState);
 
             _gameData.UserData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
+        }
+
+        /// <summary>
+        ///     Draw the "Has Cave" selection.
+        /// </summary>
+        private void DrawCaveSelection()
+        {
+            DrawEntryHeader("Special Features", backgroundColor: ColorFromFilterSubjectThingDef("Has Cave"));
+
+            var rect = ListingStandard.GetRect(DefaultElementHeight);
+            var tmpCheckState = _gameData.UserData.HasCaveState;
+            Core.Gui.Widgets.CheckBoxLabeledMulti(rect, "Has Cave: ", ref tmpCheckState);
+
+            _gameData.UserData.HasCaveState = tmpCheckState;
         }
 
         private void DrawGrowingPeriodSelection()

@@ -73,6 +73,8 @@ namespace PrepareLanding.Presets
             LoadUsableMinMax(xTerrain, "Elevation", _gameData.UserData.Elevation);
             LoadUsableMinMax(xTerrain, "TimeZone", _gameData.UserData.TimeZone);
 
+            _gameData.UserData.HasCaveState = LoadThreeState(xTerrain, "HasCave");
+
 
             // temperature
             var xTemperature = xFilters.Element(TemperatureNode);
@@ -164,6 +166,8 @@ namespace PrepareLanding.Presets
                 SaveThreeState(xTerrainFilters, "CoastalLakeTile", _gameData.UserData.ChosenCoastalLakeTileState);
                 SaveUsableMinMax(xTerrainFilters, "Elevation", _gameData.UserData.Elevation);
                 SaveUsableMinMax(xTerrainFilters, "TimeZone", _gameData.UserData.TimeZone);
+
+                SaveThreeState(xTerrainFilters, "HasCave", _gameData.UserData.HasCaveState);
 
                 // Temperature
                 var xTemperatureFilters = new XElement("Temperature");
