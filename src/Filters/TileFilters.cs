@@ -986,16 +986,16 @@ namespace PrepareLanding.Filters
         }
     }
 
-    public class TileFilterMostLeastFeature : TileFilter
+    public class TileFilterMostLeastCharacteristic : TileFilter
     {
-        public TileFilterMostLeastFeature(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(
+        public TileFilterMostLeastCharacteristic(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(
             userData, attachedProperty, heaviness)
         {
         }
 
         public override bool IsFilterActive => !UserData.MostLeastItem.IsInDefaultState;
 
-        public override string SubjectThingDef => $"MostLeastFeature: {UserData.MostLeastItem.Feature}";
+        public override string SubjectThingDef => $"MostLeastCharacteristic: {UserData.MostLeastItem.Characteristic}";
 
         public override void Filter(List<int> inputList)
         {
@@ -1004,43 +1004,43 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            if (Enumerable.Any(PrepareLanding.Instance.GameData.WorldData.WorldFeatures,
-                worldFeature => worldFeature.Feature == UserData.MostLeastItem.Feature))
-                FilterFeature(UserData.MostLeastItem);
+            if (Enumerable.Any(PrepareLanding.Instance.GameData.WorldData.WorldCharacteristics,
+                worldCharacteristicData => worldCharacteristicData.Characteristic == UserData.MostLeastItem.Characteristic))
+                FilterCharacteristic(UserData.MostLeastItem);
         }
 
-        private void FilterFeature(MostLeastItem item)
+        private void FilterCharacteristic(MostLeastItem item)
         {
-            var worldFeature = PrepareLanding.Instance.GameData.WorldData.WorldFeatureDataByFeature(item.Feature);
-            if (worldFeature == null)
+            var worldCharacteristicData = PrepareLanding.Instance.GameData.WorldData.WorldCharacteristicDataByCharacteristic(item.Characteristic);
+            if (worldCharacteristicData == null)
                 return;
 
             // we want either most or least.
-            if (item.FeatureType == MostLeastType.None)
+            if (item.CharacteristicType == MostLeastType.None)
                 return;
 
-            // get list of KeyValuePair with key being the tile ID and value being the tile feature for the whole world
+            // get list of KeyValuePair with key being the tile ID and value being the tile characteristic for the whole world
             //    e.g List<KVP<int, float>> where int is tileId and float is temperature or rainfall
-            var worldTilesAndFeatures = worldFeature.WorldTilesFeatures;
+            var worldTilesCharacteristics = worldCharacteristicData.WorldTilesCharacteristics;
 
             // can't request more tiles than there are in the world
-            if (UserData.MostLeastItem.NumberOfItems > worldTilesAndFeatures.Count)
+            if (UserData.MostLeastItem.NumberOfItems > worldTilesCharacteristics.Count)
             {
                 Messages.Message(
-                    $"You are requesting more tiles than the number of available tiles (max: {worldTilesAndFeatures.Count})",
+                    $"You are requesting more tiles than the number of available tiles (max: {worldTilesCharacteristics.Count})",
                     MessageTypeDefOf.RejectInput);
                 return;
             }
 
-            // get a list of KVP where key is tile Id and value is the feature value (e.g temperature, rainfall, elevation)
-            var mostLeastTilesAndFeatures = item.FeatureType == MostLeastType.Least
-                ? worldFeature.WorldMinRange(UserData.MostLeastItem.NumberOfItems)
-                : worldFeature.WorldMaxRange(UserData.MostLeastItem.NumberOfItems);
-            if (mostLeastTilesAndFeatures == null)
+            // get a list of KVP where key is tile Id and value is the characteristic value (e.g temperature, rainfall, elevation)
+            var mostLeastTilesAndCharacteristics = item.CharacteristicType == MostLeastType.Least
+                ? worldCharacteristicData.WorldMinRange(UserData.MostLeastItem.NumberOfItems)
+                : worldCharacteristicData.WorldMaxRange(UserData.MostLeastItem.NumberOfItems);
+            if (mostLeastTilesAndCharacteristics == null)
                 return;
 
             // we still have a list of KVP, we just want the tiles
-            var tileIds = mostLeastTilesAndFeatures.Select(kvp => kvp.Key);
+            var tileIds = mostLeastTilesAndCharacteristics.Select(kvp => kvp.Key);
 
             // add them to the filtered tiles list.
             _filteredTiles.AddRange(tileIds);

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PrepareLanding.Filters;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
 
 namespace PrepareLanding.GameData
@@ -10,6 +12,8 @@ namespace PrepareLanding.GameData
         private readonly DefData _defData;
 
         public readonly Dictionary<BiomeDef, int> NumberOfTilesByBiome = new Dictionary<BiomeDef, int>();
+
+        public List<WorldFeature> WorldF;
 
         public WorldData(DefData defData)
         {
@@ -21,10 +25,9 @@ namespace PrepareLanding.GameData
             RainfallData = new RainfallData(defData);
             ElevationData = new ElevationData(defData);
 
-
-            WorldFeatures.Add(TemperatureData);
-            WorldFeatures.Add(RainfallData);
-            WorldFeatures.Add(ElevationData);
+            WorldCharacteristics.Add(TemperatureData);
+            WorldCharacteristics.Add(RainfallData);
+            WorldCharacteristics.Add(ElevationData);
         }
 
         public ElevationData ElevationData { get; }
@@ -35,7 +38,7 @@ namespace PrepareLanding.GameData
 
         public float WorldCoverage { get; private set; }
 
-        public List<WorldFeatureData> WorldFeatures { get; } = new List<WorldFeatureData>();
+        public List<WorldCharacteristicData> WorldCharacteristics { get; } = new List<WorldCharacteristicData>();
 
         public int WorldSeed { get; private set; }
 
@@ -55,6 +58,8 @@ namespace PrepareLanding.GameData
                 var count = TileFilterBiomes.NumberOfTilesByBiome(biomeDef);
                 NumberOfTilesByBiome.Add(biomeDef, count);
             }
+
+            WorldF = Find.WorldFeatures.features.OrderBy(feature => feature.name).ToList();
         }
 
         public bool BiomeHasTiles(BiomeDef biomeDef)
@@ -69,13 +74,13 @@ namespace PrepareLanding.GameData
             return NumberOfTilesByBiome[biomeDef] != 0;
         }
 
-        public WorldFeatureData WorldFeatureDataByFeature(MostLeastFeature feature)
+        public WorldCharacteristicData WorldCharacteristicDataByCharacteristic(MostLeastCharacteristic characteristic)
         {
-            foreach (var worldFeature in WorldFeatures)
-                if (worldFeature.Feature == feature)
-                    return worldFeature;
+            foreach (var worldCharacteristic in WorldCharacteristics)
+                if (worldCharacteristic.Characteristic == characteristic)
+                    return worldCharacteristic;
 
-            Log.Error($"[PrepareLanding] asked for '{feature}' but couldn't find it...");
+            Log.Error($"[PrepareLanding] asked for '{characteristic}' but couldn't find it...");
             return null;
         }
 

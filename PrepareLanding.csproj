@@ -92,7 +92,7 @@
     <Compile Include="src\GameData\RainfallData.cs" />
     <Compile Include="src\GameData\UserData.cs" />
     <Compile Include="src\GameData\WorldData.cs" />
-    <Compile Include="src\GameData\WorldFeatureData.cs" />
+    <Compile Include="src\GameData\WorldCharacteristicData.cs" />
     <Compile Include="src\MainWindow.cs" />
     <Compile Include="src\MonoController.cs" />
     <Compile Include="src\Overlays\Overlay.cs" />

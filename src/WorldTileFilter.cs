@@ -138,7 +138,7 @@ namespace PrepareLanding
                 },
                 {
                     nameof(_userData.MostLeastItem),
-                    new TileFilterMostLeastFeature(_userData, nameof(_userData.MostLeastItem), FilterHeaviness.Light)
+                    new TileFilterMostLeastCharacteristic(_userData, nameof(_userData.MostLeastItem), FilterHeaviness.Light)
                 }
             };
 
