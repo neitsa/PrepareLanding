@@ -215,6 +215,22 @@ namespace PrepareLanding.GameData
         }
 
         /// <summary>
+        ///     Selected World Feature (name on the world map).
+        /// </summary>
+        public WorldFeature WorldFeature
+        {
+            get { return _worldFeature; }
+            set
+            {
+                if (value == _worldFeature)
+                    return;
+
+                _worldFeature = value;
+                OnPropertyChanged(nameof(WorldFeature));
+            }
+        }
+
+        /// <summary>
         ///     Current user choices for the summer movement time.
         /// </summary>
         public UsableMinMaxNumericItem<float> SummerMovementTime { get; } = new UsableMinMaxNumericItem<float>();
@@ -239,6 +255,9 @@ namespace PrepareLanding.GameData
         /// </summary>
         public UsableMinMaxNumericItem<float> WinterTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
+        /// <summary>
+        ///     Current user choice for Most / Least item
+        /// </summary>
         public MostLeastItem MostLeastItem { get; } = new MostLeastItem();
 
         /// <summary>
@@ -313,6 +332,9 @@ namespace PrepareLanding.GameData
                 return false;
 
             if (!MostLeastItem.IsInDefaultState)
+                return false;
+
+            if (WorldFeature != null)
                 return false;
 
             return true;
@@ -510,6 +532,11 @@ namespace PrepareLanding.GameData
         ///     Number of stone types when filtering with <see cref="_stoneTypesNumberOnly" />.
         /// </summary>
         private int _stoneTypesNumber = 2;
+
+        /// <summary>
+        ///     Selected wold feature by user.
+        /// </summary>
+        private WorldFeature _worldFeature;
 
         /// <summary>
         ///     Used to tell if the first reset has been done. It must be done once in the lifetime of the mod to at least

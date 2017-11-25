@@ -1046,4 +1046,30 @@ namespace PrepareLanding.Filters
             _filteredTiles.AddRange(tileIds);
         }
     }
+
+    public class TileFilterWorldFeature : TileFilter
+    {
+        public TileFilterWorldFeature(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override bool IsFilterActive => UserData.WorldFeature != null;
+
+        public override string SubjectThingDef => "World Feature";
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            // intersect the tiles in the world feature with the ones from the input list.
+            var result = UserData.WorldFeature.Tiles.Intersect(inputList);
+
+            _filteredTiles.AddRange(result.ToList());
+
+        }
+    }
 }

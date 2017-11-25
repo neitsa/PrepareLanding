@@ -139,6 +139,10 @@ namespace PrepareLanding
                 {
                     nameof(_userData.MostLeastItem),
                     new TileFilterMostLeastCharacteristic(_userData, nameof(_userData.MostLeastItem), FilterHeaviness.Light)
+                },
+                {
+                    nameof(_userData.WorldFeature),
+                    new TileFilterWorldFeature(_userData, nameof(_userData.WorldFeature), FilterHeaviness.Medium)
                 }
             };
 

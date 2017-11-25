@@ -13,7 +13,7 @@ namespace PrepareLanding.GameData
 
         public readonly Dictionary<BiomeDef, int> NumberOfTilesByBiome = new Dictionary<BiomeDef, int>();
 
-        public List<WorldFeature> WorldF;
+        public List<WorldFeature> WorldFeatures;
 
         public WorldData(DefData defData)
         {
@@ -59,7 +59,7 @@ namespace PrepareLanding.GameData
                 NumberOfTilesByBiome.Add(biomeDef, count);
             }
 
-            WorldF = Find.WorldFeatures.features.OrderBy(feature => feature.name).ToList();
+            WorldFeatures = Find.WorldFeatures.features.OrderBy(feature => feature.name).ToList();
         }
 
         public bool BiomeHasTiles(BiomeDef biomeDef)

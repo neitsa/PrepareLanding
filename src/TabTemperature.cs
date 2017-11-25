@@ -6,7 +6,6 @@ using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.Window;
 using PrepareLanding.GameData;
 using RimWorld;
-using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
@@ -28,8 +27,6 @@ namespace PrepareLanding
         private int _selectedTileIdForTemperatureForecast = -1;
         private int _year;
         private string _yearString;
-
-        private WorldFeature _worldFeature;
 
         public TabTemperature(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -74,7 +71,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader("World Feature Selection", backgroundColor: Color.magenta);
 
-            var features = _gameData.WorldData.WorldF;
+            var features = _gameData.WorldData.WorldFeatures;
 
             // "Select" button
             if (ListingStandard.ButtonText("Select World Feature"))
@@ -82,7 +79,7 @@ namespace PrepareLanding
                 var floatMenuOptions = new List<FloatMenuOption>();
 
                 // add a dummy 'Any' fake feature type. This sets the chosen feature to null.
-                Action actionClick = delegate { _worldFeature = null; };
+                Action actionClick = delegate { _gameData.UserData.WorldFeature = null; };
                 // tool-tip when hovering above the 'Any' feature name on the floating menu
                 Action mouseOverAction = delegate
                 {
@@ -97,8 +94,20 @@ namespace PrepareLanding
                 // loop through all known feature
                 foreach (var currentFeature in features)
                 {
+                    // do not allow ocean and lakes
+                    if (currentFeature.def.rootBiomes.Count != 0)
+                    {
+                        if (currentFeature.def.rootBiomes.Contains(BiomeDefOf.Ocean) ||
+                            currentFeature.def.rootBiomes.Contains(BiomeDefOf.Lake))
+                            continue;
+                    }
+                    // TODO: handle other water bodies, you'll to parse the def name as there are no other ways
+                    // see \Mods\Core\Defs\Misc\FeatureDefs\Features.xml
+                    // or another solution would be to patch the definition (e.g. OuterOcean) to have a root biome as "Ocean" (or lake or whatever water body).
+                    //if(currentFeature.def.defName contains "Ocean")
+
                     // clicking on the floating menu saves the selected feature
-                    actionClick = delegate { _worldFeature = currentFeature; };
+                    actionClick = delegate { _gameData.UserData.WorldFeature = currentFeature; };
 
                     //create the floating menu
                     menuOption = new FloatMenuOption(currentFeature.name, actionClick);
@@ -115,18 +124,18 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _worldFeature != null ? _worldFeature.name : "Any";
+            var rightLabel = _gameData.UserData.WorldFeature != null ? _gameData.UserData.WorldFeature.name : "Any";
             ListingStandard.LabelDouble("World Feature:", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;
 
             // display tool-tip over label
-            if (_worldFeature != null)
+            if (_gameData.UserData.WorldFeature != null)
             {
                 var currentRect = ListingStandard.GetRect(0f);
                 currentRect.height = currHeightAfter - currHeightBefore;
-                if (!string.IsNullOrEmpty(_worldFeature.name))
-                    TooltipHandler.TipRegion(currentRect, _worldFeature.name);
+                if (!string.IsNullOrEmpty(_gameData.UserData.WorldFeature.name))
+                    TooltipHandler.TipRegion(currentRect, _gameData.UserData.WorldFeature.name);
             }
 
         }
