@@ -231,6 +231,38 @@ namespace PrepareLanding.GameData
         }
 
         /// <summary>
+        ///     Tells if Coast Rotation should be used or not.
+        /// </summary>
+        public bool UseCoastRotation
+        {
+            get { return _useCoastRotation; }
+            set
+            {
+                if (value == _useCoastRotation)
+                    return;
+
+                _useCoastRotation = value;
+                OnPropertyChanged(nameof(UseCoastRotation));
+            }
+        }
+
+        /// <summary>
+        ///     Selected Coast Rotation.
+        /// </summary>
+        public Rot4 CoastRotation
+        {
+            get { return _coastRotation; }
+            set
+            {
+                if (value == _coastRotation)
+                    return;
+
+                _coastRotation = value;
+                OnPropertyChanged(nameof(CoastRotation));
+            }
+        }
+
+        /// <summary>
         ///     Current user choices for the summer movement time.
         /// </summary>
         public UsableMinMaxNumericItem<float> SummerMovementTime { get; } = new UsableMinMaxNumericItem<float>();
@@ -281,6 +313,9 @@ namespace PrepareLanding.GameData
                 return false;
 
             if (_coastalLakeTileState != MultiCheckboxState.Partial)
+                return false;
+
+            if (UseCoastRotation)
                 return false;
 
             if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
@@ -537,6 +572,16 @@ namespace PrepareLanding.GameData
         ///     Selected wold feature by user.
         /// </summary>
         private WorldFeature _worldFeature;
+
+        /// <summary>
+        ///     If True, enable Coast Rotation filtering.
+        /// </summary>
+        private bool _useCoastRotation;
+
+        /// <summary>
+        ///     Selected user coast rotation
+        /// </summary>
+        private Rot4 _coastRotation;
 
         /// <summary>
         ///     Used to tell if the first reset has been done. It must be done once in the lifetime of the mod to at least

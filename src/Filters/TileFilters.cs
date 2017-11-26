@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
@@ -1071,5 +1072,36 @@ namespace PrepareLanding.Filters
             _filteredTiles.AddRange(result.ToList());
 
         }
+    }
+
+    public class TileFilterCoastRotation : TileFilter
+    {
+        private static readonly List<Rot4> PossibleRotations = new List<Rot4> { /*Rot4.Invalid,*/ Rot4.North, Rot4.East, Rot4.South, Rot4.West};
+
+        public TileFilterCoastRotation(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override bool IsFilterActive => UserData.UseCoastRotation;
+
+        public override string SubjectThingDef => "Coast Rotation";
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+            
+            foreach (var tileId in inputList)
+            {
+                if(Find.World.CoastDirectionAt(tileId) == UserData.CoastRotation)
+                    _filteredTiles.Add(tileId);
+            }
+        }
+
+        public static ReadOnlyCollection<Rot4> Rotations => PossibleRotations.AsReadOnly();
+
     }
 }
