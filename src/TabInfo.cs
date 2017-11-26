@@ -86,23 +86,23 @@ namespace PrepareLanding
             }
 
             /*
-             * Highest / lowest value for all features.
+             * Highest / lowest value for all characteristics.
              */
 
-            foreach (var feature in _gameData.WorldData.WorldFeatures)
+            foreach (var characteristicData in _gameData.WorldData.WorldCharacteristics)
             {
-                var featureName = feature.FeatureName;
-                stringBuilder.AppendLine(featureName);
+                var characteristicName = characteristicData.CharacteristicName;
+                stringBuilder.AppendLine(characteristicName);
 
-                var lowestFeatureKvp = feature.WorldTilesFeatures.First();
-                var vectorLongLat = Find.WorldGrid.LongLatOf(lowestFeatureKvp.Key);
+                var lowestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.First();
+                var vectorLongLat = Find.WorldGrid.LongLatOf(lowestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Lowest {featureName}: {lowestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {lowestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Lowest {characteristicName}: {lowestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠[tile: {lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
 
-                var highestFeatureKvp = feature.WorldTilesFeatures.Last();
-                vectorLongLat = Find.WorldGrid.LongLatOf(highestFeatureKvp.Key);
+                var highestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.Last();
+                vectorLongLat = Find.WorldGrid.LongLatOf(highestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Highest {featureName}: {highestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {highestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Highest {characteristicName}: {highestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠[tile: {highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
             }
 
 

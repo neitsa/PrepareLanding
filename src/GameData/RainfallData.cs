@@ -5,22 +5,22 @@ using Verse;
 
 namespace PrepareLanding.GameData
 {
-    public class RainfallData : WorldFeatureData
+    public class RainfallData : WorldCharacteristicData
     {
         public RainfallData(DefData defData) : base(defData)
         {
         }
 
-        public override MostLeastFeature Feature => MostLeastFeature.Rainfall;
-        public override string FeatureMeasureUnit => "mm";
+        public override MostLeastCharacteristic Characteristic => MostLeastCharacteristic.Rainfall;
+        public override string CharacteristicMeasureUnit => "mm";
 
-        public Texture2D RainfallGradientTexure => FeatureGradientTexture;
+        public Texture2D RainfallGradientTexure => CharacteristicGradientTexture;
 
-        public Dictionary<BiomeDef, Dictionary<int, float>> RainFallsByBiomes => FeatureByBiomes;
+        public Dictionary<BiomeDef, Dictionary<int, float>> RainFallsByBiomes => CharacteristicByBiomes;
 
-        public List<KeyValuePair<int, float>> WorldTilesRainfalls => WorldTilesFeatures;
+        public List<KeyValuePair<int, float>> WorldTilesRainfalls => WorldTilesCharacteristics;
 
-        protected override float TileFeatureValue(int tileId)
+        protected override float TileCharacteristicValue(int tileId)
         {
             return Find.World.grid[tileId].rainfall;
         }

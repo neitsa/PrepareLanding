@@ -6,7 +6,6 @@ using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.Window;
 using PrepareLanding.GameData;
 using RimWorld;
-using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
@@ -20,9 +19,9 @@ namespace PrepareLanding
         private int _dayOfQuadrum;
         private string _dayOfQuadrumString;
 
-        private int _numberOfTilesForFeature = 1;
+        private int _numberOfTilesForCharacteristic = 1;
 
-        private string _numberOfTilesForFeatureString;
+        private string _numberOfTilesForCharacteristicString;
         private Quadrum _quadrum;
 
         private int _selectedTileIdForTemperatureForecast = -1;
@@ -59,12 +58,86 @@ namespace PrepareLanding
             DrawGrowingPeriodSelection();
             NewColumn();
             DrawRainfallSelection();
-            DrawMostLeastFeatureSelection();
+            DrawMostLeastCharacteristicSelection();
             DrawAnimalsCanGrazeNowSelection();
             DrawCaveSelection();
             NewColumn();
             DrawTemperatureForecast();
+            DrawFeatureSelection();
             End();
+        }
+
+        private void DrawFeatureSelection()
+        {
+            DrawEntryHeader("World Feature Selection", backgroundColor: Color.magenta);
+
+            var features = _gameData.WorldData.WorldFeatures;
+
+            // "Select" button
+            if (ListingStandard.ButtonText("Select World Feature"))
+            {
+                var floatMenuOptions = new List<FloatMenuOption>();
+
+                // add a dummy 'Any' fake feature type. This sets the chosen feature to null.
+                Action actionClick = delegate { _gameData.UserData.WorldFeature = null; };
+                // tool-tip when hovering above the 'Any' feature name on the floating menu
+                Action mouseOverAction = delegate
+                {
+                    var mousePos = Event.current.mousePosition;
+                    var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
+
+                    TooltipHandler.TipRegion(rect, "Any Feature");
+                };
+                var menuOption = new FloatMenuOption("Any", actionClick, MenuOptionPriority.Default, mouseOverAction);
+                floatMenuOptions.Add(menuOption);
+
+                // loop through all known feature
+                foreach (var currentFeature in features)
+                {
+                    // do not allow ocean and lakes
+                    if (currentFeature.def.rootBiomes.Count != 0)
+                    {
+                        if (currentFeature.def.rootBiomes.Contains(BiomeDefOf.Ocean) ||
+                            currentFeature.def.rootBiomes.Contains(BiomeDefOf.Lake))
+                            continue;
+                    }
+                    // TODO: handle other water bodies, you'll to parse the def name as there are no other ways
+                    // see \Mods\Core\Defs\Misc\FeatureDefs\Features.xml
+                    // or another solution would be to patch the definition (e.g. OuterOcean) to have a root biome as "Ocean" (or lake or whatever water body).
+                    //if(currentFeature.def.defName contains "Ocean")
+
+                    // clicking on the floating menu saves the selected feature
+                    actionClick = delegate { _gameData.UserData.WorldFeature = currentFeature; };
+
+                    //create the floating menu
+                    menuOption = new FloatMenuOption(currentFeature.name, actionClick);
+                    // add it to the list of floating menu options
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                // create the floating menu
+                var floatMenu = new FloatMenu(floatMenuOptions, "Select Feature Type");
+
+                // add it to the window stack to display it
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            var currHeightBefore = ListingStandard.CurHeight;
+
+            var rightLabel = _gameData.UserData.WorldFeature != null ? _gameData.UserData.WorldFeature.name : "Any";
+            ListingStandard.LabelDouble("World Feature:", rightLabel);
+
+            var currHeightAfter = ListingStandard.CurHeight;
+
+            // display tool-tip over label
+            if (_gameData.UserData.WorldFeature != null)
+            {
+                var currentRect = ListingStandard.GetRect(0f);
+                currentRect.height = currHeightAfter - currHeightBefore;
+                if (!string.IsNullOrEmpty(_gameData.UserData.WorldFeature.name))
+                    TooltipHandler.TipRegion(currentRect, _gameData.UserData.WorldFeature.name);
+            }
+
         }
 
         private void DrawTemperatureForecast()
@@ -346,26 +419,26 @@ namespace PrepareLanding
                 tempMin, tempMax);
         }
 
-        private void DrawMostLeastFeatureSelection()
+        private void DrawMostLeastCharacteristicSelection()
         {
-            DrawEntryHeader("Most / Least Feature", backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("Most / Least Characteristic", backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             /*
-             * Select Feature
+             * Select Characteristic
              */
-            const string selectFeature = "Select Feature";
+            const string selectCharacteristic = "Select Characteristic";
 
-            if (ListingStandard.ButtonText(selectFeature))
+            if (ListingStandard.ButtonText(selectCharacteristic))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
-                foreach (var feature in Enum.GetValues(typeof(MostLeastFeature)).Cast<MostLeastFeature>())
+                foreach (var characteristic in Enum.GetValues(typeof(MostLeastCharacteristic)).Cast<MostLeastCharacteristic>())
                 {
-                    var menuOption = new FloatMenuOption(feature.ToString(),
-                        delegate { _gameData.UserData.MostLeastItem.Feature = feature; });
+                    var menuOption = new FloatMenuOption(characteristic.ToString(),
+                        delegate { _gameData.UserData.MostLeastItem.Characteristic = characteristic; });
                     floatMenuOptions.Add(menuOption);
                 }
 
-                var floatMenu = new FloatMenu(floatMenuOptions, selectFeature);
+                var floatMenu = new FloatMenu(floatMenuOptions, selectCharacteristic);
                 Find.WindowStack.Add(floatMenu);
             }
 
@@ -379,28 +452,28 @@ namespace PrepareLanding
             var rightRect = tilesNumberRect.RightPart(0.20f);
 
             Widgets.Label(leftRect, "Number of Tiles [1, 10000]:");
-            _numberOfTilesForFeature = _gameData.UserData.MostLeastItem.NumberOfItems;
-            Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForFeature, ref _numberOfTilesForFeatureString,
+            _numberOfTilesForCharacteristic = _gameData.UserData.MostLeastItem.NumberOfItems;
+            Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForCharacteristic, ref _numberOfTilesForCharacteristicString,
                 1, 10000);
-            _gameData.UserData.MostLeastItem.NumberOfItems = _numberOfTilesForFeature;
+            _gameData.UserData.MostLeastItem.NumberOfItems = _numberOfTilesForCharacteristic;
 
             /*
-             * Select Feature Type (most / least)
+             * Select Characteristic Type (most / least)
              */
 
-            const string selectFeatureType = "Select Feature Type";
+            const string selectCharacteristicType = "Select Characteristic Type";
 
-            if (ListingStandard.ButtonText(selectFeatureType))
+            if (ListingStandard.ButtonText(selectCharacteristicType))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
-                foreach (var featureType in Enum.GetValues(typeof(MostLeastType)).Cast<MostLeastType>())
+                foreach (var characteristicType in Enum.GetValues(typeof(MostLeastType)).Cast<MostLeastType>())
                 {
-                    var menuOption = new FloatMenuOption(featureType.ToString(),
-                        delegate { _gameData.UserData.MostLeastItem.FeatureType = featureType; });
+                    var menuOption = new FloatMenuOption(characteristicType.ToString(),
+                        delegate { _gameData.UserData.MostLeastItem.CharacteristicType = characteristicType; });
                     floatMenuOptions.Add(menuOption);
                 }
 
-                var floatMenu = new FloatMenu(floatMenuOptions, selectFeatureType);
+                var floatMenu = new FloatMenu(floatMenuOptions, selectCharacteristicType);
                 Find.WindowStack.Add(floatMenu);
             }
 
@@ -408,22 +481,22 @@ namespace PrepareLanding
              * Result label
              */
             string text;
-            if (_gameData.UserData.MostLeastItem.Feature == MostLeastFeature.None)
+            if (_gameData.UserData.MostLeastItem.Characteristic == MostLeastCharacteristic.None)
             {
-                text = $"Push \"{selectFeature}\" button first.";
+                text = $"Push \"{selectCharacteristic}\" button first.";
             }
-            else if (_gameData.UserData.MostLeastItem.FeatureType == MostLeastType.None)
+            else if (_gameData.UserData.MostLeastItem.CharacteristicType == MostLeastType.None)
             {
-                text = $"Now use the \"{selectFeatureType}\" button.";
+                text = $"Now use the \"{selectCharacteristicType}\" button.";
             }
             else
             {
-                var highestLowest = _gameData.UserData.MostLeastItem.FeatureType == MostLeastType.Most
+                var highestLowest = _gameData.UserData.MostLeastItem.CharacteristicType == MostLeastType.Most
                     ? "highest"
                     : "lowest";
                 var tiles = _gameData.UserData.MostLeastItem.NumberOfItems > 1 ? "tiles" : "tile";
                 text =
-                    $"Selecting {_gameData.UserData.MostLeastItem.NumberOfItems} {tiles} with the {highestLowest} {_gameData.UserData.MostLeastItem.Feature}";
+                    $"Selecting {_gameData.UserData.MostLeastItem.NumberOfItems} {tiles} with the {highestLowest} {_gameData.UserData.MostLeastItem.Characteristic}";
             }
 
             ListingStandard.Label($"Result: {text}", DefaultElementHeight * 2);

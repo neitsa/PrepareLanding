@@ -518,15 +518,15 @@ namespace PrepareLanding.Presets
             if (xFoundElement == null)
                 return;
 
-            var feature = LoadEnum<MostLeastFeature>(xFoundElement, MostLeastItemFeatureNode);
+            var feature = LoadEnum<MostLeastCharacteristic>(xFoundElement, MostLeastItemFeatureNode);
             var featureType = LoadEnum<MostLeastType>(xFoundElement, MostLeastItemFeatureTypeNode);
 
             int numItems;
             if (!Load(xFoundElement, MostLeastItemNumberOfItemsNode, out numItems))
                 return;
 
-            item.Feature = feature;
-            item.FeatureType = featureType;
+            item.Characteristic = feature;
+            item.CharacteristicType = featureType;
             item.NumberOfItems = numItems;
         }
 
@@ -657,8 +657,8 @@ namespace PrepareLanding.Presets
             var xElement = new XElement(elementName);
             xRoot.Add(xElement);
 
-            xElement.Add(new XElement(MostLeastItemFeatureNode, item.Feature.ToString()));
-            xElement.Add(new XElement(MostLeastItemFeatureTypeNode, item.FeatureType.ToString()));
+            xElement.Add(new XElement(MostLeastItemFeatureNode, item.Characteristic.ToString()));
+            xElement.Add(new XElement(MostLeastItemFeatureTypeNode, item.CharacteristicType.ToString()));
             xElement.Add(new XElement(MostLeastItemNumberOfItemsNode, item.NumberOfItems));
         }
 

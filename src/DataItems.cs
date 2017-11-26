@@ -216,7 +216,7 @@ namespace PrepareLanding
         }
     }
 
-    public enum MostLeastFeature
+    public enum MostLeastCharacteristic
     {
         None = 0,
         Temperature = 1,
@@ -233,37 +233,37 @@ namespace PrepareLanding
 
     public class MostLeastItem : INotifyPropertyChanged
     {
-        private MostLeastFeature _feature;
-        private MostLeastType _featureType;
+        private MostLeastCharacteristic _characteristic;
+        private MostLeastType _characteristicType;
         private int _numberOfItems;
 
-        public MostLeastFeature Feature
+        public MostLeastCharacteristic Characteristic
         {
-            get { return _feature; }
+            get { return _characteristic; }
             set
             {
-                if (value == _feature)
+                if (value == _characteristic)
                     return;
 
-                _feature = value;
-                OnPropertyChanged(nameof(Feature));
+                _characteristic = value;
+                OnPropertyChanged(nameof(Characteristic));
             }
         }
 
-        public MostLeastType FeatureType
+        public MostLeastType CharacteristicType
         {
-            get { return _featureType; }
+            get { return _characteristicType; }
             set
             {
-                if (value == _featureType)
+                if (value == _characteristicType)
                     return;
 
-                _featureType = value;
-                OnPropertyChanged(nameof(FeatureType));
+                _characteristicType = value;
+                OnPropertyChanged(nameof(CharacteristicType));
             }
         }
 
-        public bool IsInDefaultState => Feature == MostLeastFeature.None && FeatureType == MostLeastType.None;
+        public bool IsInDefaultState => Characteristic == MostLeastCharacteristic.None && CharacteristicType == MostLeastType.None;
 
         public int NumberOfItems
         {
@@ -282,8 +282,8 @@ namespace PrepareLanding
 
         public void Reset()
         {
-            Feature = MostLeastFeature.None;
-            FeatureType = MostLeastType.None;
+            Characteristic = MostLeastCharacteristic.None;
+            CharacteristicType = MostLeastType.None;
             NumberOfItems = 0;
         }
 

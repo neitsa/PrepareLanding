@@ -2,17 +2,17 @@
 
 namespace PrepareLanding.GameData
 {
-    public class ElevationData : WorldFeatureData
+    public class ElevationData : WorldCharacteristicData
     {
         public ElevationData(DefData defData) : base(defData)
         {
         }
 
-        public override MostLeastFeature Feature => MostLeastFeature.Elevation;
+        public override MostLeastCharacteristic Characteristic => MostLeastCharacteristic.Elevation;
 
-        public override string FeatureMeasureUnit => "m";
+        public override string CharacteristicMeasureUnit => "m";
 
-        protected override float TileFeatureValue(int tileId)
+        protected override float TileCharacteristicValue(int tileId)
         {
             return Find.World.grid[tileId].elevation;
         }
