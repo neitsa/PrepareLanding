@@ -293,4 +293,63 @@ namespace PrepareLanding
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+    public class UsableFromList<T> : INotifyPropertyChanged where T : struct/*, IConvertible*/
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private readonly List<T> _options;
+        private bool _use;
+        private T _selected;
+
+        public UsableFromList(List<T> options, T defaultSelected)
+        {
+            _options = options;
+            _use = false;
+            _selected = defaultSelected;
+        }
+
+        public ReadOnlyCollection<T> Options => _options.AsReadOnly();
+
+        public bool Use
+        {
+            get { return _use; }
+            set
+            {
+                if (value == _use)
+                    return;
+
+                _use = value;
+                OnPropertyChanged(nameof(Use));
+            }
+        }
+
+        public T Selected
+        {
+            get { return _selected; }
+            set
+            {
+                if (!_use)
+                    return;
+
+                if (!_options.Contains(value))
+                {
+                    Log.Message("[PrepareLanding] Trying to set a value that is not in the default list.");
+                    return;
+                }
+
+                if (EqualityComparer<T>.Default.Equals(_selected, value))
+                    return;
+
+                _selected = value;
+                OnPropertyChanged(nameof(Selected));
+            }
+        }
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
 }

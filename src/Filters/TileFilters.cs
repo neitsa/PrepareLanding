@@ -1076,14 +1076,14 @@ namespace PrepareLanding.Filters
 
     public class TileFilterCoastRotation : TileFilter
     {
-        private static readonly List<Rot4> PossibleRotations = new List<Rot4> { /*Rot4.Invalid,*/ Rot4.North, Rot4.East, Rot4.South, Rot4.West};
+        public static readonly List<Rot4> PossibleRotations = new List<Rot4> { Rot4.North, Rot4.East, Rot4.South, Rot4.West};
 
         public TileFilterCoastRotation(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override bool IsFilterActive => UserData.UseCoastRotation;
+        public override bool IsFilterActive => UserData.CoastalRotation.Use;
 
         public override string SubjectThingDef => "Coast Rotation";
 
@@ -1096,12 +1096,9 @@ namespace PrepareLanding.Filters
             
             foreach (var tileId in inputList)
             {
-                if(Find.World.CoastDirectionAt(tileId) == UserData.CoastRotation)
+                if(Find.World.CoastDirectionAt(tileId) == UserData.CoastalRotation.Selected)
                     _filteredTiles.Add(tileId);
             }
         }
-
-        public static ReadOnlyCollection<Rot4> Rotations => PossibleRotations.AsReadOnly();
-
     }
 }

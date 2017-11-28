@@ -197,9 +197,9 @@ namespace PrepareLanding
             /*
              * Coastal rotation
              */
-            var filterCoastalRotation = _gameData.UserData.UseCoastRotation;
-            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation); 
-            _gameData.UserData.UseCoastRotation = filterCoastalRotation;
+            var filterCoastalRotation = _gameData.UserData.CoastalRotation.Use;
+            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation);
+            _gameData.UserData.CoastalRotation.Use = filterCoastalRotation;
 
             // "Select" button
             if (ListingStandard.ButtonText("Select Rotation"))
@@ -207,10 +207,10 @@ namespace PrepareLanding
                 var floatMenuOptions = new List<FloatMenuOption>();
 
                 // loop through all meaningful rotations
-                foreach (var currentRotation in TileFilterCoastRotation.Rotations)
+                foreach (var currentRotation in TileFilterCoastRotation.PossibleRotations)
                 {
                     // clicking on the floating menu saves the selected rotation
-                    Action actionClick = delegate { _gameData.UserData.CoastRotation = currentRotation; };
+                    Action actionClick = delegate { _gameData.UserData.CoastalRotation.Selected = currentRotation; };
                     // tool-tip when hovering above the rotation name on the floating menu
                     Action mouseOverAction = delegate
                     {
@@ -234,8 +234,8 @@ namespace PrepareLanding
                 Find.WindowStack.Add(floatMenu);
             }
 
-            var rightLabel = _gameData.UserData.UseCoastRotation && _gameData.UserData.CoastRotation != Rot4.Invalid 
-                ? ("HasCoast" + _gameData.UserData.CoastRotation).Translate().CapitalizeFirst() 
+            var rightLabel = _gameData.UserData.CoastalRotation.Use && _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid 
+                ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
                 : "None";
             ListingStandard.LabelDouble("Coast Rotation:", rightLabel);
         }

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using JetBrains.Annotations;
+using PrepareLanding.Filters;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -230,37 +231,8 @@ namespace PrepareLanding.GameData
             }
         }
 
-        /// <summary>
-        ///     Tells if Coast Rotation should be used or not.
-        /// </summary>
-        public bool UseCoastRotation
-        {
-            get { return _useCoastRotation; }
-            set
-            {
-                if (value == _useCoastRotation)
-                    return;
-
-                _useCoastRotation = value;
-                OnPropertyChanged(nameof(UseCoastRotation));
-            }
-        }
-
-        /// <summary>
-        ///     Selected Coast Rotation.
-        /// </summary>
-        public Rot4 CoastRotation
-        {
-            get { return _coastRotation; }
-            set
-            {
-                if (value == _coastRotation)
-                    return;
-
-                _coastRotation = value;
-                OnPropertyChanged(nameof(CoastRotation));
-            }
-        }
+        public UsableFromList<Rot4> CoastalRotation { get; } =  new UsableFromList<Rot4>(
+            TileFilterCoastRotation.PossibleRotations, TileFilterCoastRotation.PossibleRotations[0]);
 
         /// <summary>
         ///     Current user choices for the summer movement time.
@@ -315,7 +287,7 @@ namespace PrepareLanding.GameData
             if (_coastalLakeTileState != MultiCheckboxState.Partial)
                 return false;
 
-            if (UseCoastRotation)
+            if (CoastalRotation.Use)
                 return false;
 
             if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
