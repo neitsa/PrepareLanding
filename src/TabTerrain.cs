@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
+using PrepareLanding.Filters;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -192,6 +193,51 @@ namespace PrepareLanding
             Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (lake):", ref tmpCheckState);
 
             _gameData.UserData.ChosenCoastalLakeTileState = tmpCheckState;
+
+            /*
+             * Coastal rotation
+             */
+            var filterCoastalRotation = _gameData.UserData.CoastalRotation.Use;
+            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation);
+            _gameData.UserData.CoastalRotation.Use = filterCoastalRotation;
+
+            // "Select" button
+            if (ListingStandard.ButtonText("Select Rotation"))
+            {
+                var floatMenuOptions = new List<FloatMenuOption>();
+
+                // loop through all meaningful rotations
+                foreach (var currentRotation in TileFilterCoastRotation.PossibleRotations)
+                {
+                    // clicking on the floating menu saves the selected rotation
+                    Action actionClick = delegate { _gameData.UserData.CoastalRotation.Selected = currentRotation.AsInt; };
+                    // tool-tip when hovering above the rotation name on the floating menu
+                    Action mouseOverAction = delegate
+                    {
+                        var mousePos = Event.current.mousePosition;
+                        rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
+
+                        TooltipHandler.TipRegion(rect, ("HasCoast" + currentRotation).Translate());
+                    };
+
+                    //create the floating menu
+                    var menuOption = new FloatMenuOption(currentRotation.ToStringHuman(), actionClick, MenuOptionPriority.Default,
+                        mouseOverAction);
+                    // add it to the list of floating menu options
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                // create the floating menu
+                var floatMenu = new FloatMenu(floatMenuOptions, "Select Coast Rotation");
+
+                // add it to the window stack to display it
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            var rightLabel = _gameData.UserData.CoastalRotation.Use /*&& _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid*/
+                ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
+                : "None";
+            ListingStandard.LabelDouble("Coast Rotation:", rightLabel);
         }
 
         protected void DrawElevationSelection()

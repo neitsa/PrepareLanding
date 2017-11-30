@@ -102,6 +102,10 @@ namespace PrepareLanding
                     nameof(_userData.TimeZone),
                     new TileFilterTimeZones(_userData, nameof(_userData.TimeZone), FilterHeaviness.Medium)
                 }, //TODO: check heaviness
+                {
+                    nameof(_userData.CoastalRotation),
+                    new TileFilterCoastRotation(_userData, nameof(_userData.CoastalRotation), FilterHeaviness.Heavy)
+                },
                 /* temperature */
                 {
                     nameof(_userData.AverageTemperature),

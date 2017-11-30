@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using JetBrains.Annotations;
+using PrepareLanding.Filters;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -230,6 +231,9 @@ namespace PrepareLanding.GameData
             }
         }
 
+        public UsableFromList<int> CoastalRotation { get; } =  new UsableFromList<int>(
+            TileFilterCoastRotation.PossibleRotationsInt, TileFilterCoastRotation.PossibleRotationsInt[0]);
+
         /// <summary>
         ///     Current user choices for the summer movement time.
         /// </summary>
@@ -281,6 +285,9 @@ namespace PrepareLanding.GameData
                 return false;
 
             if (_coastalLakeTileState != MultiCheckboxState.Partial)
+                return false;
+
+            if (CoastalRotation.Use)
                 return false;
 
             if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
@@ -361,6 +368,7 @@ namespace PrepareLanding.GameData
             _chosenHilliness = Hilliness.Undefined;
             _chosenCoastalTileState = MultiCheckboxState.Partial;
             _coastalLakeTileState = MultiCheckboxState.Partial;
+            CoastalRotation.Reset();
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
             var defProps = PrepareLanding.Instance.GameData.DefData;
