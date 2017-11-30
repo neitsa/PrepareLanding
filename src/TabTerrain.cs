@@ -210,7 +210,7 @@ namespace PrepareLanding
                 foreach (var currentRotation in TileFilterCoastRotation.PossibleRotations)
                 {
                     // clicking on the floating menu saves the selected rotation
-                    Action actionClick = delegate { _gameData.UserData.CoastalRotation.Selected = currentRotation; };
+                    Action actionClick = delegate { _gameData.UserData.CoastalRotation.Selected = currentRotation.AsInt; };
                     // tool-tip when hovering above the rotation name on the floating menu
                     Action mouseOverAction = delegate
                     {
@@ -234,7 +234,7 @@ namespace PrepareLanding
                 Find.WindowStack.Add(floatMenu);
             }
 
-            var rightLabel = _gameData.UserData.CoastalRotation.Use && _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid 
+            var rightLabel = _gameData.UserData.CoastalRotation.Use /*&& _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid*/
                 ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
                 : "None";
             ListingStandard.LabelDouble("Coast Rotation:", rightLabel);

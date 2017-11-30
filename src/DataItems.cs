@@ -294,7 +294,7 @@ namespace PrepareLanding
         }
     }
 
-    public class UsableFromList<T> : INotifyPropertyChanged where T : struct/*, IConvertible*/
+    public class UsableFromList<T> : INotifyPropertyChanged  where T : struct, IConvertible
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -344,6 +344,12 @@ namespace PrepareLanding
                 _selected = value;
                 OnPropertyChanged(nameof(Selected));
             }
+        }
+
+        public void Reset()
+        {
+            _use = false;
+            _selected = default(T);
         }
 
         [NotifyPropertyChangedInvocator]

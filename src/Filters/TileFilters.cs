@@ -1076,7 +1076,12 @@ namespace PrepareLanding.Filters
 
     public class TileFilterCoastRotation : TileFilter
     {
+        // make sure both lists are the same
         public static readonly List<Rot4> PossibleRotations = new List<Rot4> { Rot4.North, Rot4.East, Rot4.South, Rot4.West};
+        public static readonly List<int> PossibleRotationsInt = new List<int>
+        {
+            Rot4.North.AsInt, Rot4.East.AsInt, Rot4.South.AsInt, Rot4.West.AsInt
+        };
 
         public TileFilterCoastRotation(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
@@ -1096,7 +1101,7 @@ namespace PrepareLanding.Filters
             
             foreach (var tileId in inputList)
             {
-                if(Find.World.CoastDirectionAt(tileId) == UserData.CoastalRotation.Selected)
+                if(Find.World.CoastDirectionAt(tileId).AsInt == UserData.CoastalRotation.Selected)
                     _filteredTiles.Add(tileId);
             }
         }

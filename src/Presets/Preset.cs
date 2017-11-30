@@ -70,6 +70,7 @@ namespace PrepareLanding.Presets
             }
             _gameData.UserData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
             _gameData.UserData.ChosenCoastalLakeTileState = LoadThreeState(xTerrain, "CoastalLakeTile");
+            LoadUsableFromList(xTerrain, "CoastalRotation", _gameData.UserData.CoastalRotation);
             LoadUsableMinMax(xTerrain, "Elevation", _gameData.UserData.Elevation);
             LoadUsableMinMax(xTerrain, "TimeZone", _gameData.UserData.TimeZone);
 
@@ -164,6 +165,7 @@ namespace PrepareLanding.Presets
                 }
                 SaveThreeState(xTerrainFilters, "CoastalTile", _gameData.UserData.ChosenCoastalTileState);
                 SaveThreeState(xTerrainFilters, "CoastalLakeTile", _gameData.UserData.ChosenCoastalLakeTileState);
+                SaveUsableFromList(xTerrainFilters, "CoastalRotation", _gameData.UserData.CoastalRotation);
                 SaveUsableMinMax(xTerrainFilters, "Elevation", _gameData.UserData.Elevation);
                 SaveUsableMinMax(xTerrainFilters, "TimeZone", _gameData.UserData.TimeZone);
 
@@ -260,6 +262,8 @@ namespace PrepareLanding.Presets
         private const string MaxNode = "Max";
 
         private const string UseNode = "Use";
+
+        private const string SelectedNode = "Selected";
 
         // most/least 
         private const string MostLeastItemFeatureNode = "Feature";
@@ -530,6 +534,22 @@ namespace PrepareLanding.Presets
             item.NumberOfItems = numItems;
         }
 
+        private static void LoadUsableFromList<T>(XContainer xParent, string entryName, UsableFromList<T> item) where T : struct, IConvertible
+        {
+            var xFoundElement = xParent.Element(entryName);
+            if (xFoundElement == null)
+                return;
+
+            if (!LoadBoolean(xFoundElement, UseNode, b => item.Use = b))
+                return;
+
+            T result;
+            if (!Load(xFoundElement, SelectedNode, out result))
+                return;
+
+            item.Selected = result;
+        }
+
         internal static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
         {
             bool value;
@@ -633,6 +653,19 @@ namespace PrepareLanding.Presets
             xElement.Add(new XElement(UseNode, item.Use));
             xElement.Add(new XElement(MinNode, item.Min));
             xElement.Add(new XElement(MaxNode, item.Max));
+        }
+
+        private static void SaveUsableFromList<T>(XContainer xRoot, string elementName, UsableFromList<T> item)
+            where T : struct, IConvertible
+        {
+            if (!item.Use)
+                return;
+
+            var xElement = new XElement(elementName);
+            xRoot.Add(xElement);
+
+            xElement.Add(new XElement(UseNode, item.Use));
+            xElement.Add(new XElement(SelectedNode, item.Selected));
         }
 
         private static void SaveMinMaxFromRestrictedList<T>(XContainer xRoot, string elementName,

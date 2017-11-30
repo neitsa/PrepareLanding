@@ -231,8 +231,8 @@ namespace PrepareLanding.GameData
             }
         }
 
-        public UsableFromList<Rot4> CoastalRotation { get; } =  new UsableFromList<Rot4>(
-            TileFilterCoastRotation.PossibleRotations, TileFilterCoastRotation.PossibleRotations[0]);
+        public UsableFromList<int> CoastalRotation { get; } =  new UsableFromList<int>(
+            TileFilterCoastRotation.PossibleRotationsInt, TileFilterCoastRotation.PossibleRotationsInt[0]);
 
         /// <summary>
         ///     Current user choices for the summer movement time.
@@ -368,6 +368,7 @@ namespace PrepareLanding.GameData
             _chosenHilliness = Hilliness.Undefined;
             _chosenCoastalTileState = MultiCheckboxState.Partial;
             _coastalLakeTileState = MultiCheckboxState.Partial;
+            CoastalRotation.Reset();
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
             var defProps = PrepareLanding.Instance.GameData.DefData;
@@ -544,16 +545,6 @@ namespace PrepareLanding.GameData
         ///     Selected wold feature by user.
         /// </summary>
         private WorldFeature _worldFeature;
-
-        /// <summary>
-        ///     If True, enable Coast Rotation filtering.
-        /// </summary>
-        private bool _useCoastRotation;
-
-        /// <summary>
-        ///     Selected user coast rotation
-        /// </summary>
-        private Rot4 _coastRotation;
 
         /// <summary>
         ///     Used to tell if the first reset has been done. It must be done once in the lifetime of the mod to at least
