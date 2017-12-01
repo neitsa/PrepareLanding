@@ -206,6 +206,44 @@ namespace PrepareLanding.Presets
             return successfulSave;
         }
 
+        public bool DeletePreset(string presetName)
+        {
+            if (string.IsNullOrEmpty(presetName))
+                return false;
+
+            var filePath = GetPresetFilePath(presetName);
+
+            // just check we aren't trying to delete a template preset
+            if (_presetCache.ContainsKey(presetName))
+                if (_presetCache[presetName].PresetInfo.IsTemplate)
+                {
+                    Messages.Message("[PrepareLanding] It is not allowed to delete a template preset.",
+                        MessageTypeDefOf.RejectInput);
+                    return false;
+                }
+            
+            try
+            {
+                // delete file
+                File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                Messages.Message("[PrepareLanding] Failed to delete preset file.", MessageTypeDefOf.NegativeEvent);
+                Log.Error($"[PrepareLanding] Failed to delete preset file '{filePath}'. error:\n\t{ex}\n\t{ex.Message}");
+                return false;
+            }
+
+            // remove it from the cache
+            if(_presetCache.ContainsKey(presetName))
+                _presetCache.Remove(presetName);
+
+            // renew the cache
+            RenewPresetFileCache();
+
+            return true;
+        }
+
         private static void CopyFromTemplateFolderToPresetFolder(string sourceFolder, string destFolder)
         {
             if (!Directory.Exists(sourceFolder) || !Directory.Exists(destFolder))
