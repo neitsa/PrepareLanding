@@ -71,23 +71,24 @@ namespace PrepareLanding
                     stringBuilder.AppendLine(
                         $"Tiles with Roads: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
 
-                stringBuilder.AppendLine("Biomes: (number of tiles)");
+                stringBuilder.AppendLine("Biomes:");
                 var biomes = _gameData.DefData.BiomeDefs;
-
-                //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
-                //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
 
                 foreach (var biome in biomes)
                 {
+                    stringBuilder.AppendLine($"    * {biome.LabelCap}");
                     var count = _gameData.WorldData.NumberOfTilesByBiome[biome];
-                    //stringBuilder.AppendLine($"    {biome.LabelCap.PadRight(longestBiomeName)} ➠ {count}");
-                    stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
+                    stringBuilder.AppendLine($"        - Number of Tiles ➠ {count}");
+                    stringBuilder.AppendLine($"        - {"AverageDiseaseFrequency".Translate()} ➠ {(RimWorld.GenDate.DaysPerYear / biome.diseaseMtbDays):F1} {"PerYear".Translate()}");
                 }
             }
 
             /*
              * Highest / lowest value for all characteristics.
              */
+
+            var separator = "-".Repeat(80);
+            stringBuilder.AppendLine($"\n{separator}\nWorld Records\n{separator}");
 
             foreach (var characteristicData in _gameData.WorldData.WorldCharacteristics)
             {
