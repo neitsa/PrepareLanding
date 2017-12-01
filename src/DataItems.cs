@@ -346,10 +346,18 @@ namespace PrepareLanding
             }
         }
 
-        public void Reset()
+        public void Reset(bool firePropertyChanged = true)
         {
-            _use = false;
-            _selected = default(T);
+            if (!firePropertyChanged)
+            {
+                _use = false;
+                _selected = default(T);
+            }
+            else
+            {
+                Use = false;
+                Selected = default(T);
+            }
         }
 
         [NotifyPropertyChangedInvocator]

@@ -368,7 +368,7 @@ namespace PrepareLanding.GameData
             _chosenHilliness = Hilliness.Undefined;
             _chosenCoastalTileState = MultiCheckboxState.Partial;
             _coastalLakeTileState = MultiCheckboxState.Partial;
-            CoastalRotation.Reset();
+            CoastalRotation.Reset(false);
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
             var defProps = PrepareLanding.Instance.GameData.DefData;
@@ -394,6 +394,9 @@ namespace PrepareLanding.GameData
             InitUsableMinMaxNumericItem(WinterMovementTime, nameof(WinterMovementTime));
             InitUsableMinMaxNumericItem(Elevation, nameof(Elevation));
             InitUsableMinMaxNumericItem(TimeZone, nameof(TimeZone));
+
+            _hasCaveState = MultiCheckboxState.Partial;
+            _worldFeature = null;
 
             /*
              * TEMPERATURE related Fields
