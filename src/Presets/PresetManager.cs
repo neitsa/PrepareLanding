@@ -24,11 +24,21 @@ namespace PrepareLanding.Presets
         {
             _gameData = gameData;
 
-            // just make sure the preset dir exists by calling the PresetFolder Property
-            Log.Message($"[PrepareLanding] Preset folder is at: {PresetFolder}");
+            var displayPresetFolder = PresetFolder;
+            var displayPresetTemplateFolder = PresetTemplateFolder;
 
+           // redact user name from log string
+            var userName = Environment.UserName;
+            if (displayPresetFolder.Contains(userName))
+            {
+                displayPresetFolder = displayPresetFolder.Replace(userName, "<redacted>");
+                displayPresetTemplateFolder = displayPresetTemplateFolder.Replace(userName, "<redacted>");
+            }
+
+            // just make sure the preset dir exists by calling the PresetFolder Property
+            Log.Message($"[PrepareLanding] Preset folder is at: {displayPresetFolder}");
             // location of the preset templates, provided de facto with the mod
-            Log.Message($"[PrepareLanding] Preset template folder is at: {PresetTemplateFolder}");
+            Log.Message($"[PrepareLanding] Preset template folder is at: {displayPresetTemplateFolder}");
 
             CopyFromTemplateFolderToPresetFolder(PresetTemplateFolder, PresetFolder);
 
