@@ -180,7 +180,7 @@ namespace PrepareLanding.Presets
                 SaveUsableMinMax(xTemperatureFilters, "WinterTemperature", _gameData.UserData.WinterTemperature);
                 SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
                 SaveUsableMinMax(xTemperatureFilters, "RainFall", _gameData.UserData.RainFall);
-                SaveThreeState(xTerrainFilters, "AnimalsCanGrazeNow", _gameData.UserData.ChosenAnimalsCanGrazeNowState);
+                SaveThreeState(xTemperatureFilters, "AnimalsCanGrazeNow", _gameData.UserData.ChosenAnimalsCanGrazeNowState);
                 SaveMostLeastItem(xTemperatureFilters, "MostLeastFeature", _gameData.UserData.MostLeastItem);
 
                 /*
