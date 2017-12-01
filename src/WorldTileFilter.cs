@@ -470,7 +470,8 @@ namespace PrepareLanding
             if (_userData.AreAllFieldsInDefaultSate())
             {
                 FilterInfoLogger.AppendErrorMessage(
-                    "All filters are in their default state, please select at least one filter.");
+                    "All filters are in their default state, please select at least one filter.",
+                    "All filters are in their default state.");
                 return false;
             }
 
