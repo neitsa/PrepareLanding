@@ -153,35 +153,24 @@ namespace PrepareLanding.GameData
         public FilterOptions Options { get; }
 
         /// <summary>
-        ///     Current order of the stones on the main GUI Window (as this choice order is important).
-        /// </summary>
-        public List<ThingDef> OrderedStoneDefs { get; } = new List<ThingDef>();
-
-        /// <summary>
         ///     Current user choices for the rain fall.
         /// </summary>
         public UsableMinMaxNumericItem<float> RainFall { get; } = new UsableMinMaxNumericItem<float>();
 
-
         /// <summary>
         ///     Current user choices for the river filtering.
         /// </summary>
-        public Dictionary<RiverDef, ThreeStateItem> SelectedRiverDefs { get; } =
-            new Dictionary<RiverDef, ThreeStateItem>();
+        public ThreeStateItemContainer<RiverDef> SelectedRiverDefs { get; } = new ThreeStateItemContainer<RiverDef>();
 
         /// <summary>
         ///     Current user choices for the roads filtering.
         /// </summary>
-        public Dictionary<RoadDef, ThreeStateItem> SelectedRoadDefs { get; } =
-            new Dictionary<RoadDef, ThreeStateItem>();
+        public ThreeStateItemContainer<RoadDef> SelectedRoadDefs { get; } = new ThreeStateItemContainer<RoadDef>();
 
         /// <summary>
         ///     Current user choices for the stone types filtering.
         /// </summary>
-        public Dictionary<ThingDef, ThreeStateItem> SelectedStoneDefs { get; } =
-            new Dictionary<ThingDef, ThreeStateItem>();
-
-
+        public ThreeStateItemContainerOrdered<ThingDef> SelectedStoneDefs { get; } = new ThreeStateItemContainerOrdered<ThingDef>();
 
         /// <summary>
         ///     The number of stones per tile to filter when the <see cref="StoneTypesNumberOnly" /> boolean is true.
@@ -296,13 +285,13 @@ namespace PrepareLanding.GameData
             if (_hasCaveState != MultiCheckboxState.Partial)
                 return false;
 
-            if (!IsDefDictInDefaultState(SelectedRoadDefs))
+            if (!SelectedRoadDefs.IsInDefaultState())
                 return false;
 
-            if (!IsDefDictInDefaultState(SelectedRiverDefs))
+            if (!SelectedRiverDefs.IsInDefaultState())
                 return false;
 
-            if (!IsDefDictInDefaultState(SelectedStoneDefs))
+            if (!SelectedStoneDefs.IsInDefaultState())
                 return false;
 
             if (_stoneTypesNumberOnly)
@@ -347,11 +336,6 @@ namespace PrepareLanding.GameData
             return true;
         }
 
-        public static bool IsDefDictInDefaultState<T>(Dictionary<T, ThreeStateItem> dict) where T : Def
-        {
-            return dict.All(def => def.Value.State == MultiCheckboxState.Partial);
-        }
-
         /// <summary>
         ///     Reset all fields (user choices on the GUI window) to their default state. Also clear all matching tiles.
         /// </summary>
@@ -372,17 +356,9 @@ namespace PrepareLanding.GameData
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
             var defProps = PrepareLanding.Instance.GameData.DefData;
-            InitSelectedDictionary(defProps.RoadDefs, SelectedRoadDefs, nameof(SelectedRoadDefs));
-            InitSelectedDictionary(defProps.RiverDefs, SelectedRiverDefs, nameof(SelectedRiverDefs));
-            InitSelectedDictionary(defProps.StoneDefs, SelectedStoneDefs, nameof(SelectedStoneDefs));
-
-            // patch for the fact that OrderedDictionary<TKey, TValue> doesn't exist in .NET...
-            // The list is reorder-able but the dictionary is not. We need to keep the order because it is important.
-            OrderedStoneDefs.Clear();
-            foreach (var stoneEntry in SelectedStoneDefs)
-                OrderedStoneDefs.Add(stoneEntry.Key);
-            // order by name at first
-            OrderedStoneDefs.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
+            SelectedRoadDefs.SetContainer(defProps.RoadDefs, nameof(SelectedRoadDefs));
+            SelectedRiverDefs.SetContainer(defProps.RiverDefs, nameof(SelectedRiverDefs));
+            SelectedStoneDefs.SetContainer(defProps.StoneDefs, nameof(SelectedStoneDefs));
 
             // stone numbers
             StoneTypesNumberOnly = false;
@@ -428,44 +404,6 @@ namespace PrepareLanding.GameData
                 _firstResetDone = true;
                 ResetAllFields();
             }
-        }
-
-        /// <summary>
-        ///     Initialize a dictionary from a list of RimWorld definitions (<see cref="Def" />) where keys are <see cref="Def" />
-        ///     and values are <see cref="ThreeStateItem" />.
-        ///     The propertyChangedName makes it so that if a <see cref="ThreeStateItem" /> item changed an event is fired for the
-        ///     whole dictionary rather than the contained item.
-        /// </summary>
-        /// <typeparam name="T">The type of the items in the list parameter. <b>T</b> should be a RimWorld <see cref="Def" />.</typeparam>
-        /// <param name="initCollection">A collection of <see cref="Def" /> (each entry will be used as a dictionary key).</param>
-        /// <param name="dictionary">The dictionary to be initialized.</param>
-        /// <param name="propertyChangedName">
-        ///     The bound property name (the name of the dictionary in this class). Each time a value
-        ///     in the dictionary is changed, this fire an event related to the dictionary name and not the contained values.
-        /// </param>
-        /// <param name="defaultSate">The default state of the <see cref="ThreeStateItem" />.</param>
-        protected void InitSelectedDictionary<T>(ReadOnlyCollection<T> initCollection, Dictionary<T, ThreeStateItem> dictionary,
-            string propertyChangedName, MultiCheckboxState defaultSate = MultiCheckboxState.Partial)
-        {
-            dictionary.Clear();
-            foreach (var elementDef in initCollection)
-            {
-                var item = new ThreeStateItem(defaultSate);
-                item.PropertyChanged += delegate
-                {
-                    // cheat! rather than saying that a ThreeState item changed
-                    //  just pretend the whole dictionary has changed.
-                    // We don't need a finer grain control than that, as the dictionary will contain just a few elements.
-                    OnPropertyChanged(propertyChangedName);
-                };
-                dictionary.Add(elementDef, item);
-            }
-        }
-
-        protected ThreeStateItem InitThreeStateItem(string propertyChanedName,
-            MultiCheckboxState defaultState = MultiCheckboxState.Partial)
-        {
-            return new ThreeStateItem(defaultState);
         }
 
         /// <summary>

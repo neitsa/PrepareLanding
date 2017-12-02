@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
@@ -205,17 +204,21 @@ namespace PrepareLanding.Filters
             }
 
             // collect stones that are in On & Partial states, in their precise order on the GUI!
-            var orderedStoneDefsOn = (from stone in UserData.OrderedStoneDefs
+            var orderedStoneDefsOn = (from stone in UserData.SelectedStoneDefs.OrderedItems
                 let threeStateItem = UserData.SelectedStoneDefs[stone]
                 where threeStateItem.State == MultiCheckboxState.On
                 select stone).ToList();
-            var orderedStoneDefsPartial = (from stone in UserData.OrderedStoneDefs
+
+            var orderedStoneDefsPartial = (
+                from stone in UserData.SelectedStoneDefs.OrderedItems //UserData.OrderedStoneDefs
                 let threeStateItem = UserData.SelectedStoneDefs[stone]
                 where threeStateItem.State == MultiCheckboxState.Partial
                 select stone).ToList();
+
             var orderedStoneDefsOnPartial = new List<ThingDef>();
             orderedStoneDefsOnPartial.AddRange(orderedStoneDefsOn);
             orderedStoneDefsOnPartial.AddRange(orderedStoneDefsPartial);
+
             // stone types explicitly marked OFF
             var stoneOffList = (from userDataSelectedStoneDef in UserData.SelectedStoneDefs
                 where userDataSelectedStoneDef.Value.State == MultiCheckboxState.Off

@@ -434,7 +434,7 @@ namespace PrepareLanding
             DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
             var selectedStoneDefs = _gameData.UserData.SelectedStoneDefs;
-            var orderedStoneDefs = _gameData.UserData.OrderedStoneDefs;
+            var orderedStoneDefs = _gameData.UserData.SelectedStoneDefs.OrderedItems;
 
             // Reset button: reset all entries to Off state
             if (ListingStandard.ButtonText("Reset All"))
@@ -449,7 +449,7 @@ namespace PrepareLanding
             var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
             {
                 //TODO find a way to raise an event to tell an observer that the list order has changed
-                ReorderElements(from, to, orderedStoneDefs);
+                selectedStoneDefs.ReorderElements(from, to);
                 SoundDefOf.TickHigh.PlayOneShotOnCamera();
             });
 
