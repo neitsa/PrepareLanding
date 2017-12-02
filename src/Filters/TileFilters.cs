@@ -264,16 +264,34 @@ namespace PrepareLanding.Filters
                         var subset = tileStones.Count <= orderedStoneDefsOn.Count ? tileStones : orderedStoneDefsOn;
                         var containingList = subset == tileStones ? orderedStoneDefsOn : tileStones;
 
-                        // check if the subset list has the same stone types at the same position in the containing list.
-                        if (subset.IsSubsetInOrderSamePos(containingList))
-                            _filteredTiles.Add(tileId);
+                        if (UserData.SelectedStoneDefs.OrderedFiltering)
+                        {
+                            // check if the subset list has the same stone types at the same position in the containing list.
+                            if (subset.IsSubsetInOrderSamePos(containingList))
+                                _filteredTiles.Add(tileId);
+                        }
+                        else
+                        {
+                            // check if the subset list has the same stone types bot *not* necessarily at the same position in the containing list.
+                            if (subset.IsSubset(containingList))
+                                _filteredTiles.Add(tileId);
+                        }
                     }
                     // maximum must-have stone types
                     else if (orderedStoneDefsOnCount == 3)
                     {
-                        // just check that both lists are equals (same content *and* in the same order!)
-                        if (tileStones.SequenceEqual(orderedStoneDefsOn))
-                            _filteredTiles.Add(tileId);
+                        if (UserData.SelectedStoneDefs.OrderedFiltering)
+                        {
+                            // just check that both lists are equals (same content *and* in the same order!)
+                            if (tileStones.SequenceEqual(orderedStoneDefsOn))
+                                _filteredTiles.Add(tileId);
+                        }
+                        else
+                        {
+                            // just check that both lists are equals (same content *without* any precise order!)
+                            if (tileStones.IsEqualNoOrderFast(orderedStoneDefsOn))
+                                _filteredTiles.Add(tileId);
+                        }
                     }
                     continue;
                 }

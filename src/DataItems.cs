@@ -174,6 +174,11 @@ namespace PrepareLanding
 
         public ReadOnlyCollection<T> OrderedItems => _orderedItems.AsReadOnly();
 
+        /// <summary>
+        ///     Tells whether the filtering should be order dependent (if true) or not (if false).
+        /// </summary>
+        public bool OrderedFiltering { get; set; } = true;
+
         public void SetNewOrder(List<T> otherList)
         {
             if (ItemDictionary.Count != otherList.Count)
