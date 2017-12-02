@@ -17,6 +17,47 @@ namespace PrepareLanding.Core.Extensions
             return thisEnumerable.Intersect(otherList).Count() == otherList.Count;
         }
 
+        public static bool IsEqualNoOrder<T>(this IEnumerable<T> thisEnumerable, IEnumerable<T> other)
+        {
+            return thisEnumerable.OrderBy(t => t).SequenceEqual(other.OrderBy(t => t));
+        }
+
+        public static bool IsEqualNoOrderFast<T>(this IEnumerable<T> list1, IEnumerable<T> list2)
+        {
+            var cnt = new Dictionary<T, int>();
+            foreach (var s in list1)
+            {
+                if (cnt.ContainsKey(s))
+                {
+                    cnt[s]++;
+                }
+                else
+                {
+                    cnt.Add(s, 1);
+                }
+            }
+            foreach (var s in list2)
+            {
+                if (cnt.ContainsKey(s))
+                {
+                    cnt[s]--;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return cnt.Values.All(c => c == 0);
+        }
+
+        /// <summary>
+        ///     Tells whether an enumerable contains another. This is not order dependent. 
+        ///     <see cref="thisEnumerable"/> can be shorter or the same length than <see cref="other"/> and still be a subset.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="thisEnumerable">The list that is checked for being a subset.</param>
+        /// <param name="other">The containing list.</param>
+        /// <returns>true if <see cref="thisEnumerable"/> is a subset of <see cref="other"/>, false otherwise.</returns>
         public static bool IsSubset<T>(this IEnumerable<T> thisEnumerable, IEnumerable<T> other)
         {
             return !thisEnumerable.Except(other).Any();

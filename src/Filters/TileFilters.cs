@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
@@ -205,17 +204,21 @@ namespace PrepareLanding.Filters
             }
 
             // collect stones that are in On & Partial states, in their precise order on the GUI!
-            var orderedStoneDefsOn = (from stone in UserData.OrderedStoneDefs
+            var orderedStoneDefsOn = (from stone in UserData.SelectedStoneDefs.OrderedItems
                 let threeStateItem = UserData.SelectedStoneDefs[stone]
                 where threeStateItem.State == MultiCheckboxState.On
                 select stone).ToList();
-            var orderedStoneDefsPartial = (from stone in UserData.OrderedStoneDefs
+
+            var orderedStoneDefsPartial = (
+                from stone in UserData.SelectedStoneDefs.OrderedItems //UserData.OrderedStoneDefs
                 let threeStateItem = UserData.SelectedStoneDefs[stone]
                 where threeStateItem.State == MultiCheckboxState.Partial
                 select stone).ToList();
+
             var orderedStoneDefsOnPartial = new List<ThingDef>();
             orderedStoneDefsOnPartial.AddRange(orderedStoneDefsOn);
             orderedStoneDefsOnPartial.AddRange(orderedStoneDefsPartial);
+
             // stone types explicitly marked OFF
             var stoneOffList = (from userDataSelectedStoneDef in UserData.SelectedStoneDefs
                 where userDataSelectedStoneDef.Value.State == MultiCheckboxState.Off
@@ -261,16 +264,34 @@ namespace PrepareLanding.Filters
                         var subset = tileStones.Count <= orderedStoneDefsOn.Count ? tileStones : orderedStoneDefsOn;
                         var containingList = subset == tileStones ? orderedStoneDefsOn : tileStones;
 
-                        // check if the subset list has the same stone types at the same position in the containing list.
-                        if (subset.IsSubsetInOrderSamePos(containingList))
-                            _filteredTiles.Add(tileId);
+                        if (UserData.SelectedStoneDefs.OrderedFiltering)
+                        {
+                            // check if the subset list has the same stone types at the same position in the containing list.
+                            if (subset.IsSubsetInOrderSamePos(containingList))
+                                _filteredTiles.Add(tileId);
+                        }
+                        else
+                        {
+                            // check if the subset list has the same stone types bot *not* necessarily at the same position in the containing list.
+                            if (subset.IsSubset(containingList))
+                                _filteredTiles.Add(tileId);
+                        }
                     }
                     // maximum must-have stone types
                     else if (orderedStoneDefsOnCount == 3)
                     {
-                        // just check that both lists are equals (same content *and* in the same order!)
-                        if (tileStones.SequenceEqual(orderedStoneDefsOn))
-                            _filteredTiles.Add(tileId);
+                        if (UserData.SelectedStoneDefs.OrderedFiltering)
+                        {
+                            // just check that both lists are equals (same content *and* in the same order!)
+                            if (tileStones.SequenceEqual(orderedStoneDefsOn))
+                                _filteredTiles.Add(tileId);
+                        }
+                        else
+                        {
+                            // just check that both lists are equals (same content *without* any precise order!)
+                            if (tileStones.IsEqualNoOrderFast(orderedStoneDefsOn))
+                                _filteredTiles.Add(tileId);
+                        }
                     }
                     continue;
                 }

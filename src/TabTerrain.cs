@@ -434,10 +434,20 @@ namespace PrepareLanding
             DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
             var selectedStoneDefs = _gameData.UserData.SelectedStoneDefs;
-            var orderedStoneDefs = _gameData.UserData.OrderedStoneDefs;
 
-            // Reset button: reset all entries to Off state
-            if (ListingStandard.ButtonText("Reset All"))
+            /*
+             * Buttons
+             */
+            const int numButtons = 2;
+            var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
+            if (buttonsRect.Count != numButtons)
+            {
+                Log.ErrorOnce($"[PrepareLanding] DrawStoneTypesSelection: couldn't get the right number of buttons: {numButtons}", 0x123acafe);
+                return;
+            }
+
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset All"))
             {
                 foreach (var stoneDefEntry in selectedStoneDefs)
                     stoneDefEntry.Value.State = stoneDefEntry.Value.DefaultState;
@@ -445,11 +455,19 @@ namespace PrepareLanding
                 _gameData.UserData.StoneTypesNumberOnly = false;
             }
 
+            // order / no order button
+            TooltipHandler.TipRegion(buttonsRect[1], "Whether Stone Filtering is order dependent or not.\nPress button to change filter state.");
+            var orderText = selectedStoneDefs.OrderedFiltering ? "Ordered" : "No Order";
+            if (Verse.Widgets.ButtonText(buttonsRect[1], $"Filter: {orderText}"))
+            {
+                selectedStoneDefs.OrderedFiltering = !selectedStoneDefs.OrderedFiltering;
+            }
+
             // re-orderable list group
-            var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
+                var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
             {
                 //TODO find a way to raise an event to tell an observer that the list order has changed
-                ReorderElements(from, to, orderedStoneDefs);
+                selectedStoneDefs.ReorderElements(from, to);
                 SoundDefOf.TickHigh.PlayOneShotOnCamera();
             });
 
@@ -464,7 +482,7 @@ namespace PrepareLanding
                 var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count*DefaultElementHeight,
                     ref _scrollPosStoneSelection, DefaultScrollableViewShrinkWidth);
 
-                foreach (var currentOrderedStoneDef in orderedStoneDefs)
+                foreach (var currentOrderedStoneDef in selectedStoneDefs.OrderedItems)
                 {
                     ThreeStateItem threeStateItem;
 
