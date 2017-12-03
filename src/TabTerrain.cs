@@ -198,11 +198,12 @@ namespace PrepareLanding
              * Coastal rotation
              */
             var filterCoastalRotation = _gameData.UserData.CoastalRotation.Use;
-            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation);
+            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation,
+                "Allow to search for coastal tiles which have a coast facing a specific direction.");
             _gameData.UserData.CoastalRotation.Use = filterCoastalRotation;
 
             // "Select" button
-            if (ListingStandard.ButtonText("Select Rotation"))
+            if (ListingStandard.ButtonText("Select Coast Rotation"))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
 
@@ -237,7 +238,7 @@ namespace PrepareLanding
             var rightLabel = _gameData.UserData.CoastalRotation.Use /*&& _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid*/
                 ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
                 : "None";
-            ListingStandard.LabelDouble("Coast Rotation:", rightLabel);
+            ListingStandard.LabelDouble("Selected Coast Rotation:", rightLabel);
         }
 
         protected void DrawElevationSelection()
