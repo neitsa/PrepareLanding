@@ -134,8 +134,12 @@ namespace PrepareLanding.Filters
                     if (unwantedRoadDefs.Select(r => r).Intersect(tileRoadDefs).Any())
                         continue;
 
-                    // otherwise add the tile (if the road type is MultiCheckboxState.On or MultiCheckboxState.Partial)
-                    _filteredTiles.Add(tileId);
+                    // issue #28
+                    if (tileRoadDefs.Intersect(wantedRoadDefs).Any())
+                    {
+                        // otherwise add the tile (if the road type is MultiCheckboxState.On or MultiCheckboxState.Partial)
+                        _filteredTiles.Add(tileId);
+                    }
                 }
                 else //tile has no roads
                 {
