@@ -370,7 +370,7 @@ namespace PrepareLanding
             /*
              * Buttons
              */
-            const int numButtons = 3;
+            const int numButtons = 4;
             var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
             if (buttonsRect.Count != numButtons)
             {
@@ -392,6 +392,13 @@ namespace PrepareLanding
             if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
                 foreach (var roadDefEntry in selectedRoadDefs)
                     roadDefEntry.Value.State = MultiCheckboxState.Off;
+
+            // boolean filtering type
+            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nPress to cycle through options.");
+            if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRoadDefs.FilterBooleanState.ToStringHuman()))
+            {
+                selectedRoadDefs.FilterBooleanState = selectedRoadDefs.FilterBooleanState.Next();
+            }
 
             /*
              * ScrollView

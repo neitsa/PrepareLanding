@@ -59,6 +59,25 @@ namespace PrepareLanding
         }
     }
 
+    /// <summary>
+    ///     Boolean Filtering Type.
+    /// </summary>
+    public enum FilterBoolean
+    {
+        /// <summary>
+        ///     Disjunction filtering.
+        /// </summary>
+        OrFiltering,
+        /// <summary>
+        ///     Conjunction filtering.
+        /// </summary>
+        AndFiltering,
+        /// <summary>
+        ///     Undefined filtering.
+        /// </summary>
+        Undefined,
+    }
+
     public class ThreeStateItemContainer<T> : INotifyPropertyChanged, IEnumerable<KeyValuePair<T, ThreeStateItem>> where T : Def
     {
         protected readonly Dictionary<T, ThreeStateItem> ItemDictionary = new Dictionary<T, ThreeStateItem>();
@@ -115,6 +134,8 @@ namespace PrepareLanding
         {
             return ItemDictionary.TryGetValue(def, out item);
         }
+
+        public FilterBoolean FilterBooleanState { get; set; }
 
         public Dictionary<T, ThreeStateItem>.ValueCollection Values => ItemDictionary.Values;
 

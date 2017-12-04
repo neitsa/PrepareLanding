@@ -113,12 +113,12 @@ namespace PrepareLanding.Filters
             var roadDefs = UserData.SelectedRoadDefs;
 
             // get a list of roadDefs that *must not* be present
-            var unwantedRoadDefs = (from entry in roadDefs
+            var roadDefOff = (from entry in roadDefs
                 where entry.Value.State == MultiCheckboxState.Off
                 select entry.Key).ToList();
 
             // get a list of roadDefs that *must* be present
-            var wantedRoadDefs = (from entry in roadDefs
+            var roadDefOn = (from entry in roadDefs
                 where entry.Value.State == MultiCheckboxState.On
                 select entry.Key).ToList();
 
@@ -131,11 +131,11 @@ namespace PrepareLanding.Filters
                     var tileRoadDefs = tile.VisibleRoads.Select(roadlink => roadlink.road).ToList();
 
                     // check that any of the road in the tile is *not* in the unwanted list, if it is, then just continue
-                    if (unwantedRoadDefs.Select(r => r).Intersect(tileRoadDefs).Any())
+                    if (roadDefOff.Intersect(tileRoadDefs).Any())
                         continue;
 
                     // issue #28
-                    if (tileRoadDefs.Intersect(wantedRoadDefs).Any())
+                    if (tileRoadDefs.Intersect(roadDefOn).Any())
                     {
                         // otherwise add the tile (if the road type is MultiCheckboxState.On or MultiCheckboxState.Partial)
                         _filteredTiles.Add(tileId);
@@ -147,7 +147,7 @@ namespace PrepareLanding.Filters
                     //  if user wants a specific road: do nothing
                     //  if user doesn't absolutely want a specific road type, add the tile 
                     //    (works for MultiCheckboxState.Off and MultiCheckboxState.Partial)
-                    if (wantedRoadDefs.Count == 0)
+                    if (roadDefOn.Count == 0)
                         _filteredTiles.Add(tileId);
                 }
             }
