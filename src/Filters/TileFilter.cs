@@ -117,7 +117,7 @@ namespace PrepareLanding.Filters
             {
                 // get the tile and check if it has any road
                 var tile = Find.World.grid[tileId];
-                var tileHasRoad = TileHasDef(tile);
+                var tileHasDef = TileHasDef(tile);
 
                 // get the Defs in the tile (or an empty list if no Defs)
                 var tileDefs = TileDefs<T>(tile);
@@ -130,17 +130,17 @@ namespace PrepareLanding.Filters
                     var currentSelectedDef = threeStateItemKvp.Key; // current def
                     var currentSelectionState = threeStateItemKvp.Value; // current user choice for this def
 
-                    if (tileHasRoad)
+                    if (tileHasDef)
                     {
                         switch (currentSelectionState.State)
                         {
-                            // user wants this type of roads
+                            // user wants this type of defs
                             case MultiCheckboxState.On:
                                 if (tileDefs.Contains(currentSelectedDef))
                                     _filteredTiles.Add(tileId);
                                 break;
 
-                            // user doesn't want this type of road
+                            // user doesn't want this type of defs
                             case MultiCheckboxState.Off:
                                 if (!tileDefs.Contains(currentSelectedDef) && !offNoSelect)
                                     _filteredTiles.Add(tileId);
