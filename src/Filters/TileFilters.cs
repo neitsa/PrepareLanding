@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
@@ -110,47 +111,32 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            var roadDefs = UserData.SelectedRoadDefs;
-
-            // get a list of roadDefs that *must not* be present
-            var roadDefOff = (from entry in roadDefs
-                where entry.Value.State == MultiCheckboxState.Off
-                select entry.Key).ToList();
-
-            // get a list of roadDefs that *must* be present
-            var roadDefOn = (from entry in roadDefs
-                where entry.Value.State == MultiCheckboxState.On
-                select entry.Key).ToList();
-
-            foreach (var tileId in inputList)
+            switch (UserData.SelectedRoadDefs.FilterBooleanState)
             {
-                var tile = Find.World.grid[tileId];
-                var tileHasRoad = TileHasRoad(tile);
-                if (tileHasRoad)
-                {
-                    var tileRoadDefs = tile.VisibleRoads.Select(roadlink => roadlink.road).ToList();
-
-                    // check that any of the road in the tile is *not* in the unwanted list, if it is, then just continue
-                    if (roadDefOff.Intersect(tileRoadDefs).Any())
-                        continue;
-
-                    // issue #28
-                    if (tileRoadDefs.Intersect(roadDefOn).Any())
-                    {
-                        // otherwise add the tile (if the road type is MultiCheckboxState.On or MultiCheckboxState.Partial)
-                        _filteredTiles.Add(tileId);
-                    }
-                }
-                else //tile has no roads
-                {
-                    //tile has no roads
-                    //  if user wants a specific road: do nothing
-                    //  if user doesn't absolutely want a specific road type, add the tile 
-                    //    (works for MultiCheckboxState.Off and MultiCheckboxState.Partial)
-                    if (roadDefOn.Count == 0)
-                        _filteredTiles.Add(tileId);
-                }
+                case FilterBoolean.AndFiltering:
+                    FilterAnd(inputList, UserData.SelectedRoadDefs);
+                    break;
+                case FilterBoolean.OrFiltering:
+                    FilterOr(inputList, UserData.SelectedRoadDefs, UserData.SelectedRoadDefs.OffPartialNoSelect);
+                    break;
+                case FilterBoolean.Undefined:
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+
+        protected override bool TileHasDef(Tile tile)
+        {
+            return TileHasRoad(tile);
+        }
+
+        protected override List<T> TileDefs<T>(Tile tile)
+        {
+            var tileRoadDefs = TileHasDef(tile)
+                ? tile.VisibleRoads.Select(roadlink => roadlink.road as T).Distinct().ToList()
+                : null;
+
+            return tileRoadDefs;
         }
 
         /// <summary>
@@ -163,7 +149,7 @@ namespace PrepareLanding.Filters
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRoad);
         }
 
-        public bool TileHasRoad(Tile tile)
+        public static bool TileHasRoad(Tile tile)
         {
             return tile.VisibleRoads != null && tile.VisibleRoads.Count != 0;
         }
@@ -326,6 +312,7 @@ namespace PrepareLanding.Filters
 
         public override string SubjectThingDef => "Rivers";
 
+        
         public override void Filter(List<int> inputList)
         {
             base.Filter(inputList);
@@ -333,44 +320,34 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            var riverDefs = UserData.SelectedRiverDefs;
-
-            // get a list of riverDefs that *must not* be present
-            var unwantedRiverDefs = (from entry in riverDefs
-                where entry.Value.State == MultiCheckboxState.Off
-                select entry.Key).ToList();
-
-            // get a list of riverDefs that *must* be present
-            var wantedRiverDefs = (from entry in riverDefs
-                where entry.Value.State == MultiCheckboxState.On
-                select entry.Key).ToList();
-
-            foreach (var tileId in inputList)
+            switch (UserData.SelectedRiverDefs.FilterBooleanState)
             {
-                var tileHasRiver = TileHasRiver(tileId);
-                if (tileHasRiver)
-                {
-                    // note: even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
-                    var riverLink = Find.World.grid[tileId].VisibleRivers
-                        .MaxBy(riverlink => riverlink.river.degradeThreshold);
-
-                    // check that the river is not in the unwanted list, if it is, then just continue
-                    if (unwantedRiverDefs.Contains(riverLink.river))
-                        continue;
-
-                    // add the tile if the river type is MultiCheckboxState.On or MultiCheckboxState.Partial
-                    _filteredTiles.Add(tileId);
-                }
-                else //tile has no rivers
-                {
-                    //tile has no river
-                    //  if user wants a river: do nothing
-                    //  if user doesn't absolutely want a specific river type, add the tile 
-                    //    (works for MultiCheckboxState.Off and MultiCheckboxState.Partial)
-                    if (wantedRiverDefs.Count == 0)
-                        _filteredTiles.Add(tileId);
-                }
+                case FilterBoolean.AndFiltering:
+                    FilterAnd(inputList, UserData.SelectedRiverDefs);
+                    break;
+                case FilterBoolean.OrFiltering:
+                    FilterOr(inputList, UserData.SelectedRiverDefs, UserData.SelectedRiverDefs.OffPartialNoSelect);
+                    break;
+                case FilterBoolean.Undefined:
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+
+        protected override bool TileHasDef(Tile tile)
+        {
+            return TileHasRiver(tile);
+        }
+
+        protected override List<T> TileDefs<T>(Tile tile)
+        {
+            if (!TileHasRiver(tile))
+                return null;
+
+            // note: even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
+            var riverLink = tile.VisibleRivers.MaxBy(riverlink => riverlink.river.degradeThreshold);
+
+            return new List<T>{ riverLink.river as T };
         }
 
         public static IEnumerable<int> TilesWithRiver(List<int> inputList)
@@ -378,9 +355,8 @@ namespace PrepareLanding.Filters
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRiver);
         }
 
-        public static bool TileHasRiver(int tileId)
+        public static bool TileHasRiver(Tile tile)
         {
-            var tile = Find.World.grid[tileId];
             return tile.VisibleRivers != null && tile.VisibleRivers.Count != 0;
         }
     }
