@@ -56,8 +56,6 @@ namespace PrepareLanding
                 "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
             _gameData.UserData.Options.AllowLiveFiltering = allowLiveFiltering;
 
-            //TODO: allow unimplemented biomes
-
             var allowImpassableHilliness = _gameData.UserData.Options.AllowImpassableHilliness;
             ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref allowImpassableHilliness,
                 "Allow selection and filtering of impassable tiles.");
@@ -67,6 +65,11 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref disablePreFilterCheck,
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
             _gameData.UserData.Options.DisablePreFilterCheck = disablePreFilterCheck;
+
+            var viewPartialOffNoSelect = _gameData.UserData.Options.ViewPartialOffNoSelect;
+            ListingStandard.CheckboxLabeled("View PartialOffNoSelect", ref viewPartialOffNoSelect,
+                "Allow to view the PartialOffNoSelect on the GUI for grouped three state items.");
+            _gameData.UserData.Options.ViewPartialOffNoSelect = viewPartialOffNoSelect;
 
             var resetAllFieldsOnNewGeneratedWorld = _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld;
             ListingStandard.CheckboxLabeled("Reset all filters on new world", ref resetAllFieldsOnNewGeneratedWorld,
