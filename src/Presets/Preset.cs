@@ -105,6 +105,7 @@ namespace PrepareLanding.Presets
             LoadBoolean(xOptions, "AllowLiveFiltering", b => _gameData.UserData.Options.AllowLiveFiltering = b);
             LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => _gameData.UserData.Options.BypassMaxHighlightedTiles = b);
             LoadBoolean(xOptions, "DisablePreFilterCheck", b => _gameData.UserData.Options.DisablePreFilterCheck = b);
+            LoadBoolean(xOptions, "ViewPartialOffNoSelect", b => _gameData.UserData.Options.ViewPartialOffNoSelect = b);
             LoadBoolean(xOptions, "ResetAllFieldsOnNewGeneratedWorld", b => _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld = b);
             LoadBoolean(xOptions, "DisableTileHighlighting", b => _gameData.UserData.Options.DisableTileHighlighting = b);
             LoadBoolean(xOptions, "DisableTileBlinking", b => _gameData.UserData.Options.DisableTileBlinking = b);
@@ -196,6 +197,7 @@ namespace PrepareLanding.Presets
                     SaveBoolean(xOption, "AllowLiveFiltering", _gameData.UserData.Options.AllowLiveFiltering);
                     SaveBoolean(xOption, "BypassMaxHighlightedTiles", _gameData.UserData.Options.BypassMaxHighlightedTiles);
                     SaveBoolean(xOption, "DisablePreFilterCheck", _gameData.UserData.Options.DisablePreFilterCheck);
+                    SaveBoolean(xOption, "ViewPartialOffNoSelect", _gameData.UserData.Options.ViewPartialOffNoSelect);
                     SaveBoolean(xOption, "ResetAllFieldsOnNewGeneratedWorld", _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld);
                     SaveBoolean(xOption, "DisableTileHighlighting", _gameData.UserData.Options.DisableTileHighlighting);
                     SaveBoolean(xOption, "DisableTileBlinking", _gameData.UserData.Options.DisableTileBlinking);
@@ -344,6 +346,9 @@ namespace PrepareLanding.Presets
                 return;
             }
 
+            container.FilterBooleanState = LoadEnum<FilterBoolean>(xFoundElement, "FilterBooleanState");
+            LoadBoolean(xFoundElement, "OffPartialNoSelect", b => container.OffPartialNoSelect = b);
+
             foreach (var xSubElement in xFoundElement.Elements())
             {
                 if (xSubElement.Name != subElementName)
@@ -372,6 +377,10 @@ namespace PrepareLanding.Presets
             var xFoundElement = xParent.Element(elementName);
             if (xFoundElement == null)
                 return;
+
+            container.FilterBooleanState = LoadEnum<FilterBoolean>(xFoundElement, "FilterBooleanState");
+            LoadBoolean(xFoundElement, "OffPartialNoSelect", b => container.OffPartialNoSelect = b);
+            LoadBoolean(xFoundElement, "OrderedFiltering", b => container.OrderedFiltering = b);
 
             var orderedList = new List<T>();
             foreach (var xElement in xFoundElement.Elements(entryName))
@@ -596,11 +605,14 @@ namespace PrepareLanding.Presets
 
             var xContainerElement = new XElement(containerName);
             xRoot.Add(xContainerElement);
+            xContainerElement.Add(new XElement("FilterBooleanState", container.FilterBooleanState));
+            xContainerElement.Add(new XElement("OffPartialNoSelect", container.OffPartialNoSelect));
+
             foreach (var entry in container)
             {
                 var xEntry = new XElement(entryName);
                 xEntry.Add(new XElement(DefNameNode, entry.Key.defName));
-                xEntry.Add(new XElement(StateNode, entry.Value.State.ToString()));
+                xEntry.Add(new XElement(StateNode, entry.Value.State));
                 xContainerElement.Add(xEntry);
             }
         }
@@ -613,6 +625,11 @@ namespace PrepareLanding.Presets
 
             var xContainerElement = new XElement(containerName);
             xRoot.Add(xContainerElement);
+
+            xContainerElement.Add(new XElement("FilterBooleanState", container.FilterBooleanState));
+            xContainerElement.Add(new XElement("OffPartialNoSelect", container.OffPartialNoSelect));
+            xContainerElement.Add(new XElement("OrderedFiltering", container.OrderedFiltering));
+
             foreach (var def in container.OrderedItems)
             {
                 ThreeStateItem threeStateItem;
