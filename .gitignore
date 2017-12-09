@@ -169,6 +169,12 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 
+# VS2017
+*.ide-wal
+*.ide-shm
+*.ide
+db.lock
+
 # =========================
 # Windows detritus
 # =========================

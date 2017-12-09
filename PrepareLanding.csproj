@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Core\ColorUtils.cs" />
+    <Compile Include="src\Core\Extensions\FilterBooleanExtensions.cs" />
     <Compile Include="src\Core\Extensions\ListExtensions.cs" />
     <Compile Include="src\Core\Extensions\ListingStandardExtension.cs" />
     <Compile Include="src\Core\Extensions\MathExtensions.cs" />

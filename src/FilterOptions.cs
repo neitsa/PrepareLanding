@@ -8,6 +8,7 @@ namespace PrepareLanding
         private bool _allowImpassableHilliness;
         private bool _allowInvalidTilesForNewSettlement;
         private bool _allowLiveFiltering;
+        private bool _viewPartialNoSelect;
         private bool _bypassMaxHighlightedTiles;
         private bool _disablePreFilterCheck;
         private bool _resetAllFieldsOnNewGeneratedWorld;
@@ -98,6 +99,22 @@ namespace PrepareLanding
 
                 _disablePreFilterCheck = value;
                 OnPropertyChanged(nameof(DisablePreFilterCheck));
+            }
+        }
+
+        /// <summary>
+        ///     Allow to view the button (for <see cref="ThreeStateItemContainer{T}"/>) for PartialOffNoSelect state.
+        /// </summary>
+        public bool ViewPartialOffNoSelect
+        {
+            get => _viewPartialNoSelect;
+            set
+            {
+                if (value == _viewPartialNoSelect)
+                    return;
+
+                _viewPartialNoSelect = value;
+                OnPropertyChanged(nameof(ViewPartialOffNoSelect));
             }
         }
 

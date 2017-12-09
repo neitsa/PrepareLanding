@@ -198,11 +198,12 @@ namespace PrepareLanding
              * Coastal rotation
              */
             var filterCoastalRotation = _gameData.UserData.CoastalRotation.Use;
-            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation);
+            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation,
+                "Allow to search for coastal tiles which have a coast facing a specific direction.");
             _gameData.UserData.CoastalRotation.Use = filterCoastalRotation;
 
             // "Select" button
-            if (ListingStandard.ButtonText("Select Rotation"))
+            if (ListingStandard.ButtonText("Select Coast Rotation"))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
 
@@ -237,7 +238,7 @@ namespace PrepareLanding
             var rightLabel = _gameData.UserData.CoastalRotation.Use /*&& _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid*/
                 ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
                 : "None";
-            ListingStandard.LabelDouble("Coast Rotation:", rightLabel);
+            ListingStandard.LabelDouble("Selected Coast Rotation:", rightLabel);
         }
 
         protected void DrawElevationSelection()
@@ -300,7 +301,10 @@ namespace PrepareLanding
             /*
              * Buttons
              */
-            const int numButtons = 3;
+            var numButtons = 4;
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+                numButtons += 1;
+
             var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
             if (buttonsRect.Count != numButtons)
             {
@@ -308,25 +312,38 @@ namespace PrepareLanding
                 return;
             }
 
-            // Reset button: reset all entries to Partial state
+            // Reset button: reset the container
             if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
-                foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.Partial;
+                selectedRiverDefs.Reset(riverDefs, nameof(_gameData.UserData.SelectedRiverDefs));
 
             // All rivers
             if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
-                foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.On;
+                selectedRiverDefs.All();
 
             // No rivers
             if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
-                foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.Off;
+                selectedRiverDefs.None();
+
+            // boolean filtering type
+            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nPress to cycle through options.");
+            if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRiverDefs.FilterBooleanState.ToStringHuman()))
+            {
+                selectedRiverDefs.FilterBooleanState = selectedRiverDefs.FilterBooleanState.Next();
+            }
+
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+            {
+                TooltipHandler.TipRegion(buttonsRect[4],
+                    "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
+                if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRiverDefs.OffPartialNoSelect}"))
+                {
+                    selectedRiverDefs.OffPartialNoSelect = !selectedRiverDefs.OffPartialNoSelect;
+                }
+            }
 
             /*
              * ScrollView
              */
-
             var inLs = ListingStandard.BeginScrollView(4*DefaultElementHeight,
                 selectedRiverDefs.Count*DefaultElementHeight, ref _scrollPosRiverSelection, DefaultScrollableViewShrinkWidth);
 
@@ -369,7 +386,10 @@ namespace PrepareLanding
             /*
              * Buttons
              */
-            const int numButtons = 3;
+            var numButtons = 4;
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+                numButtons += 1;
+
             var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
             if (buttonsRect.Count != numButtons)
             {
@@ -377,25 +397,38 @@ namespace PrepareLanding
                 return;
             }
 
-            // Reset button: reset all entries to Partial state
+            // Reset button: reset the container
             if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
-                foreach (var roadDefEntry in selectedRoadDefs)
-                    roadDefEntry.Value.State = MultiCheckboxState.Partial;
+                selectedRoadDefs.Reset(roadDefs, nameof(_gameData.UserData.SelectedRoadDefs));
 
             // all roads
             if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
-                foreach (var roadDefEntry in selectedRoadDefs)
-                    roadDefEntry.Value.State = MultiCheckboxState.On;
+                selectedRoadDefs.All();
 
             // no roads
             if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
-                foreach (var roadDefEntry in selectedRoadDefs)
-                    roadDefEntry.Value.State = MultiCheckboxState.Off;
+                selectedRoadDefs.None();
+
+            // boolean filtering type
+            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nPress to cycle through options.");
+            if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRoadDefs.FilterBooleanState.ToStringHuman()))
+            {
+                selectedRoadDefs.FilterBooleanState = selectedRoadDefs.FilterBooleanState.Next();
+            }
+
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+            {
+                TooltipHandler.TipRegion(buttonsRect[4],
+                    "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
+                if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRoadDefs.OffPartialNoSelect}"))
+                {
+                    selectedRoadDefs.OffPartialNoSelect = !selectedRoadDefs.OffPartialNoSelect;
+                }
+            }
 
             /*
              * ScrollView
              */
-
             var scrollViewHeight = selectedRoadDefs.Count*DefaultElementHeight;
             var inLs = ListingStandard.BeginScrollView(5 * DefaultElementHeight, scrollViewHeight,
                 ref _scrollPosRoadSelection, DefaultScrollableViewShrinkWidth);
@@ -449,8 +482,7 @@ namespace PrepareLanding
             // Reset button: reset all entries to Partial state
             if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset All"))
             {
-                foreach (var stoneDefEntry in selectedStoneDefs)
-                    stoneDefEntry.Value.State = stoneDefEntry.Value.DefaultState;
+                selectedStoneDefs.Reset(_gameData.DefData.StoneDefs, nameof(_gameData.UserData.SelectedStoneDefs));
 
                 _gameData.UserData.StoneTypesNumberOnly = false;
             }
@@ -464,7 +496,7 @@ namespace PrepareLanding
             }
 
             // re-orderable list group
-                var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
+            var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
             {
                 //TODO find a way to raise an event to tell an observer that the list order has changed
                 selectedStoneDefs.ReorderElements(from, to);
@@ -484,9 +516,7 @@ namespace PrepareLanding
 
                 foreach (var currentOrderedStoneDef in selectedStoneDefs.OrderedItems)
                 {
-                    ThreeStateItem threeStateItem;
-
-                    if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out threeStateItem))
+                    if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out var threeStateItem))
                     {
                         Log.Message("A stoneDef wasn't found in selectedStoneDefs");
                         continue;
