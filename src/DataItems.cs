@@ -84,6 +84,7 @@ namespace PrepareLanding
 
         public ThreeStateItemContainer()
         {
+            OffPartialNoSelect = true;
         }
 
         public ThreeStateItemContainer(IEnumerable<T> initCollection, string propertyChangedName = null, MultiCheckboxState defaultSate = MultiCheckboxState.Partial) 
@@ -103,7 +104,7 @@ namespace PrepareLanding
         ///     in the dictionary is changed, this fire an event related to the dictionary name and not the contained values.
         /// </param>
         /// <param name="defaultSate">The default state of the <see cref="ThreeStateItem" />.</param>
-        public virtual void SetContainer(IEnumerable<T> initCollection, string propertyChangedName = null,
+        public virtual void SetContainer(IEnumerable<T> initCollection, string propertyChangedName,
             MultiCheckboxState defaultSate = MultiCheckboxState.Partial)
         {
             ItemDictionary.Clear();
@@ -122,6 +123,43 @@ namespace PrepareLanding
                 }
                 ItemDictionary.Add(elementDef, item);
             }
+
+            FilterBooleanState = FilterBoolean.OrFiltering;
+            OffPartialNoSelect = true;
+        }
+
+        /// <summary>
+        ///     Initialize a container from an enumerable of RimWorld definitions (<see cref="Def" />)
+        ///     The propertyChangedName makes it so that if a <see cref="ThreeStateItem" /> item changed an event is fired for the
+        ///     whole dictionary rather than the contained item.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the list parameter. <b>T</b> should be a RimWorld <see cref="Def" />.</typeparam>
+        /// <param name="initCollection">A collection of <see cref="Def" /> (each entry will be used as a dictionary key).</param>
+        /// <param name="propertyChangedName">
+        ///     The bound property name (the name of the dictionary in this class). Each time a value
+        ///     in the dictionary is changed, this fire an event related to the dictionary name and not the contained values.
+        /// </param>
+        public virtual void Reset(IEnumerable<T> initCollection, string propertyChangedName)
+        {
+            SetContainer(initCollection, propertyChangedName);
+        }
+
+        /// <summary>
+        ///     Set all <see cref="ThreeStateItem" /> items to On state.
+        /// </summary>
+        public void All()
+        {
+            foreach (var kvp in ItemDictionary)
+                kvp.Value.State = MultiCheckboxState.On;
+        }
+
+        /// <summary>
+        ///     Set all <see cref="ThreeStateItem" /> items to Off state.
+        /// </summary>
+        public void None()
+        {
+            foreach (var kvp in ItemDictionary)
+                kvp.Value.State = MultiCheckboxState.Off;
         }
 
         public ThreeStateItem this[T key]
@@ -137,13 +175,21 @@ namespace PrepareLanding
 
         public FilterBoolean FilterBooleanState { get; set; }
 
+        public bool OffPartialNoSelect { get; set; }
+
         public Dictionary<T, ThreeStateItem>.ValueCollection Values => ItemDictionary.Values;
 
         public int Count => ItemDictionary.Count;
 
-        public bool IsInDefaultState()
+        /// <summary>
+        ///     Tells if the container is in its default state (where all fields have their default value).
+        /// </summary>
+        /// <returns>true if the container is in its default state, false otherwise.</returns>
+        public virtual bool IsInDefaultState()
         {
-            return ItemDictionary.All(def => def.Value.State == MultiCheckboxState.Partial);
+            return ItemDictionary.All(def => def.Value.State == MultiCheckboxState.Partial)
+                && FilterBooleanState == FilterBoolean.OrFiltering 
+                && OffPartialNoSelect;
         }
 
         #region INotifyPropertyChanged
@@ -191,6 +237,8 @@ namespace PrepareLanding
 
             // order by name at first
             _orderedItems.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
+
+            OrderedFiltering = true;
         }
 
         public ReadOnlyCollection<T> OrderedItems => _orderedItems.AsReadOnly();
@@ -199,6 +247,11 @@ namespace PrepareLanding
         ///     Tells whether the filtering should be order dependent (if true) or not (if false).
         /// </summary>
         public bool OrderedFiltering { get; set; } = true;
+
+        public override bool IsInDefaultState()
+        {
+            return base.IsInDefaultState() && OrderedFiltering;
+        }
 
         public void SetNewOrder(List<T> otherList)
         {
