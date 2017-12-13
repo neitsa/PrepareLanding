@@ -64,11 +64,9 @@ namespace PrepareLanding.Filters
                              select entry.Key).ToList();
 
             // get a list of Defs that may or may not be present
-            /*
             var selectedDefPartial = (from entry in container
                                   where entry.Value.State == MultiCheckboxState.Partial
                                   select entry.Key).ToList();
-             */
 
             // foreach each tile in the input list
             foreach (var tileId in inputList)
@@ -82,25 +80,36 @@ namespace PrepareLanding.Filters
 
                 if (tileHasDefs)
                 {
-                    // we have more "absolutely wanted" defs than there are in the tile, so we already know it doesn't match
+                    // if we have more "absolutely wanted" (ON) defs than there are defs in the tile, then we know it can't match
                     if (selectedDefOn.Count > tileDefs.Count)
                         continue;
 
-                    // when we intersect the "absolutely wanted" and the "On" list they should have the same count
-                    //if (selectedDefOn.Intersect(tileDefs).Count() != selectedDefOn.Count)
-                    if (!selectedDefOn.ContainsAll(tileDefs))
-                        continue;
-
-                    // No Def in the tile should be in the 'Off' selected state
+                    // No Def contained in the tile should be in the 'Off' selected state
                     if (selectedDefOff.Intersect(tileDefs).Any())
                         continue;
 
-                    // passed all checks, add it
+                    // all the selected On defs must be in the tile
+                    if (!tileDefs.ContainsAll(selectedDefOn))
+                        continue;
+
+                    // tile might contains defs that are in partial state
+                    if (selectedDefPartial.Count > 0 && selectedDefOn.Count > 0)
+                    {
+                        if (!tileDefs.ContainsAll(selectedDefOn))
+                        {
+                            var doNotAddTile = Enumerable.Any(selectedDefPartial,
+                                currentDefPartial => !tileDefs.Contains(currentDefPartial));
+                            if (doNotAddTile)
+                                continue;
+                        }
+                    }
+
+                    // add the tile
                     _filteredTiles.Add(tileId);
                 }
                 else // tile has no road
                 {
-                    // if any Def is in 'On' selected state, then it's not matching
+                    // if any Def is in 'On' selected state, then it can't match
                     if (selectedDefOn.Count > 0)
                         continue;
 
