@@ -187,19 +187,12 @@ namespace PrepareLanding
 
             ListingStandard.Gap(6f);
 
-            // coastal tiles (lake)
-            rect = ListingStandard.GetRect(DefaultElementHeight);
-            tmpCheckState = _gameData.UserData.ChosenCoastalLakeTileState;
-            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (lake):", ref tmpCheckState);
-
-            _gameData.UserData.ChosenCoastalLakeTileState = tmpCheckState;
-
             /*
              * Coastal rotation
              */
             var filterCoastalRotation = _gameData.UserData.CoastalRotation.Use;
             ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation,
-                "Allow to search for coastal tiles which have a coast facing a specific direction.");
+                "Allow to search for coastal sea tiles which have a coast facing a specific direction.");
             _gameData.UserData.CoastalRotation.Use = filterCoastalRotation;
 
             // "Select" button
@@ -211,19 +204,23 @@ namespace PrepareLanding
                 foreach (var currentRotation in TileFilterCoastRotation.PossibleRotations)
                 {
                     // clicking on the floating menu saves the selected rotation
-                    Action actionClick = delegate { _gameData.UserData.CoastalRotation.Selected = currentRotation.AsInt; };
+                    void ActionClick()
+                    {
+                        _gameData.UserData.CoastalRotation.Selected = currentRotation.AsInt;
+                    }
+
                     // tool-tip when hovering above the rotation name on the floating menu
-                    Action mouseOverAction = delegate
+                    void MouseOverAction()
                     {
                         var mousePos = Event.current.mousePosition;
                         rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
 
                         TooltipHandler.TipRegion(rect, ("HasCoast" + currentRotation).Translate());
-                    };
+                    }
 
                     //create the floating menu
-                    var menuOption = new FloatMenuOption(currentRotation.ToStringHuman(), actionClick, MenuOptionPriority.Default,
-                        mouseOverAction);
+                    var menuOption = new FloatMenuOption(currentRotation.ToStringHuman(), ActionClick, MenuOptionPriority.Default,
+                        MouseOverAction);
                     // add it to the list of floating menu options
                     floatMenuOptions.Add(menuOption);
                 }
@@ -239,6 +236,20 @@ namespace PrepareLanding
                 ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
                 : "None";
             ListingStandard.LabelDouble("Selected Coast Rotation:", rightLabel);
+
+            /*
+             * coastal tiles (lake)
+             */
+
+            ListingStandard.Gap(6f);
+
+            
+            rect = ListingStandard.GetRect(DefaultElementHeight);
+            TooltipHandler.TipRegion(rect, "A lake is a most 15 tiles of water surrounded by land.");
+            tmpCheckState = _gameData.UserData.ChosenCoastalLakeTileState;
+            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (lake):", ref tmpCheckState);
+
+            _gameData.UserData.ChosenCoastalLakeTileState = tmpCheckState;
         }
 
         protected void DrawElevationSelection()
