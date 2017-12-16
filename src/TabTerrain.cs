@@ -105,7 +105,7 @@ namespace PrepareLanding
             elementsList.Insert(newIndex, item);
         }
 
-        protected virtual void DrawBiomeTypesSelection()
+        private void DrawBiomeTypesSelection()
         {
             DrawEntryHeader("Biome Types", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
@@ -174,7 +174,7 @@ namespace PrepareLanding
             }
         }
 
-        protected virtual void DrawCoastalSelection()
+        private void DrawCoastalSelection()
         {
             DrawEntryHeader("Coastal Tiles", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
 
@@ -252,7 +252,7 @@ namespace PrepareLanding
             _gameData.UserData.ChosenCoastalLakeTileState = tmpCheckState;
         }
 
-        protected void DrawElevationSelection()
+        private void DrawElevationSelection()
         {
             DrawEntryHeader("Elevation (meters)", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
 
@@ -292,7 +292,7 @@ namespace PrepareLanding
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
-        protected void DrawMovementTime()
+        private void DrawMovementTime()
         {
             DrawEntryHeader("Movement Times (hours)", false,
                 backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
@@ -302,7 +302,7 @@ namespace PrepareLanding
             DrawUsableMinMaxNumericField(_gameData.UserData.WinterMovementTime, "Winter Movement Time");
         }
 
-        protected virtual void DrawRiverTypesSelection()
+        private void DrawRiverTypesSelection()
         {
             DrawEntryHeader("River Types", backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
 
@@ -387,7 +387,7 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        protected virtual void DrawRoadTypesSelection()
+        private void DrawRoadTypesSelection()
         {
             DrawEntryHeader("Road Types", backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
 
@@ -473,7 +473,7 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        protected virtual void DrawStoneTypesSelection()
+        private void DrawStoneTypesSelection()
         {
             DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
@@ -579,7 +579,7 @@ namespace PrepareLanding
             TooltipHandler.TipRegion(leftRect, tooltipText);
         }
 
-        protected virtual void DrawTimeZoneSelection()
+        private void DrawTimeZoneSelection()
         {
             DrawEntryHeader("Time Zone [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
 
