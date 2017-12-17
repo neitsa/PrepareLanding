@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
@@ -91,7 +92,7 @@ namespace PrepareLanding
             End();
         }
 
-        protected void DrawFilteredTiles()
+        private void DrawFilteredTiles()
         {
             DrawEntryHeader("Filtered Tiles", backgroundColor: Color.yellow);
 
@@ -204,7 +205,7 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(innerLs);
         }
 
-        protected void DrawSelectedTileInfo()
+        private void DrawSelectedTileInfo()
         {
             DrawEntryHeader("Selected Tile Info", backgroundColor: Color.yellow);
 
@@ -263,11 +264,22 @@ namespace PrepareLanding
             ListingStandard.LabelDouble("Rainfall".Translate(), selTile.rainfall.ToString("F0") + "mm");
             ListingStandard.LabelDouble("AnimalsCanGrazeNow".Translate(), (!VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt(selTileId)) ? "No".Translate() : "Yes".Translate());
             ListingStandard.GapLine();
+            ListingStandard.LabelDouble("AverageDiseaseFrequency".Translate(),
+                $"{(60f / selTile.biome.diseaseMtbDays):F1} {"PerYear".Translate()}");
             ListingStandard.LabelDouble("TimeZone".Translate(), GenDate.TimeZoneAt(Find.WorldGrid.LongLatOf(selTileId).x).ToStringWithSign());
+            var stringBuilder = new StringBuilder();
             var rot = Find.World.CoastDirectionAt(selTileId);
             if (rot.IsValid)
             {
-                ListingStandard.LabelDouble(string.Empty, ("HasCoast" + rot).Translate());
+                stringBuilder.AppendWithComma(("HasCoast" + rot.ToString()).Translate());
+            }
+            if (Find.World.HasCaves(selTileId))
+            {
+                stringBuilder.AppendWithComma("HasCaves".Translate());
+            }
+            if (stringBuilder.Length > 0)
+            {
+                ListingStandard.LabelDouble("SpecialFeatures".Translate(), stringBuilder.ToString().CapitalizeFirst());
             }
             if (Prefs.DevMode)
             {
