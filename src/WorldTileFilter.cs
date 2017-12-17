@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
 using PrepareLanding.GameData;
 using RimWorld;
@@ -43,7 +42,7 @@ namespace PrepareLanding
             _userData.Options.PropertyChanged += OnOptionPropertyChanged;
 
             // be alerted when the world map is generated or loaded.
-            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += PrefilterQueueLongEvent;
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += OnNewWorldGeneratedOrLoaded;
 
             // instantiate all existing filters
             _allFilters = new Dictionary<string, ITileFilter>
@@ -296,8 +295,7 @@ namespace PrepareLanding
             // clear all previous matching tiles and remove all previously highlighted tiles on the world map
             ClearMatchingTiles();
 
-            var separator = "-".Repeat(80);
-            FilterInfoLogger.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
+            FilterInfoLogger.AppendTitleMessage("New Filtering", textColor: Color.yellow);
 
             var globalFilterStopWatch = new Stopwatch();
             var localFilterStopWatch = new Stopwatch();
@@ -411,8 +409,7 @@ namespace PrepareLanding
         {
             Log.Message($"[PrepareLanding] Prefilter: {Find.WorldGrid.tiles.Count} tiles in WorldGrid.tiles");
 
-            var separator = "-".Repeat(80);
-            FilterInfoLogger.AppendMessage($"{separator}\nPreFiltering\n{separator}", textColor: Color.cyan);
+            FilterInfoLogger.AppendTitleMessage("PreFiltering", textColor: Color.cyan);
 
             ClearMatchingTiles();
 
@@ -448,6 +445,19 @@ namespace PrepareLanding
             FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
 
             OnPrefilterDone?.Invoke();
+        }
+
+        /// <summary>
+        ///     Called when the world map has been generated.
+        /// </summary>
+        private void OnNewWorldGeneratedOrLoaded()
+        {
+            // clear logger
+            FilterInfoLogger.Clear();
+            FilterInfoLogger.AppendTitleMessage("New World", textColor: Color.blue);
+
+            // tiles pre-filtering
+            PrefilterQueueLongEvent();
         }
 
         /// <summary>

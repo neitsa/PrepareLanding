@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text;
 using JetBrains.Annotations;
+using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using RimWorld;
 using UnityEngine;
@@ -56,6 +57,12 @@ namespace PrepareLanding
                 text = RichText.Color(text, (Color) textColor);
 
             AppendLine(text);
+        }
+
+        public void AppendTitleMessage(string text, bool sendToLog = false, Color? textColor = null)
+        {
+            var separator = "-".Repeat(80);
+            AppendMessage($"{separator}\n{text}\n{separator}", sendToLog, textColor);
         }
 
         public void AppendSuccessMessage(string text, bool sendToLog = false)
