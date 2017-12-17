@@ -45,7 +45,7 @@ namespace PrepareLanding
         /// <summary>
         ///     The name of the tab (that is actually displayed at its top).
         /// </summary>
-        public override string Name => "Temperature";
+        public override string Name => "Terrain II & Temp.";
 
         /// <summary>
         ///     Draw the actual content of this window.
@@ -54,16 +54,16 @@ namespace PrepareLanding
         public override void Draw(Rect inRect)
         {
             Begin(inRect);
+            DrawMostLeastCharacteristicSelection();
+            DrawCaveSelection();
+            DrawFeatureSelection();
+            NewColumn(true);
             DrawTemperaturesSelection();
             DrawGrowingPeriodSelection();
             NewColumn();
             DrawRainfallSelection();
-            DrawMostLeastCharacteristicSelection();
             DrawAnimalsCanGrazeNowSelection();
-            DrawCaveSelection();
-            NewColumn();
             DrawTemperatureForecast();
-            DrawFeatureSelection();
             End();
         }
 
@@ -81,14 +81,15 @@ namespace PrepareLanding
                 // add a dummy 'Any' fake feature type. This sets the chosen feature to null.
                 Action actionClick = delegate { _gameData.UserData.WorldFeature = null; };
                 // tool-tip when hovering above the 'Any' feature name on the floating menu
-                Action mouseOverAction = delegate
+                void MouseOverAction()
                 {
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
 
                     TooltipHandler.TipRegion(rect, "Any Feature");
-                };
-                var menuOption = new FloatMenuOption("Any", actionClick, MenuOptionPriority.Default, mouseOverAction);
+                }
+
+                var menuOption = new FloatMenuOption("Any", actionClick, MenuOptionPriority.Default, MouseOverAction);
                 floatMenuOptions.Add(menuOption);
 
                 // loop through all known feature
@@ -101,7 +102,7 @@ namespace PrepareLanding
                             currentFeature.def.rootBiomes.Contains(BiomeDefOf.Lake))
                             continue;
                     }
-                    // TODO: handle other water bodies, you'll to parse the def name as there are no other ways
+                    // TODO: handle other water bodies, you'll need to parse the def name as there are no other ways
                     // see \Mods\Core\Defs\Misc\FeatureDefs\Features.xml
                     // or another solution would be to patch the definition (e.g. OuterOcean) to have a root biome as "Ocean" (or lake or whatever water body).
                     //if(currentFeature.def.defName contains "Ocean")

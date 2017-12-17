@@ -16,6 +16,8 @@ namespace PrepareLanding
 {
     public class MainWindow : MinimizableWindow
     {
+        private const float SpaceForBottomButtons = 55f;
+
         private const float GapBetweenButtons = 10f;
 
         private const int MaxDisplayedTileWhenMinimized = 30;
@@ -277,7 +279,7 @@ namespace PrepareLanding
         {
             var numButtons = _bottomButtonsDescriptorList.Count;
 
-            var buttonsY = windowRect.height - 55f;
+            var buttonsY = windowRect.height - SpaceForBottomButtons;
 
             var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
                 _bottomButtonSize.y, GapBetweenButtons);

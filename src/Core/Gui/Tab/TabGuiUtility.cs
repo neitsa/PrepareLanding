@@ -1,4 +1,5 @@
 ﻿using System;
+using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
 using UnityEngine;
 using Verse;
@@ -18,12 +19,12 @@ namespace PrepareLanding.Core.Gui.Tab
         private static ColorInt _menuSectionBgFillColor = new ColorInt(42, 43, 44);
         public static Color MenuSectionBgFillColor = _menuSectionBgFillColor.ToColor;
 
-        protected float ColumnSizePercent;
+        private readonly float _columnSizePercent;
 
         protected TabGuiUtility(float columnSizePercent)
         {
             if (!(Math.Abs(columnSizePercent) < float.Epsilon) && !(columnSizePercent >= 1.0f))
-                ColumnSizePercent = columnSizePercent;
+                _columnSizePercent = columnSizePercent;
 
             ListingStandard = new Listing_Standard();
         }
@@ -37,36 +38,45 @@ namespace PrepareLanding.Core.Gui.Tab
         public TabRecord TabRecord { get; set; }
 
         public Listing_Standard ListingStandard { get; protected set; }
+
         public Rect InRect { get; protected set; }
 
         public abstract void Draw(Rect inRect);
 
-        public void Begin(Rect inRect)
+        protected void Begin(Rect inRect)
         {
             InRect = inRect;
 
             // set up column size
-            ListingStandard.ColumnWidth = inRect.width * ColumnSizePercent;
+            ListingStandard.ColumnWidth = inRect.width * _columnSizePercent;
 
             // begin Rect position
             ListingStandard.Begin(InRect);
         }
 
-        public void End()
+        protected void End()
         {
             ListingStandard.End();
         }
 
-        public void NewColumn()
+        protected void NewColumn(bool drawVerticalSeparator=false)
         {
             ListingStandard.NewColumn();
+            if (!drawVerticalSeparator)
+                return;
+
+            // draw vertical separator
+            var rect = ListingStandard.VirtualRect(InRect.height - DefaultElementHeight - 5f);
+            rect.x -= Listing.ColumnSpacing / 2f;
+            rect.width = 1f;
+            GUI.DrawTexture(rect, BaseContent.WhiteTex);
         }
 
         protected void DrawEntryHeader(string entryLabel, bool useStartingGap = true,
             bool useFollowingGap = false, Color? backgroundColor = null, float colorAlpha = 0.2f)
         {
             if (useStartingGap)
-                ListingStandard.Gap(DefaultGapHeight);
+                ListingStandard.Gap();
 
             var textHeight = Text.CalcHeight(entryLabel, ListingStandard.ColumnWidth);
             var r = ListingStandard.GetRect(0f);
@@ -83,7 +93,7 @@ namespace PrepareLanding.Core.Gui.Tab
             ListingStandard.GapLine(DefaultGapLineHeight);
 
             if (useFollowingGap)
-                ListingStandard.Gap(DefaultGapHeight);
+                ListingStandard.Gap();
         }
 
         protected void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label,
@@ -91,7 +101,7 @@ namespace PrepareLanding.Core.Gui.Tab
         {
             var tmpCheckedOn = numericItem.Use;
 
-            ListingStandard.Gap(DefaultGapHeight);
+            ListingStandard.Gap();
             ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"Use Min/Max {label}");
             numericItem.Use = tmpCheckedOn;
 
@@ -110,7 +120,7 @@ namespace PrepareLanding.Core.Gui.Tab
             numericItem.MaxString = maxValueString;
         }
 
-        public static Color ColorFromFilterSubjectThingDef(string filterName)
+        protected static Color ColorFromFilterSubjectThingDef(string filterName)
         {
             if (!PrepareLanding.Instance.GameData.UserData.Options.ShowFilterHeaviness)
                 return MenuSectionBgFillColor;
