@@ -36,7 +36,7 @@ namespace PrepareLanding.Coordinates
             _coordinatesString = coordinates;
 
             _regexObj = new Regex(
-                @"(?<latitude>\d{1,3}[\.,]\d{2})°*(?<latitude_direction>[NSns])(?:\s+|\s*,\s*)(?<longitude>\d{1,3}[\.,]\d{2})°*(?<longitude_direction>[EWew])");
+                @"(?<latitude>\d{1,3}[\.,]\d{2})°*(?<latitude_direction>[NSns])(?:\s+|\s*[,-]\s*)(?<longitude>\d{1,3}[\.,]\d{2})°*(?<longitude_direction>[EWew])");
 
             _coordsType = CoordinatesType.CoordString;
         }
