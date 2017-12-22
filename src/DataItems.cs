@@ -38,7 +38,7 @@ namespace PrepareLanding
         /// </summary>
         public MultiCheckboxState State
         {
-            get { return _state; }
+            get => _state;
             set
             {
                 if (value == _state)
@@ -164,8 +164,8 @@ namespace PrepareLanding
 
         public ThreeStateItem this[T key]
         {
-            get { return ItemDictionary[key]; }
-            set { ItemDictionary[key] = value; }
+            get => ItemDictionary[key];
+            set => ItemDictionary[key] = value;
         }
 
         public bool TryGetValue(T def, out ThreeStateItem item)
@@ -312,7 +312,7 @@ namespace PrepareLanding
 
         public T Max
         {
-            get { return _max; }
+            get => _max;
             set
             {
                 if (EqualityComparer<T>.Default.Equals(_max, value))
@@ -325,7 +325,7 @@ namespace PrepareLanding
 
         public string MaxString
         {
-            get { return _maxString; }
+            get => _maxString;
             set
             {
                 if (value == _maxString)
@@ -340,7 +340,7 @@ namespace PrepareLanding
 
         public T Min
         {
-            get { return _min; }
+            get => _min;
             set
             {
                 if (EqualityComparer<T>.Default.Equals(_min, value))
@@ -353,7 +353,7 @@ namespace PrepareLanding
 
         public string MinString
         {
-            get { return _minString; }
+            get => _minString;
             set
             {
                 if (value == _minString)
@@ -368,7 +368,7 @@ namespace PrepareLanding
 
         public bool Use
         {
-            get { return _use; }
+            get => _use;
             set
             {
                 if (value == _use)
@@ -418,7 +418,7 @@ namespace PrepareLanding
 
         public T Max
         {
-            get { return _max; }
+            get => _max;
             set
             {
                 if (EqualityComparer<T>.Default.Equals(_max, value))
@@ -434,7 +434,7 @@ namespace PrepareLanding
 
         public T Min
         {
-            get { return _min; }
+            get => _min;
             set
             {
                 if (EqualityComparer<T>.Default.Equals(_min, value))
@@ -452,7 +452,7 @@ namespace PrepareLanding
 
         public bool Use
         {
-            get { return _use; }
+            get => _use;
             set
             {
                 if (value == _use)
@@ -495,7 +495,7 @@ namespace PrepareLanding
 
         public MostLeastCharacteristic Characteristic
         {
-            get { return _characteristic; }
+            get => _characteristic;
             set
             {
                 if (value == _characteristic)
@@ -508,7 +508,7 @@ namespace PrepareLanding
 
         public MostLeastType CharacteristicType
         {
-            get { return _characteristicType; }
+            get => _characteristicType;
             set
             {
                 if (value == _characteristicType)
@@ -523,7 +523,7 @@ namespace PrepareLanding
 
         public int NumberOfItems
         {
-            get { return _numberOfItems; }
+            get => _numberOfItems;
             set
             {
                 if (value == _numberOfItems)
@@ -569,7 +569,7 @@ namespace PrepareLanding
 
         public bool Use
         {
-            get { return _use; }
+            get => _use;
             set
             {
                 if (value == _use)
@@ -582,7 +582,7 @@ namespace PrepareLanding
 
         public T Selected
         {
-            get { return _selected; }
+            get => _selected;
             set
             {
                 if (!_use)

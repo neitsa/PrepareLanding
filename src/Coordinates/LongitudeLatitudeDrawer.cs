@@ -5,8 +5,8 @@ namespace PrepareLanding.Coordinates
 {
     public class LongitudeLatitudeDrawer
     {
-        public float ThetaScale = 0.01f;
-        public float radius = 110f;
+        public const float ThetaScale = 0.01f;
+        public const float Radius = 110f;
         private int _size;
         private readonly LineRenderer _lineRenderer;
         private float _theta = 0f;
@@ -39,8 +39,8 @@ namespace PrepareLanding.Coordinates
             for (var i = 0; i < _size; i++)
             {
                 _theta += (2.0f * Mathf.PI * ThetaScale);
-                var x = radius * Mathf.Cos(_theta);
-                var y = radius * Mathf.Sin(_theta);
+                var x = Radius * Mathf.Cos(_theta);
+                var y = Radius * Mathf.Sin(_theta);
                 _lineRenderer.SetPosition(i, new Vector3(x, y, 0));
             }
         }

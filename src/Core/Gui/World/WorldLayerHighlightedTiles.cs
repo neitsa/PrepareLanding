@@ -44,7 +44,7 @@ namespace PrepareLanding.Core.Gui.World
         /// </summary>
         public Color TileColor
         {
-            get { return _materialColor; }
+            get => _materialColor;
             set
             {
                 _materialColor = value;

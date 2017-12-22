@@ -355,7 +355,7 @@ namespace PrepareLanding
                 Messages.Message("Pick a preset first.", MessageTypeDefOf.NegativeEvent);
         }
 
-        protected void DrawLoadPresetList(Rect inRect)
+        private void DrawLoadPresetList(Rect inRect)
         {
             DrawEntryHeader("Preset Files: Load mode", backgroundColor: Color.green);
 

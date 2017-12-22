@@ -88,8 +88,7 @@ namespace PrepareLanding.Presets
             try
             {
                 // reload the preset if it was already in the cache
-                Preset preset;
-                if (_presetCache.TryGetValue(presetName, out preset))
+                if (_presetCache.TryGetValue(presetName, out var preset))
                 {
                     preset.LoadPreset();
 
@@ -375,8 +374,7 @@ namespace PrepareLanding.Presets
             if (string.IsNullOrEmpty(presetName))
                 return null;
 
-            Preset presetValue;
-            _presetCache.TryGetValue(presetName, out presetValue);
+            _presetCache.TryGetValue(presetName, out var presetValue);
             return presetValue;
         }
 

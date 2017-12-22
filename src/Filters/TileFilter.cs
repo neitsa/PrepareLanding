@@ -12,7 +12,7 @@ namespace PrepareLanding.Filters
     {
         protected List<int> _filteredTiles = new List<int>();
 
-        protected UserData UserData;
+        protected readonly UserData UserData;
 
         protected TileFilter(UserData userData, string attachedProperty, FilterHeaviness heaviness)
         {

@@ -115,7 +115,7 @@ namespace PrepareLanding.GameData
 
         public bool AllowDrawOverlay
         {
-            get { return _allowDrawOverlay; }
+            get => _allowDrawOverlay;
             set
             {
                 if (value == _allowDrawOverlay)

@@ -67,7 +67,7 @@ namespace PrepareLanding
 #endif
         }
 
-        protected virtual void DrawBiomeTypesSelection() // TODO : factorize this function with the one from TabTerrain
+        private void DrawBiomeTypesSelection() // TODO : factorize this function with the one from TabTerrain
         {
             DrawEntryHeader("Biome Types", backgroundColor: ColorLibrary.BurntOrange);
 

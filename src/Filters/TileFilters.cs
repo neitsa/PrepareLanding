@@ -119,7 +119,6 @@ namespace PrepareLanding.Filters
                 case FilterBoolean.OrFiltering:
                     FilterOr(inputList, UserData.SelectedRoadDefs, UserData.SelectedRoadDefs.OffPartialNoSelect);
                     break;
-                case FilterBoolean.Undefined:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -328,7 +327,6 @@ namespace PrepareLanding.Filters
                 case FilterBoolean.OrFiltering:
                     FilterOr(inputList, UserData.SelectedRiverDefs, UserData.SelectedRiverDefs.OffPartialNoSelect);
                     break;
-                case FilterBoolean.Undefined:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -416,9 +414,7 @@ namespace PrepareLanding.Filters
             var ticks = Mathf.Min(GenDate.TicksPerHour + WorldPathGrid.CalculatedCostAt(tileId, false, yearPct),
                 Caravan_PathFollower.MaxMoveTicks);
 
-            int years, quadrums, days;
-            float hours;
-            ticks.TicksToPeriod(out years, out quadrums, out days, out hours);
+            ticks.TicksToPeriod(out var years, out var quadrums, out var days, out var hours);
 
             // combine everything into hours; note that we shouldn't get anything other than 'hours' and 'days'. Technically, a tile is should be passable in less than 48 hours.
             var totalHours = hours + days * GenDate.HoursPerDay +

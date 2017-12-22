@@ -25,8 +25,8 @@ namespace PrepareLanding
 
         public bool Enabled
         {
-            get { return enabled; }
-            set { enabled = value; }
+            get => enabled;
+            set => enabled = value;
         }
 
 

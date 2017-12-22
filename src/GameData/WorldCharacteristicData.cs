@@ -15,7 +15,7 @@ namespace PrepareLanding.GameData
         public const int DefaultNumberOfColorSamples = 100;
         private readonly Gradient _colorGradient;
 
-        protected readonly Material _defaultMaterial = WorldMaterials.SelectedTile;
+        protected readonly Material DefaultMaterial = WorldMaterials.SelectedTile;
 
         public readonly Dictionary<BiomeDef, List<Color>> ColorSamplesByBiomes =
             new Dictionary<BiomeDef, List<Color>>();
@@ -48,13 +48,8 @@ namespace PrepareLanding.GameData
 
         public Texture2D CharacteristicGradientTexture
         {
-            get
-            {
-                if (_characteristicGradientTexture == null)
-                    _characteristicGradientTexture = ColorUtils.CreateGradientTexture(_colorGradient);
-
-                return _characteristicGradientTexture;
-            }
+            get => _characteristicGradientTexture ??
+                   (_characteristicGradientTexture = ColorUtils.CreateGradientTexture(_colorGradient));
 
             private set
             {
