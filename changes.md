@@ -17,7 +17,7 @@ This version has more changes than I thought I would implement...
     - Caves
     - Named locations
     - Coastal rotations
-    
+
 * Reworked Road / Rivers filters to follow Boolean logic.
 
 * Stones can be filtered in order or not.
@@ -34,37 +34,37 @@ This version has more changes than I thought I would implement...
 
 * Add a filter for coastal rotation [issue #25]
     - It is now possible to filter coastal tiles that have their coast facing a certain direction
-    - e.g. Filter all tiles that have a northern coast, etc.    
+    - e.g. Filter all tiles that have a northern coast, etc.
     - It's in the Terrain Tab, below the already existing coastal filters.
-    
+
 * Completely reworked the filtering for 3 states items (ON / OFF / Partial)
     - Roads and Rivers: complete Boolean filtering (AND & OR)
         - new button on the GUI to choose between the two
     - Stones
-        - Finally added a "no order" filtering, hooray!
-    - These new filters can now be saved and loaded in presets.        
-   
+        - Finally, added a "no order" filtering, hooray!
+    - These new filters can now be saved and loaded in presets.
+
 * Add a new "Coordinates Window" (still rough implementation)
     - Allows to go to a tile by its ID or coordinates.
-    - Add buttons with main point of interests (North Pole, South Pole, etc.)    
+    - Add buttons with the main point of interests (North Pole, South Pole, etc.)
 
 ## Minor Changes
 
 * Each filter header is now colored (default to magenta)
 
 * Remove all the code that was implemented to bypass a bug in Rimworld vanilla (bug was fixed in B18) [issue #22]
-    - [bug details](https://ludeon.com/forums/index.php?topic=34054.msg347150#msg347150)  
+    - [bug details](https://ludeon.com/forums/index.php?topic=34054.msg347150#msg347150)
 
 * Info Tab
     - Add the "Average Disease Frequency" information for each biome in the Info Tab [issue #19]
-    - Rework the world information display on the Info Tab 
+    - Rework the world information display on the Info Tab
         - new "World records" with the lowest / highest characteristics (temperature, rainfall, elevation)
 
 * Add a way to list and delete presets [issue #23]
     - The delete button is in the "Load" tab, visible when you load a preset.
     - Pick a preset in the left list and press delete twice to remove it.
 
-* Fix a bug where "Animal Can Graze" filter could not be saved or loaded properly [issue #24]  
+* Fix a bug where "Animal Can Graze" filter could not be saved or loaded properly [issue #24]
 
 * (Privacy) Redact the name of the current user from the log file [issue #26]
     - The preset folder location is written in the log as a debug purpose.
@@ -79,24 +79,23 @@ This version has more changes than I thought I would implement...
 
 * Rename "Temperature" Tab to "Terrain II & Temp."
 
-* Clear the filter logger when a new world is generated 
-    - Add a new message "New World Generated"
-    
-* Updated filtered tile description (in "Filtered Tiles" tab) to be in synch. with B18. 
-    
-## Internals Changes
+* Clear the filter logger when a new world is generated
+    - Add a new message, "New World Generated"
+
+* Updated filtered tile description (in "Filtered Tiles" tab) to be in synch. with B18.
+
+## Internal Changes
 
 * Upgrade automatic builder to VS 2017 \o/
 * Add a new internal container for three state items
-    - easier to manage from a code POV.
+    - Easier to manage from a code POV.
 * Reworked completely the Harmony Patch for displaying the main PrepareLanding button.
     - 2 times less code!
     - It now allows other mods to patch the same function.
-* Major Code cleanup 
-
-
+* Major Code cleanup
 
 ***
+
 
 # Version 0.6.0
 **Released November 18, 2017**
@@ -108,7 +107,7 @@ What's New?
 ===========
 
 * Fixed code for Beta 18 support.
-* Added a new filter: 
+* Added a new filter:
     - "Coastal Tile (Lake)" in terrain tab (see. "Coastal Tiles")
         - A Lake is at most 18 tiles surrounded by land. More than that is considered a sea / ocean.
     - The previous behavior is now "Coastal Tile (sea)".
@@ -128,10 +127,12 @@ TODO for next release (v0.6.1 or v0.7)
 
 * Better Beta 18 support:
     - Add filter: average disease frequency
-    - Add filter for tiles with special feature (e.g. Caves)
+    - Add filter for tiles with special features (e.g. Caves)
     - Add possibility to filter only tiles in a named location on the world map
-	
+
+
 ***
+
 
 # Version 0.5.1
 **Released September 16, 2017**
@@ -156,17 +157,19 @@ Fixed Issues
 * bug when loading a save and going directly to the world
     - The problem was related to events that didn't tell the mod that the world was generated.
     - Fixed by changing the internal event that handle properly the world generation.
-    
+
 * Rare bug condition when loading a new world:
     1. Generate a new world and filter some tiles
-    2. Go back to main menu and load a save
+    2. Go back to the main menu and load a save
     3. From the save, go to the world and filter some tiles
     4. Exit from the save to the main menu
     5. Generate a new world
     6. PrepareLanding didn't see that the world has changed and kept references to tiles from the previous world
     * --> Reworked completely the way rimworld events (e.g. World loaded or World Generated) are handled in the mod.
 
+
 ***
+
 
 # Version 0.5.0
 **Released September 02, 2017**
@@ -221,8 +224,10 @@ Future Plans
     - 6 feature planned on 8 have been implemented (see God Mode)
 * Add world map overlays for various features (temperature, rainfall, etc.) [issue #12]
     - Code & data are there but it is too slow at the moment to be released.
-	
+
+
 ***
+
 
 # General
 
@@ -261,6 +266,7 @@ Future Plans
 
 ***
 
+
 # General
 
 # Version 0.4.2
@@ -284,7 +290,9 @@ Fixed Issues
 * Fix a NRE while in play state and the main window is shown: the number of buttons to show was miscalculated.
 * Catch a possible (rare) error condition while copying template presets to user folder: If the mod was removed, some preset files were changed and finally the mod re-installed, this error could arise, rendering the mod useless as this error was triggered
 
+
 ***
+
 
 # General
 
@@ -317,6 +325,7 @@ Fixed Issues
 
 ***
 
+
 # General
 
 # Version 0.3.1
@@ -341,7 +350,9 @@ Internal
 
 * Made the options class inherits from INotifyPropertyChanged.
 
+
 ***
+
 
 # General
 
@@ -363,7 +374,9 @@ Fixed Issues
 
 * First public release, so no fixed issues (but they were a lot of them before :p)
 
+
 ***
+
 
 # General
 
@@ -385,7 +398,9 @@ Fixed Issues
 
 * Still in the making, so a lot of bugs were fixed & the code was rapidly moving...
 
+
 ***
+
 
 # General
 
