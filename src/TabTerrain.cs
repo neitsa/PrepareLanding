@@ -72,39 +72,6 @@ namespace PrepareLanding
             End();
         }
 
-        /// <summary>
-        /// Re-order elements in a list.
-        /// </summary>
-        /// <typeparam name="T">type of elements in the list.</typeparam>
-        /// <param name="index">The old index of the element to move.</param>
-        /// <param name="newIndex">The new index of the element to move.</param>
-        /// <param name="elementsList">The list of elements.</param>
-        public static void ReorderElements<T>(int index, int newIndex, IList<T> elementsList)
-        {
-            if ((index == newIndex) || (index < 0))
-            {
-                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}");
-                return;
-            }
-
-            if (elementsList.Count == 0)
-            {
-                Log.Message("[PrepareLanding] ReorderElements: elementsList count is 0.");
-                return;
-            }
-
-            if ((index >= elementsList.Count) || (newIndex >= elementsList.Count))
-            {
-                Log.Message(
-                    $"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}; elemntsList.Count: {elementsList.Count}");
-                return;
-            }
-
-            var item = elementsList[index];
-            elementsList.RemoveAt(index);
-            elementsList.Insert(newIndex, item);
-        }
-
         private void DrawBiomeTypesSelection()
         {
             DrawEntryHeader("Biome Types", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
