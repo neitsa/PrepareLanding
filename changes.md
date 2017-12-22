@@ -1,5 +1,103 @@
 ***
 
+# Version 0.7.0
+**Released December 22, 2017**
+**`RimWorld Version: Beta 18`**
+
+# General
+
+What's New?
+===========
+
+This version has more changes than I thought I would implement...
+
+## TL;DR
+
+* New filters:
+    - Caves
+    - Named locations
+    - Coastal rotations
+    
+* Reworked Road / Rivers filters to follow Boolean logic.
+
+* Stones can be filtered in order or not.
+
+* Add a new "coordinates" window.
+
+## Major Changes
+
+* Add a filter for tiles with caves [issue #20]
+    - It's in the "Terrain 2 & Temp". tab.
+
+* Add a filter for filtering tiles that are in a specific named location (aka World Features) [issue #21]
+    - It's in the "Terrain 2 & Temp". tab.
+
+* Add a filter for coastal rotation [issue #25]
+    - It is now possible to filter coastal tiles that have their coast facing a certain direction
+    - e.g. Filter all tiles that have a northern coast, etc.    
+    - It's in the Terrain Tab, below the already existing coastal filters.
+    
+* Completely reworked the filtering for 3 states items (ON / OFF / Partial)
+    - Roads and Rivers: complete Boolean filtering (AND & OR)
+        - new button on the GUI to choose between the two
+    - Stones
+        - Finally added a "no order" filtering, hooray!
+    - These new filters can now be saved and loaded in presets.        
+   
+* Add a new "Coordinates Window" (still rough implementation)
+    - Allows to go to a tile by its ID or coordinates.
+    - Add buttons with main point of interests (North Pole, South Pole, etc.)    
+
+## Minor Changes
+
+* Each filter header is now colored (default to magenta)
+
+* Remove all the code that was implemented to bypass a bug in Rimworld vanilla (bug was fixed in B18) [issue #22]
+    - [bug details](https://ludeon.com/forums/index.php?topic=34054.msg347150#msg347150)  
+
+* Info Tab
+    - Add the "Average Disease Frequency" information for each biome in the Info Tab [issue #19]
+    - Rework the world information display on the Info Tab 
+        - new "World records" with the lowest / highest characteristics (temperature, rainfall, elevation)
+
+* Add a way to list and delete presets [issue #23]
+    - The delete button is in the "Load" tab, visible when you load a preset.
+    - Pick a preset in the left list and press delete twice to remove it.
+
+* Fix a bug where "Animal Can Graze" filter could not be saved or loaded properly [issue #24]  
+
+* (Privacy) Redact the name of the current user from the log file [issue #26]
+    - The preset folder location is written in the log as a debug purpose.
+    - This folder is, most of the time,  in a sub-dir of the user directory: thus user name would be written to the log...
+    - e.g. `C:\Users\neitsa\AppData\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\PrepareLanding`
+    - Is now logged as: `C:\Users\<redacted>\AppData\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\PrepareLanding`
+
+* Remove a warning from RimWorld: "mesh already finalized." [issue #27]
+    - RimWorld thinks that the highlighted tiles mesh (used to display highlighted tile on the world map) is already finalized.
+    - This makes RimWorld display a warning in the log.
+    - This warning was not present until B18: fixed by telling RimWorld that the mesh was not yet finalized when created.
+
+* Rename "Temperature" Tab to "Terrain II & Temp."
+
+* Clear the filter logger when a new world is generated 
+    - Add a new message "New World Generated"
+    
+* Updated filtered tile description (in "Filtered Tiles" tab) to be in synch. with B18. 
+    
+## Internals Changes
+
+* Upgrade automatic builder to VS 2017 \o/
+* Add a new internal container for three state items
+    - easier to manage from a code POV.
+* Reworked completely the Harmony Patch for displaying the main PrepareLanding button.
+    - 2 times less code!
+    - It now allows other mods to patch the same function.
+* Major Code cleanup 
+
+
+
+***
+
 # Version 0.6.0
 **Released November 18, 2017**
 **`RimWorld Version: Beta 18`**
@@ -34,8 +132,6 @@ TODO for next release (v0.6.1 or v0.7)
     - Add possibility to filter only tiles in a named location on the world map
 	
 ***
-
-
 
 # Version 0.5.1
 **Released September 16, 2017**
