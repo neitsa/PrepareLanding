@@ -192,6 +192,16 @@ namespace PrepareLanding
                 && OffPartialNoSelect;
         }
 
+        public bool IsAllOn()
+        {
+            return ItemDictionary.All(def => def.Value.State == MultiCheckboxState.On);
+        }
+
+        public bool IsAllOff()
+        {
+            return ItemDictionary.All(def => def.Value.State == MultiCheckboxState.Off);
+        }
+
         #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
