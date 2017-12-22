@@ -214,9 +214,7 @@ namespace PrepareLanding
             var buttonSaveLoadPreset = new ButtonDescriptor("Load / Save", "Load or Save Filter Presets");
             buttonSaveLoadPreset.AddFloatMenuOption("Save", delegate
                 {
-                    //_userData.PresetManager.TestSave();
-                    var tab = TabController.TabById("LoadSave") as TabLoadSave;
-                    if (tab == null)
+                    if (!(TabController.TabById("LoadSave") is TabLoadSave tab))
                         return;
 
                     tab.LoadSaveMode = LoadSaveMode.Save;
@@ -231,9 +229,7 @@ namespace PrepareLanding
             );
             buttonSaveLoadPreset.AddFloatMenuOption("Load", delegate
                 {
-                    //_userData.PresetManager.TestLoad();
-                    var tab = TabController.TabById("LoadSave") as TabLoadSave;
-                    if (tab == null)
+                    if (!(TabController.TabById("LoadSave") is TabLoadSave tab))
                         return;
 
                     tab.LoadSaveMode = LoadSaveMode.Load;

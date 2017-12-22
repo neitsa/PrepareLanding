@@ -39,7 +39,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public MultiCheckboxState ChosenAnimalsCanGrazeNowState
         {
-            get { return _chosenAnimalsCanGrazeNowState; }
+            get => _chosenAnimalsCanGrazeNowState;
             set
             {
                 if (value == _chosenAnimalsCanGrazeNowState)
@@ -55,7 +55,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public MultiCheckboxState HasCaveState
         {
-            get { return _hasCaveState; }
+            get => _hasCaveState;
             set
             {
                 if (value == _hasCaveState)
@@ -71,7 +71,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public BiomeDef ChosenBiome
         {
-            get { return _chosenBiome; }
+            get => _chosenBiome;
             set
             {
                 if (value == _chosenBiome)
@@ -87,7 +87,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public MultiCheckboxState ChosenCoastalTileState
         {
-            get { return _chosenCoastalTileState; }
+            get => _chosenCoastalTileState;
             set
             {
                 if (value == _chosenCoastalTileState)
@@ -103,7 +103,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public MultiCheckboxState ChosenCoastalLakeTileState
         {
-            get { return _coastalLakeTileState; }
+            get => _coastalLakeTileState;
             set
             {
                 if (value == _coastalLakeTileState)
@@ -119,7 +119,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public Hilliness ChosenHilliness
         {
-            get { return _chosenHilliness; }
+            get => _chosenHilliness;
             set
             {
                 if (value == _chosenHilliness)
@@ -175,7 +175,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public int StoneTypesNumber
         {
-            get { return _stoneTypesNumber; }
+            get => _stoneTypesNumber;
             set
             {
                 if (value == _stoneTypesNumber)
@@ -191,7 +191,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public bool StoneTypesNumberOnly
         {
-            get { return _stoneTypesNumberOnly; }
+            get => _stoneTypesNumberOnly;
             set
             {
                 if (value == _stoneTypesNumberOnly)
@@ -207,7 +207,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public WorldFeature WorldFeature
         {
-            get { return _worldFeature; }
+            get => _worldFeature;
             set
             {
                 if (value == _worldFeature)
@@ -395,7 +395,7 @@ namespace PrepareLanding.GameData
         ///     Called when a new world map is generated: reset all fields (user choices on  the GUI window) to their default
         ///     state.
         /// </summary>
-        protected void ExecuteOnWorldGeneratedOrLoaded()
+        private void ExecuteOnWorldGeneratedOrLoaded()
         {
             if (Options.ResetAllFieldsOnNewGeneratedWorld || !_firstResetDone)
             {
@@ -410,7 +410,7 @@ namespace PrepareLanding.GameData
         /// <typeparam name="T">The type used by the <see cref="UsableMinMaxNumericItem{T}" />.</typeparam>
         /// <param name="numericItem">An instance of <see cref="UsableMinMaxNumericItem{T}" /> to be initialized.</param>
         /// <param name="propertyChangedName">The property name bound to the <see cref="UsableMinMaxNumericItem{T}" />.</param>
-        protected void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
+        private void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
             string propertyChangedName) where T : struct, IComparable, IConvertible
         {
             numericItem.Use = false;
@@ -430,7 +430,7 @@ namespace PrepareLanding.GameData
         /// <summary>
         ///     Called when an option changed.
         /// </summary>
-        protected void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
+        private void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
         {
             // reset the chosen Hilliness if the option changed
             if (eventArgs.PropertyName == nameof(Options.AllowImpassableHilliness))

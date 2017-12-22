@@ -119,7 +119,7 @@ namespace PrepareLanding
             End();
         }
 
-        protected virtual void DrawFilterInfo()
+        private void DrawFilterInfo()
         {
             DrawEntryHeader("Filter Info", backgroundColor: Color.yellow);
 
@@ -138,7 +138,7 @@ namespace PrepareLanding
                 16f);
         }
 
-        protected virtual void DrawWorldInfo()
+        private void DrawWorldInfo()
         {
             DrawEntryHeader("World Info", backgroundColor: Color.yellow);
 
@@ -151,7 +151,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Called when a new world map has been generated.
         /// </summary>
-        protected void RebuildWorldInfo()
+        private void RebuildWorldInfo()
         {
             _worldInfo = BuildWorldInfo();
         }

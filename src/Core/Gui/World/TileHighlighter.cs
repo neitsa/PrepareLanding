@@ -109,7 +109,7 @@ namespace PrepareLanding.Core.Gui.World
         /// </summary>
         public Color TileHighlightingColor
         {
-            get { return _materialHighlightingColor; }
+            get => _materialHighlightingColor;
             set
             {
                 _materialHighlightingColor = value;

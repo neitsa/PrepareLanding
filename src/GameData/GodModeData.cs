@@ -45,7 +45,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public float AverageTemperature
         {
-            get { return _averageTemperature; }
+            get => _averageTemperature;
             set
             {
                 if (Math.Abs(value - _averageTemperature) < FloatEpsilon)
@@ -61,7 +61,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public BiomeDef Biome
         {
-            get { return _biome; }
+            get => _biome;
             set
             {
                 if (value == _biome)
@@ -77,7 +77,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public float Elevation
         {
-            get { return _elevation; }
+            get => _elevation;
             set
             {
                 if (Math.Abs(value - _elevation) < FloatEpsilon)
@@ -98,7 +98,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public Hilliness Hilliness
         {
-            get { return _hilliness; }
+            get => _hilliness;
             set
             {
                 if (value == _hilliness)
@@ -116,7 +116,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public float Rainfall
         {
-            get { return _rainfall; }
+            get => _rainfall;
             set
             {
                 if (Math.Abs(value - _rainfall) < FloatEpsilon)
@@ -138,7 +138,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public int SelectedTileId
         {
-            get { return _selectedTileId; }
+            get => _selectedTileId;
             set
             {
                 if (value == _selectedTileId)

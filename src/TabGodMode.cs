@@ -150,7 +150,7 @@ namespace PrepareLanding
                 "[Warning: this redraws the map entirely; use it only when you have finished *all* your modifications.]");
         }
 
-        protected virtual void DrawTemperatureInfo()
+        private void DrawTemperatureInfo()
         {
             DrawEntryHeader("Temperature Info", backgroundColor: Color.yellow);
 
@@ -164,7 +164,7 @@ namespace PrepareLanding
             }
         }
 
-        protected virtual void DrawBiomeTypesSelection() // TODO : factorize this function with the one from TabTerrain
+        private void DrawBiomeTypesSelection() // TODO : factorize this function with the one from TabTerrain
         {
             DrawEntryHeader("Biome Types", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -233,7 +233,7 @@ namespace PrepareLanding
             }
         }
 
-        protected void DrawTemperatureSelection()
+        private void DrawTemperatureSelection()
         {
             DrawEntryHeader("Temperature", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -250,7 +250,7 @@ namespace PrepareLanding
             _gameData.GodModeData.AverageTemperature = averageTemperature;
         }
 
-        protected void DrawRainfallSelection()
+        private void DrawRainfallSelection()
         {
             DrawEntryHeader("Rainfall", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -269,7 +269,7 @@ namespace PrepareLanding
             _gameData.GodModeData.Rainfall = rainFall;
         }
 
-        protected void DrawElevationSelection()
+        private void DrawElevationSelection()
         {
             DrawEntryHeader("Elevation", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -289,7 +289,7 @@ namespace PrepareLanding
             _gameData.GodModeData.Elevation = elevation;
         }
 
-        protected virtual void DrawHillinessTypeSelection()
+        private void DrawHillinessTypeSelection()
         {
             DrawEntryHeader("Terrain Types", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -319,7 +319,7 @@ namespace PrepareLanding
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
-        protected virtual void DrawRoadTypesSelection()
+        private void DrawRoadTypesSelection()
         {
             DrawEntryHeader("Road Types", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -370,7 +370,7 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        protected virtual void DrawRiverTypesSelection()
+        private void DrawRiverTypesSelection()
         {
             DrawEntryHeader("River Types", backgroundColor: ColorLibrary.RoyalPurple);
 
@@ -421,7 +421,7 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        protected virtual void DrawStoneTypesSelection()
+        private void DrawStoneTypesSelection()
         {
             DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 

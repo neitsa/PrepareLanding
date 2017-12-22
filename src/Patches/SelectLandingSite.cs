@@ -138,7 +138,7 @@ namespace PrepareLanding.Patches
                     DoNext();
                 }
             }
-            num6 += BottomButSize.x + 10f;
+            //num6 += BottomButSize.x + 10f;
             GenUI.AbsorbClicksInRect(rect);
         }
     }

@@ -228,7 +228,7 @@ namespace PrepareLanding
             DrawUsableMinMaxNumericField(_gameData.UserData.Elevation, "Elevation", -500f, 5000f);
         }
 
-        protected virtual void DrawHillinessTypeSelection()
+        private void DrawHillinessTypeSelection()
         {
             DrawEntryHeader($"{"Terrain".Translate()} Types",
                 backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
@@ -328,8 +328,7 @@ namespace PrepareLanding
             // display river elements
             foreach (var riverDef in riverDefs)
             {
-                ThreeStateItem threeStateItem;
-                if (!selectedRiverDefs.TryGetValue(riverDef, out threeStateItem))
+                if (!selectedRiverDefs.TryGetValue(riverDef, out var threeStateItem))
                 {
                     Log.Error(
                         $"[PrepareLanding] [DrawRiverTypesSelection] an item in riverDefs is not in selectedRiverDefs: {riverDef.LabelCap}");
@@ -414,8 +413,7 @@ namespace PrepareLanding
             // display road elements
             foreach (var roadDef in roadDefs)
             {
-                ThreeStateItem threeStateItem;
-                if (!selectedRoadDefs.TryGetValue(roadDef, out threeStateItem))
+                if (!selectedRoadDefs.TryGetValue(roadDef, out var threeStateItem))
                 {
                     Log.Error(
                         $"[PrepareLanding] [DrawRoadTypesSelection] an item in RoadDefs is not in SelectedRoadDefs: {roadDef.LabelCap}");

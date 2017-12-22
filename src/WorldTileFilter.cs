@@ -228,7 +228,6 @@ namespace PrepareLanding
             {
                 var minRange = Math.Min(_matchingTileIds.Count, 100);
 
-                int tileId;
                 if ((from _ in Enumerable.Range(0, minRange) select _matchingTileIds[random.Next(_matchingTileIds.Count)]).TryRandomElementByWeight(delegate(int x)
                 {
                     var tile = Find.WorldGrid[x];
@@ -244,7 +243,7 @@ namespace PrepareLanding
                         return 0f;
 
                     return tile.biome.factionBaseSelectionWeight;
-                }, out tileId))
+                }, out var tileId))
                 {
                     if (TileFinder.IsValidTileForNewSettlement(tileId))
                         return tileId;
@@ -271,8 +270,7 @@ namespace PrepareLanding
                     _filterHeavinessCache.Add(filter.SubjectThingDef, filter.Heaviness);
             }
 
-            FilterHeaviness filterHeaviness;
-            return _filterHeavinessCache.TryGetValue(subjectThingDef, out filterHeaviness)
+            return _filterHeavinessCache.TryGetValue(subjectThingDef, out var filterHeaviness)
                 ? filterHeaviness
                 : FilterHeaviness.Unknown;
         }
@@ -583,17 +581,6 @@ namespace PrepareLanding
         #endregion PRIVATE_FIELDS
 
         #region PREDICATES
-
-        /// <summary>
-        ///     Negate an existing predicate.
-        /// </summary>
-        /// <typeparam name="T">Type used by the predicate.</typeparam>
-        /// <param name="predicate">The predicate to be negated.</param>
-        /// <returns>Returns a <see cref="bool" /> that is the negated value of the predicate.</returns>
-        public static Predicate<T> NegatePredicate<T>(Predicate<T> predicate)
-        {
-            return x => !predicate(x);
-        }
 
         /// <summary>
         ///     Check if a <see cref="ThingDef" /> describes a stone / rock type.

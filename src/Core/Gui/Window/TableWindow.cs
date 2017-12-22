@@ -313,7 +313,7 @@ namespace PrepareLanding.Core.Gui.Window
             bool useFollowingGap = false, Color? backgroundColor = null, float colorAlpha = 0.2f)
         {
             if (useStartingGap)
-                ListingStandard.Gap(12f);
+                ListingStandard.Gap();
 
             var textHeight = Text.CalcHeight(entryLabel, ListingStandard.ColumnWidth);
             var r = ListingStandard.GetRect(0f);

@@ -61,8 +61,7 @@ namespace PrepareLanding.Presets
                 LoadBoolean(xTerrain, "StoneTypesNumberOnly", b => _gameData.UserData.StoneTypesNumberOnly = b);
                 if (_gameData.UserData.StoneTypesNumberOnly)
                 {
-                    int stoneTypesNumber;
-                    Load(xTerrain, "StoneTypesNumber", out stoneTypesNumber);
+                    Load(xTerrain, "StoneTypesNumber", out int stoneTypesNumber);
                     _gameData.UserData.StoneTypesNumber = stoneTypesNumber;
                 }
             }
@@ -127,8 +126,7 @@ namespace PrepareLanding.Presets
         {
             try
             {
-                XDocument xDocument;
-                var xRoot = GetTopElement(out xDocument, false);
+                var xRoot = GetTopElement(out var xDocument, false);
                 if (xRoot == null)
                     return;
 
@@ -362,8 +360,7 @@ namespace PrepareLanding.Presets
                 if (xState == null)
                     continue;
 
-                ThreeStateItem threeStateItem;
-                if (!container.TryGetValue(def, out threeStateItem))
+                if (!container.TryGetValue(def, out var threeStateItem))
                     continue;
 
                 var state = LoadEnum<MultiCheckboxState>(xSubElement, StateNode);
@@ -395,8 +392,7 @@ namespace PrepareLanding.Presets
 
                 orderedList.Add(def);
 
-                ThreeStateItem threeStateItem;
-                if (!container.TryGetValue(def, out threeStateItem))
+                if (!container.TryGetValue(def, out var threeStateItem))
                     goto EnsureAllEntriesPresent;
 
                 var state = LoadEnum<MultiCheckboxState>(xElement, StateNode);
@@ -424,8 +420,7 @@ namespace PrepareLanding.Presets
             if (xUse == null)
                 return;
 
-            bool use;
-            if (!Load(xFoundElement, UseNode, out use))
+            if (!Load(xFoundElement, UseNode, out bool use))
                 return;
 
             if (!use)
@@ -433,8 +428,7 @@ namespace PrepareLanding.Presets
 
             item.Use = true;
 
-            T value;
-            if (!Load(xFoundElement, MinNode, out value))
+            if (!Load(xFoundElement, MinNode, out T value))
                 return;
 
             item.Min = value;
@@ -476,8 +470,7 @@ namespace PrepareLanding.Presets
             if (xUse == null)
                 return;
 
-            bool use;
-            if (!Load(xFoundElement, UseNode, out use))
+            if (!Load(xFoundElement, UseNode, out bool use))
                 return;
 
             if (!use)
@@ -487,10 +480,8 @@ namespace PrepareLanding.Presets
 
             if (typeof(T).IsEnum)
             {
-                string value;
-
                 // min
-                if (!Load(xFoundElement, MinNode, out value))
+                if (!Load(xFoundElement, MinNode, out string value))
                     return;
 
                 if (string.IsNullOrEmpty(value))
@@ -513,8 +504,7 @@ namespace PrepareLanding.Presets
             }
             else
             {
-                T value;
-                if (!Load(xFoundElement, MinNode, out value))
+                if (!Load(xFoundElement, MinNode, out T value))
                     return;
                 item.Min = value;
 
@@ -533,8 +523,7 @@ namespace PrepareLanding.Presets
             var feature = LoadEnum<MostLeastCharacteristic>(xFoundElement, MostLeastItemFeatureNode);
             var featureType = LoadEnum<MostLeastType>(xFoundElement, MostLeastItemFeatureTypeNode);
 
-            int numItems;
-            if (!Load(xFoundElement, MostLeastItemNumberOfItemsNode, out numItems))
+            if (!Load(xFoundElement, MostLeastItemNumberOfItemsNode, out int numItems))
                 return;
 
             item.Characteristic = feature;
@@ -551,8 +540,7 @@ namespace PrepareLanding.Presets
             if (!LoadBoolean(xFoundElement, UseNode, b => item.Use = b))
                 return;
 
-            T result;
-            if (!Load(xFoundElement, SelectedNode, out result))
+            if (!Load(xFoundElement, SelectedNode, out T result))
                 return;
 
             item.Selected = result;
@@ -560,8 +548,7 @@ namespace PrepareLanding.Presets
 
         internal static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
         {
-            bool value;
-            if (!Load(xParent, entryName, out value))
+            if (!Load(xParent, entryName, out bool value))
                 return false;
 
             actionSet(value);
@@ -632,8 +619,7 @@ namespace PrepareLanding.Presets
 
             foreach (var def in container.OrderedItems)
             {
-                ThreeStateItem threeStateItem;
-                if (!container.TryGetValue(def, out threeStateItem))
+                if (!container.TryGetValue(def, out var threeStateItem))
                 {
                     // shouldn't happen, but just a defensive check
                     Log.Error($"[PrepareLanding] The def '{def.defName}' doesn't exit in the given dictionary.");
