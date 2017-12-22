@@ -178,8 +178,15 @@ namespace PrepareLanding.Filters
                                 break;
 
                             case MultiCheckboxState.Off:
-                                if (!offNoSelect)
+                                if (container.IsAllOff())
+                                {
                                     _filteredTiles.Add(tileId);
+                                }
+                                else
+                                {
+                                    if (!offNoSelect)
+                                        _filteredTiles.Add(tileId);
+                                }
                                 break;
 
                             case MultiCheckboxState.Partial:
