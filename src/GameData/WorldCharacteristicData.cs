@@ -10,12 +10,12 @@ using Verse;
 
 namespace PrepareLanding.GameData
 {
-    public abstract class WorldFeatureData
+    public abstract class WorldCharacteristicData
     {
         public const int DefaultNumberOfColorSamples = 100;
         private readonly Gradient _colorGradient;
 
-        protected readonly Material _defaultMaterial = WorldMaterials.SelectedTile;
+        protected readonly Material DefaultMaterial = WorldMaterials.SelectedTile;
 
         public readonly Dictionary<BiomeDef, List<Color>> ColorSamplesByBiomes =
             new Dictionary<BiomeDef, List<Color>>();
@@ -25,9 +25,9 @@ namespace PrepareLanding.GameData
         public readonly Dictionary<BiomeDef, List<Material>> MaterialSamplesByBiomes =
             new Dictionary<BiomeDef, List<Material>>();
 
-        private Texture2D _featureGradientTexture;
+        private Texture2D _characteristicGradientTexture;
 
-        protected WorldFeatureData(DefData defData)
+        protected WorldCharacteristicData(DefData defData)
         {
             DefData = defData;
 
@@ -41,125 +41,120 @@ namespace PrepareLanding.GameData
 
         public BiomeDef Biome { get; set; }
 
-        public abstract MostLeastFeature Feature { get; }
+        public abstract MostLeastCharacteristic Characteristic { get; }
 
-        public Dictionary<BiomeDef, Dictionary<int, float>> FeatureByBiomes { get; } =
+        public Dictionary<BiomeDef, Dictionary<int, float>> CharacteristicByBiomes { get; } =
             new Dictionary<BiomeDef, Dictionary<int, float>>();
 
-        public Texture2D FeatureGradientTexture
+        public Texture2D CharacteristicGradientTexture
         {
-            get
-            {
-                if (_featureGradientTexture == null)
-                    _featureGradientTexture = ColorUtils.CreateGradientTexture(_colorGradient);
-
-                return _featureGradientTexture;
-            }
+            get => _characteristicGradientTexture ??
+                   (_characteristicGradientTexture = ColorUtils.CreateGradientTexture(_colorGradient));
 
             private set
             {
-                if (_featureGradientTexture != null && value != _featureGradientTexture)
-                    _featureGradientTexture = value;
+                if (_characteristicGradientTexture != null && value != _characteristicGradientTexture)
+                    _characteristicGradientTexture = value;
             }
         }
 
-        public abstract string FeatureMeasureUnit { get; }
+        public abstract string CharacteristicMeasureUnit { get; }
 
-        public virtual string FeatureName => Feature.ToString();
+        public virtual string CharacteristicName => Characteristic.ToString();
 
-        public Dictionary<BiomeDef, List<float>> FeatureQuantaByBiomes { get; } =
+        public Dictionary<BiomeDef, List<float>> CharacteristicQuantaByBiomes { get; } =
             new Dictionary<BiomeDef, List<float>>();
 
         public List<Color> GradientColors { get; }
 
         /// <summary>
         ///     Whole world ordered list of <see cref="KeyValuePair{TKey,TValue}" /> where the key is a tile ID and the value is
-        ///     the feature value.
+        ///     the characteristic value.
         /// </summary>
-        public List<KeyValuePair<int, float>> WorldTilesFeatures { get; } = new List<KeyValuePair<int, float>>();
+        public List<KeyValuePair<int, float>> WorldTilesCharacteristics { get; } = new List<KeyValuePair<int, float>>();
 
-        protected abstract float TileFeatureValue(int tileId);
+        protected abstract float TileCharacteristicValue(int tileId);
 
         private void ExecuteOnWorldGeneratedOrLoaded()
         {
             // clear dictionaries and lists
-            FeatureByBiomes.Clear();
-            FeatureQuantaByBiomes.Clear();
+            CharacteristicByBiomes.Clear();
+            CharacteristicQuantaByBiomes.Clear();
             ColorSamplesByBiomes.Clear();
             MaterialSamplesByBiomes.Clear();
-            WorldTilesFeatures.Clear();
+            WorldTilesCharacteristics.Clear();
 
-            // and now fetch all feature related data
-            FetchAllFeatureData();
+            // and now fetch all characteristic related data
+            FetchAllCharacteristicData();
         }
 
-        public void FetchAllFeatureData()
+        public void FetchAllCharacteristicData()
         {
             foreach (var biomeDef in DefData.BiomeDefs)
             {
                 if (!PrepareLanding.Instance.GameData.WorldData.BiomeHasTiles(biomeDef))
                     continue;
 
-                FetchAllFeatureDataForBiome(biomeDef);
+                FetchAllCharacteristicDataForBiome(biomeDef);
 
-                var tilesAndFeatureValues = FeatureByBiomes[biomeDef];
-                WorldTilesFeatures.AddRange(tilesAndFeatureValues.ToList());
+                var tilesAndCharacteristicValues = CharacteristicByBiomes[biomeDef];
+                WorldTilesCharacteristics.AddRange(tilesAndCharacteristicValues.ToList());
             }
 
-            // sort world feature
-            WorldTilesFeatures.Sort((x, y) => x.Value.CompareTo(y.Value));
+            // sort world characteristic
+            WorldTilesCharacteristics.Sort((x, y) => x.Value.CompareTo(y.Value));
         }
 
-        public void FetchAllFeatureDataForBiome(BiomeDef biomeDef)
+        public void FetchAllCharacteristicDataForBiome(BiomeDef biomeDef)
         {
-            TilesFeatureByBiome(biomeDef);
-            QuantizeFeatureForBiome(biomeDef);
+            TilesCharacteristicByBiome(biomeDef);
+            QuantizeCharacteristicForBiome(biomeDef);
             GenerateColorSamples(biomeDef);
             // Can't do the following here on some occasions (i.e Load a save without going to the select landing page).
             // because this would load materials on another thread than the main thread.
             //GenerateMaterialByBiome(biomeDef); 
         }
 
-        public void TilesFeatureByBiome(BiomeDef biomeDef)
+        public void TilesCharacteristicByBiome(BiomeDef biomeDef)
         {
-            if (FeatureByBiomes.ContainsKey(biomeDef))
+            if (CharacteristicByBiomes.ContainsKey(biomeDef))
                 return;
 
             var tileIds = TileFilterBiomes.TileIdsByBiome(biomeDef);
 
-            var featureDict = new Dictionary<int, float>(tileIds.Count);
+            var characteristicDict = new Dictionary<int, float>(tileIds.Count);
             foreach (var tileId in tileIds)
             {
-                var value = TileFeatureValue(tileId);
-                featureDict.Add(tileId, value);
+                var value = TileCharacteristicValue(tileId);
+                characteristicDict.Add(tileId, value);
             }
 
-            FeatureByBiomes.Add(biomeDef, featureDict);
+            CharacteristicByBiomes.Add(biomeDef, characteristicDict);
         }
 
-        private void QuantizeFeatureForBiome(BiomeDef biome)
+        private void QuantizeCharacteristicForBiome(BiomeDef biome)
         {
-            if (FeatureQuantaByBiomes.ContainsKey(biome))
+            if (CharacteristicQuantaByBiomes.ContainsKey(biome))
                 return;
 
-            var maxQuanta = Mathf.Min(DefaultNumberOfColorSamples, FeatureByBiomes[biome].Count);
+            var maxQuanta = Mathf.Min(DefaultNumberOfColorSamples, CharacteristicByBiomes[biome].Count);
 
-            var biomeMinFeatureValue = MinFeatureByBiome(biome);
-            var biomeMaxFeatureValue = MaxFeatureByBiome(biome);
+            var biomeMinCharacteristicValue = MinCharacteristicByBiome(biome);
+            var biomeMaxCharacteristicValue = MaxCharacteristicByBiome(biome);
 
-            var deltaValue = biomeMaxFeatureValue - biomeMinFeatureValue;
-            var featureQuantum = deltaValue / maxQuanta;
+            var deltaValue = biomeMaxCharacteristicValue - biomeMinCharacteristicValue;
+            var characteristicQuantum = deltaValue / maxQuanta;
 
-            var tempQuantaFeatureList = new List<float>(maxQuanta);
+            var tempQuantaCharacteristicList = new List<float>(maxQuanta);
 
-            var currentFeatureQuanta = biomeMinFeatureValue;
+            var currentCharacteristicQuanta = biomeMinCharacteristicValue;
             for (var i = 0; i < maxQuanta; i++)
             {
-                currentFeatureQuanta += featureQuantum;
-                tempQuantaFeatureList.Add(currentFeatureQuanta);
+                currentCharacteristicQuanta += characteristicQuantum;
+                tempQuantaCharacteristicList.Add(currentCharacteristicQuanta);
             }
 
-            FeatureQuantaByBiomes.Add(biome, tempQuantaFeatureList);
+            CharacteristicQuantaByBiomes.Add(biome, tempQuantaCharacteristicList);
         }
 
         public void GenerateColorSamples(BiomeDef biomeDef)
@@ -167,7 +162,7 @@ namespace PrepareLanding.GameData
             if (ColorSamplesByBiomes.ContainsKey(biomeDef))
                 return;
 
-            var tileCount = FeatureByBiomes[biomeDef].Count;
+            var tileCount = CharacteristicByBiomes[biomeDef].Count;
 
             var maxSamples = Mathf.Min(tileCount, DefaultNumberOfColorSamples);
             var colorSamples = ColorUtils.CreateColorSamples(_colorGradient, maxSamples);
@@ -191,7 +186,7 @@ namespace PrepareLanding.GameData
             MaterialSamplesByBiomes[biome] = materialSamples;
         }
 
-        public Material MaterialFromTileFeature(BiomeDef biome, int tileId)
+        public Material MaterialFromTileCharacteristic(BiomeDef biome, int tileId)
         {
             var quantaIndex = FindQuantaIndex(biome, tileId);
             if (MaterialSamplesByBiomes.Count == 0)
@@ -204,8 +199,8 @@ namespace PrepareLanding.GameData
 
         protected int FindQuantaIndex(BiomeDef biome, int tileId)
         {
-            var tileAverageTemp = FeatureByBiomes[biome][tileId];
-            var temperatureQuanta = FeatureQuantaByBiomes[biome];
+            var tileAverageTemp = CharacteristicByBiomes[biome][tileId];
+            var temperatureQuanta = CharacteristicQuantaByBiomes[biome];
             var quantaLessThanOrEqu = temperatureQuanta.Where(t => t <= tileAverageTemp).ToList();
             if (!quantaLessThanOrEqu.Any())
                 return 0;
@@ -215,7 +210,7 @@ namespace PrepareLanding.GameData
             return quantaIndex;
         }
 
-        public Color ColorFromFeature(BiomeDef biome, int tileId)
+        public Color ColorFromCharacteristic(BiomeDef biome, int tileId)
         {
             var quantaIndex = FindQuantaIndex(biome, tileId);
 
@@ -229,12 +224,12 @@ namespace PrepareLanding.GameData
         /// </summary>
         /// <param name="biomeDef">The biomeDef from which to get the maximum average temperature.</param>
         /// <returns>The maximum average temperature for a given biomeDef.</returns>
-        public float MaxFeatureByBiome(BiomeDef biomeDef)
+        public float MaxCharacteristicByBiome(BiomeDef biomeDef)
         {
-            if (!FeatureByBiomes.ContainsKey(biomeDef))
+            if (!CharacteristicByBiomes.ContainsKey(biomeDef))
                 return float.NaN;
 
-            var tilesTemp = FeatureByBiomes[biomeDef];
+            var tilesTemp = CharacteristicByBiomes[biomeDef];
             return tilesTemp.Values.Max();
         }
 
@@ -243,12 +238,12 @@ namespace PrepareLanding.GameData
         /// </summary>
         /// <param name="biomeDef">The biomeDef from which to get the mean temperature.</param>
         /// <returns>The mean temperature of the given biomeDef.</returns>
-        public float MeanFeatureByBiome(BiomeDef biomeDef)
+        public float MeanCharacteristicByBiome(BiomeDef biomeDef)
         {
-            if (!FeatureByBiomes.ContainsKey(biomeDef))
+            if (!CharacteristicByBiomes.ContainsKey(biomeDef))
                 return float.NaN;
 
-            var tilesTemp = FeatureByBiomes[biomeDef];
+            var tilesTemp = CharacteristicByBiomes[biomeDef];
             return tilesTemp.Values.Mean();
         }
 
@@ -257,40 +252,40 @@ namespace PrepareLanding.GameData
         /// </summary>
         /// <param name="biomeDef">The biomeDef from which to get the minimum average temperature.</param>
         /// <returns>The minimum average temperature for a given biomeDef.</returns>
-        public float MinFeatureByBiome(BiomeDef biomeDef)
+        public float MinCharacteristicByBiome(BiomeDef biomeDef)
         {
-            if (!FeatureByBiomes.ContainsKey(biomeDef))
+            if (!CharacteristicByBiomes.ContainsKey(biomeDef))
                 return float.NaN;
 
-            var tilesTemp = FeatureByBiomes[biomeDef];
+            var tilesTemp = CharacteristicByBiomes[biomeDef];
             return tilesTemp.Values.Min();
         }
 
         public List<KeyValuePair<int, float>> WorldMinRange(int numberOfItems = 1)
         {
-            if (numberOfItems < 1 || numberOfItems > WorldTilesFeatures.Count)
+            if (numberOfItems < 1 || numberOfItems > WorldTilesCharacteristics.Count)
             {
                 Log.Message(
-                    $"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
+                    $"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesCharacteristics.Count}).");
                 return null;
             }
 
-            // get the lowest world feature values: start at the beginning and fetch the requested number of tiles
-            return WorldTilesFeatures.GetRange(0, numberOfItems);
+            // get the lowest world characteristic values: start at the beginning and fetch the requested number of tiles
+            return WorldTilesCharacteristics.GetRange(0, numberOfItems);
         }
 
         public List<KeyValuePair<int, float>> WorldMaxRange(int numberOfItems = 1)
         {
-            if (numberOfItems < 1 || numberOfItems > WorldTilesFeatures.Count)
+            if (numberOfItems < 1 || numberOfItems > WorldTilesCharacteristics.Count)
             {
                 Log.Message(
-                    $"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesFeatures.Count}).");
+                    $"[PrepareLanding] WorldMinRange: Invalid request number of items ({numberOfItems} / {WorldTilesCharacteristics.Count}).");
                 return null;
             }
 
-            // get the highest world feature values: fetch all the requested number of tiles up to the end
-            var start = WorldTilesFeatures.Count - numberOfItems;
-            return WorldTilesFeatures.GetRange(start, numberOfItems);
+            // get the highest world characteristic values: fetch all the requested number of tiles up to the end
+            var start = WorldTilesCharacteristics.Count - numberOfItems;
+            return WorldTilesCharacteristics.GetRange(start, numberOfItems);
         }
     }
 }

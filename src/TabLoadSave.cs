@@ -51,6 +51,9 @@ namespace PrepareLanding
         /// </summary>
         public const int MaxAuthorNameLength = 50;
 
+        // invalid selected item index in the preset list.
+        private const int InvalidSelectedItemIndex = -1;
+
         // size of a bottom button (length, height)
         private readonly Vector2 _bottomButtonSize = new Vector2(130f, 30f);
 
@@ -65,6 +68,9 @@ namespace PrepareLanding
 
         // wheter or not, if clicking on save, this overwrite the preset directly (true) or first display a warning.
         private bool _allowOverwriteExistingPreset;
+
+        // number of push on delete button (2 times to confirm delete)
+        private int _confirmDeletePush;
 
         // starting index of the preset list
         private int _listDisplayStartIndex;
@@ -218,13 +224,22 @@ namespace PrepareLanding
         protected void DrawBottomButtons(Rect inRect)
         {
             var buttonsY = inRect.height - 30f;
-            const int numButtons = 2;
+            var numButtons = 2;
 
+            // add 1 button for delete if we are in load mode
+            if (LoadSaveMode == LoadSaveMode.Load)
+                numButtons += 1;
+
+            // get Rect for buttons
             var buttonRects = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
                 _bottomButtonSize.y, 20f);
             if (buttonRects.Count != numButtons)
+            {
+                Log.ErrorOnce("[Prepare Landing]: DrawBottomButtons(); wrong number of buttons", 0x1cafe9);
                 return;
+            }
 
+            // get the text of button, depending on the mode we're in
             string verb;
             switch (LoadSaveMode)
             {
@@ -242,6 +257,7 @@ namespace PrepareLanding
                     throw new ArgumentOutOfRangeException();
             }
 
+            // just change the save button color if we could overwrite an existing preset.
             var presetExistsProtectFromOverwrite = false;
             if (!string.IsNullOrEmpty(_selectedFileName))
                 presetExistsProtectFromOverwrite = PresetManager.PresetExists(_selectedFileName) &&
@@ -253,6 +269,7 @@ namespace PrepareLanding
             else
                 GUI.color = Color.green;
 
+            // display the action button (load / save)
             if (Widgets.ButtonText(buttonRects[0], $"{verb} Preset"))
                 switch (LoadSaveMode)
                 {
@@ -265,14 +282,55 @@ namespace PrepareLanding
                 }
             GUI.color = savedColor;
 
-            if (Widgets.ButtonText(buttonRects[1], $"Exit {verb}"))
+            // delete button: only if in load mode!
+            var rectIndex = 1;
+            if (LoadSaveMode == LoadSaveMode.Load)
+            {
+                GUI.color = Color.red;
+                var deleteButtonText = "Delete";
+                if (_confirmDeletePush == 1)
+                    deleteButtonText = "Delete [Confirm]";
+
+                if (Widgets.ButtonText(buttonRects[rectIndex], deleteButtonText))
+                {
+                    _confirmDeletePush++;
+                    if (_confirmDeletePush == 2)
+                    {
+                        _confirmDeletePush = 0;
+                        DeletePreset();
+                        _selectedItemIndex = InvalidSelectedItemIndex;
+                        _selectedFileName = null;
+                    }
+                }
+                GUI.color = savedColor;
+
+                rectIndex++;
+            }
+
+            // exit button
+            if (Widgets.ButtonText(buttonRects[rectIndex], $"Exit {verb}"))
             {
                 LoadSaveMode = LoadSaveMode.Unknown;
                 _allowOverwriteExistingPreset = false;
-                _selectedItemIndex = -1;
+                _selectedItemIndex = InvalidSelectedItemIndex;
                 _selectedFileName = null;
+                _confirmDeletePush = 0;
                 PrepareLanding.Instance.MainWindow.TabController.SetPreviousTabAsSelectedTab();
             }
+        }
+
+        private void DeletePreset()
+        {
+            if (string.IsNullOrEmpty(_selectedFileName))
+            {
+                Messages.Message("Pick a preset first.", MessageTypeDefOf.NegativeEvent);
+                return;
+            }
+
+            if (_gameData.PresetManager.DeletePreset(_selectedFileName))
+                    Messages.Message("Successfully deleted the preset!", MessageTypeDefOf.PositiveEvent);
+            else
+                Messages.Message("Error: couldn't delete the preset...", MessageTypeDefOf.NegativeEvent);
         }
 
         #region LOAD_MODE
@@ -297,7 +355,7 @@ namespace PrepareLanding
                 Messages.Message("Pick a preset first.", MessageTypeDefOf.NegativeEvent);
         }
 
-        protected void DrawLoadPresetList(Rect inRect)
+        private void DrawLoadPresetList(Rect inRect)
         {
             DrawEntryHeader("Preset Files: Load mode", backgroundColor: Color.green);
 

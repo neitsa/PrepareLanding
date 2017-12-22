@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
@@ -110,43 +111,31 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            var roadDefs = UserData.SelectedRoadDefs;
-
-            // get a list of roadDefs that *must not* be present
-            var unwantedRoadDefs = (from entry in roadDefs
-                where entry.Value.State == MultiCheckboxState.Off
-                select entry.Key).ToList();
-
-            // get a list of roadDefs that *must* be present
-            var wantedRoadDefs = (from entry in roadDefs
-                where entry.Value.State == MultiCheckboxState.On
-                select entry.Key).ToList();
-
-            foreach (var tileId in inputList)
+            switch (UserData.SelectedRoadDefs.FilterBooleanState)
             {
-                var tile = Find.World.grid[tileId];
-                var tileHasRoad = TileHasRoad(tile);
-                if (tileHasRoad)
-                {
-                    var tileRoadDefs = tile.VisibleRoads.Select(roadlink => roadlink.road).ToList();
-
-                    // check that any of the road in the tile is *not* in the unwanted list, if it is, then just continue
-                    if (unwantedRoadDefs.Select(r => r).Intersect(tileRoadDefs).Any())
-                        continue;
-
-                    // otherwise add the tile (if the road type is MultiCheckboxState.On or MultiCheckboxState.Partial)
-                    _filteredTiles.Add(tileId);
-                }
-                else //tile has no roads
-                {
-                    //tile has no roads
-                    //  if user wants a specific road: do nothing
-                    //  if user doesn't absolutely want a specific road type, add the tile 
-                    //    (works for MultiCheckboxState.Off and MultiCheckboxState.Partial)
-                    if (wantedRoadDefs.Count == 0)
-                        _filteredTiles.Add(tileId);
-                }
+                case FilterBoolean.AndFiltering:
+                    FilterAnd(inputList, UserData.SelectedRoadDefs);
+                    break;
+                case FilterBoolean.OrFiltering:
+                    FilterOr(inputList, UserData.SelectedRoadDefs, UserData.SelectedRoadDefs.OffPartialNoSelect);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+
+        protected override bool TileHasDef(Tile tile)
+        {
+            return TileHasRoad(tile);
+        }
+
+        protected override List<T> TileDefs<T>(Tile tile)
+        {
+            var tileRoadDefs = TileHasDef(tile)
+                ? tile.VisibleRoads.Select(roadlink => roadlink.road as T).Distinct().ToList()
+                : null;
+
+            return tileRoadDefs;
         }
 
         /// <summary>
@@ -159,7 +148,7 @@ namespace PrepareLanding.Filters
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRoad);
         }
 
-        public bool TileHasRoad(Tile tile)
+        public static bool TileHasRoad(Tile tile)
         {
             return tile.VisibleRoads != null && tile.VisibleRoads.Count != 0;
         }
@@ -204,17 +193,21 @@ namespace PrepareLanding.Filters
             }
 
             // collect stones that are in On & Partial states, in their precise order on the GUI!
-            var orderedStoneDefsOn = (from stone in UserData.OrderedStoneDefs
+            var orderedStoneDefsOn = (from stone in UserData.SelectedStoneDefs.OrderedItems
                 let threeStateItem = UserData.SelectedStoneDefs[stone]
                 where threeStateItem.State == MultiCheckboxState.On
                 select stone).ToList();
-            var orderedStoneDefsPartial = (from stone in UserData.OrderedStoneDefs
+
+            var orderedStoneDefsPartial = (
+                from stone in UserData.SelectedStoneDefs.OrderedItems //UserData.OrderedStoneDefs
                 let threeStateItem = UserData.SelectedStoneDefs[stone]
                 where threeStateItem.State == MultiCheckboxState.Partial
                 select stone).ToList();
+
             var orderedStoneDefsOnPartial = new List<ThingDef>();
             orderedStoneDefsOnPartial.AddRange(orderedStoneDefsOn);
             orderedStoneDefsOnPartial.AddRange(orderedStoneDefsPartial);
+
             // stone types explicitly marked OFF
             var stoneOffList = (from userDataSelectedStoneDef in UserData.SelectedStoneDefs
                 where userDataSelectedStoneDef.Value.State == MultiCheckboxState.Off
@@ -260,16 +253,34 @@ namespace PrepareLanding.Filters
                         var subset = tileStones.Count <= orderedStoneDefsOn.Count ? tileStones : orderedStoneDefsOn;
                         var containingList = subset == tileStones ? orderedStoneDefsOn : tileStones;
 
-                        // check if the subset list has the same stone types at the same position in the containing list.
-                        if (subset.IsSubsetInOrderSamePos(containingList))
-                            _filteredTiles.Add(tileId);
+                        if (UserData.SelectedStoneDefs.OrderedFiltering)
+                        {
+                            // check if the subset list has the same stone types at the same position in the containing list.
+                            if (subset.IsSubsetInOrderSamePos(containingList))
+                                _filteredTiles.Add(tileId);
+                        }
+                        else
+                        {
+                            // check if the subset list has the same stone types bot *not* necessarily at the same position in the containing list.
+                            if (subset.IsSubset(containingList))
+                                _filteredTiles.Add(tileId);
+                        }
                     }
                     // maximum must-have stone types
                     else if (orderedStoneDefsOnCount == 3)
                     {
-                        // just check that both lists are equals (same content *and* in the same order!)
-                        if (tileStones.SequenceEqual(orderedStoneDefsOn))
-                            _filteredTiles.Add(tileId);
+                        if (UserData.SelectedStoneDefs.OrderedFiltering)
+                        {
+                            // just check that both lists are equals (same content *and* in the same order!)
+                            if (tileStones.SequenceEqual(orderedStoneDefsOn))
+                                _filteredTiles.Add(tileId);
+                        }
+                        else
+                        {
+                            // just check that both lists are equals (same content *without* any precise order!)
+                            if (tileStones.IsEqualNoOrderFast(orderedStoneDefsOn))
+                                _filteredTiles.Add(tileId);
+                        }
                     }
                     continue;
                 }
@@ -300,6 +311,7 @@ namespace PrepareLanding.Filters
 
         public override string SubjectThingDef => "Rivers";
 
+        
         public override void Filter(List<int> inputList)
         {
             base.Filter(inputList);
@@ -307,44 +319,33 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            var riverDefs = UserData.SelectedRiverDefs;
-
-            // get a list of riverDefs that *must not* be present
-            var unwantedRiverDefs = (from entry in riverDefs
-                where entry.Value.State == MultiCheckboxState.Off
-                select entry.Key).ToList();
-
-            // get a list of riverDefs that *must* be present
-            var wantedRiverDefs = (from entry in riverDefs
-                where entry.Value.State == MultiCheckboxState.On
-                select entry.Key).ToList();
-
-            foreach (var tileId in inputList)
+            switch (UserData.SelectedRiverDefs.FilterBooleanState)
             {
-                var tileHasRiver = TileHasRiver(tileId);
-                if (tileHasRiver)
-                {
-                    // note: even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
-                    var riverLink = Find.World.grid[tileId].VisibleRivers
-                        .MaxBy(riverlink => riverlink.river.degradeThreshold);
-
-                    // check that the river is not in the unwanted list, if it is, then just continue
-                    if (unwantedRiverDefs.Contains(riverLink.river))
-                        continue;
-
-                    // add the tile if the river type is MultiCheckboxState.On or MultiCheckboxState.Partial
-                    _filteredTiles.Add(tileId);
-                }
-                else //tile has no rivers
-                {
-                    //tile has no river
-                    //  if user wants a river: do nothing
-                    //  if user doesn't absolutely want a specific river type, add the tile 
-                    //    (works for MultiCheckboxState.Off and MultiCheckboxState.Partial)
-                    if (wantedRiverDefs.Count == 0)
-                        _filteredTiles.Add(tileId);
-                }
+                case FilterBoolean.AndFiltering:
+                    FilterAnd(inputList, UserData.SelectedRiverDefs);
+                    break;
+                case FilterBoolean.OrFiltering:
+                    FilterOr(inputList, UserData.SelectedRiverDefs, UserData.SelectedRiverDefs.OffPartialNoSelect);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+
+        protected override bool TileHasDef(Tile tile)
+        {
+            return TileHasRiver(tile);
+        }
+
+        protected override List<T> TileDefs<T>(Tile tile)
+        {
+            if (!TileHasRiver(tile))
+                return null;
+
+            // note: even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
+            var riverLink = tile.VisibleRivers.MaxBy(riverlink => riverlink.river.degradeThreshold);
+
+            return new List<T>{ riverLink.river as T };
         }
 
         public static IEnumerable<int> TilesWithRiver(List<int> inputList)
@@ -352,9 +353,8 @@ namespace PrepareLanding.Filters
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRiver);
         }
 
-        public static bool TileHasRiver(int tileId)
+        public static bool TileHasRiver(Tile tile)
         {
-            var tile = Find.World.grid[tileId];
             return tile.VisibleRivers != null && tile.VisibleRivers.Count != 0;
         }
     }
@@ -414,9 +414,7 @@ namespace PrepareLanding.Filters
             var ticks = Mathf.Min(GenDate.TicksPerHour + WorldPathGrid.CalculatedCostAt(tileId, false, yearPct),
                 Caravan_PathFollower.MaxMoveTicks);
 
-            int years, quadrums, days;
-            float hours;
-            ticks.TicksToPeriod(out years, out quadrums, out days, out hours);
+            ticks.TicksToPeriod(out var years, out var quadrums, out var days, out var hours);
 
             // combine everything into hours; note that we shouldn't get anything other than 'hours' and 'days'. Technically, a tile is should be passable in less than 48 hours.
             var totalHours = hours + days * GenDate.HoursPerDay +
@@ -947,16 +945,16 @@ namespace PrepareLanding.Filters
         }
     }
 
-    public class TileFilterMostLeastFeature : TileFilter
+    public class TileFilterHasCave : TileFilter
     {
-        public TileFilterMostLeastFeature(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(
-            userData, attachedProperty, heaviness)
+        public TileFilterHasCave(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override bool IsFilterActive => !UserData.MostLeastItem.IsInDefaultState;
+        public override bool IsFilterActive => UserData.HasCaveState != MultiCheckboxState.Partial;
 
-        public override string SubjectThingDef => $"MostLeastFeature: {UserData.MostLeastItem.Feature}";
+        public override string SubjectThingDef => "Has Cave";
 
         public override void Filter(List<int> inputList)
         {
@@ -965,46 +963,144 @@ namespace PrepareLanding.Filters
             if (!IsFilterActive)
                 return;
 
-            if (Enumerable.Any(PrepareLanding.Instance.GameData.WorldData.WorldFeatures,
-                worldFeature => worldFeature.Feature == UserData.MostLeastItem.Feature))
-                FilterFeature(UserData.MostLeastItem);
+            // partial state means "I don't care if they can graze now or not", so all tiles match
+            if (UserData.HasCaveState == MultiCheckboxState.Partial)
+            {
+                _filteredTiles.AddRange(inputList);
+                return;
+            }
+
+            foreach (var tileId in inputList)
+            {
+                var hasCave = Find.World.HasCaves(tileId);
+                if (UserData.HasCaveState == MultiCheckboxState.On)
+                    if (hasCave)
+                        _filteredTiles.Add(tileId);
+
+                if (UserData.HasCaveState == MultiCheckboxState.Off)
+                    if (!hasCave)
+                        _filteredTiles.Add(tileId);
+            }
+        }
+    }
+
+    public class TileFilterMostLeastCharacteristic : TileFilter
+    {
+        public TileFilterMostLeastCharacteristic(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(
+            userData, attachedProperty, heaviness)
+        {
         }
 
-        private void FilterFeature(MostLeastItem item)
+        public override bool IsFilterActive => !UserData.MostLeastItem.IsInDefaultState;
+
+        public override string SubjectThingDef => $"MostLeastCharacteristic: {UserData.MostLeastItem.Characteristic}";
+
+        public override void Filter(List<int> inputList)
         {
-            var worldFeature = PrepareLanding.Instance.GameData.WorldData.WorldFeatureDataByFeature(item.Feature);
-            if (worldFeature == null)
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            if (Enumerable.Any(PrepareLanding.Instance.GameData.WorldData.WorldCharacteristics,
+                worldCharacteristicData => worldCharacteristicData.Characteristic == UserData.MostLeastItem.Characteristic))
+                FilterCharacteristic(UserData.MostLeastItem);
+        }
+
+        private void FilterCharacteristic(MostLeastItem item)
+        {
+            var worldCharacteristicData = PrepareLanding.Instance.GameData.WorldData.WorldCharacteristicDataByCharacteristic(item.Characteristic);
+            if (worldCharacteristicData == null)
                 return;
 
             // we want either most or least.
-            if (item.FeatureType == MostLeastType.None)
+            if (item.CharacteristicType == MostLeastType.None)
                 return;
 
-            // get list of KeyValuePair with key being the tile ID and value being the tile feature for the whole world
+            // get list of KeyValuePair with key being the tile ID and value being the tile characteristic for the whole world
             //    e.g List<KVP<int, float>> where int is tileId and float is temperature or rainfall
-            var worldTilesAndFeatures = worldFeature.WorldTilesFeatures;
+            var worldTilesCharacteristics = worldCharacteristicData.WorldTilesCharacteristics;
 
             // can't request more tiles than there are in the world
-            if (UserData.MostLeastItem.NumberOfItems > worldTilesAndFeatures.Count)
+            if (UserData.MostLeastItem.NumberOfItems > worldTilesCharacteristics.Count)
             {
                 Messages.Message(
-                    $"You are requesting more tiles than the number of available tiles (max: {worldTilesAndFeatures.Count})",
+                    $"You are requesting more tiles than the number of available tiles (max: {worldTilesCharacteristics.Count})",
                     MessageTypeDefOf.RejectInput);
                 return;
             }
 
-            // get a list of KVP where key is tile Id and value is the feature value (e.g temperature, rainfall, elevation)
-            var mostLeastTilesAndFeatures = item.FeatureType == MostLeastType.Least
-                ? worldFeature.WorldMinRange(UserData.MostLeastItem.NumberOfItems)
-                : worldFeature.WorldMaxRange(UserData.MostLeastItem.NumberOfItems);
-            if (mostLeastTilesAndFeatures == null)
+            // get a list of KVP where key is tile Id and value is the characteristic value (e.g temperature, rainfall, elevation)
+            var mostLeastTilesAndCharacteristics = item.CharacteristicType == MostLeastType.Least
+                ? worldCharacteristicData.WorldMinRange(UserData.MostLeastItem.NumberOfItems)
+                : worldCharacteristicData.WorldMaxRange(UserData.MostLeastItem.NumberOfItems);
+            if (mostLeastTilesAndCharacteristics == null)
                 return;
 
             // we still have a list of KVP, we just want the tiles
-            var tileIds = mostLeastTilesAndFeatures.Select(kvp => kvp.Key);
+            var tileIds = mostLeastTilesAndCharacteristics.Select(kvp => kvp.Key);
 
             // add them to the filtered tiles list.
             _filteredTiles.AddRange(tileIds);
+        }
+    }
+
+    public class TileFilterWorldFeature : TileFilter
+    {
+        public TileFilterWorldFeature(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override bool IsFilterActive => UserData.WorldFeature != null;
+
+        public override string SubjectThingDef => "World Feature";
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            // intersect the tiles in the world feature with the ones from the input list.
+            var result = UserData.WorldFeature.Tiles.Intersect(inputList);
+
+            _filteredTiles.AddRange(result.ToList());
+
+        }
+    }
+
+    public class TileFilterCoastRotation : TileFilter
+    {
+        // make sure both lists are the same
+        public static readonly List<Rot4> PossibleRotations = new List<Rot4> { Rot4.North, Rot4.East, Rot4.South, Rot4.West};
+        public static readonly List<int> PossibleRotationsInt = new List<int>
+        {
+            Rot4.North.AsInt, Rot4.East.AsInt, Rot4.South.AsInt, Rot4.West.AsInt
+        };
+
+        public TileFilterCoastRotation(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        public override bool IsFilterActive => UserData.CoastalRotation.Use;
+
+        public override string SubjectThingDef => "Coast Rotation";
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+            
+            foreach (var tileId in inputList)
+            {
+                if(Find.World.CoastDirectionAt(tileId).AsInt == UserData.CoastalRotation.Selected)
+                    _filteredTiles.Add(tileId);
+            }
         }
     }
 }

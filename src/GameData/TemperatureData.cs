@@ -104,7 +104,7 @@ namespace PrepareLanding.GameData
         public float OffsetFromSeasonCycle { get; }
     }
 
-    public class TemperatureData : WorldFeatureData
+    public class TemperatureData : WorldCharacteristicData
     {
         private bool _allowDrawOverlay;
 
@@ -115,7 +115,7 @@ namespace PrepareLanding.GameData
 
         public bool AllowDrawOverlay
         {
-            get { return _allowDrawOverlay; }
+            get => _allowDrawOverlay;
             set
             {
                 if (value == _allowDrawOverlay)
@@ -126,17 +126,17 @@ namespace PrepareLanding.GameData
             }
         }
 
-        public override MostLeastFeature Feature => MostLeastFeature.Temperature;
+        public override MostLeastCharacteristic Characteristic => MostLeastCharacteristic.Temperature;
 
-        public override string FeatureMeasureUnit => "°C";
+        public override string CharacteristicMeasureUnit => "°C";
 
-        public Texture2D TemperatureGradientTexure => FeatureGradientTexture;
+        public Texture2D TemperatureGradientTexure => CharacteristicGradientTexture;
 
-        public Dictionary<BiomeDef, Dictionary<int, float>> TemperaturesByBiomes => FeatureByBiomes;
+        public Dictionary<BiomeDef, Dictionary<int, float>> TemperaturesByBiomes => CharacteristicByBiomes;
 
-        public List<KeyValuePair<int, float>> WorldTilesTemperatures => WorldTilesFeatures;
+        public List<KeyValuePair<int, float>> WorldTilesTemperatures => WorldTilesCharacteristics;
 
-        protected override float TileFeatureValue(int tileId)
+        protected override float TileCharacteristicValue(int tileId)
         {
             return Find.World.grid[tileId].temperature;
         }
@@ -231,8 +231,8 @@ namespace PrepareLanding.GameData
             var bigSeparator = "-".Repeat(80);
             var smallSeparator = "-".Repeat(40);
 
-            var biomeMinTemp = MinFeatureByBiome(Biome);
-            var biomeMaxTemp = MaxFeatureByBiome(Biome);
+            var biomeMinTemp = MinCharacteristicByBiome(Biome);
+            var biomeMaxTemp = MaxCharacteristicByBiome(Biome);
 
             sb.AppendLine(bigSeparator);
             sb.AppendLine(smallSeparator);
@@ -243,7 +243,7 @@ namespace PrepareLanding.GameData
             sb.AppendLine(smallSeparator);
             sb.AppendLine("---------- temperatureQuanta ----------");
             sb.AppendLine(smallSeparator);
-            var temperatureQuanta = FeatureQuantaByBiomes[Biome];
+            var temperatureQuanta = CharacteristicQuantaByBiomes[Biome];
             sb.AppendLine($"temperatureQuanta.Count: {temperatureQuanta.Count}");
             for (var i = 0; i < temperatureQuanta.Count; i++)
                 sb.AppendLine($"{i}: {temperatureQuanta[i]}");

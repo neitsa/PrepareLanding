@@ -14,11 +14,6 @@ namespace PrepareLanding
     public class PrepareLanding : ModBase
     {
         /// <summary>
-        ///     Filter Options (from the GUI window 'options' tab).
-        /// </summary>
-        private FilterOptions _filterOptions;
-
-        /// <summary>
         ///     Main mod class constructor. Sets up the static instance.
         /// </summary>
         public PrepareLanding()
@@ -34,9 +29,9 @@ namespace PrepareLanding
             GameTicks = new GameTicks();
 
             // Holds various mod options (shown on the 'option' tab on the GUI).
-            _filterOptions = new FilterOptions();
+            var filterOptions = new FilterOptions();
 
-            GameData = new GameData.GameData(_filterOptions);
+            GameData = new GameData.GameData(filterOptions);
 
             TileFilter = new WorldTileFilter(GameData.UserData);
 
@@ -44,7 +39,7 @@ namespace PrepareLanding
             MainWindow = new MainWindow(GameData);
 
             // instantiate the tile highlighter
-            TileHighlighter = new TileHighlighter(_filterOptions);
+            TileHighlighter = new TileHighlighter(filterOptions);
         }
 
         /// <summary>
@@ -90,7 +85,7 @@ namespace PrepareLanding
         /// <summary>
         ///      Instance used to control all useful events from RimWorld.
         /// </summary>
-        public RimWorldEventHandler EventHandler;
+        public readonly RimWorldEventHandler EventHandler;
 
         /// <summary>
         ///     Set the main instance to null.

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using JetBrains.Annotations;
+using PrepareLanding.Filters;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -40,7 +39,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public MultiCheckboxState ChosenAnimalsCanGrazeNowState
         {
-            get { return _chosenAnimalsCanGrazeNowState; }
+            get => _chosenAnimalsCanGrazeNowState;
             set
             {
                 if (value == _chosenAnimalsCanGrazeNowState)
@@ -52,11 +51,27 @@ namespace PrepareLanding.GameData
         }
 
         /// <summary>
+        ///     Current user choice for the "Has Cave" state.
+        /// </summary>
+        public MultiCheckboxState HasCaveState
+        {
+            get => _hasCaveState;
+            set
+            {
+                if (value == _hasCaveState)
+                    return;
+
+                _hasCaveState = value;
+                OnPropertyChanged(nameof(HasCaveState));
+            }
+        }
+
+        /// <summary>
         ///     Current user selected biome.
         /// </summary>
         public BiomeDef ChosenBiome
         {
-            get { return _chosenBiome; }
+            get => _chosenBiome;
             set
             {
                 if (value == _chosenBiome)
@@ -72,7 +87,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public MultiCheckboxState ChosenCoastalTileState
         {
-            get { return _chosenCoastalTileState; }
+            get => _chosenCoastalTileState;
             set
             {
                 if (value == _chosenCoastalTileState)
@@ -88,7 +103,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public MultiCheckboxState ChosenCoastalLakeTileState
         {
-            get { return _coastalLakeTileState; }
+            get => _coastalLakeTileState;
             set
             {
                 if (value == _coastalLakeTileState)
@@ -104,7 +119,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public Hilliness ChosenHilliness
         {
-            get { return _chosenHilliness; }
+            get => _chosenHilliness;
             set
             {
                 if (value == _chosenHilliness)
@@ -136,42 +151,31 @@ namespace PrepareLanding.GameData
         public FilterOptions Options { get; }
 
         /// <summary>
-        ///     Current order of the stones on the main GUI Window (as this choice order is important).
-        /// </summary>
-        public List<ThingDef> OrderedStoneDefs { get; } = new List<ThingDef>();
-
-        /// <summary>
         ///     Current user choices for the rain fall.
         /// </summary>
         public UsableMinMaxNumericItem<float> RainFall { get; } = new UsableMinMaxNumericItem<float>();
 
-
         /// <summary>
         ///     Current user choices for the river filtering.
         /// </summary>
-        public Dictionary<RiverDef, ThreeStateItem> SelectedRiverDefs { get; } =
-            new Dictionary<RiverDef, ThreeStateItem>();
+        public ThreeStateItemContainer<RiverDef> SelectedRiverDefs { get; } = new ThreeStateItemContainer<RiverDef>();
 
         /// <summary>
         ///     Current user choices for the roads filtering.
         /// </summary>
-        public Dictionary<RoadDef, ThreeStateItem> SelectedRoadDefs { get; } =
-            new Dictionary<RoadDef, ThreeStateItem>();
+        public ThreeStateItemContainer<RoadDef> SelectedRoadDefs { get; } = new ThreeStateItemContainer<RoadDef>();
 
         /// <summary>
         ///     Current user choices for the stone types filtering.
         /// </summary>
-        public Dictionary<ThingDef, ThreeStateItem> SelectedStoneDefs { get; } =
-            new Dictionary<ThingDef, ThreeStateItem>();
-
-
+        public ThreeStateItemContainerOrdered<ThingDef> SelectedStoneDefs { get; } = new ThreeStateItemContainerOrdered<ThingDef>();
 
         /// <summary>
         ///     The number of stones per tile to filter when the <see cref="StoneTypesNumberOnly" /> boolean is true.
         /// </summary>
         public int StoneTypesNumber
         {
-            get { return _stoneTypesNumber; }
+            get => _stoneTypesNumber;
             set
             {
                 if (value == _stoneTypesNumber)
@@ -187,7 +191,7 @@ namespace PrepareLanding.GameData
         /// </summary>
         public bool StoneTypesNumberOnly
         {
-            get { return _stoneTypesNumberOnly; }
+            get => _stoneTypesNumberOnly;
             set
             {
                 if (value == _stoneTypesNumberOnly)
@@ -197,6 +201,25 @@ namespace PrepareLanding.GameData
                 OnPropertyChanged(nameof(StoneTypesNumberOnly));
             }
         }
+
+        /// <summary>
+        ///     Selected World Feature (name on the world map).
+        /// </summary>
+        public WorldFeature WorldFeature
+        {
+            get => _worldFeature;
+            set
+            {
+                if (value == _worldFeature)
+                    return;
+
+                _worldFeature = value;
+                OnPropertyChanged(nameof(WorldFeature));
+            }
+        }
+
+        public UsableFromList<int> CoastalRotation { get; } =  new UsableFromList<int>(
+            TileFilterCoastRotation.PossibleRotationsInt, TileFilterCoastRotation.PossibleRotationsInt[0]);
 
         /// <summary>
         ///     Current user choices for the summer movement time.
@@ -223,6 +246,9 @@ namespace PrepareLanding.GameData
         /// </summary>
         public UsableMinMaxNumericItem<float> WinterTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
+        /// <summary>
+        ///     Current user choice for Most / Least item
+        /// </summary>
         public MostLeastItem MostLeastItem { get; } = new MostLeastItem();
 
         /// <summary>
@@ -248,16 +274,22 @@ namespace PrepareLanding.GameData
             if (_coastalLakeTileState != MultiCheckboxState.Partial)
                 return false;
 
+            if (CoastalRotation.Use)
+                return false;
+
             if (_chosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial)
                 return false;
 
-            if (!IsDefDictInDefaultState(SelectedRoadDefs))
+            if (_hasCaveState != MultiCheckboxState.Partial)
                 return false;
 
-            if (!IsDefDictInDefaultState(SelectedRiverDefs))
+            if (!SelectedRoadDefs.IsInDefaultState())
                 return false;
 
-            if (!IsDefDictInDefaultState(SelectedStoneDefs))
+            if (!SelectedRiverDefs.IsInDefaultState())
+                return false;
+
+            if (!SelectedStoneDefs.IsInDefaultState())
                 return false;
 
             if (_stoneTypesNumberOnly)
@@ -296,12 +328,10 @@ namespace PrepareLanding.GameData
             if (!MostLeastItem.IsInDefaultState)
                 return false;
 
-            return true;
-        }
+            if (WorldFeature != null)
+                return false;
 
-        public static bool IsDefDictInDefaultState<T>(Dictionary<T, ThreeStateItem> dict) where T : Def
-        {
-            return dict.All(def => def.Value.State == MultiCheckboxState.Partial);
+            return true;
         }
 
         /// <summary>
@@ -320,20 +350,13 @@ namespace PrepareLanding.GameData
             _chosenHilliness = Hilliness.Undefined;
             _chosenCoastalTileState = MultiCheckboxState.Partial;
             _coastalLakeTileState = MultiCheckboxState.Partial;
+            CoastalRotation.Reset(false);
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
 
             var defProps = PrepareLanding.Instance.GameData.DefData;
-            InitSelectedDictionary(defProps.RoadDefs, SelectedRoadDefs, nameof(SelectedRoadDefs));
-            InitSelectedDictionary(defProps.RiverDefs, SelectedRiverDefs, nameof(SelectedRiverDefs));
-            InitSelectedDictionary(defProps.StoneDefs, SelectedStoneDefs, nameof(SelectedStoneDefs));
-
-            // patch for the fact that OrderedDictionary<TKey, TValue> doesn't exist in .NET...
-            // The list is reorder-able but the dictionary is not. We need to keep the order because it is important.
-            OrderedStoneDefs.Clear();
-            foreach (var stoneEntry in SelectedStoneDefs)
-                OrderedStoneDefs.Add(stoneEntry.Key);
-            // order by name at first
-            OrderedStoneDefs.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
+            SelectedRoadDefs.SetContainer(defProps.RoadDefs, nameof(SelectedRoadDefs));
+            SelectedRiverDefs.SetContainer(defProps.RiverDefs, nameof(SelectedRiverDefs));
+            SelectedStoneDefs.SetContainer(defProps.StoneDefs, nameof(SelectedStoneDefs));
 
             // stone numbers
             StoneTypesNumberOnly = false;
@@ -345,6 +368,9 @@ namespace PrepareLanding.GameData
             InitUsableMinMaxNumericItem(WinterMovementTime, nameof(WinterMovementTime));
             InitUsableMinMaxNumericItem(Elevation, nameof(Elevation));
             InitUsableMinMaxNumericItem(TimeZone, nameof(TimeZone));
+
+            _hasCaveState = MultiCheckboxState.Partial;
+            _worldFeature = null;
 
             /*
              * TEMPERATURE related Fields
@@ -369,7 +395,7 @@ namespace PrepareLanding.GameData
         ///     Called when a new world map is generated: reset all fields (user choices on  the GUI window) to their default
         ///     state.
         /// </summary>
-        protected void ExecuteOnWorldGeneratedOrLoaded()
+        private void ExecuteOnWorldGeneratedOrLoaded()
         {
             if (Options.ResetAllFieldsOnNewGeneratedWorld || !_firstResetDone)
             {
@@ -379,50 +405,12 @@ namespace PrepareLanding.GameData
         }
 
         /// <summary>
-        ///     Initialize a dictionary from a list of RimWorld definitions (<see cref="Def" />) where keys are <see cref="Def" />
-        ///     and values are <see cref="ThreeStateItem" />.
-        ///     The propertyChangedName makes it so that if a <see cref="ThreeStateItem" /> item changed an event is fired for the
-        ///     whole dictionary rather than the contained item.
-        /// </summary>
-        /// <typeparam name="T">The type of the items in the list parameter. <b>T</b> should be a RimWorld <see cref="Def" />.</typeparam>
-        /// <param name="initCollection">A collection of <see cref="Def" /> (each entry will be used as a dictionary key).</param>
-        /// <param name="dictionary">The dictionary to be initialized.</param>
-        /// <param name="propertyChangedName">
-        ///     The bound property name (the name of the dictionary in this class). Each time a value
-        ///     in the dictionary is changed, this fire an event related to the dictionary name and not the contained values.
-        /// </param>
-        /// <param name="defaultSate">The default state of the <see cref="ThreeStateItem" />.</param>
-        protected void InitSelectedDictionary<T>(ReadOnlyCollection<T> initCollection, Dictionary<T, ThreeStateItem> dictionary,
-            string propertyChangedName, MultiCheckboxState defaultSate = MultiCheckboxState.Partial)
-        {
-            dictionary.Clear();
-            foreach (var elementDef in initCollection)
-            {
-                var item = new ThreeStateItem(defaultSate);
-                item.PropertyChanged += delegate
-                {
-                    // cheat! rather than saying that a ThreeState item changed
-                    //  just pretend the whole dictionary has changed.
-                    // We don't need a finer grain control than that, as the dictionary will contain just a few elements.
-                    OnPropertyChanged(propertyChangedName);
-                };
-                dictionary.Add(elementDef, item);
-            }
-        }
-
-        protected ThreeStateItem InitThreeStateItem(string propertyChanedName,
-            MultiCheckboxState defaultState = MultiCheckboxState.Partial)
-        {
-            return new ThreeStateItem(defaultState);
-        }
-
-        /// <summary>
         ///     Initialize a <see cref="UsableMinMaxNumericItem{T}" /> item.
         /// </summary>
         /// <typeparam name="T">The type used by the <see cref="UsableMinMaxNumericItem{T}" />.</typeparam>
         /// <param name="numericItem">An instance of <see cref="UsableMinMaxNumericItem{T}" /> to be initialized.</param>
         /// <param name="propertyChangedName">The property name bound to the <see cref="UsableMinMaxNumericItem{T}" />.</param>
-        protected void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
+        private void InitUsableMinMaxNumericItem<T>(UsableMinMaxNumericItem<T> numericItem,
             string propertyChangedName) where T : struct, IComparable, IConvertible
         {
             numericItem.Use = false;
@@ -442,7 +430,7 @@ namespace PrepareLanding.GameData
         /// <summary>
         ///     Called when an option changed.
         /// </summary>
-        protected void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
+        private void OptionChanged(object sender, PropertyChangedEventArgs eventArgs)
         {
             // reset the chosen Hilliness if the option changed
             if (eventArgs.PropertyName == nameof(Options.AllowImpassableHilliness))
@@ -456,6 +444,11 @@ namespace PrepareLanding.GameData
         ///     Current user choice for the "Animal Can Graze Now" state.
         /// </summary>
         private MultiCheckboxState _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
+
+        /// <summary>
+        ///     Current user choice for the "Has cave" state.
+        /// </summary>
+        private MultiCheckboxState _hasCaveState = MultiCheckboxState.Partial;
 
         /// <summary>
         ///     The currently selected biome.
@@ -486,6 +479,11 @@ namespace PrepareLanding.GameData
         ///     Number of stone types when filtering with <see cref="_stoneTypesNumberOnly" />.
         /// </summary>
         private int _stoneTypesNumber = 2;
+
+        /// <summary>
+        ///     Selected wold feature by user.
+        /// </summary>
+        private WorldFeature _worldFeature;
 
         /// <summary>
         ///     Used to tell if the first reset has been done. It must be done once in the lifetime of the mod to at least

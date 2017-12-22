@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.Linq;
-using PrepareLanding.GameData;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -48,30 +47,31 @@ namespace PrepareLanding.Presets
 
             _gameData.UserData.ChosenBiome = LoadDef<BiomeDef>(xTerrain, "Biome") as BiomeDef;
             _gameData.UserData.ChosenHilliness = LoadEnum<Hilliness>(xTerrain, "Hilliness");
-            LoadMultiThreeStates(xTerrain, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
-            LoadMultiThreeStates(xTerrain, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
+            LoadThreeStateItemContainer(xTerrain, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
+            LoadThreeStateItemContainer(xTerrain, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
             LoadUsableMinMax(xTerrain, "CurrentMovementTime", _gameData.UserData.CurrentMovementTime);
             LoadUsableMinMax(xTerrain, "SummerMovementTime", _gameData.UserData.SummerMovementTime);
             LoadUsableMinMax(xTerrain, "WinterMovementTime", _gameData.UserData.WinterMovementTime);
             if (xTerrain.Element("StoneTypesNumberOnly") == null)
             {
-                LoadMultiThreeStatesOrdered(xTerrain, "Stones", "Stone", _gameData.UserData.SelectedStoneDefs,
-                    _gameData.UserData.OrderedStoneDefs);
+                LoadThreeStateItemContainerOrdered(xTerrain, "Stones", "Stone", _gameData.UserData.SelectedStoneDefs);
             }
             else
             {
                 LoadBoolean(xTerrain, "StoneTypesNumberOnly", b => _gameData.UserData.StoneTypesNumberOnly = b);
                 if (_gameData.UserData.StoneTypesNumberOnly)
                 {
-                    int stoneTypesNumber;
-                    Load(xTerrain, "StoneTypesNumber", out stoneTypesNumber);
+                    Load(xTerrain, "StoneTypesNumber", out int stoneTypesNumber);
                     _gameData.UserData.StoneTypesNumber = stoneTypesNumber;
                 }
             }
             _gameData.UserData.ChosenCoastalTileState = LoadThreeState(xTerrain, "CoastalTile");
             _gameData.UserData.ChosenCoastalLakeTileState = LoadThreeState(xTerrain, "CoastalLakeTile");
+            LoadUsableFromList(xTerrain, "CoastalRotation", _gameData.UserData.CoastalRotation);
             LoadUsableMinMax(xTerrain, "Elevation", _gameData.UserData.Elevation);
             LoadUsableMinMax(xTerrain, "TimeZone", _gameData.UserData.TimeZone);
+
+            _gameData.UserData.HasCaveState = LoadThreeState(xTerrain, "HasCave");
 
 
             // temperature
@@ -104,6 +104,7 @@ namespace PrepareLanding.Presets
             LoadBoolean(xOptions, "AllowLiveFiltering", b => _gameData.UserData.Options.AllowLiveFiltering = b);
             LoadBoolean(xOptions, "BypassMaxHighlightedTiles", b => _gameData.UserData.Options.BypassMaxHighlightedTiles = b);
             LoadBoolean(xOptions, "DisablePreFilterCheck", b => _gameData.UserData.Options.DisablePreFilterCheck = b);
+            LoadBoolean(xOptions, "ViewPartialOffNoSelect", b => _gameData.UserData.Options.ViewPartialOffNoSelect = b);
             LoadBoolean(xOptions, "ResetAllFieldsOnNewGeneratedWorld", b => _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld = b);
             LoadBoolean(xOptions, "DisableTileHighlighting", b => _gameData.UserData.Options.DisableTileHighlighting = b);
             LoadBoolean(xOptions, "DisableTileBlinking", b => _gameData.UserData.Options.DisableTileBlinking = b);
@@ -125,8 +126,7 @@ namespace PrepareLanding.Presets
         {
             try
             {
-                XDocument xDocument;
-                var xRoot = GetTopElement(out xDocument, false);
+                var xRoot = GetTopElement(out var xDocument, false);
                 if (xRoot == null)
                     return;
 
@@ -145,8 +145,8 @@ namespace PrepareLanding.Presets
 
                 SaveDef(xTerrainFilters, "Biome", _gameData.UserData.ChosenBiome);
                 SaveHilliness(xTerrainFilters, "Hilliness", _gameData.UserData.ChosenHilliness);
-                SaveMultiThreeStates(xTerrainFilters, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
-                SaveMultiThreeStates(xTerrainFilters, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
+                SaveThreeStateItemContainer(xTerrainFilters, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
+                SaveThreeStateItemContainer(xTerrainFilters, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
                 SaveUsableMinMax(xTerrainFilters, "CurrentMovementTime", _gameData.UserData.CurrentMovementTime);
                 SaveUsableMinMax(xTerrainFilters, "SummerMovementTime", _gameData.UserData.SummerMovementTime);
                 SaveUsableMinMax(xTerrainFilters, "WinterMovementTime", _gameData.UserData.WinterMovementTime);
@@ -157,13 +157,16 @@ namespace PrepareLanding.Presets
                 }
                 else
                 {
-                    SaveMultiThreeStatesOrdered(xTerrainFilters, "Stones", "Stone", _gameData.UserData.SelectedStoneDefs,
-                        _gameData.UserData.OrderedStoneDefs);
+                    SaveThreeStateItemContainerOrdered(xTerrainFilters, "Stones", "Stone",
+                        _gameData.UserData.SelectedStoneDefs);
                 }
                 SaveThreeState(xTerrainFilters, "CoastalTile", _gameData.UserData.ChosenCoastalTileState);
                 SaveThreeState(xTerrainFilters, "CoastalLakeTile", _gameData.UserData.ChosenCoastalLakeTileState);
+                SaveUsableFromList(xTerrainFilters, "CoastalRotation", _gameData.UserData.CoastalRotation);
                 SaveUsableMinMax(xTerrainFilters, "Elevation", _gameData.UserData.Elevation);
                 SaveUsableMinMax(xTerrainFilters, "TimeZone", _gameData.UserData.TimeZone);
+
+                SaveThreeState(xTerrainFilters, "HasCave", _gameData.UserData.HasCaveState);
 
                 // Temperature
                 var xTemperatureFilters = new XElement("Temperature");
@@ -174,7 +177,7 @@ namespace PrepareLanding.Presets
                 SaveUsableMinMax(xTemperatureFilters, "WinterTemperature", _gameData.UserData.WinterTemperature);
                 SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
                 SaveUsableMinMax(xTemperatureFilters, "RainFall", _gameData.UserData.RainFall);
-                SaveThreeState(xTerrainFilters, "AnimalsCanGrazeNow", _gameData.UserData.ChosenAnimalsCanGrazeNowState);
+                SaveThreeState(xTemperatureFilters, "AnimalsCanGrazeNow", _gameData.UserData.ChosenAnimalsCanGrazeNowState);
                 SaveMostLeastItem(xTemperatureFilters, "MostLeastFeature", _gameData.UserData.MostLeastItem);
 
                 /*
@@ -192,6 +195,7 @@ namespace PrepareLanding.Presets
                     SaveBoolean(xOption, "AllowLiveFiltering", _gameData.UserData.Options.AllowLiveFiltering);
                     SaveBoolean(xOption, "BypassMaxHighlightedTiles", _gameData.UserData.Options.BypassMaxHighlightedTiles);
                     SaveBoolean(xOption, "DisablePreFilterCheck", _gameData.UserData.Options.DisablePreFilterCheck);
+                    SaveBoolean(xOption, "ViewPartialOffNoSelect", _gameData.UserData.Options.ViewPartialOffNoSelect);
                     SaveBoolean(xOption, "ResetAllFieldsOnNewGeneratedWorld", _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld);
                     SaveBoolean(xOption, "DisableTileHighlighting", _gameData.UserData.Options.DisableTileHighlighting);
                     SaveBoolean(xOption, "DisableTileBlinking", _gameData.UserData.Options.DisableTileBlinking);
@@ -256,6 +260,8 @@ namespace PrepareLanding.Presets
         private const string MaxNode = "Max";
 
         private const string UseNode = "Use";
+
+        private const string SelectedNode = "Selected";
 
         // most/least 
         private const string MostLeastItemFeatureNode = "Feature";
@@ -327,17 +333,19 @@ namespace PrepareLanding.Presets
             return (T) Enum.Parse(typeof(T), xFoundElement.Value, true);
         }
 
-        private void LoadMultiThreeStates<T>(XContainer xParent, string elementName, string subElementName,
-            Dictionary<T, ThreeStateItem> dict) where T : Def
+        private void LoadThreeStateItemContainer<T>(XContainer xParent, string elementName, string subElementName, ThreeStateItemContainer<T> container) where T : Def
         {
             var xFoundElement = xParent.Element(elementName);
             if (xFoundElement == null)
             {
-                // everything in default state
-                foreach (var value in dict.Values)
+                // set everything in default state
+                foreach (var value in container.Values)
                     value.State = MultiCheckboxState.Partial;
                 return;
             }
+
+            container.FilterBooleanState = LoadEnum<FilterBoolean>(xFoundElement, "FilterBooleanState");
+            LoadBoolean(xFoundElement, "OffPartialNoSelect", b => container.OffPartialNoSelect = b);
 
             foreach (var xSubElement in xFoundElement.Elements())
             {
@@ -352,13 +360,55 @@ namespace PrepareLanding.Presets
                 if (xState == null)
                     continue;
 
-                ThreeStateItem threeStateItem;
-                if (!dict.TryGetValue(def, out threeStateItem))
+                if (!container.TryGetValue(def, out var threeStateItem))
                     continue;
 
                 var state = LoadEnum<MultiCheckboxState>(xSubElement, StateNode);
                 threeStateItem.State = state;
             }
+        }
+
+        private void LoadThreeStateItemContainerOrdered<T>(XContainer xParent, string elementName, string entryName,
+            ThreeStateItemContainerOrdered<T> container) where T : Def
+        {
+            var xFoundElement = xParent.Element(elementName);
+            if (xFoundElement == null)
+                return;
+
+            container.FilterBooleanState = LoadEnum<FilterBoolean>(xFoundElement, "FilterBooleanState");
+            LoadBoolean(xFoundElement, "OffPartialNoSelect", b => container.OffPartialNoSelect = b);
+            LoadBoolean(xFoundElement, "OrderedFiltering", b => container.OrderedFiltering = b);
+
+            var orderedList = new List<T>();
+            foreach (var xElement in xFoundElement.Elements(entryName))
+            {
+                var xDefName = xElement.Element(DefNameNode);
+                if (xDefName == null)
+                    goto EnsureAllEntriesPresent;
+
+                var def = LoadDef<T>(xElement, DefNameNode) as T;
+                if (def == null)
+                    goto EnsureAllEntriesPresent;
+
+                orderedList.Add(def);
+
+                if (!container.TryGetValue(def, out var threeStateItem))
+                    goto EnsureAllEntriesPresent;
+
+                var state = LoadEnum<MultiCheckboxState>(xElement, StateNode);
+                threeStateItem.State = state;
+            }
+
+            EnsureAllEntriesPresent:
+            foreach (var entry in container)
+            {
+                if (orderedList.Contains(entry.Key))
+                    continue;
+
+                orderedList.Add(entry.Key);
+            }
+
+            container.SetNewOrder(orderedList);
         }
 
         private static void LoadUsableMinMax<T>(XContainer xParent, string elementName, UsableMinMaxNumericItem<T> item)
@@ -370,8 +420,7 @@ namespace PrepareLanding.Presets
             if (xUse == null)
                 return;
 
-            bool use;
-            if (!Load(xFoundElement, UseNode, out use))
+            if (!Load(xFoundElement, UseNode, out bool use))
                 return;
 
             if (!use)
@@ -379,8 +428,7 @@ namespace PrepareLanding.Presets
 
             item.Use = true;
 
-            T value;
-            if (!Load(xFoundElement, MinNode, out value))
+            if (!Load(xFoundElement, MinNode, out T value))
                 return;
 
             item.Min = value;
@@ -406,44 +454,6 @@ namespace PrepareLanding.Presets
             return true;
         }
 
-        private void LoadMultiThreeStatesOrdered<T>(XContainer xParent, string elementName, string entryName,
-            IDictionary<T, ThreeStateItem> dict, ICollection<T> orderedList) where T : Def
-        {
-            var xFoundElement = xParent.Element(elementName);
-            if (xFoundElement == null)
-                return;
-
-            orderedList.Clear();
-            foreach (var xElement in xFoundElement.Elements(entryName))
-            {
-                var xDefName = xElement.Element(DefNameNode);
-                if (xDefName == null)
-                    goto EnsureAllEntriesPresent;
-
-                var def = LoadDef<T>(xElement, DefNameNode) as T;
-                if (def == null)
-                    goto EnsureAllEntriesPresent;
-
-                orderedList.Add(def);
-
-                ThreeStateItem threeStateItem;
-                if (!dict.TryGetValue(def, out threeStateItem))
-                    goto EnsureAllEntriesPresent;
-
-                var state = LoadEnum<MultiCheckboxState>(xElement, StateNode);
-                threeStateItem.State = state;
-            }
-
-            EnsureAllEntriesPresent:
-            foreach (var entry in dict)
-            {
-                if (orderedList.Contains(entry.Key))
-                    continue;
-
-                orderedList.Add(entry.Key);
-            }
-        }
-
         private static MultiCheckboxState LoadThreeState(XContainer xParent, string containerName)
         {
             var xChild = xParent.Element(containerName);
@@ -460,8 +470,7 @@ namespace PrepareLanding.Presets
             if (xUse == null)
                 return;
 
-            bool use;
-            if (!Load(xFoundElement, UseNode, out use))
+            if (!Load(xFoundElement, UseNode, out bool use))
                 return;
 
             if (!use)
@@ -471,10 +480,8 @@ namespace PrepareLanding.Presets
 
             if (typeof(T).IsEnum)
             {
-                string value;
-
                 // min
-                if (!Load(xFoundElement, MinNode, out value))
+                if (!Load(xFoundElement, MinNode, out string value))
                     return;
 
                 if (string.IsNullOrEmpty(value))
@@ -497,8 +504,7 @@ namespace PrepareLanding.Presets
             }
             else
             {
-                T value;
-                if (!Load(xFoundElement, MinNode, out value))
+                if (!Load(xFoundElement, MinNode, out T value))
                     return;
                 item.Min = value;
 
@@ -514,22 +520,35 @@ namespace PrepareLanding.Presets
             if (xFoundElement == null)
                 return;
 
-            var feature = LoadEnum<MostLeastFeature>(xFoundElement, MostLeastItemFeatureNode);
+            var feature = LoadEnum<MostLeastCharacteristic>(xFoundElement, MostLeastItemFeatureNode);
             var featureType = LoadEnum<MostLeastType>(xFoundElement, MostLeastItemFeatureTypeNode);
 
-            int numItems;
-            if (!Load(xFoundElement, MostLeastItemNumberOfItemsNode, out numItems))
+            if (!Load(xFoundElement, MostLeastItemNumberOfItemsNode, out int numItems))
                 return;
 
-            item.Feature = feature;
-            item.FeatureType = featureType;
+            item.Characteristic = feature;
+            item.CharacteristicType = featureType;
             item.NumberOfItems = numItems;
+        }
+
+        private static void LoadUsableFromList<T>(XContainer xParent, string entryName, UsableFromList<T> item) where T : struct, IConvertible
+        {
+            var xFoundElement = xParent.Element(entryName);
+            if (xFoundElement == null)
+                return;
+
+            if (!LoadBoolean(xFoundElement, UseNode, b => item.Use = b))
+                return;
+
+            if (!Load(xFoundElement, SelectedNode, out T result))
+                return;
+
+            item.Selected = result;
         }
 
         internal static bool LoadBoolean(XContainer xParent, string entryName, Action<bool> actionSet)
         {
-            bool value;
-            if (!Load(xParent, entryName, out value))
+            if (!Load(xParent, entryName, out bool value))
                 return false;
 
             actionSet(value);
@@ -565,19 +584,50 @@ namespace PrepareLanding.Presets
             xRoot.Add(new XElement(entryName, hilliness.ToString()));
         }
 
-        private static void SaveMultiThreeStates<T>(XContainer xRoot, string containerName, string entryName,
-            Dictionary<T, ThreeStateItem> dict) where T : Def
+        private static void SaveThreeStateItemContainer<T>(XContainer xRoot, string containerName, string entryName,
+            ThreeStateItemContainer<T> container) where T : Def
         {
-            if (UserData.IsDefDictInDefaultState(dict))
+            if (container.IsInDefaultState())
                 return;
 
             var xContainerElement = new XElement(containerName);
             xRoot.Add(xContainerElement);
-            foreach (var entry in dict)
+            xContainerElement.Add(new XElement("FilterBooleanState", container.FilterBooleanState));
+            xContainerElement.Add(new XElement("OffPartialNoSelect", container.OffPartialNoSelect));
+
+            foreach (var entry in container)
             {
                 var xEntry = new XElement(entryName);
                 xEntry.Add(new XElement(DefNameNode, entry.Key.defName));
-                xEntry.Add(new XElement(StateNode, entry.Value.State.ToString()));
+                xEntry.Add(new XElement(StateNode, entry.Value.State));
+                xContainerElement.Add(xEntry);
+            }
+        }
+
+        private static void SaveThreeStateItemContainerOrdered<T>(XContainer xRoot, string containerName, string entryName,
+            ThreeStateItemContainerOrdered<T> container) where T : Def
+        {
+            if (container.IsInDefaultState())
+                return;
+
+            var xContainerElement = new XElement(containerName);
+            xRoot.Add(xContainerElement);
+
+            xContainerElement.Add(new XElement("FilterBooleanState", container.FilterBooleanState));
+            xContainerElement.Add(new XElement("OffPartialNoSelect", container.OffPartialNoSelect));
+            xContainerElement.Add(new XElement("OrderedFiltering", container.OrderedFiltering));
+
+            foreach (var def in container.OrderedItems)
+            {
+                if (!container.TryGetValue(def, out var threeStateItem))
+                {
+                    // shouldn't happen, but just a defensive check
+                    Log.Error($"[PrepareLanding] The def '{def.defName}' doesn't exit in the given dictionary.");
+                    continue;
+                }
+                var xEntry = new XElement(entryName);
+                xEntry.Add(new XElement(DefNameNode, def.defName));
+                xEntry.Add(new XElement(StateNode, threeStateItem.State.ToString()));
                 xContainerElement.Add(xEntry);
             }
         }
@@ -593,30 +643,6 @@ namespace PrepareLanding.Presets
             xContainerElement.Add(new XElement(StateNode, state.ToString()));
         }
 
-        private static void SaveMultiThreeStatesOrdered<T>(XContainer xRoot, string containerName, string entryName,
-            Dictionary<T, ThreeStateItem> dict, IEnumerable<T> orderedList) where T : Def
-        {
-            if (UserData.IsDefDictInDefaultState(dict))
-                return;
-
-            var xContainerElement = new XElement(containerName);
-            xRoot.Add(xContainerElement);
-            foreach (var def in orderedList)
-            {
-                ThreeStateItem threeStateItem;
-                if (!dict.TryGetValue(def, out threeStateItem))
-                {
-                    // shouldn't happen, but just a defensive check
-                    Log.Error($"[PrepareLanding] The def '{def.defName}' doesn't exit in the given dictionary.");
-                    continue;
-                }
-                var xEntry = new XElement(entryName);
-                xEntry.Add(new XElement(DefNameNode, def.defName));
-                xEntry.Add(new XElement(StateNode, threeStateItem.State.ToString()));
-                xContainerElement.Add(xEntry);
-            }
-        }
-
         private static void SaveUsableMinMax<T>(XContainer xRoot, string elementName, UsableMinMaxNumericItem<T> item)
             where T : struct, IComparable, IConvertible
         {
@@ -629,6 +655,19 @@ namespace PrepareLanding.Presets
             xElement.Add(new XElement(UseNode, item.Use));
             xElement.Add(new XElement(MinNode, item.Min));
             xElement.Add(new XElement(MaxNode, item.Max));
+        }
+
+        private static void SaveUsableFromList<T>(XContainer xRoot, string elementName, UsableFromList<T> item)
+            where T : struct, IConvertible
+        {
+            if (!item.Use)
+                return;
+
+            var xElement = new XElement(elementName);
+            xRoot.Add(xElement);
+
+            xElement.Add(new XElement(UseNode, item.Use));
+            xElement.Add(new XElement(SelectedNode, item.Selected));
         }
 
         private static void SaveMinMaxFromRestrictedList<T>(XContainer xRoot, string elementName,
@@ -653,8 +692,8 @@ namespace PrepareLanding.Presets
             var xElement = new XElement(elementName);
             xRoot.Add(xElement);
 
-            xElement.Add(new XElement(MostLeastItemFeatureNode, item.Feature.ToString()));
-            xElement.Add(new XElement(MostLeastItemFeatureTypeNode, item.FeatureType.ToString()));
+            xElement.Add(new XElement(MostLeastItemFeatureNode, item.Characteristic.ToString()));
+            xElement.Add(new XElement(MostLeastItemFeatureTypeNode, item.CharacteristicType.ToString()));
             xElement.Add(new XElement(MostLeastItemNumberOfItemsNode, item.NumberOfItems));
         }
 

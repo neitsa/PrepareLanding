@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
+using PrepareLanding.Filters;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -71,40 +72,7 @@ namespace PrepareLanding
             End();
         }
 
-        /// <summary>
-        /// Re-order elements in a list.
-        /// </summary>
-        /// <typeparam name="T">type of elements in the list.</typeparam>
-        /// <param name="index">The old index of the element to move.</param>
-        /// <param name="newIndex">The new index of the element to move.</param>
-        /// <param name="elementsList">The list of elements.</param>
-        public static void ReorderElements<T>(int index, int newIndex, IList<T> elementsList)
-        {
-            if ((index == newIndex) || (index < 0))
-            {
-                Log.Message($"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}");
-                return;
-            }
-
-            if (elementsList.Count == 0)
-            {
-                Log.Message("[PrepareLanding] ReorderElements: elementsList count is 0.");
-                return;
-            }
-
-            if ((index >= elementsList.Count) || (newIndex >= elementsList.Count))
-            {
-                Log.Message(
-                    $"[PrepareLanding] ReorderElements -> index: {index}; newIndex: {newIndex}; elemntsList.Count: {elementsList.Count}");
-                return;
-            }
-
-            var item = elementsList[index];
-            elementsList.RemoveAt(index);
-            elementsList.Insert(newIndex, item);
-        }
-
-        protected virtual void DrawBiomeTypesSelection()
+        private void DrawBiomeTypesSelection()
         {
             DrawEntryHeader("Biome Types", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
@@ -173,7 +141,7 @@ namespace PrepareLanding
             }
         }
 
-        protected virtual void DrawCoastalSelection()
+        private void DrawCoastalSelection()
         {
             DrawEntryHeader("Coastal Tiles", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
 
@@ -186,15 +154,72 @@ namespace PrepareLanding
 
             ListingStandard.Gap(6f);
 
-            // coastal tiles (lake)
+            /*
+             * Coastal rotation
+             */
+            var filterCoastalRotation = _gameData.UserData.CoastalRotation.Use;
+            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation,
+                "Allow to search for coastal sea tiles which have a coast facing a specific direction.");
+            _gameData.UserData.CoastalRotation.Use = filterCoastalRotation;
+
+            // "Select" button
+            if (ListingStandard.ButtonText("Select Coast Rotation"))
+            {
+                var floatMenuOptions = new List<FloatMenuOption>();
+
+                // loop through all meaningful rotations
+                foreach (var currentRotation in TileFilterCoastRotation.PossibleRotations)
+                {
+                    // clicking on the floating menu saves the selected rotation
+                    void ActionClick()
+                    {
+                        _gameData.UserData.CoastalRotation.Selected = currentRotation.AsInt;
+                    }
+
+                    // tool-tip when hovering above the rotation name on the floating menu
+                    void MouseOverAction()
+                    {
+                        var mousePos = Event.current.mousePosition;
+                        rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
+
+                        TooltipHandler.TipRegion(rect, ("HasCoast" + currentRotation).Translate());
+                    }
+
+                    //create the floating menu
+                    var menuOption = new FloatMenuOption(currentRotation.ToStringHuman(), ActionClick, MenuOptionPriority.Default,
+                        MouseOverAction);
+                    // add it to the list of floating menu options
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                // create the floating menu
+                var floatMenu = new FloatMenu(floatMenuOptions, "Select Coast Rotation");
+
+                // add it to the window stack to display it
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            var rightLabel = _gameData.UserData.CoastalRotation.Use /*&& _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid*/
+                ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
+                : "None";
+            ListingStandard.LabelDouble("Selected Coast Rotation:", rightLabel);
+
+            /*
+             * coastal tiles (lake)
+             */
+
+            ListingStandard.Gap(6f);
+
+            
             rect = ListingStandard.GetRect(DefaultElementHeight);
+            TooltipHandler.TipRegion(rect, "A lake is a most 15 tiles of water surrounded by land.");
             tmpCheckState = _gameData.UserData.ChosenCoastalLakeTileState;
             Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (lake):", ref tmpCheckState);
 
             _gameData.UserData.ChosenCoastalLakeTileState = tmpCheckState;
         }
 
-        protected void DrawElevationSelection()
+        private void DrawElevationSelection()
         {
             DrawEntryHeader("Elevation (meters)", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
 
@@ -203,7 +228,7 @@ namespace PrepareLanding
             DrawUsableMinMaxNumericField(_gameData.UserData.Elevation, "Elevation", -500f, 5000f);
         }
 
-        protected virtual void DrawHillinessTypeSelection()
+        private void DrawHillinessTypeSelection()
         {
             DrawEntryHeader($"{"Terrain".Translate()} Types",
                 backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
@@ -234,7 +259,7 @@ namespace PrepareLanding
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
-        protected void DrawMovementTime()
+        private void DrawMovementTime()
         {
             DrawEntryHeader("Movement Times (hours)", false,
                 backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
@@ -244,7 +269,7 @@ namespace PrepareLanding
             DrawUsableMinMaxNumericField(_gameData.UserData.WinterMovementTime, "Winter Movement Time");
         }
 
-        protected virtual void DrawRiverTypesSelection()
+        private void DrawRiverTypesSelection()
         {
             DrawEntryHeader("River Types", backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
 
@@ -254,7 +279,10 @@ namespace PrepareLanding
             /*
              * Buttons
              */
-            const int numButtons = 3;
+            var numButtons = 4;
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+                numButtons += 1;
+
             var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
             if (buttonsRect.Count != numButtons)
             {
@@ -262,33 +290,53 @@ namespace PrepareLanding
                 return;
             }
 
-            // Reset button: reset all entries to Partial state
+            // Reset button: reset the container
             if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
-                foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.Partial;
+                selectedRiverDefs.Reset(riverDefs, nameof(_gameData.UserData.SelectedRiverDefs));
 
             // All rivers
             if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
-                foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.On;
+                selectedRiverDefs.All();
 
             // No rivers
             if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
-                foreach (var riverDefEntry in selectedRiverDefs)
-                    riverDefEntry.Value.State = MultiCheckboxState.Off;
+                selectedRiverDefs.None();
+
+            // boolean filtering type
+            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nOR: each item is evaluated independently\nAND: all items are evaluated together.");
+            var savedColor = GUI.color;
+            GUI.color = selectedRiverDefs.FilterBooleanState.Color();
+            if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRiverDefs.FilterBooleanState.ToStringHuman()))
+            {
+                selectedRiverDefs.FilterBooleanState = selectedRiverDefs.FilterBooleanState.Next();
+            }
+            GUI.color = savedColor;
+
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+            {
+
+                TooltipHandler.TipRegion(buttonsRect[4],
+                    "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
+
+                savedColor = GUI.color;
+                GUI.color = selectedRiverDefs.OffPartialNoSelect ? Color.green : Color.red;
+                if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRiverDefs.OffPartialNoSelect}"))
+                {
+                    selectedRiverDefs.OffPartialNoSelect = !selectedRiverDefs.OffPartialNoSelect;
+                }
+                GUI.color = savedColor;
+            }
 
             /*
              * ScrollView
              */
-
             var inLs = ListingStandard.BeginScrollView(4*DefaultElementHeight,
                 selectedRiverDefs.Count*DefaultElementHeight, ref _scrollPosRiverSelection, DefaultScrollableViewShrinkWidth);
 
             // display river elements
             foreach (var riverDef in riverDefs)
             {
-                ThreeStateItem threeStateItem;
-                if (!selectedRiverDefs.TryGetValue(riverDef, out threeStateItem))
+                if (!selectedRiverDefs.TryGetValue(riverDef, out var threeStateItem))
                 {
                     Log.Error(
                         $"[PrepareLanding] [DrawRiverTypesSelection] an item in riverDefs is not in selectedRiverDefs: {riverDef.LabelCap}");
@@ -313,7 +361,7 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        protected virtual void DrawRoadTypesSelection()
+        private void DrawRoadTypesSelection()
         {
             DrawEntryHeader("Road Types", backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
 
@@ -323,7 +371,10 @@ namespace PrepareLanding
             /*
              * Buttons
              */
-            const int numButtons = 3;
+            var numButtons = 4;
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+                numButtons += 1;
+
             var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
             if (buttonsRect.Count != numButtons)
             {
@@ -331,25 +382,45 @@ namespace PrepareLanding
                 return;
             }
 
-            // Reset button: reset all entries to Partial state
+            // Reset button: reset the container
             if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
-                foreach (var roadDefEntry in selectedRoadDefs)
-                    roadDefEntry.Value.State = MultiCheckboxState.Partial;
+                selectedRoadDefs.Reset(roadDefs, nameof(_gameData.UserData.SelectedRoadDefs));
 
             // all roads
             if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
-                foreach (var roadDefEntry in selectedRoadDefs)
-                    roadDefEntry.Value.State = MultiCheckboxState.On;
+                selectedRoadDefs.All();
 
             // no roads
             if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
-                foreach (var roadDefEntry in selectedRoadDefs)
-                    roadDefEntry.Value.State = MultiCheckboxState.Off;
+                selectedRoadDefs.None();
+
+            // boolean filtering type
+            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nOR: each item is evaluated independently\nAND: all items are evaluated together.");
+            var savedColor = GUI.color;
+            GUI.color = selectedRoadDefs.FilterBooleanState.Color();
+            if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRoadDefs.FilterBooleanState.ToStringHuman()))
+            {
+                selectedRoadDefs.FilterBooleanState = selectedRoadDefs.FilterBooleanState.Next();
+            }
+            GUI.color = savedColor;
+
+            if (_gameData.UserData.Options.ViewPartialOffNoSelect)
+            {
+                TooltipHandler.TipRegion(buttonsRect[4],
+                    "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
+
+                savedColor = GUI.color;
+                GUI.color = selectedRoadDefs.OffPartialNoSelect ? Color.green : Color.red;
+                if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRoadDefs.OffPartialNoSelect}"))
+                {
+                    selectedRoadDefs.OffPartialNoSelect = !selectedRoadDefs.OffPartialNoSelect;
+                }
+                GUI.color = savedColor;
+            }
 
             /*
              * ScrollView
              */
-
             var scrollViewHeight = selectedRoadDefs.Count*DefaultElementHeight;
             var inLs = ListingStandard.BeginScrollView(5 * DefaultElementHeight, scrollViewHeight,
                 ref _scrollPosRoadSelection, DefaultScrollableViewShrinkWidth);
@@ -357,8 +428,7 @@ namespace PrepareLanding
             // display road elements
             foreach (var roadDef in roadDefs)
             {
-                ThreeStateItem threeStateItem;
-                if (!selectedRoadDefs.TryGetValue(roadDef, out threeStateItem))
+                if (!selectedRoadDefs.TryGetValue(roadDef, out var threeStateItem))
                 {
                     Log.Error(
                         $"[PrepareLanding] [DrawRoadTypesSelection] an item in RoadDefs is not in SelectedRoadDefs: {roadDef.LabelCap}");
@@ -383,27 +453,47 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(inLs);
         }
 
-        protected virtual void DrawStoneTypesSelection()
+        private void DrawStoneTypesSelection()
         {
-            DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
+            DrawEntryHeader("Stone Types", backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
             var selectedStoneDefs = _gameData.UserData.SelectedStoneDefs;
-            var orderedStoneDefs = _gameData.UserData.OrderedStoneDefs;
 
-            // Reset button: reset all entries to Off state
-            if (ListingStandard.ButtonText("Reset All"))
+            /*
+             * Buttons
+             */
+            const int numButtons = 2;
+            var buttonsRect = ListingStandard.GetRect(DefaultElementHeight).SplitRectWidthEvenly(numButtons);
+            if (buttonsRect.Count != numButtons)
             {
-                foreach (var stoneDefEntry in selectedStoneDefs)
-                    stoneDefEntry.Value.State = stoneDefEntry.Value.DefaultState;
+                Log.ErrorOnce($"[PrepareLanding] DrawStoneTypesSelection: couldn't get the right number of buttons: {numButtons}", 0x123acafe);
+                return;
+            }
+
+            // Reset button: reset all entries to Partial state
+            if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset All"))
+            {
+                selectedStoneDefs.Reset(_gameData.DefData.StoneDefs, nameof(_gameData.UserData.SelectedStoneDefs));
 
                 _gameData.UserData.StoneTypesNumberOnly = false;
             }
+
+            // order / no order button
+            TooltipHandler.TipRegion(buttonsRect[1], "Whether Stone Filtering is order dependent or not.\nPress button to change filter state.");
+            var orderText = selectedStoneDefs.OrderedFiltering ? "Ordered" : "No Order";
+            var savedColor = GUI.color;
+            GUI.color = selectedStoneDefs.OrderedFiltering ? Color.green : Color.red;
+            if (Verse.Widgets.ButtonText(buttonsRect[1], $"Filter: {orderText}"))
+            {
+                selectedStoneDefs.OrderedFiltering = !selectedStoneDefs.OrderedFiltering;
+            }
+            GUI.color = savedColor;
 
             // re-orderable list group
             var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
             {
                 //TODO find a way to raise an event to tell an observer that the list order has changed
-                ReorderElements(from, to, orderedStoneDefs);
+                selectedStoneDefs.ReorderElements(from, to);
                 SoundDefOf.TickHigh.PlayOneShotOnCamera();
             });
 
@@ -418,11 +508,9 @@ namespace PrepareLanding
                 var inLs = ListingStandard.BeginScrollView(height, selectedStoneDefs.Count*DefaultElementHeight,
                     ref _scrollPosStoneSelection, DefaultScrollableViewShrinkWidth);
 
-                foreach (var currentOrderedStoneDef in orderedStoneDefs)
+                foreach (var currentOrderedStoneDef in selectedStoneDefs.OrderedItems)
                 {
-                    ThreeStateItem threeStateItem;
-
-                    if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out threeStateItem))
+                    if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out var threeStateItem))
                     {
                         Log.Message("A stoneDef wasn't found in selectedStoneDefs");
                         continue;
@@ -474,7 +562,7 @@ namespace PrepareLanding
             TooltipHandler.TipRegion(leftRect, tooltipText);
         }
 
-        protected virtual void DrawTimeZoneSelection()
+        private void DrawTimeZoneSelection()
         {
             DrawEntryHeader("Time Zone [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
 

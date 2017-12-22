@@ -16,6 +16,8 @@ namespace PrepareLanding
 {
     public class MainWindow : MinimizableWindow
     {
+        public const float SpaceForBottomButtons = 55f;
+
         private const float GapBetweenButtons = 10f;
 
         private const int MaxDisplayedTileWhenMinimized = 30;
@@ -212,9 +214,7 @@ namespace PrepareLanding
             var buttonSaveLoadPreset = new ButtonDescriptor("Load / Save", "Load or Save Filter Presets");
             buttonSaveLoadPreset.AddFloatMenuOption("Save", delegate
                 {
-                    //_userData.PresetManager.TestSave();
-                    var tab = TabController.TabById("LoadSave") as TabLoadSave;
-                    if (tab == null)
+                    if (!(TabController.TabById("LoadSave") is TabLoadSave tab))
                         return;
 
                     tab.LoadSaveMode = LoadSaveMode.Save;
@@ -229,9 +229,7 @@ namespace PrepareLanding
             );
             buttonSaveLoadPreset.AddFloatMenuOption("Load", delegate
                 {
-                    //_userData.PresetManager.TestLoad();
-                    var tab = TabController.TabById("LoadSave") as TabLoadSave;
-                    if (tab == null)
+                    if (!(TabController.TabById("LoadSave") is TabLoadSave tab))
                         return;
 
                     tab.LoadSaveMode = LoadSaveMode.Load;
@@ -277,7 +275,7 @@ namespace PrepareLanding
         {
             var numButtons = _bottomButtonsDescriptorList.Count;
 
-            var buttonsY = windowRect.height - 55f;
+            var buttonsY = windowRect.height - SpaceForBottomButtons;
 
             var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
                 _bottomButtonSize.y, GapBetweenButtons);

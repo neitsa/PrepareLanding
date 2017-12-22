@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
 using PrepareLanding.GameData;
 using RimWorld;
@@ -43,7 +42,7 @@ namespace PrepareLanding
             _userData.Options.PropertyChanged += OnOptionPropertyChanged;
 
             // be alerted when the world map is generated or loaded.
-            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += PrefilterQueueLongEvent;
+            PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += OnNewWorldGeneratedOrLoaded;
 
             // instantiate all existing filters
             _allFilters = new Dictionary<string, ITileFilter>
@@ -102,6 +101,10 @@ namespace PrepareLanding
                     nameof(_userData.TimeZone),
                     new TileFilterTimeZones(_userData, nameof(_userData.TimeZone), FilterHeaviness.Medium)
                 }, //TODO: check heaviness
+                {
+                    nameof(_userData.CoastalRotation),
+                    new TileFilterCoastRotation(_userData, nameof(_userData.CoastalRotation), FilterHeaviness.Heavy)
+                },
                 /* temperature */
                 {
                     nameof(_userData.AverageTemperature),
@@ -132,8 +135,17 @@ namespace PrepareLanding
                         FilterHeaviness.Heavy)
                 }, //TODO check heaviness
                 {
+                    nameof(_userData.HasCaveState),
+                    new TileFilterHasCave(_userData, nameof(_userData.HasCaveState),
+                        FilterHeaviness.Light)
+                },
+                {
                     nameof(_userData.MostLeastItem),
-                    new TileFilterMostLeastFeature(_userData, nameof(_userData.MostLeastItem), FilterHeaviness.Light)
+                    new TileFilterMostLeastCharacteristic(_userData, nameof(_userData.MostLeastItem), FilterHeaviness.Light)
+                },
+                {
+                    nameof(_userData.WorldFeature),
+                    new TileFilterWorldFeature(_userData, nameof(_userData.WorldFeature), FilterHeaviness.Medium)
                 }
             };
 
@@ -216,7 +228,6 @@ namespace PrepareLanding
             {
                 var minRange = Math.Min(_matchingTileIds.Count, 100);
 
-                int tileId;
                 if ((from _ in Enumerable.Range(0, minRange) select _matchingTileIds[random.Next(_matchingTileIds.Count)]).TryRandomElementByWeight(delegate(int x)
                 {
                     var tile = Find.WorldGrid[x];
@@ -232,7 +243,7 @@ namespace PrepareLanding
                         return 0f;
 
                     return tile.biome.factionBaseSelectionWeight;
-                }, out tileId))
+                }, out var tileId))
                 {
                     if (TileFinder.IsValidTileForNewSettlement(tileId))
                         return tileId;
@@ -259,8 +270,7 @@ namespace PrepareLanding
                     _filterHeavinessCache.Add(filter.SubjectThingDef, filter.Heaviness);
             }
 
-            FilterHeaviness filterHeaviness;
-            return _filterHeavinessCache.TryGetValue(subjectThingDef, out filterHeaviness)
+            return _filterHeavinessCache.TryGetValue(subjectThingDef, out var filterHeaviness)
                 ? filterHeaviness
                 : FilterHeaviness.Unknown;
         }
@@ -283,8 +293,7 @@ namespace PrepareLanding
             // clear all previous matching tiles and remove all previously highlighted tiles on the world map
             ClearMatchingTiles();
 
-            var separator = "-".Repeat(80);
-            FilterInfoLogger.AppendMessage($"{separator}\nNew Filtering\n{separator}", textColor: Color.yellow);
+            FilterInfoLogger.AppendTitleMessage("New Filtering", textColor: Color.yellow);
 
             var globalFilterStopWatch = new Stopwatch();
             var localFilterStopWatch = new Stopwatch();
@@ -398,8 +407,7 @@ namespace PrepareLanding
         {
             Log.Message($"[PrepareLanding] Prefilter: {Find.WorldGrid.tiles.Count} tiles in WorldGrid.tiles");
 
-            var separator = "-".Repeat(80);
-            FilterInfoLogger.AppendMessage($"{separator}\nPreFiltering\n{separator}", textColor: Color.cyan);
+            FilterInfoLogger.AppendTitleMessage("PreFiltering", textColor: Color.cyan);
 
             ClearMatchingTiles();
 
@@ -438,6 +446,19 @@ namespace PrepareLanding
         }
 
         /// <summary>
+        ///     Called when the world map has been generated.
+        /// </summary>
+        private void OnNewWorldGeneratedOrLoaded()
+        {
+            // clear logger
+            FilterInfoLogger.Clear();
+            FilterInfoLogger.AppendTitleMessage("New World", textColor: Color.blue);
+
+            // tiles pre-filtering
+            PrefilterQueueLongEvent();
+        }
+
+        /// <summary>
         ///     Called when the world map has been generated. We use it to pre-filter valid tiles.
         /// </summary>
         private void PrefilterQueueLongEvent()
@@ -457,7 +478,16 @@ namespace PrepareLanding
             if (_userData.AreAllFieldsInDefaultSate())
             {
                 FilterInfoLogger.AppendErrorMessage(
-                    "All filters are in their default state, please select at least one filter.");
+                    "All filters are in their default state, please select at least one filter.",
+                    "All filters are in their default state.");
+                return false;
+            }
+
+            // can't have 'cave' filter ON with hilliness less than large hills (see RimWorld.Planet.World.HasCaves)
+            if (_userData.HasCaveState == MultiCheckboxState.On & (_userData.ChosenHilliness < Hilliness.LargeHills & _userData.ChosenHilliness != Hilliness.Undefined))
+            {
+                FilterInfoLogger.AppendErrorMessage(
+                    $"There can be no caves with the chosen terrain type. Choose at least {Hilliness.LargeHills.GetLabelCap()}.");
                 return false;
             }
 
@@ -551,17 +581,6 @@ namespace PrepareLanding
         #endregion PRIVATE_FIELDS
 
         #region PREDICATES
-
-        /// <summary>
-        ///     Negate an existing predicate.
-        /// </summary>
-        /// <typeparam name="T">Type used by the predicate.</typeparam>
-        /// <param name="predicate">The predicate to be negated.</param>
-        /// <returns>Returns a <see cref="bool" /> that is the negated value of the predicate.</returns>
-        public static Predicate<T> NegatePredicate<T>(Predicate<T> predicate)
-        {
-            return x => !predicate(x);
-        }
 
         /// <summary>
         ///     Check if a <see cref="ThingDef" /> describes a stone / rock type.

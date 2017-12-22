@@ -13,10 +13,11 @@ namespace PrepareLanding
         private readonly GUIStyle _styleFilterInfo;
         private readonly GUIStyle _styleWorldInfo;
         private Vector2 _scrollPosFilterInfo;
-
         private Vector2 _scrollPosWorldInfo;
+        private Vector2 _scrollPosWorldRecords;
 
         private string _worldInfo;
+        private string _worldRecords;
 
         public TabInfo(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -49,9 +50,11 @@ namespace PrepareLanding
 
         public override string Name => "World Info";
 
-        public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
+        private string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
 
-        public string BuildWorldInfo()
+        private string WolrdRecords => _worldRecords ?? (_worldRecords = BuildWorldRecords());
+
+        private string BuildWorldInfo()
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Planet Name: {Find.World.info.name}");
@@ -71,40 +74,43 @@ namespace PrepareLanding
                     stringBuilder.AppendLine(
                         $"Tiles with Roads: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
 
-                stringBuilder.AppendLine("Biomes: (number of tiles)");
+                stringBuilder.AppendLine("Biomes:");
                 var biomes = _gameData.DefData.BiomeDefs;
-
-                //var biomeNames = biomes.Select(biome => biome.LabelCap).ToList();
-                //var longestBiomeName = biomeNames.Aggregate("", (max, cur) => max.Length > cur.Length ? max : cur).Length;
 
                 foreach (var biome in biomes)
                 {
+                    stringBuilder.AppendLine($"    * {biome.LabelCap}");
                     var count = _gameData.WorldData.NumberOfTilesByBiome[biome];
-                    //stringBuilder.AppendLine($"    {biome.LabelCap.PadRight(longestBiomeName)} ➠ {count}");
-                    stringBuilder.AppendLine($"    {biome.LabelCap} ➠ {count}");
+                    stringBuilder.AppendLine($"        - Number of Tiles ➠ {count}");
+                    stringBuilder.AppendLine($"        - {"AverageDiseaseFrequency".Translate()} ➠ {(RimWorld.GenDate.DaysPerYear / biome.diseaseMtbDays):F1} {"PerYear".Translate()}");
                 }
             }
 
+            return stringBuilder.ToString();
+        }
+
+        private string BuildWorldRecords()
+        {
             /*
-             * Highest / lowest value for all features.
+             * Highest / lowest value for all characteristics.
              */
+             var stringBuilder = new StringBuilder();
 
-            foreach (var feature in _gameData.WorldData.WorldFeatures)
+            foreach (var characteristicData in _gameData.WorldData.WorldCharacteristics)
             {
-                var featureName = feature.FeatureName;
-                stringBuilder.AppendLine(featureName);
+                var characteristicName = characteristicData.CharacteristicName;
+                stringBuilder.AppendLine(characteristicName);
 
-                var lowestFeatureKvp = feature.WorldTilesFeatures.First();
-                var vectorLongLat = Find.WorldGrid.LongLatOf(lowestFeatureKvp.Key);
+                var lowestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.First();
+                var vectorLongLat = Find.WorldGrid.LongLatOf(lowestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Lowest {featureName}: {lowestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {lowestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Lowest {characteristicName}: {lowestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
 
-                var highestFeatureKvp = feature.WorldTilesFeatures.Last();
-                vectorLongLat = Find.WorldGrid.LongLatOf(highestFeatureKvp.Key);
+                var highestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.Last();
+                vectorLongLat = Find.WorldGrid.LongLatOf(highestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Highest {featureName}: {highestFeatureKvp.Value:F1} {feature.FeatureMeasureUnit}\n\t    ➠[tile: {highestFeatureKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Highest {characteristicName}: {highestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
             }
-
 
             return stringBuilder.ToString();
         }
@@ -113,12 +119,13 @@ namespace PrepareLanding
         {
             Begin(inRect);
             DrawWorldInfo();
+            DrawWorldRecord();
             NewColumn();
             DrawFilterInfo();
             End();
         }
 
-        protected virtual void DrawFilterInfo()
+        private void DrawFilterInfo()
         {
             DrawEntryHeader("Filter Info", backgroundColor: Color.yellow);
 
@@ -131,28 +138,39 @@ namespace PrepareLanding
             if (text.NullOrEmpty())
                 return;
 
-            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
+            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - DefaultElementHeight;
 
             ListingStandard.ScrollableTextArea(maxOuterRectHeight, text, ref _scrollPosFilterInfo, _styleFilterInfo,
-                16f);
+                DefaultScrollableViewShrinkWidth);
         }
 
-        protected virtual void DrawWorldInfo()
+        private void DrawWorldInfo()
         {
-            DrawEntryHeader("World Info", backgroundColor: Color.yellow);
+            var remSpace = DrawEntryHeader("World Info", backgroundColor: Color.yellow);
 
-            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
+            var maxOuterRectHeight = (InRect.height - MainWindow.SpaceForBottomButtons - remSpace) / 2;
 
             ListingStandard.ScrollableTextArea(maxOuterRectHeight, WorldInfo, ref _scrollPosWorldInfo, _styleWorldInfo,
-                16f);
+                DefaultScrollableViewShrinkWidth);
+        }
+
+        private void DrawWorldRecord()
+        {
+            var currHeight = DrawEntryHeader("World Records", backgroundColor: Color.yellow);
+
+            var maxOuterRectHeight = currHeight - MainWindow.SpaceForBottomButtons - DefaultElementHeight;
+
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, WolrdRecords, ref _scrollPosWorldRecords, _styleWorldInfo,
+                DefaultScrollableViewShrinkWidth);
         }
 
         /// <summary>
         ///     Called when a new world map has been generated.
         /// </summary>
-        protected void RebuildWorldInfo()
+        private void RebuildWorldInfo()
         {
             _worldInfo = BuildWorldInfo();
+            _worldRecords = BuildWorldRecords();
         }
     }
 }

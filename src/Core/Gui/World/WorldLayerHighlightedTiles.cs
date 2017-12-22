@@ -44,7 +44,7 @@ namespace PrepareLanding.Core.Gui.World
         /// </summary>
         public Color TileColor
         {
-            get { return _materialColor; }
+            get => _materialColor;
             set
             {
                 _materialColor = value;
@@ -75,6 +75,8 @@ namespace PrepareLanding.Core.Gui.World
                     continue;
 
                 var subMesh = GetSubMesh(_defaultMaterial);
+                subMesh.finalized = false;
+
                 Find.World.grid.GetTileVertices(tileId, _vertices);
 
                 var startVertIndex = subMesh.verts.Count;
@@ -99,7 +101,7 @@ namespace PrepareLanding.Core.Gui.World
                     currentIndex++;
                 }
 
-                FinalizeMesh(MeshParts.All);
+                subMesh.FinalizeMesh(MeshParts.All);
             }
         }
 

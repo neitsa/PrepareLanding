@@ -10,7 +10,7 @@
   #---------------------------------#
 
   # version format (you need to bump it when changing version)
-  version: 0.6.0-{build}-{branch}
+  version: 0.7.0-{build}-{branch}
 
   # branches
   branches:
@@ -35,7 +35,7 @@
   #---------------------------------#
 
   # Build worker image (VM template)
-  image: Visual Studio 2015
+  image: Visual Studio 2017
 
   # scripts that are called at very beginning, before repo cloning
   init:

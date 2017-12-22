@@ -8,6 +8,7 @@ namespace PrepareLanding
         private bool _allowImpassableHilliness;
         private bool _allowInvalidTilesForNewSettlement;
         private bool _allowLiveFiltering;
+        private bool _viewPartialNoSelect;
         private bool _bypassMaxHighlightedTiles;
         private bool _disablePreFilterCheck;
         private bool _resetAllFieldsOnNewGeneratedWorld;
@@ -21,7 +22,7 @@ namespace PrepareLanding
         /// </summary>
         public bool AllowImpassableHilliness
         {
-            get { return _allowImpassableHilliness; }
+            get => _allowImpassableHilliness;
             set
             {
                 if (value == _allowImpassableHilliness)
@@ -40,7 +41,7 @@ namespace PrepareLanding
         /// </summary>
         public bool AllowInvalidTilesForNewSettlement
         {
-            get { return _allowInvalidTilesForNewSettlement; }
+            get => _allowInvalidTilesForNewSettlement;
             set
             {
                 if (value == _allowInvalidTilesForNewSettlement)
@@ -57,7 +58,7 @@ namespace PrepareLanding
         /// </summary>
         public bool AllowLiveFiltering
         {
-            get { return _allowLiveFiltering; }
+            get => _allowLiveFiltering;
             set
             {
                 if (value == _allowLiveFiltering)
@@ -74,7 +75,7 @@ namespace PrepareLanding
         /// </summary>
         public bool BypassMaxHighlightedTiles
         {
-            get { return _bypassMaxHighlightedTiles; }
+            get => _bypassMaxHighlightedTiles;
             set
             {
                 if (value == _bypassMaxHighlightedTiles)
@@ -90,7 +91,7 @@ namespace PrepareLanding
         /// </summary>
         public bool DisablePreFilterCheck
         {
-            get { return _disablePreFilterCheck; }
+            get => _disablePreFilterCheck;
             set
             {
                 if (value == _disablePreFilterCheck)
@@ -102,11 +103,27 @@ namespace PrepareLanding
         }
 
         /// <summary>
+        ///     Allow to view the button (for <see cref="ThreeStateItemContainer{T}"/>) for PartialOffNoSelect state.
+        /// </summary>
+        public bool ViewPartialOffNoSelect
+        {
+            get => _viewPartialNoSelect;
+            set
+            {
+                if (value == _viewPartialNoSelect)
+                    return;
+
+                _viewPartialNoSelect = value;
+                OnPropertyChanged(nameof(ViewPartialOffNoSelect));
+            }
+        }
+
+        /// <summary>
         ///     If ON all the filters are reset on a new world (if false, the filters are kept in their previous state).
         /// </summary>
         public bool ResetAllFieldsOnNewGeneratedWorld
         {
-            get { return _resetAllFieldsOnNewGeneratedWorld; }
+            get => _resetAllFieldsOnNewGeneratedWorld;
             set
             {
                 if (value == _resetAllFieldsOnNewGeneratedWorld)
@@ -122,7 +139,7 @@ namespace PrepareLanding
         /// </summary>
         public bool DisableTileBlinking
         {
-            get { return _disableTileBlinking; }
+            get => _disableTileBlinking;
             set
             {
                 if (value == _disableTileBlinking)
@@ -138,7 +155,7 @@ namespace PrepareLanding
         /// </summary>
         public bool DisableTileHighlighting
         {
-            get { return _disableTileHighlighting; }
+            get => _disableTileHighlighting;
             set
             {
                 if (value == _disableTileHighlighting)
@@ -154,7 +171,7 @@ namespace PrepareLanding
         /// </summary>
         public bool ShowDebugTileId
         {
-            get { return _showDebugTileId; }
+            get => _showDebugTileId;
             set
             {
                 if (value == _showDebugTileId)
@@ -170,7 +187,7 @@ namespace PrepareLanding
         /// </summary>
         public bool ShowFilterHeaviness
         {
-            get { return _showFilterHeaviness; }
+            get => _showFilterHeaviness;
             set
             {
                 if (value == _showFilterHeaviness)

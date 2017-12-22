@@ -24,11 +24,21 @@ namespace PrepareLanding.Presets
         {
             _gameData = gameData;
 
-            // just make sure the preset dir exists by calling the PresetFolder Property
-            Log.Message($"[PrepareLanding] Preset folder is at: {PresetFolder}");
+            var displayPresetFolder = PresetFolder;
+            var displayPresetTemplateFolder = PresetTemplateFolder;
 
+           // redact user name from log string
+            var userName = Environment.UserName;
+            if (displayPresetFolder.Contains(userName))
+            {
+                displayPresetFolder = displayPresetFolder.Replace(userName, "<redacted>");
+                displayPresetTemplateFolder = displayPresetTemplateFolder.Replace(userName, "<redacted>");
+            }
+
+            // just make sure the preset dir exists by calling the PresetFolder Property
+            Log.Message($"[PrepareLanding] Preset folder is at: {displayPresetFolder}");
             // location of the preset templates, provided de facto with the mod
-            Log.Message($"[PrepareLanding] Preset template folder is at: {PresetTemplateFolder}");
+            Log.Message($"[PrepareLanding] Preset template folder is at: {displayPresetTemplateFolder}");
 
             CopyFromTemplateFolderToPresetFolder(PresetTemplateFolder, PresetFolder);
 
@@ -78,8 +88,7 @@ namespace PrepareLanding.Presets
             try
             {
                 // reload the preset if it was already in the cache
-                Preset preset;
-                if (_presetCache.TryGetValue(presetName, out preset))
+                if (_presetCache.TryGetValue(presetName, out var preset))
                 {
                     preset.LoadPreset();
 
@@ -206,6 +215,44 @@ namespace PrepareLanding.Presets
             return successfulSave;
         }
 
+        public bool DeletePreset(string presetName)
+        {
+            if (string.IsNullOrEmpty(presetName))
+                return false;
+
+            var filePath = GetPresetFilePath(presetName);
+
+            // just check we aren't trying to delete a template preset
+            if (_presetCache.ContainsKey(presetName))
+                if (_presetCache[presetName].PresetInfo.IsTemplate)
+                {
+                    Messages.Message("[PrepareLanding] It is not allowed to delete a template preset.",
+                        MessageTypeDefOf.RejectInput);
+                    return false;
+                }
+            
+            try
+            {
+                // delete file
+                File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                Messages.Message("[PrepareLanding] Failed to delete preset file.", MessageTypeDefOf.NegativeEvent);
+                Log.Error($"[PrepareLanding] Failed to delete preset file '{filePath}'. error:\n\t{ex}\n\t{ex.Message}");
+                return false;
+            }
+
+            // remove it from the cache
+            if(_presetCache.ContainsKey(presetName))
+                _presetCache.Remove(presetName);
+
+            // renew the cache
+            RenewPresetFileCache();
+
+            return true;
+        }
+
         private static void CopyFromTemplateFolderToPresetFolder(string sourceFolder, string destFolder)
         {
             if (!Directory.Exists(sourceFolder) || !Directory.Exists(destFolder))
@@ -327,8 +374,7 @@ namespace PrepareLanding.Presets
             if (string.IsNullOrEmpty(presetName))
                 return null;
 
-            Preset presetValue;
-            _presetCache.TryGetValue(presetName, out presetValue);
+            _presetCache.TryGetValue(presetName, out var presetValue);
             return presetValue;
         }
 

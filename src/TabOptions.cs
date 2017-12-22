@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using PrepareLanding.Core.Extensions;
-using PrepareLanding.Core.Gui.Tab;
+﻿using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.World;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -10,17 +7,8 @@ namespace PrepareLanding
 {
     public class TabOptions : TabGuiUtility
     {
-        // split percentage for the 3 elements of the "go to tile" entry.
-        private readonly List<float> _goToTileSplitPct = new List<float> {0.5f, 0.35f, 0.15f};
-
         // game data
         private readonly GameData.GameData _gameData;
-
-        // default tile number (for "go to tile").
-        private int _tileNumber;
-
-        // tile number, as string (for "go to tile")
-        private string _tileNumberString = string.Empty;
 
         public TabOptions(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -47,7 +35,7 @@ namespace PrepareLanding
             End();
         }
 
-        protected virtual void DrawFilterOptions()
+        private void DrawFilterOptions()
         {
             DrawEntryHeader("Filter Options", backgroundColor: Color.cyan);
 
@@ -55,8 +43,6 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Allow Live Filtering", ref allowLiveFiltering,
                 "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
             _gameData.UserData.Options.AllowLiveFiltering = allowLiveFiltering;
-
-            //TODO: allow unimplemented biomes
 
             var allowImpassableHilliness = _gameData.UserData.Options.AllowImpassableHilliness;
             ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref allowImpassableHilliness,
@@ -67,6 +53,11 @@ namespace PrepareLanding
             ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref disablePreFilterCheck,
                 "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
             _gameData.UserData.Options.DisablePreFilterCheck = disablePreFilterCheck;
+
+            var viewPartialOffNoSelect = _gameData.UserData.Options.ViewPartialOffNoSelect;
+            ListingStandard.CheckboxLabeled("View PartialOffNoSelect", ref viewPartialOffNoSelect,
+                "Allow to view the PartialOffNoSelect on the GUI for grouped three state items.");
+            _gameData.UserData.Options.ViewPartialOffNoSelect = viewPartialOffNoSelect;
 
             var resetAllFieldsOnNewGeneratedWorld = _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld;
             ListingStandard.CheckboxLabeled("Reset all filters on new world", ref resetAllFieldsOnNewGeneratedWorld,
@@ -83,81 +74,9 @@ namespace PrepareLanding
                 ref allowInvalidTilesForNewSettlement,
                 "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
             _gameData.UserData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
-
-            GoToTileOption();
-
-#if DEBUG_TEST_COORDINATES
-            GoToCoordinatesOption();
-#endif
-
         }
 
-        private void GoToCoordinatesOption()
-        {
-            if (!ListingStandard.ButtonText("Test Coord"))
-                return;
-
-            if (_tileNumber < 0)
-                return;
-
-            var tileCenter = GetTileCenter(_tileNumber);
-            var x = Mathf.Atan2(tileCenter.x, -tileCenter.z) * 57.29578f;
-            var y = Mathf.Asin(tileCenter.y / 100f) * 57.29578f;
-            Log.Message($"TileId: {_tileNumber}; TileCenter: {tileCenter}; x: {x}; y: {y}");
-
-            // finding back vector3 components from longitude and latitude
-            var longitude = x;
-            var latitude = y;
-
-            var theta = Mathf.Deg2Rad * longitude; // Azimuth angle (0 <= theta <= 2 * pi)
-            var latRad = Mathf.Deg2Rad * latitude;
-            var compY = Mathf.Sin(latRad);
-            var phi = Mathf.Acos(compY); // Zenith angle (0 <= phi <= pi)
-            var compX = Mathf.Sin(phi) * Mathf.Sin(theta);
-            var compZ = Mathf.Sin(phi) * Mathf.Cos(theta);
-            // multiply by north pole magnitude (it's the same as multiplying by the radius of the world sphere which is 100)
-            var vec = new Vector3(compX, compY, -compZ) * Find.WorldGrid.NorthPolePos.magnitude;
-            Log.Message($"Vec: {vec}");
-
-        }
-
-        private static Vector3 GetTileCenter(int tileId)
-        {
-            var worldGrid = Find.WorldGrid;
-            var num = (tileId + 1 >= worldGrid.tileIDToVerts_offsets.Count) ? worldGrid.verts.Count : worldGrid.tileIDToVerts_offsets[tileId + 1];
-            var a = Vector3.zero;
-            var num2 = 0;
-            for (var i = worldGrid.tileIDToVerts_offsets[tileId]; i < num; i++)
-            {
-                a += worldGrid.verts[i];
-                num2++;
-            }
-            return a / num2;
-        }
-
-        private void GoToTileOption()
-        {
-            var goToTileOptionRectSpace = ListingStandard.GetRect(30f);
-            var rects = goToTileOptionRectSpace.SplitRectWidth(_goToTileSplitPct);
-            var maxTileId = Find.WorldGrid.TilesCount - 1;
-            Widgets.Label(rects[0], $"Go to Tile [0, {maxTileId}]:");
-            Widgets.TextFieldNumeric(rects[1], ref _tileNumber, ref _tileNumberString, 0, maxTileId);
-            if (Widgets.ButtonText(rects[2], "Go!"))
-            {
-                if ((_tileNumber < 0) || (_tileNumber >= Find.WorldGrid.TilesCount))
-                {
-                    Messages.Message($"Out of Range: {_tileNumber}; Range: [0, {Find.WorldGrid.TilesCount}).",
-                        MessageTypeDefOf.RejectInput);
-                }
-                else
-                {
-                    Find.WorldInterface.SelectedTile = _tileNumber;
-                    Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
-                }
-            }
-        }
-
-        protected virtual void DrawTileHighlighterOptions()
+        private void DrawTileHighlighterOptions()
         {
             DrawEntryHeader("Tile Highlighter Options", backgroundColor: Color.cyan);
 

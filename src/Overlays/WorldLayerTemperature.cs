@@ -52,9 +52,11 @@ namespace PrepareLanding.Overlays
                 if (tileId < 0)
                     continue;
 
-                var material = temperatureData.MaterialFromTileFeature(biome, tileId);
+                var material = temperatureData.MaterialFromTileCharacteristic(biome, tileId);
 
                 var subMesh = GetSubMesh(material);
+                subMesh.finalized = false;
+
                 Find.World.grid.GetTileVertices(tileId, _vertices);
 
                 var startVertIndex = subMesh.verts.Count;
@@ -82,7 +84,7 @@ namespace PrepareLanding.Overlays
                     currentIndex++;
                 }
 
-                FinalizeMesh(MeshParts.All);
+                subMesh.FinalizeMesh(MeshParts.All);
             }
 
             sw.Stop();
