@@ -1,5 +1,7 @@
 ﻿using System;
+using PrepareLanding.Defs;
 using PrepareLanding.Patches;
+using UnityEngine;
 using Verse;
 
 namespace PrepareLanding
@@ -107,19 +109,40 @@ namespace PrepareLanding
         /// <summary>
         ///     Called on each <see cref="RimWorld.WorldInterface" /> Gui event.
         /// </summary>
-        public void OnWorldInterfaceOnGui()
+        private void OnWorldInterfaceOnGui()
         {
             //Log.Message("[PrepareLanding] OnWorldInterfaceOnGui");
+            OnWorldInterfaceOnGuiPump();
             WorldInterfaceOnGui?.Invoke();
         }
 
         /// <summary>
         ///     Called on each <see cref="RimWorld.WorldInterface" /> update event.
         /// </summary>
-        public void OnWorldInterfaceUpdate()
+        private void OnWorldInterfaceUpdate()
         {
             //Log.Message("[PrepareLanding] OnWorldInterfaceUpdate");
             WorldInterfaceUpdate?.Invoke();
+        }
+
+        /// <summary>
+        ///     Handle key down events when the World interface is displayed.
+        /// </summary>
+        private void OnWorldInterfaceOnGuiPump()
+        {
+            if (Event.current.type != EventType.KeyDown)
+                return;
+
+            // coordinates window
+            if (KeyBindings.CoordinatesWindow.JustPressed && KeysUtils.IsControlPressedAndHeld)
+            {
+                if (Coordinates.MainWindow.CanBeDisplayed && !Coordinates.MainWindow.IsInWindowStack)
+                {
+                    var coordinatesWindows = new Coordinates.MainWindow();
+                    Find.WindowStack.Add(coordinatesWindows);
+                }
+
+            }
         }
     }
 }

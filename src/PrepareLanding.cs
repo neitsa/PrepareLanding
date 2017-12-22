@@ -90,7 +90,7 @@ namespace PrepareLanding
         /// <summary>
         ///      Instance used to control all useful events from RimWorld.
         /// </summary>
-        public RimWorldEventHandler EventHandler;
+        public readonly RimWorldEventHandler EventHandler;
 
         /// <summary>
         ///     Set the main instance to null.
