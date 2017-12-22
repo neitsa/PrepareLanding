@@ -13,11 +13,7 @@ namespace PrepareLanding.Core.Gui.Tab
         public const float DefaultGapHeight = 12f;
         public const float DefaultScrollableViewShrinkWidth = 16f;
 
-        private static ColorInt _windowBgFillColorInt = new ColorInt(21, 25, 29);
-        public static Color WindowBgFillColor = _windowBgFillColorInt.ToColor;
-
-        private static ColorInt _menuSectionBgFillColor = new ColorInt(42, 43, 44);
-        public static Color MenuSectionBgFillColor = _menuSectionBgFillColor.ToColor;
+        public static Color DefaultMenuSectionBgFillColor = Color.magenta;
 
         private readonly float _columnSizePercent;
 
@@ -82,7 +78,7 @@ namespace PrepareLanding.Core.Gui.Tab
             var r = ListingStandard.GetRect(0f);
             r.height = textHeight;
 
-            var bgColor = backgroundColor.GetValueOrDefault(MenuSectionBgFillColor);
+            var bgColor = backgroundColor.GetValueOrDefault(DefaultMenuSectionBgFillColor);
             if (backgroundColor != null)
                 bgColor.a = colorAlpha;
 
@@ -123,14 +119,14 @@ namespace PrepareLanding.Core.Gui.Tab
         protected static Color ColorFromFilterSubjectThingDef(string filterName)
         {
             if (!PrepareLanding.Instance.GameData.UserData.Options.ShowFilterHeaviness)
-                return MenuSectionBgFillColor;
+                return DefaultMenuSectionBgFillColor;
 
             Color result;
             var heaviness = PrepareLanding.Instance.TileFilter.FilterHeavinessFromFilterSubjectThingDef(filterName);
             switch (heaviness)
             {
                 case FilterHeaviness.Unknown:
-                    result = MenuSectionBgFillColor;
+                    result = DefaultMenuSectionBgFillColor;
                     break;
                 case FilterHeaviness.Light:
                     result = Color.green;

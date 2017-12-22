@@ -319,7 +319,7 @@ namespace PrepareLanding.Core.Gui.Window
             var r = ListingStandard.GetRect(0f);
             r.height = textHeight;
 
-            var bgColor = backgroundColor.GetValueOrDefault(TabGuiUtility.MenuSectionBgFillColor);
+            var bgColor = backgroundColor.GetValueOrDefault(TabGuiUtility.DefaultMenuSectionBgFillColor);
             if (backgroundColor != null)
                 bgColor.a = colorAlpha;
 
