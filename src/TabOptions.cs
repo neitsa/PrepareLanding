@@ -74,24 +74,6 @@ namespace PrepareLanding
                 ref allowInvalidTilesForNewSettlement,
                 "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
             _gameData.UserData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
-
-            // coordinates window
-            GoToCoordinatesOption();
-        }
-
-        private void GoToCoordinatesOption()
-        {
-            if (!ListingStandard.ButtonText("Open Coordinates Window"))
-                return;
-
-            if (Coordinates.MainWindow.IsInWindowStack)
-                return;
-
-            if (!Coordinates.MainWindow.CanBeDisplayed)
-                return;
-
-            var coordinatesWindow = new Coordinates.MainWindow();
-            Find.WindowStack.Add(coordinatesWindow);
         }
 
         private void DrawTileHighlighterOptions()

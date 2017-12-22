@@ -57,6 +57,7 @@ namespace PrepareLanding
             DrawMostLeastCharacteristicSelection();
             DrawCaveSelection();
             DrawFeatureSelection();
+            DrawOpenCoordinatesWindow();
             NewColumn(true);
             DrawTemperaturesSelection();
             DrawGrowingPeriodSelection();
@@ -138,7 +139,23 @@ namespace PrepareLanding
                 if (!string.IsNullOrEmpty(_gameData.UserData.WorldFeature.name))
                     TooltipHandler.TipRegion(currentRect, _gameData.UserData.WorldFeature.name);
             }
+        }
 
+        private void DrawOpenCoordinatesWindow()
+        {
+            DrawEntryHeader("Coordinates Window", backgroundColor: Color.magenta);
+
+            if (!ListingStandard.ButtonText("Open Coordinates Window"))
+                return;
+
+            if (Coordinates.MainWindow.IsInWindowStack)
+                return;
+
+            if (!Coordinates.MainWindow.CanBeDisplayed)
+                return;
+
+            var coordinatesWindow = new Coordinates.MainWindow();
+            Find.WindowStack.Add(coordinatesWindow);
         }
 
         private void DrawTemperatureForecast()
