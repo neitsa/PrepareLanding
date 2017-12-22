@@ -303,11 +303,14 @@ namespace PrepareLanding
                 selectedRiverDefs.None();
 
             // boolean filtering type
-            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nPress to cycle through options.");
+            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nOR: each item is evaluated independently\nAND: all items are evaluated together.");
+            var savedColor = GUI.color;
+            GUI.color = selectedRiverDefs.FilterBooleanState.Color();
             if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRiverDefs.FilterBooleanState.ToStringHuman()))
             {
                 selectedRiverDefs.FilterBooleanState = selectedRiverDefs.FilterBooleanState.Next();
             }
+            GUI.color = savedColor;
 
             if (_gameData.UserData.Options.ViewPartialOffNoSelect)
             {
@@ -315,7 +318,7 @@ namespace PrepareLanding
                 TooltipHandler.TipRegion(buttonsRect[4],
                     "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
 
-                var savedColor = GUI.color;
+                savedColor = GUI.color;
                 GUI.color = selectedRiverDefs.OffPartialNoSelect ? Color.green : Color.red;
                 if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRiverDefs.OffPartialNoSelect}"))
                 {
@@ -392,18 +395,21 @@ namespace PrepareLanding
                 selectedRoadDefs.None();
 
             // boolean filtering type
-            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nPress to cycle through options.");
+            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nOR: each item is evaluated independently\nAND: all items are evaluated together.");
+            var savedColor = GUI.color;
+            GUI.color = selectedRoadDefs.FilterBooleanState.Color();
             if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRoadDefs.FilterBooleanState.ToStringHuman()))
             {
                 selectedRoadDefs.FilterBooleanState = selectedRoadDefs.FilterBooleanState.Next();
             }
+            GUI.color = savedColor;
 
             if (_gameData.UserData.Options.ViewPartialOffNoSelect)
             {
                 TooltipHandler.TipRegion(buttonsRect[4],
                     "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
 
-                var savedColor = GUI.color;
+                savedColor = GUI.color;
                 GUI.color = selectedRoadDefs.OffPartialNoSelect ? Color.green : Color.red;
                 if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRoadDefs.OffPartialNoSelect}"))
                 {
@@ -475,10 +481,13 @@ namespace PrepareLanding
             // order / no order button
             TooltipHandler.TipRegion(buttonsRect[1], "Whether Stone Filtering is order dependent or not.\nPress button to change filter state.");
             var orderText = selectedStoneDefs.OrderedFiltering ? "Ordered" : "No Order";
+            var savedColor = GUI.color;
+            GUI.color = selectedStoneDefs.OrderedFiltering ? Color.green : Color.red;
             if (Verse.Widgets.ButtonText(buttonsRect[1], $"Filter: {orderText}"))
             {
                 selectedStoneDefs.OrderedFiltering = !selectedStoneDefs.OrderedFiltering;
             }
+            GUI.color = savedColor;
 
             // re-orderable list group
             var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
