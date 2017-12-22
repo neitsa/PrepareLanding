@@ -311,12 +311,17 @@ namespace PrepareLanding
 
             if (_gameData.UserData.Options.ViewPartialOffNoSelect)
             {
+
                 TooltipHandler.TipRegion(buttonsRect[4],
                     "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
+
+                var savedColor = GUI.color;
+                GUI.color = selectedRiverDefs.OffPartialNoSelect ? Color.green : Color.red;
                 if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRiverDefs.OffPartialNoSelect}"))
                 {
                     selectedRiverDefs.OffPartialNoSelect = !selectedRiverDefs.OffPartialNoSelect;
                 }
+                GUI.color = savedColor;
             }
 
             /*
@@ -397,10 +402,14 @@ namespace PrepareLanding
             {
                 TooltipHandler.TipRegion(buttonsRect[4],
                     "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
+
+                var savedColor = GUI.color;
+                GUI.color = selectedRoadDefs.OffPartialNoSelect ? Color.green : Color.red;
                 if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRoadDefs.OffPartialNoSelect}"))
                 {
                     selectedRoadDefs.OffPartialNoSelect = !selectedRoadDefs.OffPartialNoSelect;
                 }
+                GUI.color = savedColor;
             }
 
             /*
@@ -440,7 +449,7 @@ namespace PrepareLanding
 
         private void DrawStoneTypesSelection()
         {
-            DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
+            DrawEntryHeader("Stone Types", backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
             var selectedStoneDefs = _gameData.UserData.SelectedStoneDefs;
 
