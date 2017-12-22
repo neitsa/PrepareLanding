@@ -20,6 +20,8 @@ namespace PrepareLanding
             Instance = gameObject.AddComponent<MonoController>();
         }
 
+        public LineRenderer LineRenderer { get; private set; }
+
 
         public bool Enabled
         {
@@ -32,6 +34,7 @@ namespace PrepareLanding
         {
             Log.Message("[PrepareLanding] MonoController Start");
             enabled = false;
+            LineRenderer = gameObject.AddComponent<LineRenderer>();
         }
 
         public void OnDestroy()

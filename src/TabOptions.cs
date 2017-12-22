@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using PrepareLanding.Core.Extensions;
-using PrepareLanding.Core.Gui.Tab;
+﻿using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.World;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -10,17 +7,8 @@ namespace PrepareLanding
 {
     public class TabOptions : TabGuiUtility
     {
-        // split percentage for the 3 elements of the "go to tile" entry.
-        private readonly List<float> _goToTileSplitPct = new List<float> {0.5f, 0.35f, 0.15f};
-
         // game data
         private readonly GameData.GameData _gameData;
-
-        // default tile number (for "go to tile").
-        private int _tileNumber;
-
-        // tile number, as string (for "go to tile")
-        private string _tileNumberString = string.Empty;
 
         public TabOptions(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -47,7 +35,7 @@ namespace PrepareLanding
             End();
         }
 
-        protected virtual void DrawFilterOptions()
+        private void DrawFilterOptions()
         {
             DrawEntryHeader("Filter Options", backgroundColor: Color.cyan);
 
@@ -87,80 +75,26 @@ namespace PrepareLanding
                 "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
             _gameData.UserData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
 
-            GoToTileOption();
-
-#if DEBUG_TEST_COORDINATES
+            // coordinates window
             GoToCoordinatesOption();
-#endif
-
         }
 
         private void GoToCoordinatesOption()
         {
-            if (!ListingStandard.ButtonText("Test Coord"))
+            if (!ListingStandard.ButtonText("Open Coordinates Window"))
                 return;
 
-            if (_tileNumber < 0)
+            if (Coordinates.MainWindow.IsInWindowStack)
                 return;
 
-            var tileCenter = GetTileCenter(_tileNumber);
-            var x = Mathf.Atan2(tileCenter.x, -tileCenter.z) * 57.29578f;
-            var y = Mathf.Asin(tileCenter.y / 100f) * 57.29578f;
-            Log.Message($"TileId: {_tileNumber}; TileCenter: {tileCenter}; x: {x}; y: {y}");
+            if (!Coordinates.MainWindow.CanBeDisplayed)
+                return;
 
-            // finding back vector3 components from longitude and latitude
-            var longitude = x;
-            var latitude = y;
-
-            var theta = Mathf.Deg2Rad * longitude; // Azimuth angle (0 <= theta <= 2 * pi)
-            var latRad = Mathf.Deg2Rad * latitude;
-            var compY = Mathf.Sin(latRad);
-            var phi = Mathf.Acos(compY); // Zenith angle (0 <= phi <= pi)
-            var compX = Mathf.Sin(phi) * Mathf.Sin(theta);
-            var compZ = Mathf.Sin(phi) * Mathf.Cos(theta);
-            // multiply by north pole magnitude (it's the same as multiplying by the radius of the world sphere which is 100)
-            var vec = new Vector3(compX, compY, -compZ) * Find.WorldGrid.NorthPolePos.magnitude;
-            Log.Message($"Vec: {vec}");
-
+            var coordinatesWindow = new Coordinates.MainWindow();
+            Find.WindowStack.Add(coordinatesWindow);
         }
 
-        private static Vector3 GetTileCenter(int tileId)
-        {
-            var worldGrid = Find.WorldGrid;
-            var num = (tileId + 1 >= worldGrid.tileIDToVerts_offsets.Count) ? worldGrid.verts.Count : worldGrid.tileIDToVerts_offsets[tileId + 1];
-            var a = Vector3.zero;
-            var num2 = 0;
-            for (var i = worldGrid.tileIDToVerts_offsets[tileId]; i < num; i++)
-            {
-                a += worldGrid.verts[i];
-                num2++;
-            }
-            return a / num2;
-        }
-
-        private void GoToTileOption()
-        {
-            var goToTileOptionRectSpace = ListingStandard.GetRect(30f);
-            var rects = goToTileOptionRectSpace.SplitRectWidth(_goToTileSplitPct);
-            var maxTileId = Find.WorldGrid.TilesCount - 1;
-            Widgets.Label(rects[0], $"Go to Tile [0, {maxTileId}]:");
-            Widgets.TextFieldNumeric(rects[1], ref _tileNumber, ref _tileNumberString, 0, maxTileId);
-            if (Widgets.ButtonText(rects[2], "Go!"))
-            {
-                if ((_tileNumber < 0) || (_tileNumber >= Find.WorldGrid.TilesCount))
-                {
-                    Messages.Message($"Out of Range: {_tileNumber}; Range: [0, {Find.WorldGrid.TilesCount}).",
-                        MessageTypeDefOf.RejectInput);
-                }
-                else
-                {
-                    Find.WorldInterface.SelectedTile = _tileNumber;
-                    Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
-                }
-            }
-        }
-
-        protected virtual void DrawTileHighlighterOptions()
+        private void DrawTileHighlighterOptions()
         {
             DrawEntryHeader("Tile Highlighter Options", backgroundColor: Color.cyan);
 

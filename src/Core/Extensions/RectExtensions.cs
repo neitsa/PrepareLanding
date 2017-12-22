@@ -110,5 +110,93 @@ namespace PrepareLanding.Core.Extensions
         {
             return new Rect(rect.x, rect.y + margin, rect.width - margin, rect.height - margin * 2f);
         }
+
+        public static List<Rect> Split(this Rect rect, int numberOfSplit, float spaceWidth = 0f)
+        {
+            if (numberOfSplit <= 0)
+            {
+                Log.Error($"[GoToTile] Rect.Split(): number of split is wrong ({numberOfSplit}).");
+                return null;
+            }
+
+            var result = new List<Rect>(numberOfSplit);
+
+            if (numberOfSplit == 1)
+            {
+                result.Add(rect);
+                return result;
+            }
+
+            var divisor = 1f / numberOfSplit;
+            if (rect.width * divisor - spaceWidth < 1f)
+            {
+                Log.Error($"[GoToTile] Rect.Split(): invalid space width ({spaceWidth}).");
+                return null;
+            }
+
+            var xVal = rect.x;
+            for (var i = 0; i < numberOfSplit; i++)
+            {
+                var newWidth = rect.width * divisor;
+                newWidth -= spaceWidth;
+                var newRect = new Rect(xVal, rect.y, newWidth, rect.height);
+                result.Add(newRect);
+
+                xVal += newWidth;
+                if (i != numberOfSplit - 1)
+                    xVal += spaceWidth;
+            }
+
+            return result;
+        }
+
+        public static List<Rect> SplitBy(this Rect rect, float[] splitsPct, float spaceWidth = 0f)
+        {
+            var numberOfSplit = splitsPct.Length;
+            if (numberOfSplit <= 0)
+            {
+                Log.Error($"[GoToTile] Rect.Split(): number of split is wrong ({numberOfSplit}).");
+                return null;
+            }
+
+            var result = new List<Rect>(numberOfSplit);
+
+            if (numberOfSplit == 1)
+            {
+                result.Add(rect);
+                return result;
+            }
+
+            // check that the amount of pct is (roughly) equal to 1
+            var totalPct = 0f;
+            for (var i = 0; i < numberOfSplit; i++)
+                totalPct += splitsPct[i];
+            if (totalPct - 1 > 1.01f || totalPct - 1f > 0.01f)
+            {
+                Log.Error($"[GoToTile] Rect.Split(): totalPct is wrong ({totalPct}).");
+                return null;
+            }
+
+            var xVal = rect.x;
+            for (var i = 0; i < numberOfSplit; i++)
+            {
+                var newWidth = rect.width * splitsPct[i];
+                newWidth -= spaceWidth;
+                if (newWidth <= 0f)
+                {
+                    Log.Error($"[GoToTile] Rect.Split(): would result in non existent width :({newWidth}).");
+                    return null;
+                }
+
+                var newRect = new Rect(xVal, rect.y, newWidth, rect.height);
+                result.Add(newRect);
+
+                xVal += newWidth;
+                if (i != numberOfSplit - 1)
+                    xVal += spaceWidth;
+            }
+
+            return result;
+        }
     }
 }
