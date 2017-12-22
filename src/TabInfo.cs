@@ -13,10 +13,11 @@ namespace PrepareLanding
         private readonly GUIStyle _styleFilterInfo;
         private readonly GUIStyle _styleWorldInfo;
         private Vector2 _scrollPosFilterInfo;
-
         private Vector2 _scrollPosWorldInfo;
+        private Vector2 _scrollPosWorldRecords;
 
         private string _worldInfo;
+        private string _worldRecords;
 
         public TabInfo(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -49,9 +50,11 @@ namespace PrepareLanding
 
         public override string Name => "World Info";
 
-        public string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
+        private string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
 
-        public string BuildWorldInfo()
+        private string WolrdRecords => _worldRecords ?? (_worldRecords = BuildWorldRecords());
+
+        private string BuildWorldInfo()
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Planet Name: {Find.World.info.name}");
@@ -83,12 +86,15 @@ namespace PrepareLanding
                 }
             }
 
+            return stringBuilder.ToString();
+        }
+
+        private string BuildWorldRecords()
+        {
             /*
              * Highest / lowest value for all characteristics.
              */
-
-            var separator = "-".Repeat(80);
-            stringBuilder.AppendLine($"\n{separator}\nWorld Records\n{separator}");
+             var stringBuilder = new StringBuilder();
 
             foreach (var characteristicData in _gameData.WorldData.WorldCharacteristics)
             {
@@ -98,14 +104,13 @@ namespace PrepareLanding
                 var lowestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.First();
                 var vectorLongLat = Find.WorldGrid.LongLatOf(lowestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Lowest {characteristicName}: {lowestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠[tile: {lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Lowest {characteristicName}: {lowestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
 
                 var highestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.Last();
                 vectorLongLat = Find.WorldGrid.LongLatOf(highestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Highest {characteristicName}: {highestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠[tile: {highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\tWorld Highest {characteristicName}: {highestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
             }
-
 
             return stringBuilder.ToString();
         }
@@ -114,6 +119,7 @@ namespace PrepareLanding
         {
             Begin(inRect);
             DrawWorldInfo();
+            DrawWorldRecord();
             NewColumn();
             DrawFilterInfo();
             End();
@@ -132,20 +138,30 @@ namespace PrepareLanding
             if (text.NullOrEmpty())
                 return;
 
-            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
+            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - DefaultElementHeight;
 
             ListingStandard.ScrollableTextArea(maxOuterRectHeight, text, ref _scrollPosFilterInfo, _styleFilterInfo,
-                16f);
+                DefaultScrollableViewShrinkWidth);
         }
 
         private void DrawWorldInfo()
         {
-            DrawEntryHeader("World Info", backgroundColor: Color.yellow);
+            var remSpace = DrawEntryHeader("World Info", backgroundColor: Color.yellow);
 
-            var maxOuterRectHeight = InRect.height - ListingStandard.CurHeight - 30f;
+            var maxOuterRectHeight = (InRect.height - MainWindow.SpaceForBottomButtons - remSpace) / 2;
 
             ListingStandard.ScrollableTextArea(maxOuterRectHeight, WorldInfo, ref _scrollPosWorldInfo, _styleWorldInfo,
-                16f);
+                DefaultScrollableViewShrinkWidth);
+        }
+
+        private void DrawWorldRecord()
+        {
+            var currHeight = DrawEntryHeader("World Records", backgroundColor: Color.yellow);
+
+            var maxOuterRectHeight = currHeight - MainWindow.SpaceForBottomButtons - DefaultElementHeight;
+
+            ListingStandard.ScrollableTextArea(maxOuterRectHeight, WolrdRecords, ref _scrollPosWorldRecords, _styleWorldInfo,
+                DefaultScrollableViewShrinkWidth);
         }
 
         /// <summary>
@@ -154,6 +170,7 @@ namespace PrepareLanding
         private void RebuildWorldInfo()
         {
             _worldInfo = BuildWorldInfo();
+            _worldRecords = BuildWorldRecords();
         }
     }
 }

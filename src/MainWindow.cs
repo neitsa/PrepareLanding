@@ -16,7 +16,7 @@ namespace PrepareLanding
 {
     public class MainWindow : MinimizableWindow
     {
-        private const float SpaceForBottomButtons = 55f;
+        public const float SpaceForBottomButtons = 55f;
 
         private const float GapBetweenButtons = 10f;
 

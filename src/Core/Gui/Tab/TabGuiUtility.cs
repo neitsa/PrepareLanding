@@ -68,7 +68,7 @@ namespace PrepareLanding.Core.Gui.Tab
             GUI.DrawTexture(rect, BaseContent.WhiteTex);
         }
 
-        protected void DrawEntryHeader(string entryLabel, bool useStartingGap = true,
+        protected float DrawEntryHeader(string entryLabel, bool useStartingGap = true,
             bool useFollowingGap = false, Color? backgroundColor = null, float colorAlpha = 0.2f)
         {
             if (useStartingGap)
@@ -90,6 +90,8 @@ namespace PrepareLanding.Core.Gui.Tab
 
             if (useFollowingGap)
                 ListingStandard.Gap();
+
+            return ListingStandard.CurHeight;
         }
 
         protected void DrawUsableMinMaxNumericField<T>(UsableMinMaxNumericItem<T> numericItem, string label,
