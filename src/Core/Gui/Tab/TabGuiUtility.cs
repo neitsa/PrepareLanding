@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Filters;
 using UnityEngine;
@@ -99,11 +101,11 @@ namespace PrepareLanding.Core.Gui.Tab
         {
             var tmpCheckedOn = numericItem.Use;
 
-            var textMin = "PLUsableMinMaxNumFieldMin".Translate();
-            var textMax = "PLUsableMinMaxNumFieldMax".Translate();
+            var textMin = "PLINT_UsableMinMaxNumFieldMin".Translate();
+            var textMax = "PLINT_UsableMinMaxNumFieldMax".Translate();
 
             ListingStandard.Gap();
-            ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"{"PLUsableMinMaxNumFieldUse".Translate()} {textMin}/{textMax} {label}");
+            ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"{"PLINT_UsableMinMaxNumFieldUse".Translate()} {textMin}/{textMax} {label}");
             numericItem.Use = tmpCheckedOn;
 
             var minValue = numericItem.Min;
@@ -119,6 +121,64 @@ namespace PrepareLanding.Core.Gui.Tab
             Verse.Widgets.TextFieldNumericLabeled(maxValueLabelRect, $"{textMax}: ", ref maxValue, ref maxValueString, min, max);
             numericItem.Max = maxValue;
             numericItem.MaxString = maxValueString;
+        }
+
+        protected void DrawUsableMinMaxFromRestrictedListItem<T>(MinMaxFromRestrictedListItem<T> item, string label, Func<T, string> itemToStringFunc = null)
+            where T : struct, IConvertible
+        {
+            var tmpCheckedOn = item.Use;
+
+            var textMin = "PLINT_UsableMinMaxNumFieldMin".Translate();
+            var textMax = "PLINT_UsableMinMaxNumFieldMax".Translate();
+
+            // Use
+            ListingStandard.Gap();
+            ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"{"PLINT_UsableMinMaxNumFieldUse".Translate()} {textMin}/{textMax} {label}");
+            item.Use = tmpCheckedOn;
+
+            // MIN
+            if (ListingStandard.ButtonText($"{"PLINT_UsableMinMaxNumFieldMin".Translate()} {label}"))
+            {
+                var floatMenuOptions = new List<FloatMenuOption>();
+                foreach (var itemOption in item.Options)
+                {
+                    var menuOptionString = itemToStringFunc == null
+                        ? itemOption.ToString(CultureInfo.InvariantCulture)
+                        : itemToStringFunc(itemOption);
+                    var menuOption = new FloatMenuOption(menuOptionString, delegate { item.Min = itemOption; });
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                var floatMenu = new FloatMenu(floatMenuOptions, $"{"PLINT_MinMaxFromRestrictedListItemSelect".Translate()} {label}");
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            var minValueString = itemToStringFunc == null
+                ? item.Min.ToString(CultureInfo.InvariantCulture)
+                : itemToStringFunc(item.Min);
+            ListingStandard.LabelDouble($"{"PLINT_UsableMinMaxNumFieldMin".Translate()} {label}:", minValueString);
+
+            // MAX
+            if (ListingStandard.ButtonText($"{"PLINT_UsableMinMaxNumFieldMax".Translate()} {label}"))
+            {
+                var floatMenuOptions = new List<FloatMenuOption>();
+                foreach (var itemOption in item.Options)
+                {
+                    var menuOptionString = itemToStringFunc == null
+                        ? itemOption.ToString(CultureInfo.InvariantCulture)
+                        : itemToStringFunc(itemOption);
+                    var menuOption = new FloatMenuOption(menuOptionString, delegate { item.Max = itemOption; });
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                var floatMenu = new FloatMenu(floatMenuOptions, $"{"PLINT_MinMaxFromRestrictedListItemSelect".Translate()} {label}");
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            var maxValueString = itemToStringFunc == null
+                ? item.Min.ToString(CultureInfo.InvariantCulture)
+                : itemToStringFunc(item.Max);
+            ListingStandard.LabelDouble($"{"PLINT_UsableMinMaxNumFieldMax".Translate()} {label}:", maxValueString);
         }
 
         protected static Color ColorFromFilterSubjectThingDef(string filterName)
