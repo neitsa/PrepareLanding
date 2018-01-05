@@ -45,7 +45,7 @@ namespace PrepareLanding
         /// <summary>
         ///     The name of the tab (that is actually displayed at its top).
         /// </summary>
-        public override string Name => "Terrain II & Temp.";
+        public override string Name => "PLMWT2T_TabName".Translate();
 
         /// <summary>
         ///     Draw the actual content of this window.
@@ -70,12 +70,12 @@ namespace PrepareLanding
 
         private void DrawFeatureSelection()
         {
-            DrawEntryHeader("World Feature Selection", backgroundColor: Color.magenta);
+            DrawEntryHeader("PLMWT2T_WorldFeatureSelection".Translate(), backgroundColor: Color.magenta);
 
             var features = _gameData.WorldData.WorldFeatures;
 
             // "Select" button
-            if (ListingStandard.ButtonText("Select World Feature"))
+            if (ListingStandard.ButtonText("PLMWT2T_SelectWorldFeature".Translate()))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
 
@@ -87,10 +87,10 @@ namespace PrepareLanding
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
 
-                    TooltipHandler.TipRegion(rect, "Any Feature");
+                    TooltipHandler.TipRegion(rect, "PLMWT2T_AnyWorldFeature".Translate());
                 }
 
-                var menuOption = new FloatMenuOption("Any", actionClick, MenuOptionPriority.Default, MouseOverAction);
+                var menuOption = new FloatMenuOption("PLMW_SelectAny".Translate(), actionClick, MenuOptionPriority.Default, MouseOverAction);
                 floatMenuOptions.Add(menuOption);
 
                 // loop through all known feature
@@ -118,7 +118,7 @@ namespace PrepareLanding
                 }
 
                 // create the floating menu
-                var floatMenu = new FloatMenu(floatMenuOptions, "Select Feature Type");
+                var floatMenu = new FloatMenu(floatMenuOptions, "PLMWT2T_SelectWorldFeature".Translate());
 
                 // add it to the window stack to display it
                 Find.WindowStack.Add(floatMenu);
@@ -126,8 +126,8 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _gameData.UserData.WorldFeature != null ? _gameData.UserData.WorldFeature.name : "Any";
-            ListingStandard.LabelDouble("World Feature:", rightLabel);
+            var rightLabel = _gameData.UserData.WorldFeature != null ? _gameData.UserData.WorldFeature.name : "PLMW_SelectAny".Translate();
+            ListingStandard.LabelDouble($"{"PLMWT2T_WorldFeature".Translate()}:", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;
 
@@ -143,9 +143,9 @@ namespace PrepareLanding
 
         private void DrawOpenCoordinatesWindow()
         {
-            DrawEntryHeader("Coordinates Window", backgroundColor: Color.magenta);
+            DrawEntryHeader("PLMWT2T_CoordinatesWindow".Translate(), backgroundColor: Color.magenta);
 
-            if (!ListingStandard.ButtonText("Open Coordinates Window"))
+            if (!ListingStandard.ButtonText("PLMWT2T_OpenCoordinatesWindow".Translate()))
                 return;
 
             if (Coordinates.MainWindow.IsInWindowStack)
@@ -160,19 +160,19 @@ namespace PrepareLanding
 
         private void DrawTemperatureForecast()
         {
-            DrawEntryHeader("Temperature Forecast", backgroundColor: Color.magenta);
+            DrawEntryHeader("PLMWT2T_TemperatureForecast".Translate(), backgroundColor: Color.magenta);
 
             var tileId = Find.WorldSelector.selectedTile;
 
             if (!Find.WorldSelector.AnyObjectOrTileSelected || tileId < 0)
             {
                 var labelRect = ListingStandard.GetRect(DefaultElementHeight);
-                Widgets.Label(labelRect, "Pick a tile on world map!");
+                Widgets.Label(labelRect, "PLMWT2T_TempPickTileOnWorldMap".Translate());
                 _selectedTileIdForTemperatureForecast = -1;
                 return;
             }
 
-            ListingStandard.LabelDouble("Selected Tile: ", tileId.ToString());
+            ListingStandard.LabelDouble($"{"PLMWT2T_TempSelectedTile".Translate()}: ", tileId.ToString());
             _selectedTileIdForTemperatureForecast = tileId;
 
             ListingStandard.GapLine(DefaultGapLineHeight);
@@ -187,7 +187,7 @@ namespace PrepareLanding
             var daySelector = ListingStandard.GetRect(30f);
             var dayLabelRect = daySelector.LeftPart(0.70f);
             var dayFieldRect = daySelector.RightPart(0.30f);
-            Widgets.Label(dayLabelRect, "Quadrum Day [1, 15]: ");
+            Widgets.Label(dayLabelRect, $"{"PLMWT2T_QuadrumDay".Translate()} [1, 15]: ");
             Widgets.TextFieldNumeric(dayFieldRect, ref _dayOfQuadrum, ref _dayOfQuadrumString, 1,
                 GenDate.DaysPerQuadrum);
 
@@ -196,7 +196,7 @@ namespace PrepareLanding
             // quadrum
             var quadrumRect = ListingStandard.GetRect(30f);
             var quadrumButtonRect = quadrumRect.LeftHalf();
-            if (Widgets.ButtonText(quadrumButtonRect, "Select Quadrum"))
+            if (Widgets.ButtonText(quadrumButtonRect, "PLMWT2T_SelectQuadrum".Translate()))
             {
                 // get all possible enumeration values for hilliness
                 var quadrumList = Enum.GetValues(typeof(Quadrum)).Cast<Quadrum>().ToList();
@@ -214,7 +214,7 @@ namespace PrepareLanding
                     floatMenuOptions.Add(menuOption);
                 }
 
-                var floatMenu = new FloatMenu(floatMenuOptions, "Select Quadrum");
+                var floatMenu = new FloatMenu(floatMenuOptions, "PLMWT2T_SelectQuadrum".Translate());
                 Find.WindowStack.Add(floatMenu);
             }
             var quadrumLabelRect = quadrumRect.RightHalf();
@@ -226,7 +226,7 @@ namespace PrepareLanding
             var yearSelector = ListingStandard.GetRect(30f);
             var yearLabelRect = yearSelector.LeftPart(0.7f);
             var yearFieldRect = yearSelector.RightPart(0.3f);
-            Widgets.Label(yearLabelRect, $"Year [{GenDate.DefaultStartingYear}, {GenDate.DefaultStartingYear + 50}]: ");
+            Widgets.Label(yearLabelRect, $"{"ClockYear".Translate()} [{GenDate.DefaultStartingYear}, {GenDate.DefaultStartingYear + 50}]: ");
             Widgets.TextFieldNumeric(yearFieldRect, ref _year, ref _yearString, GenDate.DefaultStartingYear,
                 GenDate.DefaultStartingYear + 50);
 
@@ -236,7 +236,7 @@ namespace PrepareLanding
             // date display
             var dateNowRect = ListingStandard.GetRect(30f);
             var labelDateLeftRect = dateNowRect.LeftPart(0.20f);
-            Widgets.Label(labelDateLeftRect, "Date: ");
+            Widgets.Label(labelDateLeftRect, $"{"ClockDate".Translate()}: ");
             var labelDateRightRect = dateNowRect.RightPart(0.60f);
             var dateString = GenDate.DateReadoutStringAt(_dateTicks,
                 Find.WorldGrid.LongLatOf(_selectedTileIdForTemperatureForecast));
@@ -249,7 +249,7 @@ namespace PrepareLanding
             /*
              * Forecast
              */
-            if (ListingStandard.ButtonText("View Temperature Forecast"))
+            if (ListingStandard.ButtonText("PLMWT2T_ViewTemperatureForecast".Translate()))
                 ViewTemperatureForecast(_selectedTileIdForTemperatureForecast, _dateTicks);
         }
 
@@ -336,11 +336,11 @@ namespace PrepareLanding
 
         private void DrawAnimalsCanGrazeNowSelection()
         {
-            DrawEntryHeader("Animals", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
+            DrawEntryHeader($"{"WorkTagAnimals".Translate().CapitalizeFirst()}", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _gameData.UserData.ChosenAnimalsCanGrazeNowState;
-            Core.Gui.Widgets.CheckBoxLabeledMulti(rect, "Animals Can Graze Now:", ref tmpCheckState);
+            Core.Gui.Widgets.CheckBoxLabeledMulti(rect, $"{"AnimalsCanGrazeNow".Translate()}: ", ref tmpCheckState);
 
             _gameData.UserData.ChosenAnimalsCanGrazeNowState = tmpCheckState;
         }
@@ -350,63 +350,22 @@ namespace PrepareLanding
         /// </summary>
         private void DrawCaveSelection()
         {
-            DrawEntryHeader("Special Features", backgroundColor: ColorFromFilterSubjectThingDef("Has Cave"));
+            DrawEntryHeader("SpecialFeatures".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Has Cave"));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _gameData.UserData.HasCaveState;
-            Core.Gui.Widgets.CheckBoxLabeledMulti(rect, "Has Cave: ", ref tmpCheckState);
+            Core.Gui.Widgets.CheckBoxLabeledMulti(rect, $"{"HasCaves".Translate()}:", ref tmpCheckState);
 
             _gameData.UserData.HasCaveState = tmpCheckState;
         }
 
-        private void DrawGrowingPeriodSelection()
+        private void DrawGrowingPeriodSelection() // TODO check against the other like coastal filter or movement time
         {
-            const string label = "Growing Period";
-            DrawEntryHeader($"{label} (days)", backgroundColor: ColorFromFilterSubjectThingDef("Growing Periods"));
+            string label = "OutdoorGrowingPeriod".Translate();
+            DrawEntryHeader($"{label} ({"DaysLower".Translate()})", backgroundColor: ColorFromFilterSubjectThingDef("Growing Periods"));
 
-            var boundField = _gameData.UserData.GrowingPeriod;
-
-            var tmpCheckedOn = boundField.Use;
-
-            ListingStandard.Gap();
-            ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"Use Min/Max {label}");
-            boundField.Use = tmpCheckedOn;
-
-            // MIN
-
-            if (ListingStandard.ButtonText($"Min {label}"))
-            {
-                var floatMenuOptions = new List<FloatMenuOption>();
-                foreach (var growingTwelfth in boundField.Options)
-                {
-                    var menuOption = new FloatMenuOption(growingTwelfth.GrowingDaysString(),
-                        delegate { boundField.Min = growingTwelfth; });
-                    floatMenuOptions.Add(menuOption);
-                }
-
-                var floatMenu = new FloatMenu(floatMenuOptions, $"Select {label}");
-                Find.WindowStack.Add(floatMenu);
-            }
-
-            ListingStandard.LabelDouble($"Min. {label}:", boundField.Min.GrowingDaysString());
-
-            // MAX
-
-            if (ListingStandard.ButtonText($"Max {label}"))
-            {
-                var floatMenuOptions = new List<FloatMenuOption>();
-                foreach (var growingTwelfth in boundField.Options)
-                {
-                    var menuOption = new FloatMenuOption(growingTwelfth.GrowingDaysString(),
-                        delegate { boundField.Max = growingTwelfth; });
-                    floatMenuOptions.Add(menuOption);
-                }
-
-                var floatMenu = new FloatMenu(floatMenuOptions, $"Select {label}");
-                Find.WindowStack.Add(floatMenu);
-            }
-
-            ListingStandard.LabelDouble($"Max. {label}:", boundField.Max.GrowingDaysString());
+            DrawUsableMinMaxFromRestrictedListItem(_gameData.UserData.GrowingPeriod, label,
+                twelfth => twelfth.GrowingDaysString());
         }
 
         private void DrawRainfallSelection()
@@ -415,10 +374,10 @@ namespace PrepareLanding
             const float rainfallMin = 0f;
             const float rainfallMax = 5000f;
 
-            DrawEntryHeader($"Rain Fall (mm) [{rainfallMin}, {rainfallMax}]",
+            DrawEntryHeader($"{"Rainfall".Translate()} ({"PLMWT2T_RainfallMillimeters".Translate()}) [{rainfallMin}, {rainfallMax}]",
                 backgroundColor: ColorFromFilterSubjectThingDef("Rain Falls"));
 
-            DrawUsableMinMaxNumericField(_gameData.UserData.RainFall, "Rain Fall", rainfallMin, rainfallMax);
+            DrawUsableMinMaxNumericField(_gameData.UserData.RainFall, "Rainfall".Translate(), rainfallMin, rainfallMax);
         }
 
         private void DrawTemperaturesSelection()
@@ -426,25 +385,25 @@ namespace PrepareLanding
             const float tempMin = TemperatureTuning.MinimumTemperature;
             const float tempMax = TemperatureTuning.MaximumTemperature;
 
-            DrawEntryHeader($"Temperatures (°C) [{tempMin}, {tempMax}]",
+            DrawEntryHeader($"{"Temperature".Translate()} (°C) [{tempMin}, {tempMax}]",
                 backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
 
-            DrawUsableMinMaxNumericField(_gameData.UserData.AverageTemperature, "Average Temperature",
+            DrawUsableMinMaxNumericField(_gameData.UserData.AverageTemperature, "AvgTemp".Translate(),
                 tempMin, tempMax);
-            DrawUsableMinMaxNumericField(_gameData.UserData.WinterTemperature, "Winter Temperature",
+            DrawUsableMinMaxNumericField(_gameData.UserData.WinterTemperature, "AvgWinterTemp".Translate(),
                 tempMin, tempMax);
-            DrawUsableMinMaxNumericField(_gameData.UserData.SummerTemperature, "Summer Temperature",
+            DrawUsableMinMaxNumericField(_gameData.UserData.SummerTemperature, "AvgSummerTemp".Translate(),
                 tempMin, tempMax);
         }
 
         private void DrawMostLeastCharacteristicSelection()
         {
-            DrawEntryHeader("Most / Least Characteristic", backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("PLMWT2T_MostLeastCharacteristics".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             /*
              * Select Characteristic
              */
-            const string selectCharacteristic = "Select Characteristic";
+            var selectCharacteristic = "PLMWT2T_MostLeastSelectCharacteristic".Translate();
 
             if (ListingStandard.ButtonText(selectCharacteristic))
             {
@@ -469,7 +428,7 @@ namespace PrepareLanding
             var leftRect = tilesNumberRect.LeftPart(0.80f);
             var rightRect = tilesNumberRect.RightPart(0.20f);
 
-            Widgets.Label(leftRect, "Number of Tiles [1, 10000]:");
+            Widgets.Label(leftRect, $"{"PLMWT2T_MostLeastNumberOfTiles".Translate()} [1, 10000]:");
             _numberOfTilesForCharacteristic = _gameData.UserData.MostLeastItem.NumberOfItems;
             Widgets.TextFieldNumeric(rightRect, ref _numberOfTilesForCharacteristic, ref _numberOfTilesForCharacteristicString,
                 1, 10000);
@@ -479,7 +438,7 @@ namespace PrepareLanding
              * Select Characteristic Type (most / least)
              */
 
-            const string selectCharacteristicType = "Select Characteristic Type";
+            var selectCharacteristicType = "PLMWT2T_MostLeastSelectCharacteristicType".Translate();
 
             if (ListingStandard.ButtonText(selectCharacteristicType))
             {
@@ -501,23 +460,24 @@ namespace PrepareLanding
             string text;
             if (_gameData.UserData.MostLeastItem.Characteristic == MostLeastCharacteristic.None)
             {
-                text = $"Push \"{selectCharacteristic}\" button first.";
+                text = string.Format("PLMWT2T_MostLeastPressButtonFirst".Translate(), selectCharacteristic);
             }
             else if (_gameData.UserData.MostLeastItem.CharacteristicType == MostLeastType.None)
             {
-                text = $"Now use the \"{selectCharacteristicType}\" button.";
+                text = string.Format("PLMWT2T_MostLeastNowUseButton".Translate(), selectCharacteristicType);
             }
             else
             {
                 var highestLowest = _gameData.UserData.MostLeastItem.CharacteristicType == MostLeastType.Most
-                    ? "highest"
-                    : "lowest";
-                var tiles = _gameData.UserData.MostLeastItem.NumberOfItems > 1 ? "tiles" : "tile";
-                text =
-                    $"Selecting {_gameData.UserData.MostLeastItem.NumberOfItems} {tiles} with the {highestLowest} {_gameData.UserData.MostLeastItem.Characteristic}";
+                    ? "PLMWT2T_MostLeastHighest".Translate()
+                    : "PLMWT2T_MostLeastLowest".Translate();
+                var tileString = _gameData.UserData.MostLeastItem.NumberOfItems > 1 ? "PLMW_Tiles".Translate() : "PLMW_Tile".Translate();
+                text = string.Format("PLMWT2T_MostLeastSelectingTiles".Translate(),
+                    _gameData.UserData.MostLeastItem.NumberOfItems, tileString, highestLowest,
+                    _gameData.UserData.MostLeastItem.Characteristic);
             }
 
-            ListingStandard.Label($"Result: {text}", DefaultElementHeight * 2);
+            ListingStandard.Label($"{"PLMWT2T_MostLeastResult".Translate()}: {text}", DefaultElementHeight * 2);
         }
     }
 }

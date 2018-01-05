@@ -11,6 +11,8 @@
     <PLMW_Hour>Hour</PLMW_Hour> <!-- Note: "Hour" as the SI unit of time -->
     <PLMW_Reset>Reset</PLMW_Reset> <!-- as in "Reset all options"; used for the main window buttons -->
     <PLMW_All>All</PLMW_All> <!-- as in "All available options"; used for the main window buttons -->
+    <PLMW_Tile>Tile</PLMW_Tile> <!-- as in "Tile on the world map" -->
+    <PLMW_Tiles>Tiles</PLMW_Tiles>
 
         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Terrain Tab [TT] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
         <PLMWTT_TabName>Terrain</PLMWTT_TabName>
@@ -52,10 +54,48 @@
         <PLMWTT_UseNumberOfStoneTypes>Use # of stone types [2,3]</PLMWTT_UseNumberOfStoneTypes>
         <PLMWTT_UseNumberOfStoneTypesToolTip>Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.</PLMWTT_UseNumberOfStoneTypesToolTip>
 
+        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Terrain II & Temperature Tab [T2T] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <PLMWT2T_TabName>Terrain II &amp; Temp.</PLMWT2T_TabName> <!-- Terrain 2 and Temperature -->
+
+            <!-- side note for translators: a "world feature" is a named location on the world map; that's the name used in RimWorld code -->
+        <PLMWT2T_WorldFeature>World Feature</PLMWT2T_WorldFeature>
+        <PLMWT2T_WorldFeatureSelection>World Feature Selection</PLMWT2T_WorldFeatureSelection>
+        <PLMWT2T_SelectWorldFeature>Select World Feature</PLMWT2T_SelectWorldFeature>
+        <PLMWT2T_AnyWorldFeature>Any World Feature</PLMWT2T_AnyWorldFeature>
+
+        <PLMWT2T_CoordinatesWindow>Coordinates Window</PLMWT2T_CoordinatesWindow>
+        <PLMWT2T_OpenCoordinatesWindow>Open Coordinates Window</PLMWT2T_OpenCoordinatesWindow>
+
+        <PLMWT2T_TemperatureForecast>Temperature Forecast</PLMWT2T_TemperatureForecast>
+        <PLMWT2T_TempPickTileOnWorldMap>Pick a tile on the world map!</PLMWT2T_TempPickTileOnWorldMap>
+        <PLMWT2T_TempSelectedTile>Selected Tile</PLMWT2T_TempSelectedTile>
+        <PLMWT2T_QuadrumDay>Quadrum Day</PLMWT2T_QuadrumDay>
+        <PLMWT2T_SelectQuadrum>Select Quadrum</PLMWT2T_SelectQuadrum>
+        <PLMWT2T_ViewTemperatureForecast>View Temperature Forecast</PLMWT2T_ViewTemperatureForecast>
+
+        <PLMWT2T_RainfallMillimeters>mm</PLMWT2T_RainfallMillimeters> <!-- SI unit of length: millimeters -->
+
+        <PLMWT2T_MostLeastCharacteristics>Highest / Lowest Characteristics</PLMWT2T_MostLeastCharacteristics>
+        <PLMWT2T_MostLeastSelectCharacteristic>Select a Characteristic</PLMWT2T_MostLeastSelectCharacteristic>
+        <PLMWT2T_MostLeastNumberOfTiles>Number of Tiles</PLMWT2T_MostLeastNumberOfTiles>
+        <PLMWT2T_MostLeastSelectCharacteristicType>Select Characteristic Type</PLMWT2T_MostLeastSelectCharacteristicType>
+        <PLMWT2T_MostLeastPressButtonFirst>Press the "{0}" button first.</PLMWT2T_MostLeastPressButtonFirst>
+        <PLMWT2T_MostLeastNowUseButton>Now use the "{0}" button.</PLMWT2T_MostLeastNowUseButton>
+        <PLMWT2T_MostLeastHighest>highest</PLMWT2T_MostLeastHighest> <!-- used in e.g: "Selecting x tiles with the highest temperature" -->
+        <PLMWT2T_MostLeastLowest>lowest</PLMWT2T_MostLeastLowest>  <!-- ditto, but replace 'highest' with 'lowest' -->
+        <PLMWT2T_MostLeastSelectingTiles>selecting {0} {1} with the {2} {3}</PLMWT2T_MostLeastSelectingTiles>  <!-- used in e.g: "selecting x tiles with the highest temperature" -->
+        <PLMWT2T_MostLeastResult>Result</PLMWT2T_MostLeastResult> <!-- prefixed to the above string, e.g: "Result: selecting x tiles with the lowest altitude" -->
+
+    <!--=============================================== Internal [INT] ==============================================-->
+    <!-- Strings that are related to internal C# code but they appear on the GUI -->
+
         <!-- Usable Min / Max Numeric Field -->
-        <PLUsableMinMaxNumFieldMin>Min</PLUsableMinMaxNumFieldMin> <!-- As in "Minimum" -->
-        <PLUsableMinMaxNumFieldMax>Max</PLUsableMinMaxNumFieldMax> <!-- As in "Maximum" -->
-        <PLUsableMinMaxNumFieldUse>Use</PLUsableMinMaxNumFieldUse> <!-- Used only in "Use Min/Max" -->
+        <PLINT_UsableMinMaxNumFieldMin>Min</PLINT_UsableMinMaxNumFieldMin> <!-- As in "Minimum" -->
+        <PLINT_UsableMinMaxNumFieldMax>Max</PLINT_UsableMinMaxNumFieldMax> <!-- As in "Maximum" -->
+        <PLINT_UsableMinMaxNumFieldUse>Use</PLINT_UsableMinMaxNumFieldUse> <!-- Used only in "Use Min/Max" -->
+
+        <!-- MinMaxFromRestrictedListItem -->
+        <PLINT_MinMaxFromRestrictedListItemSelect>Select</PLINT_MinMaxFromRestrictedListItemSelect> <!-- As in "Select Growing Period" -->
 
 
 
