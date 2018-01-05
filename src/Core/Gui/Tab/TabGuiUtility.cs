@@ -99,21 +99,24 @@ namespace PrepareLanding.Core.Gui.Tab
         {
             var tmpCheckedOn = numericItem.Use;
 
+            var textMin = "PLUsableMinMaxNumFieldMin".Translate();
+            var textMax = "PLUsableMinMaxNumFieldMax".Translate();
+
             ListingStandard.Gap();
-            ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"Use Min/Max {label}");
+            ListingStandard.CheckboxLabeled(label, ref tmpCheckedOn, $"{"PLUsableMinMaxNumFieldUse".Translate()} {textMin}/{textMax} {label}");
             numericItem.Use = tmpCheckedOn;
 
             var minValue = numericItem.Min;
             var minValueString = numericItem.MinString;
             var minValueLabelRect = ListingStandard.GetRect(DefaultElementHeight);
-            Verse.Widgets.TextFieldNumericLabeled(minValueLabelRect, "Min: ", ref minValue, ref minValueString, min, max);
+            Verse.Widgets.TextFieldNumericLabeled(minValueLabelRect, $"{textMin}: ", ref minValue, ref minValueString, min, max);
             numericItem.Min = minValue;
             numericItem.MinString = minValueString;
 
             var maxValue = numericItem.Max;
             var maxValueString = numericItem.MaxString;
             var maxValueLabelRect = ListingStandard.GetRect(DefaultElementHeight);
-            Verse.Widgets.TextFieldNumericLabeled(maxValueLabelRect, "Max: ", ref maxValue, ref maxValueString, min, max);
+            Verse.Widgets.TextFieldNumericLabeled(maxValueLabelRect, $"{textMax}: ", ref maxValue, ref maxValueString, min, max);
             numericItem.Max = maxValue;
             numericItem.MaxString = maxValueString;
         }

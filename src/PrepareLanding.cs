@@ -4,8 +4,6 @@ using PrepareLanding.Core.Gui.World;
 using PrepareLanding.Presets;
 using Verse;
 
-//TODO: general TODO -> translate all GUI strings.
-
 namespace PrepareLanding
 {
     /// <summary>

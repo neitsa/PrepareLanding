@@ -49,7 +49,7 @@ namespace PrepareLanding
         /// <summary>
         ///     The name of the tab (that is actually displayed at its top).
         /// </summary>
-        public override string Name => "Terrain";
+        public override string Name => "PLMWTT_TabName".Translate();
 
         /// <summary>
         ///     Draw the actual content of this window.
@@ -74,12 +74,12 @@ namespace PrepareLanding
 
         private void DrawBiomeTypesSelection()
         {
-            DrawEntryHeader("Biome Types", false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("PLMWTT_BiomeTypes".Translate(), false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
 
             var biomeDefs = _gameData.DefData.BiomeDefs;
 
             // "Select" button
-            if (ListingStandard.ButtonText("Select Biome"))
+            if (ListingStandard.ButtonText("PLMWTT_SelectBiome".Translate()))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
 
@@ -91,9 +91,9 @@ namespace PrepareLanding
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
 
-                    TooltipHandler.TipRegion(rect, "Any Biome");
+                    TooltipHandler.TipRegion(rect, "PLMWTT_AnyBiome".Translate());
                 };
-                var menuOption = new FloatMenuOption("Any", actionClick, MenuOptionPriority.Default, mouseOverAction);
+                var menuOption = new FloatMenuOption("PLMW_SelectAny".Translate(), actionClick, MenuOptionPriority.Default, mouseOverAction);
                 floatMenuOptions.Add(menuOption);
 
                 // loop through all known biomes
@@ -118,7 +118,7 @@ namespace PrepareLanding
                 }
 
                 // create the floating menu
-                var floatMenu = new FloatMenu(floatMenuOptions, "Select Biome Type");
+                var floatMenu = new FloatMenu(floatMenuOptions, "PLMWTT_SelectBiomeType".Translate());
 
                 // add it to the window stack to display it
                 Find.WindowStack.Add(floatMenu);
@@ -126,8 +126,8 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _gameData.UserData.ChosenBiome != null ? _gameData.UserData.ChosenBiome.LabelCap : "Any";
-            ListingStandard.LabelDouble("Biome:", rightLabel);
+            var rightLabel = _gameData.UserData.ChosenBiome != null ? _gameData.UserData.ChosenBiome.LabelCap : "PLMW_SelectAny".Translate();
+            ListingStandard.LabelDouble($"{"Biome".Translate()}:", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;
 
@@ -143,12 +143,12 @@ namespace PrepareLanding
 
         private void DrawCoastalSelection()
         {
-            DrawEntryHeader("Coastal Tiles", false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
+            DrawEntryHeader("PLMWTT_CoastalTiles".Translate(), false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
 
             // coastal tiles (sea)
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _gameData.UserData.ChosenCoastalTileState;
-            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (sea):", ref tmpCheckState);
+            Widgets.CheckBoxLabeledMulti(rect, $"{"PLMWTT_IsCoastalTileOcean".Translate()}:", ref tmpCheckState);
 
             _gameData.UserData.ChosenCoastalTileState = tmpCheckState;
 
@@ -158,12 +158,12 @@ namespace PrepareLanding
              * Coastal rotation
              */
             var filterCoastalRotation = _gameData.UserData.CoastalRotation.Use;
-            ListingStandard.CheckboxLabeled("Use Coastal Rotation", ref filterCoastalRotation,
-                "Allow to search for coastal sea tiles which have a coast facing a specific direction.");
+            ListingStandard.CheckboxLabeled("PLMWTT_UseCoastalRoation".Translate(), ref filterCoastalRotation,
+                "PLMWTT_UseCoastalRoationTooltip".Translate());
             _gameData.UserData.CoastalRotation.Use = filterCoastalRotation;
 
             // "Select" button
-            if (ListingStandard.ButtonText("Select Coast Rotation"))
+            if (ListingStandard.ButtonText("PLMWTT_SelectCoastRotation".Translate()))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
 
@@ -193,7 +193,7 @@ namespace PrepareLanding
                 }
 
                 // create the floating menu
-                var floatMenu = new FloatMenu(floatMenuOptions, "Select Coast Rotation");
+                var floatMenu = new FloatMenu(floatMenuOptions, "PLMWTT_SelectCoastRotation".Translate());
 
                 // add it to the window stack to display it
                 Find.WindowStack.Add(floatMenu);
@@ -201,8 +201,8 @@ namespace PrepareLanding
 
             var rightLabel = _gameData.UserData.CoastalRotation.Use /*&& _gameData.UserData.CoastalRotation.Selected != Rot4.Invalid*/
                 ? ("HasCoast" + _gameData.UserData.CoastalRotation.Selected).Translate().CapitalizeFirst() 
-                : "None";
-            ListingStandard.LabelDouble("Selected Coast Rotation:", rightLabel);
+                : "PLMW_None".Translate();
+            ListingStandard.LabelDouble($"{"PLMWTT_SelectedCoastRotation".Translate()}:", rightLabel);
 
             /*
              * coastal tiles (lake)
@@ -212,16 +212,16 @@ namespace PrepareLanding
 
             
             rect = ListingStandard.GetRect(DefaultElementHeight);
-            TooltipHandler.TipRegion(rect, "A lake is a most 15 tiles of water surrounded by land.");
+            TooltipHandler.TipRegion(rect, "PLMWTT_IsCoastalTileLakeTooltip".Translate());
             tmpCheckState = _gameData.UserData.ChosenCoastalLakeTileState;
-            Widgets.CheckBoxLabeledMulti(rect, "Is Coastal Tile (lake):", ref tmpCheckState);
+            Widgets.CheckBoxLabeledMulti(rect, $"{"PLMWTT_IsCoastalTileLake".Translate()}:", ref tmpCheckState);
 
             _gameData.UserData.ChosenCoastalLakeTileState = tmpCheckState;
         }
 
         private void DrawElevationSelection()
         {
-            DrawEntryHeader("Elevation (meters)", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
+            DrawEntryHeader($"{"Elevation".Translate()} ({Find.ActiveLanguageWorker.Pluralize("PLMW_Meter".Translate())})", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
 
             // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
             // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
@@ -230,15 +230,15 @@ namespace PrepareLanding
 
         private void DrawHillinessTypeSelection()
         {
-            DrawEntryHeader($"{"Terrain".Translate()} Types",
+            DrawEntryHeader("PLMWTT_TerrainTypes".Translate(),
                 backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
 
-            if (ListingStandard.ButtonText("Select Terrain"))
+            if (ListingStandard.ButtonText("PLMWTT_SelectTerrain".Translate()))
             {
                 var floatMenuOptions = new List<FloatMenuOption>();
                 foreach (var hillinessValue in _gameData.DefData.HillinessCollection)
                 {
-                    var label = "Any";
+                    var label = "PLMW_SelectAny".Translate();
 
                     if (hillinessValue != Hilliness.Undefined)
                         label = hillinessValue.GetLabelCap();
@@ -248,30 +248,30 @@ namespace PrepareLanding
                     floatMenuOptions.Add(menuOption);
                 }
 
-                var floatMenu = new FloatMenu(floatMenuOptions, "Select terrain");
+                var floatMenu = new FloatMenu(floatMenuOptions, "PLMWTT_SelectTerrain".Translate());
                 Find.WindowStack.Add(floatMenu);
             }
 
             // note: RimWorld logs an error when .GetLabelCap() is used on Hilliness.Undefined
             var rightLabel = _gameData.UserData.ChosenHilliness != Hilliness.Undefined
                 ? _gameData.UserData.ChosenHilliness.GetLabelCap()
-                : "Any";
+                : "PLMW_SelectAny".Translate();
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
         private void DrawMovementTime()
         {
-            DrawEntryHeader("Movement Times (hours)", false,
+            DrawEntryHeader($"{"CaravanBaseMovementTime".Translate()} ({Find.ActiveLanguageWorker.Pluralize("PLMW_Hour".Translate())})", false,
                 backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
 
-            DrawUsableMinMaxNumericField(_gameData.UserData.CurrentMovementTime, "Current Movement Time");
-            DrawUsableMinMaxNumericField(_gameData.UserData.SummerMovementTime, "Summer Movement Time");
-            DrawUsableMinMaxNumericField(_gameData.UserData.WinterMovementTime, "Winter Movement Time");
+            DrawUsableMinMaxNumericField(_gameData.UserData.CurrentMovementTime, "MovementTimeNow".Translate());
+            DrawUsableMinMaxNumericField(_gameData.UserData.SummerMovementTime, "MovementTimeSummer".Translate());
+            DrawUsableMinMaxNumericField(_gameData.UserData.WinterMovementTime, "MovementTimeWinter".Translate());
         }
 
         private void DrawRiverTypesSelection()
         {
-            DrawEntryHeader("River Types", backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
+            DrawEntryHeader("PLMWTT_RiverTypes".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
 
             var riverDefs = _gameData.DefData.RiverDefs;
             var selectedRiverDefs = _gameData.UserData.SelectedRiverDefs;
@@ -291,40 +291,30 @@ namespace PrepareLanding
             }
 
             // Reset button: reset the container
-            if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
+            if (Widgets.ButtonTextToolTip(buttonsRect[0], "PLMW_Reset".Translate(), "PLMWTT_ButtonResetTooltip".Translate()))
                 selectedRiverDefs.Reset(riverDefs, nameof(_gameData.UserData.SelectedRiverDefs));
 
             // All rivers
-            if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
+            if (Widgets.ButtonTextToolTip(buttonsRect[1], "PLMW_All".Translate(), "PLMWTT_ButtonAllTooltip".Translate()))
                 selectedRiverDefs.All();
 
             // No rivers
-            if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
+            if (Widgets.ButtonTextToolTip(buttonsRect[2], "PLMW_None".Translate(), "PLMWTT_ButtonNoneTooltip".Translate()))
                 selectedRiverDefs.None();
 
             // boolean filtering type
-            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nOR: each item is evaluated independently\nAND: all items are evaluated together.");
-            var savedColor = GUI.color;
-            GUI.color = selectedRiverDefs.FilterBooleanState.Color();
-            if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRiverDefs.FilterBooleanState.ToStringHuman()))
+            if (Widgets.ButtonTextToolTipColor(buttonsRect[3], selectedRiverDefs.FilterBooleanState.ToStringHuman(), "PLMWTT_ORANDTooltip".Translate(), selectedRiverDefs.FilterBooleanState.Color()))
             {
                 selectedRiverDefs.FilterBooleanState = selectedRiverDefs.FilterBooleanState.Next();
             }
-            GUI.color = savedColor;
 
             if (_gameData.UserData.Options.ViewPartialOffNoSelect)
             {
-
-                TooltipHandler.TipRegion(buttonsRect[4],
-                    "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
-
-                savedColor = GUI.color;
-                GUI.color = selectedRiverDefs.OffPartialNoSelect ? Color.green : Color.red;
-                if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRiverDefs.OffPartialNoSelect}"))
+                var color = selectedRiverDefs.OffPartialNoSelect ? Color.green : Color.red;
+                if (Widgets.ButtonTextToolTipColor(buttonsRect[4], $"{"PLMWTT_SelectedShort".Translate()} {selectedRiverDefs.OffPartialNoSelect}", "PLMWTT_OffPartialTooltip".Translate(), color))
                 {
                     selectedRiverDefs.OffPartialNoSelect = !selectedRiverDefs.OffPartialNoSelect;
                 }
-                GUI.color = savedColor;
             }
 
             /*
@@ -363,7 +353,7 @@ namespace PrepareLanding
 
         private void DrawRoadTypesSelection()
         {
-            DrawEntryHeader("Road Types", backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
+            DrawEntryHeader("PLMWTT_RoadTypes".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
 
             var roadDefs = _gameData.DefData.RoadDefs;
             var selectedRoadDefs = _gameData.UserData.SelectedRoadDefs;
@@ -383,39 +373,30 @@ namespace PrepareLanding
             }
 
             // Reset button: reset the container
-            if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset"))
+            if (Widgets.ButtonTextToolTip(buttonsRect[0], "PLMW_Reset".Translate(), "PLMWTT_ButtonResetTooltip".Translate()))
                 selectedRoadDefs.Reset(roadDefs, nameof(_gameData.UserData.SelectedRoadDefs));
 
             // all roads
-            if (Verse.Widgets.ButtonText(buttonsRect[1], "All"))
+            if (Widgets.ButtonTextToolTip(buttonsRect[1], "PLMW_All".Translate(), "PLMWTT_ButtonAllTooltip".Translate()))
                 selectedRoadDefs.All();
 
             // no roads
-            if (Verse.Widgets.ButtonText(buttonsRect[2], "None"))
+            if (Widgets.ButtonTextToolTip(buttonsRect[2], "PLMW_None".Translate(), "PLMWTT_ButtonNoneTooltip".Translate()))
                 selectedRoadDefs.None();
 
             // boolean filtering type
-            TooltipHandler.TipRegion(buttonsRect[3], "Type of filtering to apply.\nOR: each item is evaluated independently\nAND: all items are evaluated together.");
-            var savedColor = GUI.color;
-            GUI.color = selectedRoadDefs.FilterBooleanState.Color();
-            if (Verse.Widgets.ButtonText(buttonsRect[3], selectedRoadDefs.FilterBooleanState.ToStringHuman()))
+            if (Widgets.ButtonTextToolTipColor(buttonsRect[3], selectedRoadDefs.FilterBooleanState.ToStringHuman(), "PLMWTT_ORANDTooltip".Translate(), selectedRoadDefs.FilterBooleanState.Color()))
             {
                 selectedRoadDefs.FilterBooleanState = selectedRoadDefs.FilterBooleanState.Next();
             }
-            GUI.color = savedColor;
 
             if (_gameData.UserData.Options.ViewPartialOffNoSelect)
             {
-                TooltipHandler.TipRegion(buttonsRect[4],
-                    "If True, Off and Partial states do not allow any selection.\nIf false, they allow selection of tiles.");
-
-                savedColor = GUI.color;
-                GUI.color = selectedRoadDefs.OffPartialNoSelect ? Color.green : Color.red;
-                if (Verse.Widgets.ButtonText(buttonsRect[4], $"Sel {selectedRoadDefs.OffPartialNoSelect}"))
+                var color = selectedRoadDefs.OffPartialNoSelect ? Color.green : Color.red;
+                if (Widgets.ButtonTextToolTipColor(buttonsRect[4], $"{"PLMWTT_SelectedShort".Translate()} {selectedRoadDefs.OffPartialNoSelect}", "PLMWTT_OffPartialTooltip".Translate(), color))
                 {
                     selectedRoadDefs.OffPartialNoSelect = !selectedRoadDefs.OffPartialNoSelect;
                 }
-                GUI.color = savedColor;
             }
 
             /*
@@ -455,7 +436,7 @@ namespace PrepareLanding
 
         private void DrawStoneTypesSelection()
         {
-            DrawEntryHeader("Stone Types", backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
+            DrawEntryHeader("PLMWTT_StoneTypes".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
 
             var selectedStoneDefs = _gameData.UserData.SelectedStoneDefs;
 
@@ -471,7 +452,7 @@ namespace PrepareLanding
             }
 
             // Reset button: reset all entries to Partial state
-            if (Verse.Widgets.ButtonText(buttonsRect[0], "Reset All"))
+            if (Verse.Widgets.ButtonText(buttonsRect[0], "PLMW_Reset".Translate()))
             {
                 selectedStoneDefs.Reset(_gameData.DefData.StoneDefs, nameof(_gameData.UserData.SelectedStoneDefs));
 
@@ -479,11 +460,11 @@ namespace PrepareLanding
             }
 
             // order / no order button
-            TooltipHandler.TipRegion(buttonsRect[1], "Whether Stone Filtering is order dependent or not.\nPress button to change filter state.");
-            var orderText = selectedStoneDefs.OrderedFiltering ? "Ordered" : "No Order";
+            TooltipHandler.TipRegion(buttonsRect[1], "PLMWTT_StoneOrderTooltip".Translate());
+            var orderText = selectedStoneDefs.OrderedFiltering ? "PLMWTT_Ordered".Translate() : "PLMWTT_NoOrder".Translate();
             var savedColor = GUI.color;
             GUI.color = selectedStoneDefs.OrderedFiltering ? Color.green : Color.red;
-            if (Verse.Widgets.ButtonText(buttonsRect[1], $"Filter: {orderText}"))
+            if (Verse.Widgets.ButtonText(buttonsRect[1], $"{"PLMWTT_Filter".Translate()}: {orderText}"))
             {
                 selectedStoneDefs.OrderedFiltering = !selectedStoneDefs.OrderedFiltering;
             }
@@ -550,21 +531,19 @@ namespace PrepareLanding
             var rightRect = stoneTypesNumberRect.RightPart(0.20f);
 
             var filterByStoneNumber = _gameData.UserData.StoneTypesNumberOnly;
-            Verse.Widgets.CheckboxLabeled(leftRect, "Use # of stone types [2,3]:", ref filterByStoneNumber);
+            Verse.Widgets.CheckboxLabeled(leftRect, $"{"PLMWTT_UseNumberOfStoneTypes".Translate()}:", ref filterByStoneNumber);
             _gameData.UserData.StoneTypesNumberOnly = filterByStoneNumber;
 
             var numberOfStones = _gameData.UserData.StoneTypesNumber;
             Verse.Widgets.TextFieldNumeric(rightRect, ref numberOfStones, ref _bufferStringNumberOfStones, 2, 3);
             _gameData.UserData.StoneTypesNumber = numberOfStones;
 
-            const string tooltipText =
-                "Filter tiles that have only the given number of stone types (whatever the types are). This disables the other stone filters.";
-            TooltipHandler.TipRegion(leftRect, tooltipText);
+            TooltipHandler.TipRegion(leftRect, "PLMWTT_UseNumberOfStoneTypesToolTip".Translate());
         }
 
         private void DrawTimeZoneSelection()
         {
-            DrawEntryHeader("Time Zone [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
+            DrawEntryHeader($"{"TimeZone".Translate()} [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.TimeZone, "Time Zone", -12, 12);
         }
