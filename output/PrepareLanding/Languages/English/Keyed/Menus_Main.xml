@@ -14,6 +14,16 @@
     <PLMW_Tile>Tile</PLMW_Tile> <!-- as in "Tile on the world map" -->
     <PLMW_Tiles>Tiles</PLMW_Tiles>
 
+        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom Buttons [BB] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <PLMWBB_FilterTiles>Filter Tiles</PLMWBB_FilterTiles>
+        <PLMWBB_ResetFilters>Reset Filters</PLMWBB_ResetFilters>
+        <PLMWBB_Minimize>Minimize</PLMWBB_Minimize>
+        <PLMWBB_SelectRandom>Select Random</PLMWBB_SelectRandom>
+
+        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Load / Save [LS] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+
+
         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Terrain Tab [TT] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
         <PLMWTT_TabName>Terrain</PLMWTT_TabName>
 

@@ -68,7 +68,7 @@ namespace PrepareLanding
 
             #region BOTTOM_BUTTONS
 
-            var buttonFilterTiles = new ButtonDescriptor("Filter Tiles",
+            var buttonFilterTiles = new ButtonDescriptor("PLMWBB_FilterTiles".Translate(),
                 delegate
                 {
                     SoundDefOf.TickLow.PlayOneShotOnCamera();
@@ -83,30 +83,31 @@ namespace PrepareLanding
                     PrepareLanding.Instance.TileFilter.Filter();
                 });
 
-            var buttonResetFilters = new ButtonDescriptor("Reset Filters",
+            var buttonResetFilters = new ButtonDescriptor("PLMWBB_ResetFilters".Translate(),
                 delegate
                 {
                     SoundDefOf.TickLow.PlayOneShotOnCamera();
                     gameData.UserData.ResetAllFields();
                 });
 
-            var buttonMinimize = new ButtonDescriptor("Minimize",
+            var buttonMinimize = new ButtonDescriptor("PLMWBB_Minimize".Translate(),
                 delegate
                 {
                     SoundDefOf.TickHigh.PlayOneShotOnCamera();
                     Minimize();
                 });
 
-            var buttonSelectRandomSite = new ButtonDescriptor("Select Random", delegate
-            {
-                SoundDefOf.Click.PlayOneShotOnCamera();
-                var tileId = PrepareLanding.Instance.TileFilter.RandomFilteredTile();
-                if (tileId == Tile.Invalid)
-                    return;
+            var buttonSelectRandomSite = new ButtonDescriptor("PLMWBB_SelectRandom".Translate(), 
+                delegate
+                {
+                    SoundDefOf.Click.PlayOneShotOnCamera();
+                    var tileId = PrepareLanding.Instance.TileFilter.RandomFilteredTile();
+                    if (tileId == Tile.Invalid)
+                        return;
 
-                Find.WorldInterface.SelectedTile = tileId;
-                Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
-            });
+                    Find.WorldInterface.SelectedTile = tileId;
+                    Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
+                });
 
             _buttonCloseDescriptor = new ButtonDescriptor("CloseButton".Translate(),
                 delegate
