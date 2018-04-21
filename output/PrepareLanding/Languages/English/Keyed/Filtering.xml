@@ -38,6 +38,8 @@
     <PLFILT_NoCavesForChosenTerrain>There can be no caves with the chosen terrain type. Choose at least {0}.</PLFILT_NoCavesForChosenTerrain>
     <PLFILT_NoBiomeNoTerrainSelected>No biome and no terrain selected for a Planet coverage >= 50%&#xA;&#x9;Please select a biome and a terrain first.</PLFILT_NoBiomeNoTerrainSelected>
     
+    <!-- as in "Filtering Biomes" or "Filtering Caves"; dev: this is in TileFilter.cs -->
+    <PLFILT_Filtering>Filtering</PLFILT_Filtering>
     <!--============ LongEventHandler ==============-->
     <PLFILT_FilteringWorldTiles>Filtering World Tiles</PLFILT_FilteringWorldTiles>
     <PLFILT_PreFilteringWorldTiles>Prefiltering World Tiles</PLFILT_PreFilteringWorldTiles>

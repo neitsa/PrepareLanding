@@ -28,7 +28,7 @@ namespace PrepareLanding.Filters
 
         public virtual List<int> FilteredTiles => _filteredTiles;
 
-        public virtual string RunningDescription => $"Filtering {SubjectThingDef}";
+        public virtual string RunningDescription => $"{"PLFILT_Filtering".Translate()} {SubjectThingDef}";
 
         public string AttachedProperty { get; }
 
