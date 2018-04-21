@@ -107,10 +107,4 @@
         <!-- MinMaxFromRestrictedListItem -->
         <PLINT_MinMaxFromRestrictedListItemSelect>Select</PLINT_MinMaxFromRestrictedListItemSelect> <!-- As in "Select Growing Period" -->
 
-
-
-    <!--============ LongEventHandler ==============-->
-    <FilteringWorldTiles>Filtering World Tiles</FilteringWorldTiles>
-    <PreFilteringWorldTiles>Prefiltering World Tiles</PreFilteringWorldTiles>
-
 </LanguageData>

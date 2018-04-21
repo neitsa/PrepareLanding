@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <!-- use 4 spaces indentation, NOT tabs -->
+    <!-- Overall prefix for the mod is "PL" for PrepareLanding -->
+    <!--=============================================== Filtering [FILT] =============================================-->
+    <PLFILT_FilteredTilesCleared>Filtered tiles cleared.</PLFILT_FilteredTilesCleared>
+    <PLFILT_FailedFindValidBaseTile>Failed to find a valid base tile.</PLFILT_FailedFindValidBaseTile>
+    <PLFILT_NewFilterfing>New Filtering</PLFILT_NewFilterfing>
+        <!-- {0} is 0 or a positive number -->
+    <PLFILT_StartingFilteringWithxTiles>Starting filtering with: {0} tiles.</PLFILT_StartingFilteringWithxTiles>
+        <!-- {0} is either PLFILT_InConjunctionPreviousFilters or simply a dot '.' -->
+    <PLFILT_ZeroMatchingTiles>this filter resulted in 0 matching tiles{0} Maybe the filtering was a little bit too harsh?</PLFILT_ZeroMatchingTiles>
+        <!-- {0} is 0 or a positive number -->
+    <PLFILT_InConjunctionPreviousFilters> (in conjunction with the previous {0} filters)</PLFILT_InConjunctionPreviousFilters>
+    <PLFILT_FilterResultZeroTiles>Filter resulted in 0 tiles</PLFILT_FilterResultZeroTiles>
+    <PLFILT_AllValidTilesMatching>this filter results in all valid tiles matching</PLFILT_AllValidTilesMatching>
+        <!-- as in "Filtering Biomes: 123 tiles found." -->
+    <PLFILT_TilesFound>tiles found</PLFILT_TilesFound>
+        <!-- as in "Filter ran in: 0.01 seconds." ; note that this is for a single filter -->
+    <PLFILT_FilterRanIn>filter ran in:</PLFILT_FilterRanIn>
+        <!-- {0} is 0 or a positive number -->
+    <PLFILT_xTilesMatchAllFilters>Before checking for valid tiles: a total of {0} tile(s) match(es) all filters.</PLFILT_xTilesMatchAllFilters>
+    <PLFILT_NoTileMatchesFilter>No tile matches the given filter(s).</PLFILT_NoTileMatchesFilter>
+        <!-- {0} is 0 or a positive number; {1} is a time as in: "All 2 filters ran in 0.01 seconds" -->
+    <PLFILT_AllFiltersRanIn>All {0} filter(s) ran in {1}.</PLFILT_AllFiltersRanIn>
+        <!-- {0} is 0 or a positive number -->
+    <PLFILT_TotalOfxTilesMatchAllFilters>A total of {0} tile(s) match(es) all filters.</PLFILT_TotalOfxTilesMatchAllFilters>
+    <PLFILT_PreFiltering>PreFiltering</PLFILT_PreFiltering>
+        <!-- {0} and {1} are 0 or a positive number -->
+    <PLFILT_ValidTilesRemainAfterFilter>Prefilter: {0} valid tile(s) remain(s) after filtering ({1} tile(s) removed).</PLFILT_ValidTilesRemainAfterFilter>
+        <!-- {0} is 0 or a positive number -->
+    <PLFILT_TilesWithRiver>Prefilter: {0} tiles with at least one river.</PLFILT_TilesWithRiver> 
+    <PLFILT_TilesWithRoad>Prefilter: {0} tiles with at least one road.</PLFILT_TilesWithRoad>
+    <PLFILT_NewWorld>New World</PLFILT_NewWorld>
+    <PLFILT_AllFiltersInDefaultState>All filters are in their default state</PLFILT_AllFiltersInDefaultState>
+    <PLFILT_PleaseSelectAtLeastOneFilter>please select at least one filter</PLFILT_PleaseSelectAtLeastOneFilter>
+        <!-- {0} is a hilliness type, as "Large Hills" for example -->
+    <PLFILT_NoCavesForChosenTerrain>There can be no caves with the chosen terrain type. Choose at least {0}.</PLFILT_NoCavesForChosenTerrain>
+    <PLFILT_NoBiomeNoTerrainSelected>No biome and no terrain selected for a Planet coverage >= 50%&#xA;&#x9;Please select a biome and a terrain first.</PLFILT_NoBiomeNoTerrainSelected>
+    
+    <!--============ LongEventHandler ==============-->
+    <PLFILT_FilteringWorldTiles>Filtering World Tiles</PLFILT_FilteringWorldTiles>
+    <PLFILT_PreFilteringWorldTiles>Prefiltering World Tiles</PLFILT_PreFilteringWorldTiles>
+    
+</LanguageData>
