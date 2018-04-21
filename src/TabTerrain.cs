@@ -545,7 +545,7 @@ namespace PrepareLanding
         {
             DrawEntryHeader($"{"TimeZone".Translate()} [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
 
-            DrawUsableMinMaxNumericField(_gameData.UserData.TimeZone, "Time Zone", -12, 12);
+            DrawUsableMinMaxNumericField(_gameData.UserData.TimeZone, "TimeZone".Translate(), -12, 12);
         }
     }
 }
