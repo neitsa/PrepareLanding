@@ -217,7 +217,7 @@ namespace PrepareLanding
         {
             if (_matchingTileIds.Count == 0)
             {
-                Messages.Message("Please filter tiles first.", MessageTypeDefOf.RejectInput);
+                Messages.Message("PLFILT_FilterTilesFirst".Translate(), MessageTypeDefOf.RejectInput);
                 return Tile.Invalid;
             }
 
