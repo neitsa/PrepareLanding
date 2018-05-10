@@ -206,7 +206,7 @@ namespace PrepareLanding
                 FilterTiles();
             else
                 LongEventHandler.QueueLongEvent(FilterTiles,
-                    $"[{"PrepareLanding".Translate()}] {"PLFILT_FilteringWorldTiles".Translate()}", true, null);
+                    $"[PrepareLanding] {"PLFILT_FilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
@@ -474,7 +474,7 @@ namespace PrepareLanding
         private void PrefilterQueueLongEvent()
         {
             LongEventHandler.QueueLongEvent(Prefilter,
-                $"[\"PrepareLanding\"] {"PreFilteringWorldTiles".Translate()}", true, null);
+                $"[PrepareLanding] {"PreFilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
