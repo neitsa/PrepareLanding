@@ -135,7 +135,7 @@ namespace PrepareLanding.Coordinates
 
             if (_goToTileId == Tile.Invalid || _goToTileId < 0 || _goToTileId >= Find.WorldGrid.TilesCount)
                 Messages.Message(
-                    $"[GoToTile] Out of Range: {_goToTileId}; Range: [0, {Find.WorldGrid.TilesCount}).",
+                    $"[PrepareLanding] Out of Range: {_goToTileId}; Range: [0, {Find.WorldGrid.TilesCount}).",
                     MessageTypeDefOf.RejectInput);
             else
                 SetGuiFromTile(_goToTileId, Find.WorldGrid.GetTileCenter(_goToTileId));
@@ -195,7 +195,7 @@ namespace PrepareLanding.Coordinates
                 _goToTileId = tileId;
                 _goToTileIdString = string.Empty;
                 _goToCoordsString = Coordinates.LongLatOfString(coordinates);
-                Messages.Message($"[GoToTile] Couldn't find tile for given coordinates: '{_goToCoordsString}",
+                Messages.Message($"[PrepareLanding] Couldn't find tile for given coordinates: '{_goToCoordsString}",
                     MessageTypeDefOf.NegativeEvent);
             }
         }
