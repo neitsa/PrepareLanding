@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
-    <!-- use 4 spaces indentation, NOT tabs -->
+    <!-- Use 4 spaces indentation, NOT tabs -->
     <!-- Overall prefix for the mod is "PL" for PrepareLanding -->
+
     <!--=============================================== Filtering [FILT] =============================================-->
     <PLFILT_FilteredTilesCleared>Filtered tiles cleared.</PLFILT_FilteredTilesCleared>
     <PLFILT_FilterTilesFirst>Please filter tiles first.</PLFILT_FilterTilesFirst>
@@ -41,7 +42,9 @@
 
     <!-- as in "Filtering Biomes" or "Filtering Caves"; dev: this is in TileFilter.cs -->
     <PLFILT_Filtering>Filtering</PLFILT_Filtering>
+
     <!--============ LongEventHandler ==============-->
+        <!-- Note: RimWorld offers no translation text for these strings... I let them here in case it is added in Rimworld's code -->
     <PLFILT_FilteringWorldTiles>Filtering World Tiles</PLFILT_FilteringWorldTiles>
     <PLFILT_PreFilteringWorldTiles>Prefiltering World Tiles</PLFILT_PreFilteringWorldTiles>
 

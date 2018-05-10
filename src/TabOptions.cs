@@ -20,10 +20,10 @@ namespace PrepareLanding
         public override bool CanBeDrawn { get; set; } = true;
 
         /// <summary>A unique identifier for the Tab.</summary>
-        public override string Id => "PLOPT_Options".Translate();
+        public override string Id => "Options";
 
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
-        public override string Name => Id;
+        public override string Name => "PLOPT_Options".Translate();
 
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>

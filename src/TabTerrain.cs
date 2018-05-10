@@ -44,7 +44,7 @@ namespace PrepareLanding
         public override bool CanBeDrawn { get; set; } = true;
 
         /// <summary>A unique identifier for the Tab.</summary>
-        public override string Id => Name;
+        public override string Id => "Terrain";
 
         /// <summary>
         ///     The name of the tab (that is actually displayed at its top).
@@ -493,7 +493,7 @@ namespace PrepareLanding
                 {
                     if (!selectedStoneDefs.TryGetValue(currentOrderedStoneDef, out var threeStateItem))
                     {
-                        Log.Message("A stoneDef wasn't found in selectedStoneDefs");
+                        Log.ErrorOnce("A stoneDef wasn't found in selectedStoneDefs", 0x1cafe9);
                         continue;
                     }
 

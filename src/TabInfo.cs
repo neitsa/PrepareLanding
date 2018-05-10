@@ -48,7 +48,7 @@ namespace PrepareLanding
 
         public override string Id => "WorldInfo";
 
-        public override string Name => "World Info";
+        public override string Name => "PLMWINF_WorldInfo".Translate();
 
         private string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
 
@@ -57,33 +57,35 @@ namespace PrepareLanding
         private string BuildWorldInfo()
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"Planet Name: {Find.World.info.name}");
+            stringBuilder.AppendLine($"{"PLMWINF_PlanetName".Translate()}: {Find.World.info.name}");
             stringBuilder.AppendLine($"{"PlanetSeed".Translate()}: {Find.World.info.seedString}");
             stringBuilder.AppendLine(
                 $"{"PlanetCoverageShort".Translate()}: {Find.World.info.planetCoverage.ToStringPercent()}");
-            stringBuilder.AppendLine($"Total Tiles: {Find.World.grid.TilesCount}");
-            if (PrepareLanding.Instance.TileFilter != null)
+            stringBuilder.AppendLine($"{"PLMWINF_TotalTiles".Translate()}: {Find.World.grid.TilesCount}");
+
+            // if nothing filtered yet, then bail out now.
+            if (PrepareLanding.Instance.TileFilter == null)
+                return stringBuilder.ToString();
+
+            if (PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly != null)
+                stringBuilder.AppendLine(
+                    $"{"PLMWINF_SettleableTiles".Translate()}: {PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly.Count}");
+            if (PrepareLanding.Instance.TileFilter.AllTilesWithRiver != null)
+                stringBuilder.AppendLine(
+                    $"{"PLMWINF_TilesWithRivers".Translate()}: {PrepareLanding.Instance.TileFilter.AllTilesWithRiver.Count}");
+            if (PrepareLanding.Instance.TileFilter.AllTilesWithRoad != null)
+                stringBuilder.AppendLine(
+                    $"{"PLMWINF_TilesWithRoads".Translate()}: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
+
+            stringBuilder.AppendLine($"{"PLMWINF_Biomes".Translate()}:");
+            var biomes = _gameData.DefData.BiomeDefs;
+
+            foreach (var biome in biomes)
             {
-                if (PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly != null)
-                    stringBuilder.AppendLine(
-                        $"Settleable Tiles: {PrepareLanding.Instance.TileFilter.AllValidTilesReadOnly.Count}");
-                if (PrepareLanding.Instance.TileFilter.AllTilesWithRiver != null)
-                    stringBuilder.AppendLine(
-                        $"Tiles with Rivers: {PrepareLanding.Instance.TileFilter.AllTilesWithRiver.Count}");
-                if (PrepareLanding.Instance.TileFilter.AllTilesWithRoad != null)
-                    stringBuilder.AppendLine(
-                        $"Tiles with Roads: {PrepareLanding.Instance.TileFilter.AllTilesWithRoad.Count}");
-
-                stringBuilder.AppendLine("Biomes:");
-                var biomes = _gameData.DefData.BiomeDefs;
-
-                foreach (var biome in biomes)
-                {
-                    stringBuilder.AppendLine($"    * {biome.LabelCap}");
-                    var count = _gameData.WorldData.NumberOfTilesByBiome[biome];
-                    stringBuilder.AppendLine($"        - Number of Tiles ➠ {count}");
-                    stringBuilder.AppendLine($"        - {"AverageDiseaseFrequency".Translate()} ➠ {(RimWorld.GenDate.DaysPerYear / biome.diseaseMtbDays):F1} {"PerYear".Translate()}");
-                }
+                stringBuilder.AppendLine($"    * {biome.LabelCap}");
+                var count = _gameData.WorldData.NumberOfTilesByBiome[biome];
+                stringBuilder.AppendLine($"        - {"PLMWINF_NumberOfTiles".Translate()} ➠ {count}");
+                stringBuilder.AppendLine($"        - {"AverageDiseaseFrequency".Translate()} ➠ {(RimWorld.GenDate.DaysPerYear / biome.diseaseMtbDays):F1} {"PerYear".Translate()}");
             }
 
             return stringBuilder.ToString();
@@ -104,12 +106,12 @@ namespace PrepareLanding
                 var lowestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.First();
                 var vectorLongLat = Find.WorldGrid.LongLatOf(lowestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Lowest {characteristicName}: {lowestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\t{"PLMWINF_WorldLowest".Translate()} {characteristicName}: {lowestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
 
                 var highestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.Last();
                 vectorLongLat = Find.WorldGrid.LongLatOf(highestCharacteristicKvp.Key);
                 stringBuilder.AppendLine(
-                    $"\tWorld Highest {characteristicName}: {highestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
+                    $"\t{"PLMWINF_WorldHighest".Translate()} {characteristicName}: {highestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
             }
 
             return stringBuilder.ToString();
@@ -127,9 +129,9 @@ namespace PrepareLanding
 
         private void DrawFilterInfo()
         {
-            DrawEntryHeader("Filter Info", backgroundColor: Color.yellow);
+            DrawEntryHeader("PLMWINF_FilterInfo".Translate(), backgroundColor: Color.yellow);
 
-            if (ListingStandard.ButtonText("Clear Info"))
+            if (ListingStandard.ButtonText("PLMWINF_ClearInfo".Translate()))
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.Clear();
 
             ListingStandard.Gap();
@@ -146,7 +148,7 @@ namespace PrepareLanding
 
         private void DrawWorldInfo()
         {
-            var remSpace = DrawEntryHeader("World Info", backgroundColor: Color.yellow);
+            var remSpace = DrawEntryHeader("PLMWINF_WorldInfo".Translate(), backgroundColor: Color.yellow);
 
             var maxOuterRectHeight = (InRect.height - MainWindow.SpaceForBottomButtons - remSpace) / 2;
 
@@ -156,7 +158,7 @@ namespace PrepareLanding
 
         private void DrawWorldRecord()
         {
-            var currHeight = DrawEntryHeader("World Records", backgroundColor: Color.yellow);
+            var currHeight = DrawEntryHeader("PLMWINF_WorldRecords".Translate(), backgroundColor: Color.yellow);
 
             var maxOuterRectHeight = currHeight - MainWindow.SpaceForBottomButtons - DefaultElementHeight;
 

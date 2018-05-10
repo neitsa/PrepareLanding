@@ -40,7 +40,7 @@ namespace PrepareLanding
         /// <summary>
         ///     A unique identifier for the Tab.
         /// </summary>
-        public override string Id => Name;
+        public override string Id => "Temperature";
 
         /// <summary>
         ///     The name of the tab (that is actually displayed at its top).
@@ -261,17 +261,17 @@ namespace PrepareLanding
             var tempsForTwelves = TemperatureData.TemperaturesForTwelfth(tileId);
             var twelvesGetters = new List<ColumnData<TemperatureForecastForTwelfth>>
             {
-                new ColumnData<TemperatureForecastForTwelfth>("Quadrum", "Quadrum of Year",
+                new ColumnData<TemperatureForecastForTwelfth>("PLTFW_Quadrum".Translate(), "PLTFW_QuadrumToolTip".Translate(),
                     tfft => $"{tfft.Twelfth.GetQuadrum()}"),
-                new ColumnData<TemperatureForecastForTwelfth>("Season", "Season of Year",
+                new ColumnData<TemperatureForecastForTwelfth>("PLTFW_Season".Translate(), "PLTFW_SeasonToolTip".Translate(),
                     tfft => $"{tfft.Twelfth.GetQuadrum().GetSeason(tfft.Latitude)}"),
-                new ColumnData<TemperatureForecastForTwelfth>("Twelfth", "Twelfth of Year",
+                new ColumnData<TemperatureForecastForTwelfth>("PLTFW_Twelfth".Translate(), "PLTFW_TwelfthToolTip".Translate(),
                     tfft => $"{tfft.Twelfth}"),
-                new ColumnData<TemperatureForecastForTwelfth>("Avg. Temp", "Average Temperature for Twelfth",
+                new ColumnData<TemperatureForecastForTwelfth>("PLTFW_AvgTemp".Translate(), "PLTFW_AvgTempToolTip".Translate(),
                     tfft => $"{tfft.AverageTemperatureForTwelfth:F2}")
             };
             var tableViewTempForTwelves =
-                new TableView<TemperatureForecastForTwelfth>("Forecast For Twelves", tempsForTwelves,
+                new TableView<TemperatureForecastForTwelfth>("PLTFW_ForecastForTwelves".Translate(), tempsForTwelves,
                     twelvesGetters);
 
 
@@ -284,20 +284,21 @@ namespace PrepareLanding
                 TemperatureData.TemperaturesForDay(tileId, dateTicks);
             var temperaturesForHoursGetters = new List<ColumnData<TemperatureForecastForDay>>
             {
-                new ColumnData<TemperatureForecastForDay>("Hour", "Hour of Day", tffd => $"{tffd.Hour}"),
-                new ColumnData<TemperatureForecastForDay>("Temp", "Outdoor Temperature",
+                new ColumnData<TemperatureForecastForDay>("PLTFW_Hour".Translate(), "PLTFW_HourToolTip".Translate(), tffd => $"{tffd.Hour}"),
+                new ColumnData<TemperatureForecastForDay>("PLTFW_OutdoorTemp".Translate(), "PLTFW_OutdoorTempToolTip".Translate(),
                     tffd => $"{tffd.OutdoorTemperature:F1}"),
                 //new ColumnData<TemperatureForecastForDay>("RandomVar", "Daily Random Variation", tffd => $"{tffd.DailyRandomVariation:F1}"),
-                new ColumnData<TemperatureForecastForDay>("OffDRV", "Offset from Daily Random Variation",
+                new ColumnData<TemperatureForecastForDay>("PLTFW_OffDRV".Translate(), "PLTFW_OffDRVToolTip".Translate(),
                     tffd => $"{tffd.OffsetFromDailyRandomVariation:F1}"),
-                new ColumnData<TemperatureForecastForDay>("OffSeason", "Offset from Season Average",
+                new ColumnData<TemperatureForecastForDay>("PLTFW_OffSeason".Translate(), "PLTFW_OffSeasonToolTip".Translate(),
                     tffd => $"{tffd.OffsetFromSeasonCycle:F1}"),
-                new ColumnData<TemperatureForecastForDay>("SunEff", "Offset from Sun Cycle",
+                new ColumnData<TemperatureForecastForDay>("PLTFW_SunEff".Translate(), "PLTFW_SunEffToolTip".Translate(),
                     tffd => $"{tffd.OffsetFromSunCycle:F1}")
             };
+
+            var tableName = string.Format("PLTFW_ForecastForHours".Translate(), GenDate.HoursPerDay, dateString);
             var tableViewTempForDay =
-                new TableView<TemperatureForecastForDay>($"Forecast for {GenDate.HoursPerDay} Hours [{dateString}]",
-                    temperaturesForHoursOfDay,
+                new TableView<TemperatureForecastForDay>(tableName, temperaturesForHoursOfDay,
                     temperaturesForHoursGetters);
 
             /*
@@ -307,18 +308,18 @@ namespace PrepareLanding
                 TemperatureData.TemperaturesForYear(tileId, dateTicks);
             var temperaturesForDaysOfYearGetters = new List<ColumnData<TemperatureForecastForYear>>
             {
-                new ColumnData<TemperatureForecastForYear>("Day", "Day of Year", tffy => $"{tffy.Day}"),
-                new ColumnData<TemperatureForecastForYear>("Min", "Minimum Temperature of Day",
+                new ColumnData<TemperatureForecastForYear>("PLTFW_Day".Translate(), "PLTFW_DayToolTip".Translate(), tffy => $"{tffy.Day}"),
+                new ColumnData<TemperatureForecastForYear>("PLTFW_Min".Translate(), "PLTFW_MinToolTip".Translate(),
                     tffy => $"{tffy.MinTemp:F2}"),
-                new ColumnData<TemperatureForecastForYear>("Max", "Maximum Temperature of Day",
+                new ColumnData<TemperatureForecastForYear>("PLTFW_Max".Translate(), "PLTFW_MaxToolTip".Translate(),
                     tffy => $"{tffy.MaxTemp:F2}"),
-                new ColumnData<TemperatureForecastForYear>("OffSeason", "Offset from Season Average",
+                new ColumnData<TemperatureForecastForYear>("PLTFW_OffSeason".Translate(), "PLTFW_OffSeasonToolTip".Translate(),
                     tffy => $"{tffy.OffsetFromSeasonCycle:F2}"),
-                new ColumnData<TemperatureForecastForYear>("OffDRV", "Offset from Daily Random Variation",
+                new ColumnData<TemperatureForecastForYear>("PLTFW_OffDRV".Translate(), "PLTFW_OffDRVToolTip".Translate(),
                     tffy => $"{tffy.OffsetFromDailyRandomVariation:F2}")
             };
             var tableViewTempForYear =
-                new TableView<TemperatureForecastForYear>("Forecast for Next Year", tempsForDaysOfYear,
+                new TableView<TemperatureForecastForYear>("PLTFW_ForecastForNextYear".Translate(), tempsForDaysOfYear,
                     temperaturesForDaysOfYearGetters);
 
             /*

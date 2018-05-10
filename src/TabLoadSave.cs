@@ -113,10 +113,9 @@ namespace PrepareLanding
                 richText = true
             };
 
-            // setup default name
-            if (SteamManager.Initialized)
-                _presetAuthorSave = SteamUtility.SteamPersonaName;
+            // setup default name 
             // TODO check if possible to get logged in user if non steam rimworld
+            _presetAuthorSave = SteamManager.Initialized ? SteamUtility.SteamPersonaName : "Your_Name";
 
             #region LIST_BUTTONS
 
