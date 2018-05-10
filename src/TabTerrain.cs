@@ -225,7 +225,7 @@ namespace PrepareLanding
 
             // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
             // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
-            DrawUsableMinMaxNumericField(_gameData.UserData.Elevation, "Elevation", -500f, 5000f);
+            DrawUsableMinMaxNumericField(_gameData.UserData.Elevation, "Elevation".Translate(), -500f, 5000f);
         }
 
         private void DrawHillinessTypeSelection()
