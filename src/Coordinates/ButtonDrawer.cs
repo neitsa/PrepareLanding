@@ -81,7 +81,10 @@ namespace PrepareLanding.Coordinates
 
                     button.UnfoldAction?.Invoke(button);
                 }
-                var toolTipText = button.IsUnfolded ? $"Close {button.ToolTip}" : $"Show {button.ToolTip}";
+
+                var toolTipText = button.IsUnfolded
+                    ? $"{"PLCOORDBDRAW_Close".Translate()} {button.ToolTip}"
+                    : $"{"PLCOORDBDRAW_Show".Translate()} {button.ToolTip}";
                 TooltipHandler.TipRegion(buttonRect, toolTipText);
 
                 rectX += button.ButtonWidth + ButtonSpace;

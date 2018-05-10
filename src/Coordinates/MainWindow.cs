@@ -46,7 +46,7 @@ namespace PrepareLanding.Coordinates
             }
 
             var buttonSpecificLocations =
-                new DrawerButton("World Specific Locations", DrawSpecificLocations, UnfoldAction);
+                new DrawerButton("PLCOORDWIN_WorldSpecificLocations".Translate(), DrawSpecificLocations, UnfoldAction);
             //var buttonReportLog = new DrawerButton("Report Log", DrawReportLog, unfoldAction);
 
             _buttonDrawerHandler = new ButtonDrawerHandler();
@@ -64,14 +64,18 @@ namespace PrepareLanding.Coordinates
         {
             base.PreOpen();
             _buttonsDescriptors = new List<ButtonTextDescriptorCoordinates>();
-            var b1 = new ButtonTextDescriptorCoordinates("NP", "North Pole", Find.WorldGrid.NorthPolePos);
+            var b1 = new ButtonTextDescriptorCoordinates("PLCOORDWIN_NorthPoleAbbr".Translate(),
+                "PLCOORDWIN_NorthPole".Translate(), Find.WorldGrid.NorthPolePos);
             _buttonsDescriptors.Add(b1);
-            var b2 = new ButtonTextDescriptorCoordinates("SP", "South Pole", new Vector3(0, -100f, 0));
+            var b2 = new ButtonTextDescriptorCoordinates("PLCOORDWIN_SouthPoleAbbr".Translate(),
+                "PLCOORDWIN_SouthPole".Translate(), new Vector3(0, -100f, 0));
             _buttonsDescriptors.Add(b2);
-            var b3 = new ButtonTextDescriptorCoordinates("O", "Origin Point [0°, 0°]",
+            var b3 = new ButtonTextDescriptorCoordinates("PLCOORDWIN_OriginPointAbbr".Translate(),
+                "PLCOORDWIN_OriginPoint".Translate(),
                 new Vector3(0, 0, -100)); // note: negative z component is facing us at world start.
             _buttonsDescriptors.Add(b3);
-            var b4 = new ButtonTextDescriptorCoordinates("AO", "Ante-Origin Point [0°, 180°]", new Vector3(0, 0, 100));
+            var b4 = new ButtonTextDescriptorCoordinates("PLCOORDWIN_AnteOriginAbbr".Translate(),
+                "PLCOORDWIN_AnteOrigin".Translate(), new Vector3(0, 0, 100));
             _buttonsDescriptors.Add(b4);
 
 #if DEBUG_LONGLATDRAWER
@@ -128,14 +132,14 @@ namespace PrepareLanding.Coordinates
                 SetGuiFromTile(selectedTile, Find.WorldGrid.GetTileCenter(selectedTile), false);
 
             var maxTileId = Find.WorldGrid.TilesCount - 1;
-            Widgets.Label(rects[0], $"Tile ID [0, {maxTileId}]:");
+            Widgets.Label(rects[0], string.Format("PLCOORDWIN_TileIdNum".Translate(), maxTileId));
             Widgets.TextFieldNumeric(rects[1], ref _goToTileId, ref _goToTileIdString, 0, maxTileId);
-            if (!Widgets.ButtonText(rects[2], "Go!"))
+            if (!Widgets.ButtonText(rects[2], "PLCOORDWIN_GoButton".Translate()))
                 return;
 
             if (_goToTileId == Tile.Invalid || _goToTileId < 0 || _goToTileId >= Find.WorldGrid.TilesCount)
                 Messages.Message(
-                    $"[PrepareLanding] Out of Range: {_goToTileId}; Range: [0, {Find.WorldGrid.TilesCount}).",
+                    $"[PrepareLanding] {string.Format("PLCOORDWIN_TileIdOutOfRange".Translate(), _goToTileId, Find.WorldGrid.TilesCount)}",
                     MessageTypeDefOf.RejectInput);
             else
                 SetGuiFromTile(_goToTileId, Find.WorldGrid.GetTileCenter(_goToTileId));
@@ -146,9 +150,9 @@ namespace PrepareLanding.Coordinates
             var goToCoordsRect = _listingStandard.GetRect(30f);
             var rects = goToCoordsRect.SplitBy(_goToCoordsPct, 5f);
 
-            Widgets.Label(rects[0], "Coords:");
+            Widgets.Label(rects[0], "PLCOORDWIN_CoordsLabel".Translate());
             _goToCoordsString = Widgets.TextField(rects[1], _goToCoordsString);
-            if (!Widgets.ButtonText(rects[2], "Go!"))
+            if (!Widgets.ButtonText(rects[2], "PLCOORDWIN_GoButton".Translate()))
                 return;
 
             var coords = new Coordinates(_goToCoordsString);
@@ -195,7 +199,7 @@ namespace PrepareLanding.Coordinates
                 _goToTileId = tileId;
                 _goToTileIdString = string.Empty;
                 _goToCoordsString = Coordinates.LongLatOfString(coordinates);
-                Messages.Message($"[PrepareLanding] Couldn't find tile for given coordinates: '{_goToCoordsString}",
+                Messages.Message($"[PrepareLanding] {"PLCOORDWIN_NoTileForCoords".Translate()} '{_goToCoordsString}",
                     MessageTypeDefOf.NegativeEvent);
             }
         }
