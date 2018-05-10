@@ -141,7 +141,6 @@ namespace PrepareLanding
                     var coordinatesWindows = new Coordinates.MainWindow();
                     Find.WindowStack.Add(coordinatesWindows);
                 }
-
             }
         }
     }
