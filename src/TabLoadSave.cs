@@ -76,7 +76,7 @@ namespace PrepareLanding
         private int _listDisplayStartIndex;
 
         // preset author name during save mode.
-        private string _presetAuthorSave = string.Empty;
+        private string _presetAuthorSave;
 
         // preset description text during save mode.
         private string _presetDescriptionSave = string.Empty;
@@ -123,15 +123,15 @@ namespace PrepareLanding
             {
                 // reset starting display index
                 _listDisplayStartIndex = 0;
-            }, "Go to start of item list.");
+            }, "PLMWLODSAV_GoToStartOfItemList".Translate());
 
             var buttonPreviousPage = new ButtonDescriptor("<", delegate
             {
                 if (_listDisplayStartIndex >= MaxItemsToDisplay)
                     _listDisplayStartIndex -= MaxItemsToDisplay;
                 else
-                    Messages.Message("Reached start of item list.", MessageTypeDefOf.RejectInput);
-            }, "Go to previous list page.");
+                    Messages.Message("PLMWLODSAV_ReachedListStart".Translate(), MessageTypeDefOf.RejectInput);
+            }, "PLMWLODSAV_GoToPreviousListPage".Translate());
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
             {
@@ -139,22 +139,22 @@ namespace PrepareLanding
                 _listDisplayStartIndex += MaxItemsToDisplay;
                 if (_listDisplayStartIndex > presetFilesCount)
                 {
-                    Messages.Message($"No more available items to display (max: {presetFilesCount}).",
+                    Messages.Message($"{"PLMWLODSAV_NoMoreItemsAvailable".Translate()} {presetFilesCount}).",
                         MessageTypeDefOf.RejectInput);
                     _listDisplayStartIndex -= MaxItemsToDisplay;
                 }
-            }, "Go to next list page.");
+            }, "PLMWLODSAV_GoToNextListPage".Translate());
 
             var buttonListEnd = new ButtonDescriptor(">>", delegate
             {
                 var presetFilesCount = _gameData.PresetManager.AllPresetFiles.Count;
                 var displayIndexStart = presetFilesCount - presetFilesCount%MaxItemsToDisplay;
                 if (displayIndexStart == _listDisplayStartIndex)
-                    Messages.Message($"No more available items to display (max: {presetFilesCount}).",
+                    Messages.Message($"{"PLMWLODSAV_NoMoreItemsAvailable".Translate()} {presetFilesCount}).",
                         MessageTypeDefOf.RejectInput);
 
                 _listDisplayStartIndex = displayIndexStart;
-            }, "Go to end of list.");
+            }, "PLMWLODSAV_GoToEndOfList".Translate());
 
             _buttonList =
                 new List<ButtonDescriptor> {buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd};
@@ -165,7 +165,7 @@ namespace PrepareLanding
         /// <summary>Gets whether the tab can be draw or not.</summary>
         public override bool CanBeDrawn
         {
-            get { return LoadSaveMode != LoadSaveMode.Unknown; }
+            get => LoadSaveMode != LoadSaveMode.Unknown;
             set { }
         }
 
@@ -183,13 +183,13 @@ namespace PrepareLanding
                 switch (LoadSaveMode)
                 {
                     case LoadSaveMode.Unknown:
-                        name = "Load / Save";
+                        name = $"{"PLMWLODSAV_Load".Translate()} / {"PLMWLODSAV_Save".Translate()}";
                         break;
                     case LoadSaveMode.Load:
-                        name = "Load";
+                        name = "PLMWLODSAV_Load".Translate();
                         break;
                     case LoadSaveMode.Save:
-                        name = "Save";
+                        name = "PLMWLODSAV_Save".Translate();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -216,11 +216,15 @@ namespace PrepareLanding
 
                 case LoadSaveMode.Unknown:
                     break;
+
+                default:
+                    Log.ErrorOnce("[PrepareLanding] TabLoadSave: unknown mode", 0x1234cafe);
+                    break;
             }
             DrawBottomButtons(inRect);
         }
 
-        protected void DrawBottomButtons(Rect inRect)
+        private void DrawBottomButtons(Rect inRect)
         {
             var buttonsY = inRect.height - 30f;
             var numButtons = 2;
@@ -238,24 +242,6 @@ namespace PrepareLanding
                 return;
             }
 
-            // get the text of button, depending on the mode we're in
-            string verb;
-            switch (LoadSaveMode)
-            {
-                case LoadSaveMode.Unknown:
-                    // shouldn't happen
-                    verb = "Load / Save";
-                    break;
-                case LoadSaveMode.Load:
-                    verb = "Load";
-                    break;
-                case LoadSaveMode.Save:
-                    verb = "Save";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
             // just change the save button color if we could overwrite an existing preset.
             var presetExistsProtectFromOverwrite = false;
             if (!string.IsNullOrEmpty(_selectedFileName))
@@ -269,7 +255,7 @@ namespace PrepareLanding
                 GUI.color = Color.green;
 
             // display the action button (load / save)
-            if (Widgets.ButtonText(buttonRects[0], $"{verb} Preset"))
+            if (Widgets.ButtonText(buttonRects[0], $"{Name} Preset"))
                 switch (LoadSaveMode)
                 {
                     case LoadSaveMode.Load:
@@ -286,9 +272,9 @@ namespace PrepareLanding
             if (LoadSaveMode == LoadSaveMode.Load)
             {
                 GUI.color = Color.red;
-                var deleteButtonText = "Delete";
+                var deleteButtonText = "PLMWLODSAV_Delete".Translate();
                 if (_confirmDeletePush == 1)
-                    deleteButtonText = "Delete [Confirm]";
+                    deleteButtonText = "PLMWLODSAV_DeleteConfirm".Translate();
 
                 if (Widgets.ButtonText(buttonRects[rectIndex], deleteButtonText))
                 {
@@ -307,7 +293,7 @@ namespace PrepareLanding
             }
 
             // exit button
-            if (Widgets.ButtonText(buttonRects[rectIndex], $"Exit {verb}"))
+            if (Widgets.ButtonText(buttonRects[rectIndex], $"{"PLMWLODSAV_ExitCurrentMode".Translate()} {Name}"))
             {
                 LoadSaveMode = LoadSaveMode.Unknown;
                 _allowOverwriteExistingPreset = false;
@@ -322,19 +308,19 @@ namespace PrepareLanding
         {
             if (string.IsNullOrEmpty(_selectedFileName))
             {
-                Messages.Message("Pick a preset first.", MessageTypeDefOf.NegativeEvent);
+                Messages.Message("PLMWLODSAV_PickPresetFirst".Translate(), MessageTypeDefOf.NegativeEvent);
                 return;
             }
 
             if (_gameData.PresetManager.DeletePreset(_selectedFileName))
-                    Messages.Message("Successfully deleted the preset!", MessageTypeDefOf.PositiveEvent);
+                    Messages.Message("PLMWLODSAV_SuccessDelete".Translate(), MessageTypeDefOf.PositiveEvent);
             else
-                Messages.Message("Error: couldn't delete the preset...", MessageTypeDefOf.NegativeEvent);
+                Messages.Message("PLMWLODSAV_ErrorDelete".Translate(), MessageTypeDefOf.NegativeEvent);
         }
 
         #region LOAD_MODE
 
-        protected void DrawLoadMode(Rect inRect)
+        private void DrawLoadMode(Rect inRect)
         {
             Begin(inRect);
             DrawLoadPresetList(inRect);
@@ -347,16 +333,16 @@ namespace PrepareLanding
         {
             if (!string.IsNullOrEmpty(_selectedFileName))
                 if (_gameData.PresetManager.LoadPreset(_selectedFileName, true))
-                    Messages.Message("Successfully loaded the preset!", MessageTypeDefOf.PositiveEvent);
+                    Messages.Message("PLMWLODSAV_SuccessLoad".Translate(), MessageTypeDefOf.PositiveEvent);
                 else
-                    Messages.Message("Error: couldn't load the preset...", MessageTypeDefOf.NegativeEvent);
+                    Messages.Message("PLMWLODSAV_ErrorLoad".Translate(), MessageTypeDefOf.NegativeEvent);
             else
-                Messages.Message("Pick a preset first.", MessageTypeDefOf.NegativeEvent);
+                Messages.Message("PLMWLODSAV_PickPresetFirst".Translate(), MessageTypeDefOf.NegativeEvent);
         }
 
         private void DrawLoadPresetList(Rect inRect)
         {
-            DrawEntryHeader("Preset Files: Load mode", backgroundColor: Color.green);
+            DrawEntryHeader("PLMWLODSAV_PresetLoadMode".Translate(), backgroundColor: Color.green);
 
             var presetFiles = _gameData.PresetManager.AllPresetFiles;
             if (presetFiles == null)
@@ -368,7 +354,7 @@ namespace PrepareLanding
             var presetFilesCount = presetFiles.Count;
             if (presetFiles.Count == 0)
             {
-                ListingStandard.Label("No existing presets.");
+                ListingStandard.Label("PLMWLODSAV_NoExistingPresets".Translate());
                 return;
             }
 
@@ -454,32 +440,32 @@ namespace PrepareLanding
             ListingStandard.EndScrollView(innerLs);
         }
 
-        protected void DrawLoadPresetInfo(Rect inRect)
+        private void DrawLoadPresetInfo(Rect inRect)
         {
-            DrawEntryHeader("Preset Info:", backgroundColor: Color.green);
+            DrawEntryHeader("PLMWLODSAV_PresetInfo".Translate(), backgroundColor: Color.green);
 
             if (_selectedItemIndex < 0)
                 return;
 
-            ListingStandard.TextEntryLabeled2("Preset Name:", _selectedFileName);
+            ListingStandard.TextEntryLabeled2("PLMWLODSAV_PresetName".Translate(), _selectedFileName);
 
             var preset = _gameData.PresetManager.PresetByPresetName(_selectedFileName);
             if (preset == null)
                 return;
 
-            ListingStandard.TextEntryLabeled2("Author:", preset.PresetInfo.Author);
+            ListingStandard.TextEntryLabeled2("PLMWLODSAV_PresetAuthor".Translate(), preset.PresetInfo.Author);
 
-            ListingStandard.Label("Description:");
+            ListingStandard.Label("PLMWLODSAV_PresetDescription".Translate());
             var descriptionRect = ListingStandard.GetRect(80f);
             Widgets.TextAreaScrollable(descriptionRect, preset.PresetInfo.Description,
                 ref _scrollPosPresetLoadDescription);
 
-            ListingStandard.Label("Filters:");
+            ListingStandard.Label("PLMWLODSAV_PresetFilters".Translate());
             const float maxOuterRectHeight = 130f;
             ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.FilterInfo,
                 ref _scrollPosPresetFilterInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
 
-            ListingStandard.Label("Options:");
+            ListingStandard.Label("PLMWLODSAV_PresetOptions".Translate());
             ListingStandard.ScrollableTextArea(maxOuterRectHeight, preset.PresetInfo.OptionInfo,
                 ref _scrollPosPresetOptionInfo, _stylePresetInfo, DefaultScrollableViewShrinkWidth);
         }
@@ -488,7 +474,7 @@ namespace PrepareLanding
 
         #region SAVE_MODE
 
-        protected void DrawSaveMode(Rect inRect)
+        private void DrawSaveMode(Rect inRect)
         {
             Begin(inRect);
             DrawSaveFileName(inRect);
@@ -498,36 +484,34 @@ namespace PrepareLanding
         private void SavePreset(bool presetExistsProtectFromOverwrite)
         {
             if (_gameData.UserData.AreAllFieldsInDefaultSate())
-                Messages.Message("All filters seem to be in their default state", MessageTypeDefOf.RejectInput);
+                Messages.Message("PLMWLODSAV_AllFiltersInDefaultState".Translate(), MessageTypeDefOf.RejectInput);
             else
             {
                 if (presetExistsProtectFromOverwrite)
                 {
                     _allowOverwriteExistingPreset = true;
-                    Messages.Message(
-                        "Click again on the \"Save\" button to confirm the overwrite of the existing preset.",
-                        MessageTypeDefOf.NeutralEvent);
+                    Messages.Message("PLMWLODSAV_ClickAgainOnSaveButton".Translate(), MessageTypeDefOf.NeutralEvent);
                 }
                 else
                 {
                     _allowOverwriteExistingPreset = false;
                     if (_gameData.PresetManager.SavePreset(_selectedFileName, _presetDescriptionSave, _presetAuthorSave,
                         _saveOptions))
-                        Messages.Message("Successfully saved the preset!", MessageTypeDefOf.PositiveEvent);
+                        Messages.Message("PLMWLODSAV_SuccessSave".Translate(), MessageTypeDefOf.PositiveEvent);
                     else
-                        Messages.Message("Error: couldn't save the preset...", MessageTypeDefOf.NegativeEvent);
+                        Messages.Message("PLMWLODSAV_ErrorSave".Translate(), MessageTypeDefOf.NegativeEvent);
                 }
             }
         }
 
-        protected void DrawSaveFileName(Rect inRect)
+        private void DrawSaveFileName(Rect inRect)
         {
-            DrawEntryHeader("Preset Files: Save mode", backgroundColor: Color.red);
+            DrawEntryHeader("PLMWLODSAV_PresetSaveMode".Translate(), backgroundColor: Color.red);
 
             var fileNameRect = ListingStandard.GetRect(DefaultElementHeight);
 
             var fileNameLabelRect = fileNameRect.LeftPart(0.2f);
-            Widgets.Label(fileNameLabelRect, "FileName:");
+            Widgets.Label(fileNameLabelRect, "PLMWLODSAV_FileName".Translate());
 
             var fileNameTextRect = fileNameRect.RightPart(0.8f);
             if (string.IsNullOrEmpty(_selectedFileName))
@@ -537,12 +521,12 @@ namespace PrepareLanding
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
-            ListingStandard.CheckboxLabeled("Save Options", ref _saveOptions,
-                "Check to also save options alongside filters.");
+            ListingStandard.CheckboxLabeled("PLMWLODSAV_SaveOptions".Translate(), ref _saveOptions,
+                "PLMWLODSAV_SaveOptionsToolTip".Translate());
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
-            DrawEntryHeader($"Author: [optional; {MaxAuthorNameLength} chars max]");
+            DrawEntryHeader(string.Format("PLMWLODSAV_AuthorName".Translate(), MaxAuthorNameLength));
 
             _presetAuthorSave = ListingStandard.TextEntry(_presetAuthorSave);
             if (_presetAuthorSave.Length >= MaxAuthorNameLength)
@@ -550,7 +534,7 @@ namespace PrepareLanding
 
             ListingStandard.GapLine(DefaultGapLineHeight);
 
-            DrawEntryHeader($"Description: [optional; {MaxDescriptionLength} chars max]");
+            DrawEntryHeader(string.Format("PLMWLODSAV_DescriptionString".Translate(), MaxDescriptionLength));
 
             var descriptionRect = ListingStandard.GetRect(80f);
             _presetDescriptionSave = Widgets.TextAreaScrollable(descriptionRect, _presetDescriptionSave,

@@ -294,19 +294,19 @@ namespace PrepareLanding.Core.Gui.Window
 
         private void DrawTileInfo()
         {
-            DrawEntryHeader("Tile Specs", backgroundColor: Color.magenta);
+            DrawEntryHeader("PLTFWTW_TileSpecifications".Translate(), backgroundColor: Color.magenta);
 
             var vectorLongLat = Find.WorldGrid.LongLatOf(_tileId);
             var latitude = vectorLongLat.y;
             var longitude = vectorLongLat.x;
 
-            ListingStandard.Label($"Date: {GenDate.DateReadoutStringAt(_dateTicks, vectorLongLat)}");
-            ListingStandard.Label($"Tile ID: {_tileId}");
+            ListingStandard.Label($"{"PLTFWTW_Date".Translate()}: {GenDate.DateReadoutStringAt(_dateTicks, vectorLongLat)}");
+            ListingStandard.Label($"{"PLTFWTW_TileId".Translate()}: {_tileId}");
             ListingStandard.Label(
-                $"Latitude - Longitude: {latitude.ToStringLatitude()} - {longitude.ToStringLongitude()}");
-            ListingStandard.Label($"Equatorial distance: {Find.WorldGrid.DistanceFromEquatorNormalized(_tileId)}");
-            ListingStandard.Label($"Tile average temperature: {Find.World.grid[_tileId].temperature} °C");
-            ListingStandard.Label($"Seasonal shift amplitude: {GenTemperature.SeasonalShiftAmplitudeAt(_tileId)} °C");
+                $"{"PLTFWTW_LatLong".Translate()}: {latitude.ToStringLatitude()} - {longitude.ToStringLongitude()}");
+            ListingStandard.Label($"{"PLTFWTW_EquatorialDistance".Translate()}: {Find.WorldGrid.DistanceFromEquatorNormalized(_tileId)}");
+            ListingStandard.Label($"{"PLTFWTW_TileAvgTemp".Translate()}: {Find.World.grid[_tileId].temperature} °C");
+            ListingStandard.Label($"{"PLTFWTW_SeasonalShiftAmplitude".Translate()}: {GenTemperature.SeasonalShiftAmplitudeAt(_tileId)} °C");
         }
 
         protected virtual void DrawEntryHeader(string entryLabel, bool useStartingGap = true,

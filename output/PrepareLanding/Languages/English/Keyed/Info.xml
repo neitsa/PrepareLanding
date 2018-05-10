@@ -16,7 +16,7 @@
     <PLMWINF_Biomes>Biomes</PLMWINF_Biomes>
     <PLMWINF_NumberOfTiles>Number of Tiles</PLMWINF_NumberOfTiles>
 
-        <!-- "Records" as in highest or lowest characteristic (e.g temperature, altitude, etc.)
+        <!-- "Records" as in highest or lowest characteristics (e.g temperature, altitude, etc.)
         The string is constructed as follows:
 
         * World [Highest/Lowest] "charac": X Y -> [tile: N; LAT - LONG]

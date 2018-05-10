@@ -113,7 +113,7 @@ namespace PrepareLanding.Presets
             }
             catch (Exception e)
             {
-                Messages.Message("[PrepareLanding] Error loading preset.", MessageTypeDefOf.RejectInput);
+                Messages.Message($"[PrepareLanding] {"PLPRESTMAN_ErrorLoadingPreset".Translate()}", MessageTypeDefOf.RejectInput);
                 Log.Error($"Failed to load preset file '{filePath}'. Error:\n\t{e}\n\t{e.Message}");
 
                 successfulLoad = false;
@@ -148,7 +148,7 @@ namespace PrepareLanding.Presets
             }
             catch (Exception e)
             {
-                Messages.Message("[PrepareLanding] Error loading preset info.", MessageTypeDefOf.RejectInput);
+                Messages.Message($"[PrepareLanding] {"PLPRESTMAN_ErrorLoadingPresetInfo".Translate()}", MessageTypeDefOf.RejectInput);
                 Log.Error($"[PrepareLanding] LoadPresetInfo error: {e}");
                 throw;
             }
@@ -168,7 +168,7 @@ namespace PrepareLanding.Presets
             if (_presetCache.ContainsKey(presetName))
                 if (_presetCache[presetName].PresetInfo.IsTemplate)
                 {
-                    Messages.Message("[PrepareLanding] It is not allowed to overwrite a template preset.",
+                    Messages.Message($"[PrepareLanding] {"PLPRESTMAN_NoOverwritePresetTemplate".Translate()}",
                         MessageTypeDefOf.RejectInput);
                     return false;
                 }
@@ -206,7 +206,7 @@ namespace PrepareLanding.Presets
                 if (_presetCache.ContainsKey(presetName))
                     _presetCache.Remove(presetName);
 
-                Messages.Message("[PrepareLanding] Failed to save preset file.", MessageTypeDefOf.RejectInput);
+                Messages.Message($"[PrepareLanding] {"PLPRESTMAN_ErrorSavingPreset".Translate()}", MessageTypeDefOf.RejectInput);
                 Log.Error($"[PrepareLanding] Failed to save preset file '{filePath}'. error:\n\t{e}\n\t{e.Message}");
 
                 successfulSave = false;
@@ -226,7 +226,7 @@ namespace PrepareLanding.Presets
             if (_presetCache.ContainsKey(presetName))
                 if (_presetCache[presetName].PresetInfo.IsTemplate)
                 {
-                    Messages.Message("[PrepareLanding] It is not allowed to delete a template preset.",
+                    Messages.Message($"[PrepareLanding] {"PLPRESTMAN_NoDeletePresetTemplate".Translate()}",
                         MessageTypeDefOf.RejectInput);
                     return false;
                 }
@@ -238,7 +238,7 @@ namespace PrepareLanding.Presets
             }
             catch (Exception ex)
             {
-                Messages.Message("[PrepareLanding] Failed to delete preset file.", MessageTypeDefOf.NegativeEvent);
+                Messages.Message($"[PrepareLanding] {"PLPRESTMAN_ErrorDeletingPreset".Translate()}", MessageTypeDefOf.NegativeEvent);
                 Log.Error($"[PrepareLanding] Failed to delete preset file '{filePath}'. error:\n\t{ex}\n\t{ex.Message}");
                 return false;
             }
@@ -276,7 +276,7 @@ namespace PrepareLanding.Presets
                 catch (Exception e)
                 {
                     Log.Error(
-                        $"[PrepareLanding] An error occured in CopyFromTemplateFolderToPresetFolder.\n\t:Source: {sourceFile}\n\tDest:{destFilePath}\n\tError: {e}");
+                        $"[PrepareLanding] An error occurred in CopyFromTemplateFolderToPresetFolder.\n\t:Source: {sourceFile}\n\tDest:{destFilePath}\n\tError: {e}");
                 }
             }
         }

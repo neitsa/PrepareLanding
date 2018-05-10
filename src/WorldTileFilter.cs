@@ -251,7 +251,7 @@ namespace PrepareLanding
             }
 
             Messages.Message("PLFILT_FailedFindValidBaseTile".Translate(), MessageTypeDefOf.RejectInput);
-            Log.Error("[PrepareLanding] Failed to find a valid base tile.");
+            Log.Error("[PrepareLanding] Failed to find a valid tile for a base.");
             return Tile.Invalid;
         }
 

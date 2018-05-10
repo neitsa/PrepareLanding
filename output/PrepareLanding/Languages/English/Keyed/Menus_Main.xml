@@ -20,6 +20,11 @@
     <PLMWBB_Minimize>Minimize</PLMWBB_Minimize>
     <PLMWBB_SelectRandom>Select Random</PLMWBB_SelectRandom>
 
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Minimized Window [MINW] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <!-- dev: in MinimizedWindow.cs -->
+    <PLMWMINW_MinmizedWindow>Minimized Window</PLMWMINW_MinmizedWindow>
+    <PLMWMINW_MaximizeWindow>Maximize Window</PLMWMINW_MaximizeWindow> <!-- tool-tip on the minimized window for the maximize button -->
+
     <!--=============================================== Internal [INT] ==============================================-->
     <!-- Strings that are related to internal C# code but they still appear in some places on the GUI -->
 

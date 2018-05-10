@@ -104,4 +104,15 @@
 
     <PLTFW_Max>Max</PLTFW_Max>
     <PLTFW_MaxToolTip>Maximum Temperature of the Day</PLTFW_MaxToolTip>
+
+    <!-- from TableWindows.cs [TW] -->
+
+    <PLTFWTW_TileSpecifications>Tile Specifications</PLTFWTW_TileSpecifications>
+    <PLTFWTW_Date>Date</PLTFWTW_Date>
+    <PLTFWTW_TileId>Tile ID</PLTFWTW_TileId>
+    <PLTFWTW_LatLong>Latitude - Longitude</PLTFWTW_LatLong>
+    <PLTFWTW_EquatorialDistance>Equatorial Distance</PLTFWTW_EquatorialDistance> <!-- tile distance from the planet equator -->
+    <PLTFWTW_TileAvgTemp>Tile Average Temperature</PLTFWTW_TileAvgTemp>
+    <PLTFWTW_SeasonalShiftAmplitude>Seasonal Shift Amplitude</PLTFWTW_SeasonalShiftAmplitude> <!-- Tile Temperature offset due to its position on the globe, compared to an idealized position at the equator -->
+
 </LanguageData>

@@ -6,7 +6,7 @@
     <!--=============================================== Filtering [FILT] =============================================-->
     <PLFILT_FilteredTilesCleared>Filtered tiles cleared.</PLFILT_FilteredTilesCleared>
     <PLFILT_FilterTilesFirst>Please filter tiles first.</PLFILT_FilterTilesFirst>
-    <PLFILT_FailedFindValidBaseTile>Failed to find a valid base tile.</PLFILT_FailedFindValidBaseTile>
+    <PLFILT_FailedFindValidBaseTile>Failed to find a valid tile for a base.</PLFILT_FailedFindValidBaseTile>
     <PLFILT_NewFilterfing>New Filtering</PLFILT_NewFilterfing>
         <!-- {0} is 0 or a positive number -->
     <PLFILT_StartingFilteringWithxTiles>Starting filtering with: {0} tiles.</PLFILT_StartingFilteringWithxTiles>
@@ -29,10 +29,10 @@
     <PLFILT_TotalOfxTilesMatchAllFilters>A total of {0} tile(s) match(es) all filters.</PLFILT_TotalOfxTilesMatchAllFilters>
     <PLFILT_PreFiltering>PreFiltering</PLFILT_PreFiltering>
         <!-- {0} and {1} are 0 or a positive number -->
-    <PLFILT_ValidTilesRemainAfterFilter>Prefilter: {0} valid tile(s) remain(s) after filtering ({1} tile(s) removed).</PLFILT_ValidTilesRemainAfterFilter>
+    <PLFILT_ValidTilesRemainAfterFilter>Pre-filter: {0} valid tile(s) remain(s) after filtering ({1} tile(s) removed).</PLFILT_ValidTilesRemainAfterFilter>
         <!-- {0} is 0 or a positive number -->
-    <PLFILT_TilesWithRiver>Prefilter: {0} tiles with at least one river.</PLFILT_TilesWithRiver>
-    <PLFILT_TilesWithRoad>Prefilter: {0} tiles with at least one road.</PLFILT_TilesWithRoad>
+    <PLFILT_TilesWithRiver>Pre-filter: {0} tiles with at least one river.</PLFILT_TilesWithRiver>
+    <PLFILT_TilesWithRoad>Pre-filter: {0} tiles with at least one road.</PLFILT_TilesWithRoad>
     <PLFILT_NewWorld>New World</PLFILT_NewWorld>
     <PLFILT_AllFiltersInDefaultState>All filters are in their default state</PLFILT_AllFiltersInDefaultState>
     <PLFILT_PleaseSelectAtLeastOneFilter>please select at least one filter</PLFILT_PleaseSelectAtLeastOneFilter>
@@ -42,10 +42,18 @@
 
     <!-- as in "Filtering Biomes" or "Filtering Caves"; dev: this is in TileFilter.cs -->
     <PLFILT_Filtering>Filtering</PLFILT_Filtering>
+    
+    <!--============ Filter Info Logger [FILIL] ==============-->
+    
+        <!-- for {0} there are two possibilities:
+            - it is a short message, starting with a space (thus there's no space between 'occurred' and {0})
+            - there is not short message and then the string is a dot ('.');
+        {1} is a tab name, probably "World Info" but this is also translated. -->
+    <PLFILIL_FilterErrorOccurred>A filter error occurred{0}&#xA;Please see the "{1}" tab for an error description.</PLFILIL_FilterErrorOccurred>
 
     <!--============ LongEventHandler ==============-->
         <!-- Note: RimWorld offers no translation text for these strings... I let them here in case it is added in Rimworld's code -->
     <PLFILT_FilteringWorldTiles>Filtering World Tiles</PLFILT_FilteringWorldTiles>
-    <PLFILT_PreFilteringWorldTiles>Prefiltering World Tiles</PLFILT_PreFilteringWorldTiles>
+    <PLFILT_PreFilteringWorldTiles>Pre-filtering World Tiles</PLFILT_PreFilteringWorldTiles>
 
 </LanguageData>
