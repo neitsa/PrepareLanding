@@ -255,7 +255,7 @@ namespace PrepareLanding
                 GUI.color = Color.green;
 
             // display the action button (load / save)
-            if (Widgets.ButtonText(buttonRects[0], $"{Name} Preset"))
+            if (Widgets.ButtonText(buttonRects[0], $"{Name} {"PLMWLODSAV_Preset".Translate()}"))
                 switch (LoadSaveMode)
                 {
                     case LoadSaveMode.Load:

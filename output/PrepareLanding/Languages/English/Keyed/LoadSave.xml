@@ -4,6 +4,7 @@
     <!-- Overall prefix for the mod is "PL" for PrepareLanding; MW for Main Window -->
 
     <!--=========================================== Load / Save Tab [LODSAV] ========================================-->
+    <PLMWLODSAV_Preset>Preset</PLMWLODSAV_Preset> <!-- used right after a mode, either "load" or "save", as in "Load Preset" -->
     <PLMWLODSAV_Load>Load</PLMWLODSAV_Load>
     <PLMWLODSAV_Save>Save</PLMWLODSAV_Save>
     <PLMWLODSAV_Delete>Delete</PLMWLODSAV_Delete>
