@@ -40,7 +40,7 @@ namespace PrepareLanding
         {
             doCloseButton = false; // explicitly disable close button, we'll draw it ourselves
             doCloseX = true;
-            optionalTitle = "Prepare Landing";
+            optionalTitle = "Prepare Landing"; // Do not translate
             MinimizedWindow.WindowLabel = optionalTitle;
             MinimizedWindow.AddMinimizedWindowContent += AddMinimizedWindowContent;
 
@@ -135,19 +135,21 @@ namespace PrepareLanding
 
             #region MINIMIZED_WINDOW_BUTTONS
 
+            //TODO: this is exactly the same code than in TabFilterTiles.cs: find a way to refactor the code.
+
             var buttonListStart = new ButtonDescriptor("<<", delegate
             {
                 // reset starting display index
                 _tileDisplayIndexStart = 0;
-            }, "Go to start of tile list.");
+            }, "PLMWFTIL_GoToStartOfTileList".Translate());
 
             var buttonPreviousPage = new ButtonDescriptor("<", delegate
             {
                 if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 else
-                    Messages.Message("Reached start of tile list.", MessageTypeDefOf.RejectInput);
-            }, "Go to previous list page.");
+                    Messages.Message("PLMWFTIL_ReachedListStart".Translate(), MessageTypeDefOf.RejectInput);
+            }, "PLMWFTIL_GoToPreviousListPage".Translate());
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
             {
@@ -155,25 +157,25 @@ namespace PrepareLanding
                 _tileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
                 if (_tileDisplayIndexStart > matchingTilesCount)
                 {
-                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                    Messages.Message($"{"PLMWFTIL_NoMoreTilesAvailable".Translate()} {matchingTilesCount}).",
                         MessageTypeDefOf.RejectInput);
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 }
-            }, "Go to next list page.");
+            }, "PLMWFTIL_GoToNextListPage".Translate());
 
             var buttonListEnd = new ButtonDescriptor(">>", delegate
             {
                 var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
                 var tileDisplayIndexStart = matchingTilesCount - matchingTilesCount % MaxDisplayedTileWhenMinimized;
                 if (tileDisplayIndexStart == _tileDisplayIndexStart)
-                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                    Messages.Message($"{"PLMWFTIL_NoMoreTilesAvailable".Translate()} {matchingTilesCount}).",
                         MessageTypeDefOf.RejectInput);
 
                 _tileDisplayIndexStart = tileDisplayIndexStart;
-            }, "Go to end of list.");
+            }, "PLMWFTIL_GoToEndOfList".Translate());
 
             _minimizedWindowButtonsDescriptorList =
-                new List<ButtonDescriptor> {buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd};
+                new List<ButtonDescriptor> { buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd };
 
             #endregion MINIMIZED_WINDOW_BUTTONS
         }
@@ -209,26 +211,27 @@ namespace PrepareLanding
              * I can't remember exactly where, but it deals with Unity calculating the text size of a floating menu.
              * So better to let this code here rather than in the ctor.
              */
-            if (Enumerable.Any(_bottomButtonsDescriptorList, buttonDesctipor => buttonDesctipor.Label == "Load / Save"))
+            if (Enumerable.Any(_bottomButtonsDescriptorList, buttonDescriptor => buttonDescriptor.Label == "PLMWBB_LoadSave".Translate()))
                 return;
 
-            var buttonSaveLoadPreset = new ButtonDescriptor("Load / Save", "Load or Save Filter Presets");
-            buttonSaveLoadPreset.AddFloatMenuOption("Save", delegate
+            var buttonSaveLoadPreset = new ButtonDescriptor("PLMWBB_LoadSave".Translate(),
+                "PLMWBB_LoadOrSaveFilterPresets".Translate());
+            buttonSaveLoadPreset.AddFloatMenuOption("PLMWLODSAV_Save".Translate(), delegate /* action click */
                 {
                     if (!(TabController.TabById("LoadSave") is TabLoadSave tab))
                         return;
 
                     tab.LoadSaveMode = LoadSaveMode.Save;
                     TabController.SetSelectedTabById("LoadSave");
-                }, delegate
+                }, delegate /* action mouse over */
                 {
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, 30f, 30f);
 
-                    TooltipHandler.TipRegion(rect, "Save current filter states to a preset.");
+                    TooltipHandler.TipRegion(rect, "PLMWBB_SaveFiltersToPreset".Translate());
                 }
             );
-            buttonSaveLoadPreset.AddFloatMenuOption("Load", delegate
+            buttonSaveLoadPreset.AddFloatMenuOption("PLMWLODSAV_Load".Translate(), delegate
                 {
                     if (!(TabController.TabById("LoadSave") is TabLoadSave tab))
                         return;
@@ -241,10 +244,10 @@ namespace PrepareLanding
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, 30f, 30f);
 
-                    TooltipHandler.TipRegion(rect, "Load a preset.");
+                    TooltipHandler.TipRegion(rect, "PLMWBB_LoadPreset".Translate());
                 }
             );
-            buttonSaveLoadPreset.AddFloatMenu("Select Action");
+            buttonSaveLoadPreset.AddFloatMenu("PLMWBB_SelectAction".Translate());
             _bottomButtonsDescriptorList.Add(buttonSaveLoadPreset);
 
             // do not display the "close" button while playing (the "World" button on bottom menu bar was clicked)
@@ -261,7 +264,6 @@ namespace PrepareLanding
 
             }
         }
-
 
         public override void PostClose()
         {
@@ -320,7 +322,7 @@ namespace PrepareLanding
              * Buttons
              */
 
-            if (listingStandard.ButtonText("Clear Filtered Tiles"))
+            if (listingStandard.ButtonText("PLMWMINW_ClearFilteredTiles".Translate()))
             {
                 // clear everything
                 PrepareLanding.Instance.TileFilter.ClearMatchingTiles();

@@ -46,6 +46,7 @@ namespace PrepareLanding.Coordinates
         public Action<Rect> DrawContent { get; }
 
         public float DrawerHeight { get; }
+
         public bool IsUnfolded { get; set; }
 
         public string Text => IsUnfolded ? "▲" : "▼";
