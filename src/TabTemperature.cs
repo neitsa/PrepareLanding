@@ -4,6 +4,7 @@ using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.Window;
+using PrepareLanding.Filters;
 using PrepareLanding.GameData;
 using RimWorld;
 using UnityEngine;
@@ -70,7 +71,8 @@ namespace PrepareLanding
 
         private void DrawFeatureSelection()
         {
-            DrawEntryHeader("PLMWT2T_WorldFeatureSelection".Translate(), backgroundColor: Color.magenta);
+            DrawEntryHeader("PLMWT2T_WorldFeatureSelection".Translate(),
+                backgroundColor: ColorFromFilterType(typeof(TileFilterWorldFeature)));
 
             var features = _gameData.WorldData.WorldFeatures;
 
@@ -337,7 +339,8 @@ namespace PrepareLanding
 
         private void DrawAnimalsCanGrazeNowSelection()
         {
-            DrawEntryHeader($"{"WorkTagAnimals".Translate().CapitalizeFirst()}", backgroundColor: ColorFromFilterSubjectThingDef("Animals Can Graze Now"));
+            DrawEntryHeader($"{"WorkTagAnimals".Translate().CapitalizeFirst()}",
+                backgroundColor: ColorFromFilterType(typeof(TileFilterAnimalsCanGrazeNow)));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _gameData.UserData.ChosenAnimalsCanGrazeNowState;
@@ -351,7 +354,8 @@ namespace PrepareLanding
         /// </summary>
         private void DrawCaveSelection()
         {
-            DrawEntryHeader("SpecialFeatures".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Has Cave"));
+            DrawEntryHeader("SpecialFeatures".Translate(),
+                backgroundColor: ColorFromFilterType(typeof(TileFilterHasCave)));
 
             var rect = ListingStandard.GetRect(DefaultElementHeight);
             var tmpCheckState = _gameData.UserData.HasCaveState;
@@ -362,8 +366,9 @@ namespace PrepareLanding
 
         private void DrawGrowingPeriodSelection() // TODO check against the other like coastal filter or movement time
         {
-            string label = "OutdoorGrowingPeriod".Translate();
-            DrawEntryHeader($"{label} ({"DaysLower".Translate()})", backgroundColor: ColorFromFilterSubjectThingDef("Growing Periods"));
+            var label = "OutdoorGrowingPeriod".Translate();
+            DrawEntryHeader($"{label} ({"DaysLower".Translate()})",
+                backgroundColor: ColorFromFilterType(typeof(TileFilterGrowingPeriods)));
 
             DrawUsableMinMaxFromRestrictedListItem(_gameData.UserData.GrowingPeriod, label,
                 twelfth => twelfth.GrowingDaysString());
@@ -376,7 +381,7 @@ namespace PrepareLanding
             const float rainfallMax = 5000f;
 
             DrawEntryHeader($"{"Rainfall".Translate()} ({"PLMWT2T_RainfallMillimeters".Translate()}) [{rainfallMin}, {rainfallMax}]",
-                backgroundColor: ColorFromFilterSubjectThingDef("Rain Falls"));
+                backgroundColor: ColorFromFilterType(typeof(TileFilterRainFalls)));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.RainFall, "Rainfall".Translate(), rainfallMin, rainfallMax);
         }
@@ -387,7 +392,7 @@ namespace PrepareLanding
             const float tempMax = TemperatureTuning.MaximumTemperature;
 
             DrawEntryHeader($"{"Temperature".Translate()} (°C) [{tempMin}, {tempMax}]",
-                backgroundColor: ColorFromFilterSubjectThingDef("Average Temperatures"));
+                backgroundColor: ColorFromFilterType(typeof(TileFilterAverageTemperatures)));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.AverageTemperature, "AvgTemp".Translate(),
                 tempMin, tempMax);
@@ -399,7 +404,8 @@ namespace PrepareLanding
 
         private void DrawMostLeastCharacteristicSelection()
         {
-            DrawEntryHeader("PLMWT2T_MostLeastCharacteristics".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("PLMWT2T_MostLeastCharacteristics".Translate(),
+                backgroundColor: ColorFromFilterType(typeof(TileFilterMostLeastCharacteristic)));
 
             /*
              * Select Characteristic

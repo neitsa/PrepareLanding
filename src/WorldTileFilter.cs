@@ -256,21 +256,22 @@ namespace PrepareLanding
         }
 
         /// <summary>
-        ///     Given the <see cref="TileFilter.SubjectThingDef" /> from a filter, returns the filter heaviness.
+        ///     Given a <see cref="TileFilter" /> returns its heaviness.
         /// </summary>
-        /// <param name="subjectThingDef">The <see cref="TileFilter.SubjectThingDef" /> from a filter.</param>
+        /// <param name="filterType">The type of a <see cref="TileFilter" />.</param>
         /// <returns>The filter heaviness of the filter if the filter is found, otherwise <see cref="FilterHeaviness.Unknown" />.</returns>
-        public FilterHeaviness FilterHeavinessFromFilterSubjectThingDef(string subjectThingDef)
+        public FilterHeaviness FilterHeavinessFromFilterType(Type filterType)
         {
             if (_filterHeavinessCache == null)
             {
-                _filterHeavinessCache = new Dictionary<string, FilterHeaviness>();
-
+                _filterHeavinessCache = new Dictionary<Type, FilterHeaviness>();
                 foreach (var filter in _allFilters.Values)
-                    _filterHeavinessCache.Add(filter.SubjectThingDef, filter.Heaviness);
+                {
+                    _filterHeavinessCache.Add(filter.GetType(), filter.Heaviness);
+                }
             }
 
-            return _filterHeavinessCache.TryGetValue(subjectThingDef, out var filterHeaviness)
+            return _filterHeavinessCache.TryGetValue(filterType, out var filterHeaviness)
                 ? filterHeaviness
                 : FilterHeaviness.Unknown;
         }
@@ -584,10 +585,10 @@ namespace PrepareLanding
         private readonly UserData _userData;
 
         /// <summary>
-        ///     A cache for filter heaviness. Key is the <see cref="TileFilter.SubjectThingDef" />, value is the filter heaviness (
+        ///     A cache for filter heaviness. Key is a <see cref="TileFilter" /> type, value is the filter heaviness (
         ///     <see cref="FilterHeaviness" />).
         /// </summary>
-        private Dictionary<string, FilterHeaviness> _filterHeavinessCache;
+        private Dictionary<Type, FilterHeaviness> _filterHeavinessCache;
 
         #endregion PRIVATE_FIELDS
 

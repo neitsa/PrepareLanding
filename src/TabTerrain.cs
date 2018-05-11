@@ -74,7 +74,7 @@ namespace PrepareLanding
 
         private void DrawBiomeTypesSelection()
         {
-            DrawEntryHeader("PLMWTT_BiomeTypes".Translate(), false, backgroundColor: ColorFromFilterSubjectThingDef("Biomes"));
+            DrawEntryHeader("PLMWTT_BiomeTypes".Translate(), false, backgroundColor: ColorFromFilterType(typeof(TileFilterBiomes)));
 
             var biomeDefs = _gameData.DefData.BiomeDefs;
 
@@ -143,7 +143,8 @@ namespace PrepareLanding
 
         private void DrawCoastalSelection()
         {
-            DrawEntryHeader("PLMWTT_CoastalTiles".Translate(), false, backgroundColor: ColorFromFilterSubjectThingDef("Coastal Tiles"));
+            DrawEntryHeader("PLMWTT_CoastalTiles".Translate(), false,
+                backgroundColor: ColorFromFilterType(typeof(TileFilterCoastalTiles)));
 
             // coastal tiles (sea)
             var rect = ListingStandard.GetRect(DefaultElementHeight);
@@ -221,7 +222,9 @@ namespace PrepareLanding
 
         private void DrawElevationSelection()
         {
-            DrawEntryHeader($"{"Elevation".Translate()} ({Find.ActiveLanguageWorker.Pluralize("PLMW_Meter".Translate())})", backgroundColor: ColorFromFilterSubjectThingDef("Elevations"));
+            DrawEntryHeader(
+                $"{"Elevation".Translate()} ({Find.ActiveLanguageWorker.Pluralize("PLMW_Meter".Translate())})",
+                backgroundColor: ColorFromFilterType(typeof(TileFilterElevations)));
 
             // note: see RimWorld.Planet.WorldGenStep_Terrain.ElevationRange for min / max elevation (private static var)
             // max is defined in RimWorld.Planet.WorldMaterials.ElevationMax
@@ -231,7 +234,7 @@ namespace PrepareLanding
         private void DrawHillinessTypeSelection()
         {
             DrawEntryHeader("PLMWTT_TerrainTypes".Translate(),
-                backgroundColor: ColorFromFilterSubjectThingDef("Terrains"));
+                backgroundColor: ColorFromFilterType(typeof(TileFilterHilliness)));
 
             if (ListingStandard.ButtonText("PLMWTT_SelectTerrain".Translate()))
             {
@@ -262,7 +265,7 @@ namespace PrepareLanding
         private void DrawMovementTime()
         {
             DrawEntryHeader($"{"CaravanBaseMovementTime".Translate()} ({Find.ActiveLanguageWorker.Pluralize("PLMW_Hour".Translate())})", false,
-                backgroundColor: ColorFromFilterSubjectThingDef("Current Movement Times"));
+                backgroundColor: ColorFromFilterType(typeof(TileFilterCurrentMovementTimes)));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.CurrentMovementTime, "MovementTimeNow".Translate());
             DrawUsableMinMaxNumericField(_gameData.UserData.SummerMovementTime, "MovementTimeSummer".Translate());
@@ -271,7 +274,7 @@ namespace PrepareLanding
 
         private void DrawRiverTypesSelection()
         {
-            DrawEntryHeader("PLMWTT_RiverTypes".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Rivers"));
+            DrawEntryHeader("PLMWTT_RiverTypes".Translate(), backgroundColor: ColorFromFilterType(typeof(TileFilterRivers)));
 
             var riverDefs = _gameData.DefData.RiverDefs;
             var selectedRiverDefs = _gameData.UserData.SelectedRiverDefs;
@@ -353,7 +356,7 @@ namespace PrepareLanding
 
         private void DrawRoadTypesSelection()
         {
-            DrawEntryHeader("PLMWTT_RoadTypes".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Roads"));
+            DrawEntryHeader("PLMWTT_RoadTypes".Translate(), backgroundColor: ColorFromFilterType(typeof(TileFilterRoads)));
 
             var roadDefs = _gameData.DefData.RoadDefs;
             var selectedRoadDefs = _gameData.UserData.SelectedRoadDefs;
@@ -436,7 +439,7 @@ namespace PrepareLanding
 
         private void DrawStoneTypesSelection()
         {
-            DrawEntryHeader("PLMWTT_StoneTypes".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
+            DrawEntryHeader("PLMWTT_StoneTypes".Translate(), backgroundColor: ColorFromFilterType(typeof(TileFilterStones)));
 
             var selectedStoneDefs = _gameData.UserData.SelectedStoneDefs;
 
@@ -543,7 +546,7 @@ namespace PrepareLanding
 
         private void DrawTimeZoneSelection()
         {
-            DrawEntryHeader($"{"TimeZone".Translate()} [-12, +12]", backgroundColor: ColorFromFilterSubjectThingDef("Time Zones"));
+            DrawEntryHeader($"{"TimeZone".Translate()} [-12, +12]", backgroundColor: ColorFromFilterType(typeof(TileFilterTimeZones)));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.TimeZone, "TimeZone".Translate(), -12, 12);
         }

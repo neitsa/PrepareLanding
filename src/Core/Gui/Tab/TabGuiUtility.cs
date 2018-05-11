@@ -181,13 +181,13 @@ namespace PrepareLanding.Core.Gui.Tab
             ListingStandard.LabelDouble($"{"PLINT_UsableMinMaxNumFieldMax".Translate()} {label}:", maxValueString);
         }
 
-        protected static Color ColorFromFilterSubjectThingDef(string filterName)
+        protected static Color ColorFromFilterType(Type filterType)
         {
             if (!PrepareLanding.Instance.GameData.UserData.Options.ShowFilterHeaviness)
                 return DefaultMenuSectionBgFillColor;
 
             Color result;
-            var heaviness = PrepareLanding.Instance.TileFilter.FilterHeavinessFromFilterSubjectThingDef(filterName);
+            var heaviness = PrepareLanding.Instance.TileFilter.FilterHeavinessFromFilterType(filterType);
             switch (heaviness)
             {
                 case FilterHeaviness.Unknown:
