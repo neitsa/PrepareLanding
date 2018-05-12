@@ -40,11 +40,15 @@
     <PLFILT_NoCavesForChosenTerrain>There can be no caves with the chosen terrain type. Choose at least {0}.</PLFILT_NoCavesForChosenTerrain>
     <PLFILT_NoBiomeNoTerrainSelected>No biome and no terrain selected for a Planet coverage >= 50%&#xA;&#x9;Please select a biome and a terrain first.</PLFILT_NoBiomeNoTerrainSelected>
 
-    <!-- as in "Filtering Biomes" or "Filtering Caves"; dev: this is in TileFilter.cs -->
-    <PLFILT_Filtering>Filtering</PLFILT_Filtering>
-    
+    <!-- ######## dev: this is in TileFilter.cs ######## -->
+
+    <PLFILT_Filtering>Filtering</PLFILT_Filtering> <!-- as in "Filtering Biomes" or "Filtering Caves" -->
+    <PLFILT_MovementTimeIsNull>MovementTime is null in</PLFILT_MovementTimeIsNull> <!-- followed by a function name; this is an internal error that might be logged on the GUI -->
+    <PLFILT_VerifyMinIsLessOrEqualMax>please verify that Min value is less or equal than Max value (actual comparison:</PLFILT_VerifyMinIsLessOrEqualMax> <!-- followed by two numbers -->
+    <PLFILT_TemperatureIsNull>Temperature is null in</PLFILT_TemperatureIsNull>
+
     <!--============ Filter Info Logger [FILIL] ==============-->
-    
+
         <!-- for {0} there are two possibilities:
             - it is a short message, starting with a space (thus there's no space between 'occurred' and {0})
             - there is not short message and then the string is a dot ('.');

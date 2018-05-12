@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.GameData;
+using RimWorld;
 using RimWorld.Planet;
+using UnityEngine;
 using Verse;
 
 namespace PrepareLanding.Filters
 {
     public abstract class TileFilter : ITileFilter
     {
-        protected List<int> _filteredTiles = new List<int>();
+        protected readonly List<int> _filteredTiles = new List<int>();
 
         protected readonly UserData UserData;
 
@@ -202,6 +204,125 @@ namespace PrepareLanding.Filters
                     if (_filteredTiles.Count > 0 && _filteredTiles.Last() == tileId)
                         break;
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Abstract base class for Movement Time Filters.
+    /// </summary>
+    public abstract class TileFilterMovementTime : TileFilter
+    {
+        protected TileFilterMovementTime(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        protected abstract float YearPct(int tileId);
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            // e.g userData.CurrentMovementTime, UserData.SummerMovementTime or UserData.WinterMovementTime
+            var movementTime = (UsableMinMaxNumericItem<float>)UserData.GetType().GetProperty(AttachedProperty)
+                ?.GetValue(UserData, null);
+            if (movementTime == null)
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
+                    $"{"PLFILT_MovementTimeIsNull".Translate()} TileFilterMovementTime.Filter.", sendToLog: true);
+                return;
+            }
+
+            if (!movementTime.IsCorrectRange)
+            {
+                var message =
+                    $"{SubjectThingDef}: {"PLFILT_VerifyMinIsLessOrEqualMax".Translate()}: {movementTime.Min} <= {movementTime.Max}).";
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
+                return;
+            }
+
+            var tileIdsCount = inputList.Count;
+            for (var i = 0; i < tileIdsCount; i++)
+            {
+                var tileId = inputList[i];
+
+                // must be passable
+                if (Find.World.Impassable(tileId))
+                    continue;
+
+                var yearPct = YearPct(tileId);
+
+                FilterMovementTime(tileId, yearPct, movementTime, _filteredTiles);
+            }
+        }
+
+        protected static void FilterMovementTime(int tileId, float yearPct, UsableMinMaxNumericItem<float> item,
+            List<int> resultList)
+        {
+            var ticks = Mathf.Min(GenDate.TicksPerHour + WorldPathGrid.CalculatedCostAt(tileId, false, yearPct),
+                Caravan_PathFollower.MaxMoveTicks);
+
+            ticks.TicksToPeriod(out var years, out var quadrums, out var days, out var hours);
+
+            // combine everything into hours; note that we shouldn't get anything other than 'hours' and 'days'. Technically, a tile is should be passable in less than 48 hours.
+            var totalHours = hours + days * GenDate.HoursPerDay +
+                             quadrums * GenDate.DaysPerQuadrum * GenDate.HoursPerDay +
+                             years * GenDate.DaysPerTwelfth * GenDate.TwelfthsPerYear * GenDate.HoursPerDay;
+
+            //TODO: see how RimWorld rounds movement time numbers; e.g 4.06 is 4.1, does that mean that 4.02 is 4?
+
+            if (item.InRange(totalHours))
+                resultList.Add(tileId);
+        }
+    }
+
+    /// <summary>
+    /// Abstract base class for Temperature Filters.
+    /// </summary>
+    public abstract class TileFilterTemperatures : TileFilter
+    {
+        protected TileFilterTemperatures(UserData userData, string attachedProperty,
+            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        {
+        }
+
+        protected abstract float TemperatureForTile(int tileId);
+
+        public override void Filter(List<int> inputList)
+        {
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            // e.g UserData.AverageTemperature, UserData.SummerTemperature or UserData.WinterTemperature
+            var temperatureItem = (UsableMinMaxNumericItem<float>)UserData.GetType().GetProperty(AttachedProperty)
+                ?.GetValue(UserData, null);
+            if (temperatureItem == null)
+            {
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
+                    $"{"PLFILT_TemperatureIsNull".Translate()} TileFilterTemperatures.Filter.", sendToLog: true);
+                return;
+            }
+
+            if (!temperatureItem.IsCorrectRange)
+            {
+                var message =
+                    $"{SubjectThingDef}: {"PLFILT_VerifyMinIsLessOrEqualMax".Translate()}: {temperatureItem.Min} <= {temperatureItem.Max}).";
+                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
+                return;
+            }
+
+            foreach (var tileId in inputList)
+            {
+                var tileTemp = TemperatureForTile(tileId);
+
+                if (temperatureItem.InRange(tileTemp))
+                    _filteredTiles.Add(tileId);
             }
         }
     }

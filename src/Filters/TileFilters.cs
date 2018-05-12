@@ -6,7 +6,6 @@ using PrepareLanding.Core.Extensions;
 using PrepareLanding.GameData;
 using RimWorld;
 using RimWorld.Planet;
-using UnityEngine;
 using Verse;
 
 namespace PrepareLanding.Filters
@@ -20,7 +19,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.ChosenBiome != null;
 
-        public override string SubjectThingDef => "Biomes";
+        public override string SubjectThingDef => "PLTILFILT_Biomes".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -69,7 +68,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.ChosenHilliness != Hilliness.Undefined;
 
-        public override string SubjectThingDef => "Terrains";
+        public override string SubjectThingDef => "PLTILFILT_Terrains".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -102,7 +101,7 @@ namespace PrepareLanding.Filters
             }
         }
 
-        public override string SubjectThingDef => "Roads";
+        public override string SubjectThingDef => "PLTILFILT_Roads".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -171,7 +170,7 @@ namespace PrepareLanding.Filters
             }
         }
 
-        public override string SubjectThingDef => "Stones";
+        public override string SubjectThingDef => "PLTILFILT_Stones".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -219,7 +218,7 @@ namespace PrepareLanding.Filters
             if (orderedStoneDefsOnCount > 3)
             {
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
-                    $"Cannot select more than 3 stone types (selected: {orderedStoneDefsOnCount}).");
+                    $"{"PLTILFILT_CantSelectMoreThan3Stones".Translate()} {orderedStoneDefsOnCount}).");
                 return;
             }
 
@@ -227,7 +226,7 @@ namespace PrepareLanding.Filters
             if (orderedStoneDefsOnPartial.Count < 2)
             {
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
-                    $"At least 2 types of stone types must be in ON or PARTIAL state (selected: {orderedStoneDefsOnPartial.Count}).");
+                    $"{"PLTILFILT_AtLeast2StoneTypesOnOrPartial".Translate()} {orderedStoneDefsOnPartial.Count}).");
                 return;
             }
 
@@ -309,7 +308,7 @@ namespace PrepareLanding.Filters
             }
         }
 
-        public override string SubjectThingDef => "Rivers";
+        public override string SubjectThingDef => "PLTILFILT_Rivers".Translate();
 
         
         public override void Filter(List<int> inputList)
@@ -348,7 +347,7 @@ namespace PrepareLanding.Filters
             return new List<T>{ riverLink.river as T };
         }
 
-        public static IEnumerable<int> TilesWithRiver(List<int> inputList)
+        public static IEnumerable<int> TilesWithRiver(IEnumerable<int> inputList)
         {
             return inputList.Intersect(PrepareLanding.Instance.TileFilter.AllTilesWithRiver);
         }
@@ -356,75 +355,6 @@ namespace PrepareLanding.Filters
         public static bool TileHasRiver(Tile tile)
         {
             return tile.VisibleRivers != null && tile.VisibleRivers.Count != 0;
-        }
-    }
-
-    public abstract class TileFilterMovementTime : TileFilter
-    {
-        protected TileFilterMovementTime(UserData userData, string attachedProperty,
-            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
-        {
-        }
-
-        protected abstract float YearPct(int tileId);
-
-        public override void Filter(List<int> inputList)
-        {
-            base.Filter(inputList);
-
-            if (!IsFilterActive)
-                return;
-
-            // e.g userData.CurrentMovementTime, UserData.SummerMovementTime or UserData.WinterMovementTime
-            var movementTime = (UsableMinMaxNumericItem<float>) UserData.GetType().GetProperty(AttachedProperty)
-                ?.GetValue(UserData, null);
-            if (movementTime == null)
-            {
-                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
-                    "MovementTime is null in TileFilterMovementTime.Filter.", sendToLog: true);
-                return;
-            }
-
-            if (!movementTime.IsCorrectRange)
-            {
-                var message =
-                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {movementTime.Min} <= {movementTime.Max}).";
-                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
-                return;
-            }
-
-            var tileIdsCount = inputList.Count;
-            for (var i = 0; i < tileIdsCount; i++)
-            {
-                var tileId = inputList[i];
-
-                // must be passable
-                if (Find.World.Impassable(tileId))
-                    continue;
-
-                var yearPct = YearPct(tileId);
-
-                FilterMovementTime(tileId, yearPct, movementTime, _filteredTiles);
-            }
-        }
-
-        protected static void FilterMovementTime(int tileId, float yearPct, UsableMinMaxNumericItem<float> item,
-            List<int> resultList)
-        {
-            var ticks = Mathf.Min(GenDate.TicksPerHour + WorldPathGrid.CalculatedCostAt(tileId, false, yearPct),
-                Caravan_PathFollower.MaxMoveTicks);
-
-            ticks.TicksToPeriod(out var years, out var quadrums, out var days, out var hours);
-
-            // combine everything into hours; note that we shouldn't get anything other than 'hours' and 'days'. Technically, a tile is should be passable in less than 48 hours.
-            var totalHours = hours + days * GenDate.HoursPerDay +
-                             quadrums * GenDate.DaysPerQuadrum * GenDate.HoursPerDay +
-                             years * GenDate.DaysPerTwelfth * GenDate.TwelfthsPerYear * GenDate.HoursPerDay;
-
-            //TODO: see how RimWorld rounds movement time numbers; e.g 4.06 is 4.1, does that mean that 4.02 is 4?
-
-            if (item.InRange(totalHours))
-                resultList.Add(tileId);
         }
     }
 
@@ -437,7 +367,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.CurrentMovementTime.Use;
 
-        public override string SubjectThingDef => "Current Movement Times";
+        public override string SubjectThingDef => "PLTILFILT_CurrentMovementTimes".Translate();
 
         protected override float YearPct(int tileId)
         {
@@ -454,7 +384,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.WinterMovementTime.Use;
 
-        public override string SubjectThingDef => "Winter Movement Times";
+        public override string SubjectThingDef => "PLTILFILT_WinterMovementTimes".Translate();
 
         protected override float YearPct(int tileId)
         {
@@ -473,7 +403,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.SummerMovementTime.Use;
 
-        public override string SubjectThingDef => "Summer Movement Times";
+        public override string SubjectThingDef => "PLTILFILT_SummerMovementTimes".Translate();
 
         protected override float YearPct(int tileId)
         {
@@ -492,7 +422,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.ChosenCoastalTileState != MultiCheckboxState.Partial;
 
-        public override string SubjectThingDef => "Coastal Tiles";
+        public override string SubjectThingDef => "PLTILFILT_CoastalTiles".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -553,7 +483,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.ChosenCoastalLakeTileState != MultiCheckboxState.Partial;
 
-        public override string SubjectThingDef => "Coastal Lake Tiles";
+        public override string SubjectThingDef => "PLTILFILT_CoastalLakeTiles".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -645,7 +575,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.Elevation.Use;
 
-        public override string SubjectThingDef => "Elevations";
+        public override string SubjectThingDef => "PLTILFILT_Elevations".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -657,7 +587,7 @@ namespace PrepareLanding.Filters
             if (!UserData.Elevation.IsCorrectRange)
             {
                 var message =
-                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.Elevation.Min} <= {UserData.Elevation.Max}).";
+                    $"{SubjectThingDef}: {"PLFILT_VerifyMinIsLessOrEqualMax".Translate()}: {UserData.Elevation.Min} <= {UserData.Elevation.Max}).";
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
@@ -681,7 +611,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.TimeZone.Use;
 
-        public override string SubjectThingDef => "Time Zones";
+        public override string SubjectThingDef => "PLTILFILT_TimeZones".Translate();
 
 
         public override void Filter(List<int> inputList)
@@ -694,7 +624,7 @@ namespace PrepareLanding.Filters
             if (!UserData.TimeZone.IsCorrectRange)
             {
                 var message =
-                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.TimeZone.Min} <= {UserData.TimeZone.Max}).";
+                    $"{SubjectThingDef}: {"PLFILT_VerifyMinIsLessOrEqualMax".Translate()}: {UserData.TimeZone.Min} <= {UserData.TimeZone.Max}).";
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
@@ -703,50 +633,6 @@ namespace PrepareLanding.Filters
             {
                 var timeZone = GenDate.TimeZoneAt(Find.WorldGrid.LongLatOf(tileId).x);
                 if (UserData.TimeZone.InRange(timeZone))
-                    _filteredTiles.Add(tileId);
-            }
-        }
-    }
-
-    public abstract class TileFilterTemperatures : TileFilter
-    {
-        protected TileFilterTemperatures(UserData userData, string attachedProperty,
-            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
-        {
-        }
-
-        protected abstract float TemperatureForTile(int tileId);
-
-        public override void Filter(List<int> inputList)
-        {
-            base.Filter(inputList);
-
-            if (!IsFilterActive)
-                return;
-
-            // e.g UserData.AverageTemperature, UserData.SummerTemperature or UserData.WinterTemperature
-            var temperatureItem = (UsableMinMaxNumericItem<float>) UserData.GetType().GetProperty(AttachedProperty)
-                ?.GetValue(UserData, null);
-            if (temperatureItem == null)
-            {
-                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(
-                    "TemperatureItem is null in TileFilterTemperatures.Filter.", sendToLog: true);
-                return;
-            }
-
-            if (!temperatureItem.IsCorrectRange)
-            {
-                var message =
-                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {temperatureItem.Min} <= {temperatureItem.Max}).";
-                PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
-                return;
-            }
-
-            foreach (var tileId in inputList)
-            {
-                var tileTemp = TemperatureForTile(tileId);
-
-                if (temperatureItem.InRange(tileTemp))
                     _filteredTiles.Add(tileId);
             }
         }
@@ -761,7 +647,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.AverageTemperature.Use;
 
-        public override string SubjectThingDef => "Average Temperatures";
+        public override string SubjectThingDef => "PLTILFILT_AverageTemperatures".Translate();
 
         protected override float TemperatureForTile(int tileId)
         {
@@ -779,7 +665,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.WinterTemperature.Use;
 
-        public override string SubjectThingDef => "Winter Temperatures";
+        public override string SubjectThingDef => "PLTILFILT_WinterTemperatures".Translate();
 
         protected override float TemperatureForTile(int tileId)
         {
@@ -792,7 +678,6 @@ namespace PrepareLanding.Filters
         }
     }
 
-
     public class TileFilterSummerTemperatures : TileFilterTemperatures
     {
         public TileFilterSummerTemperatures(UserData userData, string attachedProperty,
@@ -802,7 +687,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.SummerTemperature.Use;
 
-        public override string SubjectThingDef => "Summer Temperatures";
+        public override string SubjectThingDef => "PLTILFILT_SummerTemperatures".Translate();
 
         protected override float TemperatureForTile(int tileId)
         {
@@ -824,7 +709,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.GrowingPeriod.Use;
 
-        public override string SubjectThingDef => "Growing Periods";
+        public override string SubjectThingDef => "PLTILFILT_GrowingPeriods".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -838,7 +723,7 @@ namespace PrepareLanding.Filters
                 var minGrowingDays = UserData.GrowingPeriod.Min.ToGrowingDays();
                 var maxGrowingDays = UserData.GrowingPeriod.Max.ToGrowingDays();
                 var message =
-                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {minGrowingDays} days <= {maxGrowingDays} days).";
+                    $"{SubjectThingDef}: {"PLFILT_VerifyMinIsLessOrEqualMax".Translate()}: {minGrowingDays} days <= {maxGrowingDays} days).";
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
@@ -871,7 +756,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.RainFall.Use;
 
-        public override string SubjectThingDef => "Rain Falls";
+        public override string SubjectThingDef => "PLTILFILT_RainFalls".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -883,7 +768,7 @@ namespace PrepareLanding.Filters
             if (!UserData.RainFall.IsCorrectRange)
             {
                 var message =
-                    $"{SubjectThingDef}: please verify that Min value is less or equal than Max value (actual comparison: {UserData.RainFall.Min} <= {UserData.RainFall.Max}).";
+                    $"{SubjectThingDef}: {"PLFILT_VerifyMinIsLessOrEqualMax".Translate()}: {UserData.RainFall.Min} <= {UserData.RainFall.Max}).";
                 PrepareLanding.Instance.TileFilter.FilterInfoLogger.AppendErrorMessage(message);
                 return;
             }
@@ -907,7 +792,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.ChosenAnimalsCanGrazeNowState != MultiCheckboxState.Partial;
 
-        public override string SubjectThingDef => "Animals Can Graze Now";
+        public override string SubjectThingDef => "AnimalsCanGrazeNow".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -954,7 +839,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.HasCaveState != MultiCheckboxState.Partial;
 
-        public override string SubjectThingDef => "Has Cave";
+        public override string SubjectThingDef => "HasCaves".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -993,7 +878,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => !UserData.MostLeastItem.IsInDefaultState;
 
-        public override string SubjectThingDef => $"MostLeastCharacteristic: {UserData.MostLeastItem.Characteristic}";
+        public override string SubjectThingDef => $"{"PLMWT2T_MostLeastCharacteristics".Translate()}: {UserData.MostLeastItem.Characteristic}";
 
         public override void Filter(List<int> inputList)
         {
@@ -1025,7 +910,7 @@ namespace PrepareLanding.Filters
             if (UserData.MostLeastItem.NumberOfItems > worldTilesCharacteristics.Count)
             {
                 Messages.Message(
-                    $"You are requesting more tiles than the number of available tiles (max: {worldTilesCharacteristics.Count})",
+                    $"{"PLTILFILT_RequestingMoreTilesThanAvailable".Translate()} {worldTilesCharacteristics.Count})",
                     MessageTypeDefOf.RejectInput);
                 return;
             }
@@ -1054,7 +939,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.WorldFeature != null;
 
-        public override string SubjectThingDef => "World Feature";
+        public override string SubjectThingDef => "PLTILFILT_WorldFeatures".Translate();
 
         public override void Filter(List<int> inputList)
         {
@@ -1087,7 +972,7 @@ namespace PrepareLanding.Filters
 
         public override bool IsFilterActive => UserData.CoastalRotation.Use;
 
-        public override string SubjectThingDef => "Coast Rotation";
+        public override string SubjectThingDef => "PLTILFILT_CoastalRotation".Translate();
 
         public override void Filter(List<int> inputList)
         {
