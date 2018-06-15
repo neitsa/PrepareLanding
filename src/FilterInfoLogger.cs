@@ -34,10 +34,10 @@ namespace PrepareLanding
                 }
 
                 var tab = PrepareLanding.Instance.MainWindow.TabController.TabById("WorldInfo");
-                var tabName = tab == null ? "World Info" : tab.Name;
-                var shortMessage = shortRimWorldMessage == null ? "" : $": {shortRimWorldMessage}";
+                var tabName = tab == null ? "PLMWINF_WorldInfo".Translate() : tab.Name;
+                var shortMessage = shortRimWorldMessage.NullOrEmpty() ? "" : $": {shortRimWorldMessage}";
                 Messages.Message(
-                    $"[PrepareLanding] A filter error occurred{shortMessage}\nPlease see the \"{tabName}\" tab for an error description.",
+                    $"[PrepareLanding] {string.Format("PLFILIL_FilterErrorOccurred".Translate(), shortMessage, tabName)}",
                     MessageTypeDefOf.RejectInput);
             }
 
@@ -92,7 +92,7 @@ namespace PrepareLanding
         }
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

@@ -6,6 +6,7 @@ using Verse;
 
 namespace PrepareLanding
 {
+#if TAB_OVERLAYS
     public class TabOverlays : TabGuiUtility
     {
         private readonly GameData.GameData _gameData;
@@ -138,4 +139,5 @@ namespace PrepareLanding
             }
         }
     }
+#endif
 }

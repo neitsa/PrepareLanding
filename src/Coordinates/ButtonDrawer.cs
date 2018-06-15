@@ -46,6 +46,7 @@ namespace PrepareLanding.Coordinates
         public Action<Rect> DrawContent { get; }
 
         public float DrawerHeight { get; }
+
         public bool IsUnfolded { get; set; }
 
         public string Text => IsUnfolded ? "▲" : "▼";
@@ -81,7 +82,10 @@ namespace PrepareLanding.Coordinates
 
                     button.UnfoldAction?.Invoke(button);
                 }
-                var toolTipText = button.IsUnfolded ? $"Close {button.ToolTip}" : $"Show {button.ToolTip}";
+
+                var toolTipText = button.IsUnfolded
+                    ? $"{"PLCOORDBDRAW_Close".Translate()} {button.ToolTip}"
+                    : $"{"PLCOORDBDRAW_Show".Translate()} {button.ToolTip}";
                 TooltipHandler.TipRegion(buttonRect, toolTipText);
 
                 rectX += button.ButtonWidth + ButtonSpace;

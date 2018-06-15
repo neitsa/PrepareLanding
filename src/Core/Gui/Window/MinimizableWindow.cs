@@ -8,7 +8,7 @@ namespace PrepareLanding.Core.Gui.Window
     {
         // closed here means: not on the RimWorld window stack
         private bool _mainWindowClosed;
-        protected MinimizedWindow MinimizedWindow;
+        protected readonly MinimizedWindow MinimizedWindow;
 
         protected MinimizableWindow()
         {
@@ -17,7 +17,7 @@ namespace PrepareLanding.Core.Gui.Window
             MinimizedWindow.OnMinimizedWindowClosed += MinimizedWindowClosed;
         }
 
-        public bool Minimized { get; protected set; }
+        public bool Minimized { get; private set; }
 
         public bool IsClosed => _mainWindowClosed && MinimizedWindow.Closed;
 

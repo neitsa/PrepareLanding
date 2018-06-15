@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
+using PrepareLanding.Filters;
 using PrepareLanding.GameData;
 using RimWorld;
 using RimWorld.Planet;
@@ -423,7 +424,7 @@ namespace PrepareLanding
 
         private void DrawStoneTypesSelection()
         {
-            DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorFromFilterSubjectThingDef("Stones"));
+            DrawEntryHeader("StoneTypesHere".Translate(), backgroundColor: ColorLibrary.RoyalPurple);
 
             var selectedStoneDefs = _gameData.GodModeData.SelectedStoneDefs;
             var orderedStoneDefs = _gameData.GodModeData.OrderedStoneDefs;

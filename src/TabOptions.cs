@@ -23,7 +23,7 @@ namespace PrepareLanding
         public override string Id => "Options";
 
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
-        public override string Name => Id;
+        public override string Name => "PLOPT_Options".Translate();
 
         /// <summary>Draw the content of the tab.</summary>
         /// <param name="inRect">The <see cref="T:UnityEngine.Rect" /> in which to draw the tab content.</param>
@@ -37,68 +37,69 @@ namespace PrepareLanding
 
         private void DrawFilterOptions()
         {
-            DrawEntryHeader("Filter Options", backgroundColor: Color.cyan);
+            DrawEntryHeader("PLOPT_FilterOptions".Translate(), backgroundColor: Color.cyan);
 
             var allowLiveFiltering = _gameData.UserData.Options.AllowLiveFiltering;
-            ListingStandard.CheckboxLabeled("Allow Live Filtering", ref allowLiveFiltering,
-                "[Warning: CPU heavy] Allow filtering without pressing the \"Filter\" button.");
+            ListingStandard.CheckboxLabeled("PLOPT_AllowLiveFiltering".Translate(), ref allowLiveFiltering,
+                "PLOPT_AllowLiveFilteringToolTip".Translate());
             _gameData.UserData.Options.AllowLiveFiltering = allowLiveFiltering;
 
             var allowImpassableHilliness = _gameData.UserData.Options.AllowImpassableHilliness;
-            ListingStandard.CheckboxLabeled("Allow Impassable Tiles", ref allowImpassableHilliness,
-                "Allow selection and filtering of impassable tiles.");
+            ListingStandard.CheckboxLabeled("PLOPT_AllowImpassableTiles".Translate(), ref allowImpassableHilliness,
+                "PLOPT_AllowImpassableTilesToolTip".Translate());
             _gameData.UserData.Options.AllowImpassableHilliness = allowImpassableHilliness;
 
             var disablePreFilterCheck = _gameData.UserData.Options.DisablePreFilterCheck;
-            ListingStandard.CheckboxLabeled("Disable PreFilter Check", ref disablePreFilterCheck,
-                "Disable the check where Biomes and Terrains must be selected with a world coverage >= 50%.");
+            ListingStandard.CheckboxLabeled("PLOPT_DisablePreFilterCheck".Translate(), ref disablePreFilterCheck,
+                "PLOPT_DisablePreFilterCheckToolTip".Translate());
             _gameData.UserData.Options.DisablePreFilterCheck = disablePreFilterCheck;
 
             var viewPartialOffNoSelect = _gameData.UserData.Options.ViewPartialOffNoSelect;
-            ListingStandard.CheckboxLabeled("View PartialOffNoSelect", ref viewPartialOffNoSelect,
-                "Allow to view the PartialOffNoSelect on the GUI for grouped three state items.");
+            ListingStandard.CheckboxLabeled("PLOPT_ViewPartialOffNoSelect".Translate(), ref viewPartialOffNoSelect,
+                "PLOPT_ViewPartialOffNoSelectToolTip".Translate());
             _gameData.UserData.Options.ViewPartialOffNoSelect = viewPartialOffNoSelect;
 
             var resetAllFieldsOnNewGeneratedWorld = _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld;
-            ListingStandard.CheckboxLabeled("Reset all filters on new world", ref resetAllFieldsOnNewGeneratedWorld,
-                "If ON, all filters are reset to their default state on a new generated world, otherwise the filters are kept in their previous state.");
+            ListingStandard.CheckboxLabeled("PLOPT_ResetAllFiltersOnNewWorld".Translate(), ref resetAllFieldsOnNewGeneratedWorld,
+                "PLOPT_ResetAllFiltersOnNewWorldToolTip".Translate());
             _gameData.UserData.Options.ResetAllFieldsOnNewGeneratedWorld = resetAllFieldsOnNewGeneratedWorld;
 
             var showFilterHeaviness = _gameData.UserData.Options.ShowFilterHeaviness;
-            ListingStandard.CheckboxLabeled("Show Filter Heaviness", ref showFilterHeaviness,
-                "Show filter heaviness (possible filter CPU calculation heaviness) on filter header in the GUI.");
+            ListingStandard.CheckboxLabeled("PLOPT_ShowFilterHeaviness".Translate(), ref showFilterHeaviness,
+                "PLOPT_ShowFilterHeavinessToolTip".Translate());
             _gameData.UserData.Options.ShowFilterHeaviness = showFilterHeaviness;
 
             var allowInvalidTilesForNewSettlement = _gameData.UserData.Options.AllowInvalidTilesForNewSettlement;
-            ListingStandard.CheckboxLabeled("Allow Invalid Tiles for New Settlement",
-                ref allowInvalidTilesForNewSettlement,
-                "If on, this prevents a last pass that would have removed tiles deemed as not valid for a new settlement.");
+            ListingStandard.CheckboxLabeled("PLOPT_AllowInvalidTilesForNewSettlement".Translate(),
+                ref allowInvalidTilesForNewSettlement, "PLOPT_AllowInvalidTilesForNewSettlementToolTip".Translate());
             _gameData.UserData.Options.AllowInvalidTilesForNewSettlement = allowInvalidTilesForNewSettlement;
         }
 
         private void DrawTileHighlighterOptions()
         {
-            DrawEntryHeader("Tile Highlighter Options", backgroundColor: Color.cyan);
+            DrawEntryHeader("PLOPT_TileHighlighterOptions".Translate(), backgroundColor: Color.cyan);
 
             var disableTileHighligthing = _gameData.UserData.Options.DisableTileHighlighting;
-            ListingStandard.CheckboxLabeled("Disable Tile Highlighting", ref disableTileHighligthing,
-                "Disable tile highlighting altogether.");
+            ListingStandard.CheckboxLabeled("PLOPT_DisableTileHighlighting".Translate(), ref disableTileHighligthing,
+                "PLOPT_DisableTileHighlightingToolTip".Translate());
             _gameData.UserData.Options.DisableTileHighlighting = disableTileHighligthing;
 
             var disableTileBlinking = _gameData.UserData.Options.DisableTileBlinking;
-            ListingStandard.CheckboxLabeled("Disable Tile Blinking", ref disableTileBlinking,
-                "Disable tile blinking (\"breathing\") for filtered tiles on the world map.");
+            ListingStandard.CheckboxLabeled("PLOPT_DisableTileBlinking".Translate(), ref disableTileBlinking,
+                "PLOPT_DisableTileBlinkingToolTip".Translate());
             _gameData.UserData.Options.DisableTileBlinking = disableTileBlinking;
 
             // allow to show the debug tile ID on the highlighted tile
             var showDebugTileId = _gameData.UserData.Options.ShowDebugTileId;
-            ListingStandard.CheckboxLabeled("Show Debug Tile ID", ref showDebugTileId,
-                "Show the Debug Tile ID for the highlighted tiles.");
+            ListingStandard.CheckboxLabeled("PLOPT_ShowDebugTileId".Translate(), ref showDebugTileId,
+                "PLOPT_ShowDebugTileIdToolTip".Translate());
             _gameData.UserData.Options.ShowDebugTileId = showDebugTileId;
 
             var bypassMaxHighlightedTiles = _gameData.UserData.Options.BypassMaxHighlightedTiles;
-            ListingStandard.CheckboxLabeled("Bypass TileHighlighter Maximum", ref bypassMaxHighlightedTiles,
-                $"Allow highlighting more than {TileHighlighter.MaxHighlightedTiles} tiles.");
+            var msgBypassTileHighlighterMaximumToolTip = string.Format(
+                "PLOPT_BypassTileHighlighterMaximumToolTip".Translate(), TileHighlighter.MaxHighlightedTiles);
+            ListingStandard.CheckboxLabeled("PLOPT_BypassTileHighlighterMaximum".Translate(), ref bypassMaxHighlightedTiles,
+                msgBypassTileHighlighterMaximumToolTip);
             _gameData.UserData.Options.BypassMaxHighlightedTiles = bypassMaxHighlightedTiles;
         }
     }

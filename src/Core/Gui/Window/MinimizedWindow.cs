@@ -22,7 +22,7 @@ namespace PrepareLanding.Core.Gui.Window
             if (windowLabel.NullOrEmpty())
                 WindowLabel = !_parentWindow.optionalTitle.NullOrEmpty()
                     ? _parentWindow.optionalTitle
-                    : "Minimized Window";
+                    : "PLMWMINW_MinmizedWindow".Translate();
 
             doCloseX = false;
             doCloseButton = false;
@@ -75,7 +75,7 @@ namespace PrepareLanding.Core.Gui.Window
             if (Verse.Widgets.ButtonText(buttonRect, "▲"))
                 Close();
 
-            TooltipHandler.TipRegion(buttonRect, "Maximize Window");
+            TooltipHandler.TipRegion(buttonRect, "PLMWMINW_MaximizeWindow".Translate());
 
             // make some space before eventual content
             _listingStandard.GapLine(6f);

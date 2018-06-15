@@ -14,6 +14,22 @@ namespace PrepareLanding.Core.Gui
 
         public static Color InactiveColor = new Color(0.37f, 0.37f, 0.37f, 0.8f);
 
+        public static bool ButtonTextToolTip(Rect buttonRect, string text, string tooltip, bool drawBackground=true, bool doMouseOverSound=false, bool active=true)
+        {
+            TooltipHandler.TipRegion(buttonRect, tooltip);
+            return Verse.Widgets.ButtonText(buttonRect, text, drawBackground, doMouseOverSound, active);
+        }
+
+        public static bool ButtonTextToolTipColor(Rect buttonRect, string text, string tooltip, Color buttonColor, bool drawBackground = true, bool doMouseOverSound = false, bool active = true)
+        {
+            TooltipHandler.TipRegion(buttonRect, tooltip);
+            var savedColor = GUI.color;
+            GUI.color = buttonColor;
+            var result =  Verse.Widgets.ButtonText(buttonRect, text, drawBackground, doMouseOverSound, active);
+            GUI.color = savedColor;
+            return result;
+        }
+
         public static void CheckBoxLabeledMulti(Rect rect, string label, ref MultiCheckboxState state,
             bool disabled = false)
         {

@@ -184,7 +184,7 @@ namespace PrepareLanding
         /// </summary>
         public void ClearMatchingTiles()
         {
-            FilterInfoLogger.AppendWarningMessage("Filtered tiles cleared.");
+            FilterInfoLogger.AppendWarningMessage("PLFILT_FilteredTilesCleared".Translate());
 
             // clear the list of matched tiles.
             _matchingTileIds.Clear();
@@ -206,7 +206,7 @@ namespace PrepareLanding
                 FilterTiles();
             else
                 LongEventHandler.QueueLongEvent(FilterTiles,
-                    $"[{"PrepareLanding".Translate()}] {"FilteringWorldTiles".Translate()}", true, null);
+                    $"[PrepareLanding] {"PLFILT_FilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace PrepareLanding
         {
             if (_matchingTileIds.Count == 0)
             {
-                Messages.Message("Please filter tiles first.", MessageTypeDefOf.RejectInput);
+                Messages.Message("PLFILT_FilterTilesFirst".Translate(), MessageTypeDefOf.RejectInput);
                 return Tile.Invalid;
             }
 
@@ -250,27 +250,28 @@ namespace PrepareLanding
                 }
             }
 
-            Messages.Message("Failed to find a valid base tile.", MessageTypeDefOf.RejectInput);
-            Log.Error("[PrepareLanding] Failed to find a valid base tile.");
+            Messages.Message("PLFILT_FailedFindValidBaseTile".Translate(), MessageTypeDefOf.RejectInput);
+            Log.Error("[PrepareLanding] Failed to find a valid tile for a base.");
             return Tile.Invalid;
         }
 
         /// <summary>
-        ///     Given the <see cref="TileFilter.SubjectThingDef" /> from a filter, returns the filter heaviness.
+        ///     Given a <see cref="TileFilter" /> returns its heaviness.
         /// </summary>
-        /// <param name="subjectThingDef">The <see cref="TileFilter.SubjectThingDef" /> from a filter.</param>
+        /// <param name="filterType">The type of a <see cref="TileFilter" />.</param>
         /// <returns>The filter heaviness of the filter if the filter is found, otherwise <see cref="FilterHeaviness.Unknown" />.</returns>
-        public FilterHeaviness FilterHeavinessFromFilterSubjectThingDef(string subjectThingDef)
+        public FilterHeaviness FilterHeavinessFromFilterType(Type filterType)
         {
             if (_filterHeavinessCache == null)
             {
-                _filterHeavinessCache = new Dictionary<string, FilterHeaviness>();
-
+                _filterHeavinessCache = new Dictionary<Type, FilterHeaviness>();
                 foreach (var filter in _allFilters.Values)
-                    _filterHeavinessCache.Add(filter.SubjectThingDef, filter.Heaviness);
+                {
+                    _filterHeavinessCache.Add(filter.GetType(), filter.Heaviness);
+                }
             }
 
-            return _filterHeavinessCache.TryGetValue(subjectThingDef, out var filterHeaviness)
+            return _filterHeavinessCache.TryGetValue(filterType, out var filterHeaviness)
                 ? filterHeaviness
                 : FilterHeaviness.Unknown;
         }
@@ -293,7 +294,7 @@ namespace PrepareLanding
             // clear all previous matching tiles and remove all previously highlighted tiles on the world map
             ClearMatchingTiles();
 
-            FilterInfoLogger.AppendTitleMessage("New Filtering", textColor: Color.yellow);
+            FilterInfoLogger.AppendTitleMessage("PLFILT_NewFilterfing".Translate(), textColor: Color.yellow);
 
             var globalFilterStopWatch = new Stopwatch();
             var localFilterStopWatch = new Stopwatch();
@@ -304,7 +305,8 @@ namespace PrepareLanding
             var result = new List<int>();
             var firstUnionDone = false;
 
-            FilterInfoLogger.AppendMessage($"Starting filtering with: {_allValidTileIds.Count} tiles.");
+            var msgText = string.Format("PLFILT_StartingFilteringWithxTiles".Translate(), _allValidTileIds.Count);
+            FilterInfoLogger.AppendMessage(msgText);
 
             var usedFilters = 0;
             for (var i = 0; i < _sortedFilters.Count; i++)
@@ -333,13 +335,13 @@ namespace PrepareLanding
                 var filteredTiles = filter.FilteredTiles;
                 if (filteredTiles.Count == 0 && filter.IsFilterActive)
                 {
-                    var conjunctionMessage = ".";
-                    if (usedFilters > 1)
-                        conjunctionMessage = $"(in conjunction with the previous {usedFilters - 1} filters)";
+                    var conjunctionMessage = usedFilters > 1
+                        ? string.Format("PLFILT_InConjunctionPreviousFilters".Translate(), usedFilters - 1)
+                        : ".";
 
-                    FilterInfoLogger.AppendErrorMessage(
-                        $"{filter.RunningDescription}: this filter resulted in 0 matching tiles{conjunctionMessage} Maybe the filtering was a little bit too harsh?",
-                        "Filter resulted in 0 tiles", sendToLog: true);
+                    var msgZeroMatchingTiles = string.Format("PLFILT_ZeroMatchingTiles".Translate(), conjunctionMessage);
+                    FilterInfoLogger.AppendErrorMessage($"{filter.RunningDescription}: {msgZeroMatchingTiles}",
+                        "PLFILT_FilterResultZeroTiles".Translate(), sendToLog: true);
 
                     globalFilterStopWatch.Stop();
                     return;
@@ -348,8 +350,11 @@ namespace PrepareLanding
                 // just send a warning that even if some filter was active it resulted in all tiles matching...
                 // this might happen, for example, on 5% coverage wold where the map is composed of only one biome.
                 if (filteredTiles.Count == _allValidTileIds.Count)
-                    FilterInfoLogger.AppendWarningMessage(
-                        $"{filter.RunningDescription}: this filter results in all valid tiles matching.", true);
+                {
+                    var msgAllValidTilesMatching = "PLFILT_AllValidTilesMatching".Translate();
+                    FilterInfoLogger.AppendWarningMessage($"{filter.RunningDescription}: {msgAllValidTilesMatching}.",
+                        true);
+                }
 
                 // actually make a union with the empty result (as of now) when we have the first filter giving something.
                 if (!firstUnionDone)
@@ -363,16 +368,17 @@ namespace PrepareLanding
                     result = filteredTiles.Intersect(result).ToList();
                 }
 
-                FilterInfoLogger.AppendMessage($"{filter.RunningDescription}: {result.Count} tiles found.");
                 FilterInfoLogger.AppendMessage(
-                    $"\t\"{filter.SubjectThingDef}\" filter ran in: {filterTime}.");
+                    $"{filter.RunningDescription}: {result.Count} {"PLFILT_TilesFound".Translate()}.");
+                FilterInfoLogger.AppendMessage(
+                    $"\t\"{filter.SubjectThingDef}\" {"PLFILT_FilterRanIn".Translate()}: {filterTime}.");
             }
 
             // all results into one list
             _matchingTileIds.AddRange(result);
 
-            FilterInfoLogger.AppendMessage(
-                $"Before checking for valid tiles: a total of {_matchingTileIds.Count} tile(s) matches all filters.");
+            FilterInfoLogger.AppendMessage(string.Format("PLFILT_xTilesMatchAllFilters".Translate(),
+                _matchingTileIds.Count));
 
             // last pass, remove all tile that are deemed as not being settleable
             if (!_userData.Options.AllowInvalidTilesForNewSettlement)
@@ -383,13 +389,17 @@ namespace PrepareLanding
             // check if the applied filters gave no resulting tiles (the set of applied filters was probably too harsh).
             if (_matchingTileIds.Count == 0)
             {
-                FilterInfoLogger.AppendErrorMessage("No tile matches the given filter(s).", sendToLog: true);
+                FilterInfoLogger.AppendErrorMessage("PLFILT_NoTileMatchesFilter".Translate(), sendToLog: true);
             }
             else
             {
-                FilterInfoLogger.AppendMessage($"All {usedFilters} filter(s) ran in {globalFilterStopWatch.Elapsed}.");
-                FilterInfoLogger.AppendSuccessMessage(
-                    $"A total of {_matchingTileIds.Count} tile(s) matches all filters.", true);
+                var msgAllFiltersRanIn = string.Format("PLFILT_AllFiltersRanIn".Translate(), usedFilters,
+                    globalFilterStopWatch.Elapsed);
+                
+                FilterInfoLogger.AppendMessage(msgAllFiltersRanIn);
+                var msgTotalOfxTilesMatchAllFilters = string.Format("PLFILT_TotalOfxTilesMatchAllFilters".Translate(),
+                    _matchingTileIds.Count);
+                FilterInfoLogger.AppendSuccessMessage(msgTotalOfxTilesMatchAllFilters, true);
             }
 
             // now highlight filtered tiles
@@ -407,7 +417,7 @@ namespace PrepareLanding
         {
             Log.Message($"[PrepareLanding] Prefilter: {Find.WorldGrid.tiles.Count} tiles in WorldGrid.tiles");
 
-            FilterInfoLogger.AppendTitleMessage("PreFiltering", textColor: Color.cyan);
+            FilterInfoLogger.AppendTitleMessage("PLFILT_PreFiltering".Translate(), textColor: Color.cyan);
 
             ClearMatchingTiles();
 
@@ -424,15 +434,16 @@ namespace PrepareLanding
                 _allValidTileIds.Add(i);
             }
 
-            FilterInfoLogger.AppendMessage(
-                $"Prefilter: {_allValidTileIds.Count} tiles remain after filter ({Find.WorldGrid.tiles.Count - _allValidTileIds.Count} removed).");
+            var msgTilesRemainAfterFilter = string.Format("PLFILT_ValidTilesRemainAfterFilter".Translate(),
+                _allValidTileIds.Count, Find.WorldGrid.tiles.Count - _allValidTileIds.Count);
+            FilterInfoLogger.AppendMessage(msgTilesRemainAfterFilter);
 
             // get all tiles with at least one river
             var allTilesWithRivers = _allValidTileIds.FindAll(
                 tileId => Find.World.grid[tileId].VisibleRivers != null &&
                           Find.World.grid[tileId].VisibleRivers.Count != 0);
             AllTilesWithRiver = new ReadOnlyCollection<int>(allTilesWithRivers);
-            FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRivers.Count} tiles with at least one river.");
+            FilterInfoLogger.AppendMessage(string.Format("PLFILT_TilesWithRiver".Translate(), AllTilesWithRiver.Count));
 
             // get all tiles with at least one road
             var allTilesWithRoads =
@@ -440,7 +451,7 @@ namespace PrepareLanding
                                                    Find.World.grid[tileId].VisibleRoads.Count != 0);
 
             AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
-            FilterInfoLogger.AppendMessage($"Prefilter: {allTilesWithRoads.Count} tiles with at least one road.");
+            FilterInfoLogger.AppendMessage(string.Format("PLFILT_TilesWithRoad".Translate(), AllTilesWithRoad.Count));
 
             OnPrefilterDone?.Invoke();
         }
@@ -452,7 +463,7 @@ namespace PrepareLanding
         {
             // clear logger
             FilterInfoLogger.Clear();
-            FilterInfoLogger.AppendTitleMessage("New World", textColor: Color.blue);
+            FilterInfoLogger.AppendTitleMessage("PLFILT_NewWorld".Translate(), textColor: Color.blue);
 
             // tiles pre-filtering
             PrefilterQueueLongEvent();
@@ -464,7 +475,7 @@ namespace PrepareLanding
         private void PrefilterQueueLongEvent()
         {
             LongEventHandler.QueueLongEvent(Prefilter,
-                $"[{"PrepareLanding".Translate()}] {"PreFilteringWorldTiles".Translate()}", true, null);
+                $"[PrepareLanding] {"PreFilteringWorldTiles".Translate()}", true, null);
         }
 
         /// <summary>
@@ -477,17 +488,19 @@ namespace PrepareLanding
             //  this won't give any meaningful result in the default state as it match all the settleable tiles on the world map.
             if (_userData.AreAllFieldsInDefaultSate())
             {
+                var msgAllFiltersInDefaultState = "PLFILT_AllFiltersInDefaultState".Translate();
                 FilterInfoLogger.AppendErrorMessage(
-                    "All filters are in their default state, please select at least one filter.",
-                    "All filters are in their default state.");
+                    $"{msgAllFiltersInDefaultState}, {"PLFILT_PleaseSelectAtLeastOneFilter".Translate()}.",
+                    msgAllFiltersInDefaultState);
                 return false;
             }
 
             // can't have 'cave' filter ON with hilliness less than large hills (see RimWorld.Planet.World.HasCaves)
             if (_userData.HasCaveState == MultiCheckboxState.On & (_userData.ChosenHilliness < Hilliness.LargeHills & _userData.ChosenHilliness != Hilliness.Undefined))
             {
-                FilterInfoLogger.AppendErrorMessage(
-                    $"There can be no caves with the chosen terrain type. Choose at least {Hilliness.LargeHills.GetLabelCap()}.");
+                var msgNoCavesForChosenTerrain = string.Format("PLFILT_NoCavesForChosenTerrain".Translate(),
+                    Hilliness.LargeHills.GetLabelCap());
+                FilterInfoLogger.AppendErrorMessage(msgNoCavesForChosenTerrain);
                 return false;
             }
 
@@ -497,8 +510,7 @@ namespace PrepareLanding
                 if (!_userData.Options.DisablePreFilterCheck)
                     if (_userData.ChosenBiome == null || _userData.ChosenHilliness == Hilliness.Undefined)
                     {
-                        FilterInfoLogger.AppendErrorMessage(
-                            "No biome and no terrain selected for a Planet coverage >= 50%\n\tPlease select a biome and a terrain first.");
+                        FilterInfoLogger.AppendErrorMessage("PLFILT_NoBiomeNoTerrainSelected".Translate());
                         return false;
                     }
 
@@ -573,10 +585,10 @@ namespace PrepareLanding
         private readonly UserData _userData;
 
         /// <summary>
-        ///     A cache for filter heaviness. Key is the <see cref="TileFilter.SubjectThingDef" />, value is the filter heaviness (
+        ///     A cache for filter heaviness. Key is a <see cref="TileFilter" /> type, value is the filter heaviness (
         ///     <see cref="FilterHeaviness" />).
         /// </summary>
-        private Dictionary<string, FilterHeaviness> _filterHeavinessCache;
+        private Dictionary<Type, FilterHeaviness> _filterHeavinessCache;
 
         #endregion PRIVATE_FIELDS
 

@@ -1,5 +1,6 @@
 ﻿namespace PrepareLanding.Overlays
 {
+#if TAB_OVERLAYS
     public abstract class Overlay
     {
         protected GameData.GameData GameData;
@@ -11,4 +12,5 @@
             GameData = gameData;
         }
     }
+#endif
 }

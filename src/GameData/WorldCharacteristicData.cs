@@ -13,7 +13,9 @@ namespace PrepareLanding.GameData
     public abstract class WorldCharacteristicData
     {
         public const int DefaultNumberOfColorSamples = 100;
+
         private readonly Gradient _colorGradient;
+
 
         protected readonly Material DefaultMaterial = WorldMaterials.SelectedTile;
 
@@ -33,10 +35,12 @@ namespace PrepareLanding.GameData
 
             PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += ExecuteOnWorldGeneratedOrLoaded;
 
+#if TAB_OVERLAYS
             // Cocorico!
             GradientColors = new List<Color> {Color.blue, Color.white, Color.red};
 
             _colorGradient = ColorUtils.CreateSolidGradient(GradientColors);
+#endif
         }
 
         public BiomeDef Biome { get; set; }
@@ -77,6 +81,13 @@ namespace PrepareLanding.GameData
 
         private void ExecuteOnWorldGeneratedOrLoaded()
         {
+            // don't do anything if we don't want world data.
+            if (PrepareLanding.Instance.GameOptions.DisableWorldData)
+            {
+                Log.Message("[PrepareLanding] PrepareLanding.Instance.GameOptions.DisableWorldData: enabled");
+                return;
+            }
+
             // clear dictionaries and lists
             CharacteristicByBiomes.Clear();
             CharacteristicQuantaByBiomes.Clear();
@@ -108,8 +119,10 @@ namespace PrepareLanding.GameData
         public void FetchAllCharacteristicDataForBiome(BiomeDef biomeDef)
         {
             TilesCharacteristicByBiome(biomeDef);
+#if TAB_OVERLAYS
             QuantizeCharacteristicForBiome(biomeDef);
             GenerateColorSamples(biomeDef);
+#endif
             // Can't do the following here on some occasions (i.e Load a save without going to the select landing page).
             // because this would load materials on another thread than the main thread.
             //GenerateMaterialByBiome(biomeDef); 

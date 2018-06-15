@@ -33,15 +33,15 @@ namespace PrepareLanding
             {
                 // reset starting display index
                 _tileDisplayIndexStart = 0;
-            }, "Go to start of tile list.");
+            }, "PLMWFTIL_GoToStartOfTileList".Translate());
 
             var buttonPreviousPage = new ButtonDescriptor("<", delegate
             {
                 if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 else
-                    Messages.Message("Reached start of tile list.", MessageTypeDefOf.RejectInput);
-            }, "Go to previous list page.");
+                    Messages.Message("PLMWFTIL_ReachedListStart".Translate(), MessageTypeDefOf.RejectInput);
+            }, "PLMWFTIL_GoToPreviousListPage".Translate());
 
             var buttonNextPage = new ButtonDescriptor(">", delegate
             {
@@ -49,22 +49,22 @@ namespace PrepareLanding
                 _tileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
                 if (_tileDisplayIndexStart > matchingTilesCount)
                 {
-                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                    Messages.Message($"{"PLMWFTIL_NoMoreTilesAvailable".Translate()} {matchingTilesCount}).",
                         MessageTypeDefOf.RejectInput);
                     _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 }
-            }, "Go to next list page.");
+            }, "PLMWFTIL_GoToNextListPage".Translate());
 
             var buttonListEnd = new ButtonDescriptor(">>", delegate
             {
                 var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
                 var tileDisplayIndexStart = matchingTilesCount - matchingTilesCount % MaxDisplayedTileWhenMinimized;
                 if (tileDisplayIndexStart == _tileDisplayIndexStart)
-                    Messages.Message($"No more tiles available to display (max: {matchingTilesCount}).",
+                    Messages.Message($"{"PLMWFTIL_NoMoreTilesAvailable".Translate()} {matchingTilesCount}).",
                         MessageTypeDefOf.RejectInput);
 
                 _tileDisplayIndexStart = tileDisplayIndexStart;
-            }, "Go to end of list.");
+            }, "PLMWFTIL_GoToEndOfList".Translate());
 
             _minimizedWindowButtonsDescriptorList =
                 new List<ButtonDescriptor> {buttonListStart, buttonPreviousPage, buttonNextPage, buttonListEnd};
@@ -76,7 +76,7 @@ namespace PrepareLanding
         public override string Id => "FilteredTiles";
 
         /// <summary>The name of the tab (that is actually displayed at its top).</summary>
-        public override string Name => "Filtered Tiles";
+        public override string Name => "PLMWFTIL_FilteredTiles".Translate();
 
         /// <summary>Gets whether the tab can be draw or not.</summary>
         public override bool CanBeDrawn { get; set; } = true;
@@ -94,7 +94,7 @@ namespace PrepareLanding
 
         private void DrawFilteredTiles()
         {
-            DrawEntryHeader("Filtered Tiles", backgroundColor: Color.yellow);
+            DrawEntryHeader("PLMWFTIL_FilteredTiles".Translate(), backgroundColor: Color.yellow);
 
             // default line height
             const float gapLineHeight = 4f;
@@ -109,7 +109,7 @@ namespace PrepareLanding
              * Buttons
              */
 
-            if (ListingStandard.ButtonText("Clear Filtered Tiles"))
+            if (ListingStandard.ButtonText("PLMWFTIL_ClearFilteredTiles".Translate()))
             {
                 // clear everything
                 PrepareLanding.Instance.TileFilter.ClearMatchingTiles();
@@ -207,7 +207,7 @@ namespace PrepareLanding
 
         private void DrawSelectedTileInfo()
         {
-            DrawEntryHeader("Selected Tile Info", backgroundColor: Color.yellow);
+            DrawEntryHeader("PLMWFTIL_SelectedTileInfo".Translate(), backgroundColor: Color.yellow);
 
             var matchingTiles = PrepareLanding.Instance.TileFilter.AllMatchingTiles;
 
@@ -283,7 +283,7 @@ namespace PrepareLanding
             }
             if (Prefs.DevMode)
             {
-                ListingStandard.LabelDouble("Debug world tile ID", selTileId.ToString());
+                ListingStandard.LabelDouble("PLMWFTIL_DebugWorldTileId".Translate(), selTileId.ToString());
             }
         }
     }

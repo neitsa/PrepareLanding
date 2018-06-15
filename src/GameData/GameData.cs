@@ -42,9 +42,6 @@ namespace PrepareLanding.GameData
 
             // data specific to a single generated world.
             WorldData = new WorldData(DefData);
-
-            // Preset manager (load and save presets).
-            //PresetManager = new PresetManager(this);
         }
     }
 }

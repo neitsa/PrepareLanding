@@ -81,14 +81,14 @@ namespace PrepareLanding.Coordinates
             }
             catch (ArgumentException ex)
             {
-                Log.Message($"[GoToTile] Failed match: '{_coordinatesString}'.\n\t{ex}");
-                Messages.Message("The string doesn't match a coordinates string.", MessageTypeDefOf.RejectInput);
+                Log.Message($"[PrepareLanding] Failed match: '{_coordinatesString}'.\n\t{ex}");
+                Messages.Message("PLCOORD_StringDoesntMatchCoords".Translate(), MessageTypeDefOf.RejectInput);
                 return false;
             }
 
             if (!float.TryParse(longitudeString, out _longitude))
             {
-                var message = $"[GoToTile] Failed to parse longitude: '{longitudeString}'.";
+                var message = $"[PrepareLanding] {"PLCOORD_FailedParseLongitude".Translate()}: '{longitudeString}'.";
                 Log.Message(message);
                 Messages.Message(message, MessageTypeDefOf.RejectInput);
                 return false;
@@ -96,7 +96,7 @@ namespace PrepareLanding.Coordinates
 
             if (!float.TryParse(latitudeString, out _latitude))
             {
-                var message = $"[GoToTile] Failed to parse latitude: '{latitudeString}'.";
+                var message = $"[PrepareLanding] {"PLCOORD_FailedParseLatitude".Translate()}: '{latitudeString}'.";
                 Log.Message(message);
                 Messages.Message(message, MessageTypeDefOf.RejectInput);
                 return false;
@@ -104,7 +104,7 @@ namespace PrepareLanding.Coordinates
 
             if (_longitude < 0f || _longitude > 180f)
             {
-                var message = $"[GoToTile] longitude should fall in the range [0, 180]: '{_longitude}'.";
+                var message = $"[PrepareLanding] {"PLCOORD_LongitudeRange".Translate()}: '{_longitude}'.";
                 Log.Message(message);
                 Messages.Message(message, MessageTypeDefOf.RejectInput);
                 return false;
@@ -112,7 +112,7 @@ namespace PrepareLanding.Coordinates
 
             if (_latitude < 0f || _latitude > 180f)
             {
-                var message = $"[GoToTile] latitude should fall in the range [0, 180]: '{_latitude}'.";
+                var message = $"[PrepareLanding] {"PLCOORD_LatitudeRange".Translate()}: '{_latitude}'.";
                 Log.Message(message);
                 Messages.Message(message, MessageTypeDefOf.RejectInput);
                 return false;
@@ -129,7 +129,7 @@ namespace PrepareLanding.Coordinates
                 return _latitude;
 
             // shouldn't happen as the regular expression wouldn't match the string
-            var message = $"[GoToTile] latitude direction should be N or S but it's '{_latitudeDirection}'.";
+            var message = $"[PrepareLanding] {"PLCOORD_LatitudeDirection".Translate()} '{_latitudeDirection}'.";
             Log.Error(message);
             throw new ArgumentException(message);
         }
@@ -142,7 +142,7 @@ namespace PrepareLanding.Coordinates
                 return _longitude;
 
             // shouldn't happen as the regular expression wouldn't match the string
-            var message = $"[GoToTile] longitude direction should be W or E but it's '{_longitudeDirection}'.";
+            var message = $"[PrepareLanding] {"PLCOORD_LongitudeDirection".Translate()} '{_longitudeDirection}'.";
             Log.Error(message);
             throw new ArgumentException(message);
         }

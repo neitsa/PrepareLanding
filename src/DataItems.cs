@@ -247,8 +247,6 @@ namespace PrepareLanding
 
             // order by name at first
             _orderedItems.Sort((x, y) => string.Compare(x.LabelCap, y.LabelCap, StringComparison.Ordinal));
-
-            OrderedFiltering = true;
         }
 
         public ReadOnlyCollection<T> OrderedItems => _orderedItems.AsReadOnly();
@@ -256,7 +254,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Tells whether the filtering should be order dependent (if true) or not (if false).
         /// </summary>
-        public bool OrderedFiltering { get; set; } = true;
+        public bool OrderedFiltering { get; set; }
 
         public override bool IsInDefaultState()
         {
