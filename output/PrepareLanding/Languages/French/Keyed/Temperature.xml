@@ -19,8 +19,8 @@
     <PLMWT2T_TempPickTileOnWorldMap>Choisissez une tuile sur la carte!</PLMWT2T_TempPickTileOnWorldMap>
     <PLMWT2T_TempSelectedTile>Tuile Sélectionnée</PLMWT2T_TempSelectedTile>
     <PLMWT2T_QuadrumDay>Jour du Quadrum</PLMWT2T_QuadrumDay>
-    <PLMWT2T_SelectQuadrum>Sélectionnez un Quadrum</PLMWT2T_SelectQuadrum>
-    <PLMWT2T_ViewTemperatureForecast>Voir les Prévisions des Températures</PLMWT2T_ViewTemperatureForecast>
+    <PLMWT2T_SelectQuadrum>Sélectionnez Quadrum</PLMWT2T_SelectQuadrum>
+    <PLMWT2T_ViewTemperatureForecast>Voir Prévisions des Températures</PLMWT2T_ViewTemperatureForecast>
 
     <PLMWT2T_RainfallMillimeters>mm</PLMWT2T_RainfallMillimeters> <!-- SI unit of length: millimeters -->
 

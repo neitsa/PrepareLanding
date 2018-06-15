@@ -41,8 +41,8 @@
     <PLMWTT_StoneOrderTooltip>Indique si le filtrage des pierres dépend de l'ordre ou non.&#10;Appuyez sur le bouton pour changer l'état du filtre.</PLMWTT_StoneOrderTooltip>
     <PLMWTT_Ordered>Ordonné</PLMWTT_Ordered> <!-- as of now only used for stone filter -->
     <PLMWTT_NoOrder>Non Ordonné</PLMWTT_NoOrder> <!-- as of now only used for stone filter -->
-    <PLMWTT_Filter>Filtrage :</PLMWTT_Filter> <!-- as in "Filter: Ordered" or "Filter: No order" -->
+    <PLMWTT_Filter>Filtrage</PLMWTT_Filter> <!-- as in "Filter: Ordered" or "Filter: No order" -->
     <PLMWTT_UseNumberOfStoneTypes>Utiliser nombre de pierres [2,3]</PLMWTT_UseNumberOfStoneTypes>
-    <PLMWTT_UseNumberOfStoneTypesToolTip>Filtre les tuiles ayant le bon nombres de pierres (quel que soit leur type). Cela désactive les autres filtres.</PLMWTT_UseNumberOfStoneTypesToolTip>
+    <PLMWTT_UseNumberOfStoneTypesToolTip>Filtre les tuiles ayant le bon nombre de pierres (quel que soit leur type). Cela désactive les autres filtres.</PLMWTT_UseNumberOfStoneTypesToolTip>
 
 </LanguageData>

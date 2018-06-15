@@ -16,7 +16,7 @@
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom Buttons [BB] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <PLMWBB_FilterTiles>Filtrer Tuile</PLMWBB_FilterTiles>
-    <PLMWBB_ResetFilters>Réinitialiser Filtre</PLMWBB_ResetFilters>
+    <PLMWBB_ResetFilters>Réinitialiser Filtres</PLMWBB_ResetFilters>
     <PLMWBB_Minimize>Minimiser</PLMWBB_Minimize>
     <PLMWBB_SelectRandom>Tuile au Hasard</PLMWBB_SelectRandom>
         <!-- Load / Save specific; some strings are also obtained from LoadSave.xml -->
