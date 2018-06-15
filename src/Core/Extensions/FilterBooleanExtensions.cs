@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Verse;
 
 namespace PrepareLanding.Core.Extensions
 {
@@ -9,10 +10,10 @@ namespace PrepareLanding.Core.Extensions
             switch (filterBool)
             {
                 case FilterBoolean.AndFiltering:
-                    return "AND";
+                    return "PLMWTT_FilterBooleanOr".Translate();
 
                 case FilterBoolean.OrFiltering:
-                    return "OR";
+                    return "PLMWTT_FilterBooleanAnd".Translate();
 
                 default:
                     return "UNK";
