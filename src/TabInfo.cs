@@ -98,10 +98,23 @@ namespace PrepareLanding
              */
              var stringBuilder = new StringBuilder();
 
+            if (_gameData.WorldData.WorldCharacteristics == null || _gameData.WorldData.WorldCharacteristics.Count == 0)
+            {
+                Log.Error("[PrepareLanding] TabInfo.BuildWorldRecords: No Info");
+                return "No info";
+            }
+           
+
             foreach (var characteristicData in _gameData.WorldData.WorldCharacteristics)
             {
                 var characteristicName = characteristicData.CharacteristicName;
                 stringBuilder.AppendLine(characteristicName);
+
+                if (characteristicData.WorldTilesCharacteristics.Count == 0)
+                {
+                    stringBuilder.AppendLine("\tNo Info [DisableWorldData enabled]");
+                    continue;
+                }
 
                 var lowestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.First();
                 var vectorLongLat = Find.WorldGrid.LongLatOf(lowestCharacteristicKvp.Key);
