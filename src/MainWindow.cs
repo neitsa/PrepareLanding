@@ -16,14 +16,14 @@ namespace PrepareLanding
 {
     public class MainWindow : MinimizableWindow
     {
-        public const float SpaceForBottomButtons = 55f;
+        public const float SpaceForBottomButtons = 65f;
 
         private const float GapBetweenButtons = 10f;
 
         private const int MaxDisplayedTileWhenMinimized = 30;
 
         private readonly List<ButtonDescriptor> _bottomButtonsDescriptorList;
-        private readonly Vector2 _bottomButtonSize = new Vector2(105f, 30f);
+        private readonly Vector2 _bottomButtonSize = new Vector2(110f, 40f);
         private readonly List<ButtonDescriptor> _minimizedWindowButtonsDescriptorList;
 
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
@@ -52,7 +52,7 @@ namespace PrepareLanding
             _tabGuiUtilities.Add(new TabTemperature(gameData, 0.30f));
             _tabGuiUtilities.Add(new TabFilteredTiles(0.48f));
             _tabGuiUtilities.Add(new TabInfo(gameData, 0.48f));
-            _tabGuiUtilities.Add(new TabOptions(gameData, 0.30f));
+            _tabGuiUtilities.Add(new TabOptions(gameData, 0.35f));
             _tabGuiUtilities.Add(new TabLoadSave(gameData, 0.48f));
 #if TAB_OVERLAYS
             _tabGuiUtilities.Add(new TabOverlays(gameData, 0.50f));
