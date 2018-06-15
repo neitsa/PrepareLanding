@@ -22,13 +22,15 @@
     <PLMWTT_SelectCoastRotation>Select Coast Rotation</PLMWTT_SelectCoastRotation>
     <PLMWTT_SelectedCoastRotation>Selected Coast Rotation</PLMWTT_SelectedCoastRotation>
     <PLMWTT_IsCoastalTileLake>Is Coastal Tile (lake)</PLMWTT_IsCoastalTileLake>
-    <PLMWTT_IsCoastalTileLakeTooltip>A lake is a most 15 tiles of water surrounded by land.</PLMWTT_IsCoastalTileLakeTooltip>
+    <PLMWTT_IsCoastalTileLakeTooltip>A lake is at most 15 tiles of water surrounded by land.</PLMWTT_IsCoastalTileLakeTooltip>
 
     <PLMWTT_TerrainTypes>Terrain Types</PLMWTT_TerrainTypes>
     <PLMWTT_SelectTerrain>Select Terrain</PLMWTT_SelectTerrain>
 
     <PLMWTT_RiverTypes>River Types</PLMWTT_RiverTypes>
 
+    <PLMWTT_FilterBooleanOr>OR</PLMWTT_FilterBooleanOr>  <!-- boolean OR; uppercase -->
+    <PLMWTT_FilterBooleanAnd>AND</PLMWTT_FilterBooleanAnd>  <!-- boolean AND; uppercase -->
     <PLMWTT_ORANDTooltip>Type of filtering to apply.&#10;OR: each item is evaluated independently.&#10;AND: all items are evaluated together.</PLMWTT_ORANDTooltip>
     <PLMWTT_OffPartialTooltip>If True, Off and Partial states do not allow any tile selection.&#10;If false, they allow selection of tiles.</PLMWTT_OffPartialTooltip>
     <PLMWTT_SelectedShort>Sel.</PLMWTT_SelectedShort> <!-- 'Sel.' as in "Selected" -->
