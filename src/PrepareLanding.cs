@@ -23,6 +23,9 @@ namespace PrepareLanding
             // initialize events
             EventHandler = new RimWorldEventHandler();
 
+            // global game options
+            GameOptions = new GameOptions(Settings, EventHandler);
+
             // instance used to keep track of (or override) game ticks.
             GameTicks = new GameTicks();
 
@@ -44,6 +47,9 @@ namespace PrepareLanding
         ///     Main static instance, holding references to useful class instances.
         /// </summary>
         public static PrepareLanding Instance { get; private set; }
+
+
+        public GameOptions GameOptions { get; }
 
         /// <summary>
         ///     Instance used to keep track of (or override) game ticks.

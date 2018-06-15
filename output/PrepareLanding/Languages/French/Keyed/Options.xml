@@ -2,7 +2,12 @@
 <LanguageData>
     <!-- use 4 spaces indentation, NOT tabs -->
     <!-- Overall prefix for the mod is "PL" for PrepareLanding -->
-
+    
+    <!--=========================================== Main Game Options [GOPT] ========================================-->
+    <!-- visible in "Options > Mod Settings" menu only -->
+    <PLGOPT_DisableWorldDataTitle>Désactive les Données du Monde</PLGOPT_DisableWorldDataTitle>
+    <PLGOPT_DisableWorldDataDescription>Permet de désactiver les données du monde:&#xD;Les données du monde sont différentes données utilisées par PrepareLanding pour afficher des informations sur le monde. Si l'option est activée cela supprime ces informations, économise de la mémoire et des cycles de processeur.&#xD;En contrepartie moins d'informations sont disponibles.</PLGOPT_DisableWorldDataDescription>    
+    
     <!--======================================== Main Window Options Tab [OPT] ======================================-->
         <!-- Tab Name in main window -->
     <PLOPT_Options>Options</PLOPT_Options>
