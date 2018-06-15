@@ -21,20 +21,33 @@ namespace PrepareLanding.GameData
 
             PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += ExecuteOnWorldGeneratedOrLoaded;
 
+#if TEMPERATURE_DATA || WORLD_DATA
             TemperatureData = new TemperatureData(defData);
-            RainfallData = new RainfallData(defData);
-            ElevationData = new ElevationData(defData);
-
             WorldCharacteristics.Add(TemperatureData);
+#endif
+
+#if RAINFALL_DATA || WORLD_DATA
+            RainfallData = new RainfallData(defData);
             WorldCharacteristics.Add(RainfallData);
+#endif
+#if ELEVATION_DATA || WORLD_DATA
+            ElevationData = new ElevationData(defData);
             WorldCharacteristics.Add(ElevationData);
+#endif
         }
 
+
+#if ELEVATION_DATA || WORLD_DATA
         public ElevationData ElevationData { get; }
+#endif
 
+#if RAINFALL_DATA || WORLD_DATA
         public RainfallData RainfallData { get; }
+#endif
 
+#if TEMPERATURE_DATA || WORLD_DATA
         public TemperatureData TemperatureData { get; }
+#endif
 
         public float WorldCoverage { get; private set; }
 

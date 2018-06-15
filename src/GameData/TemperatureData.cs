@@ -113,6 +113,7 @@ namespace PrepareLanding.GameData
         {
         }
 
+#if TEMPERATURE_DATA || WORLD_DATA
         public bool AllowDrawOverlay
         {
             get => _allowDrawOverlay;
@@ -125,6 +126,7 @@ namespace PrepareLanding.GameData
                 Find.World.renderer.SetDirty<WorldLayerTemperature>();
             }
         }
+#endif
 
         public override MostLeastCharacteristic Characteristic => MostLeastCharacteristic.Temperature;
 
