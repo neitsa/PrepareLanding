@@ -1,5 +1,36 @@
 ***
 
+# Version 0.8.0
+**Released June 15, 2018**
+**`RimWorld Version: Beta 18`**
+
+# General
+
+What's New?
+===========
+
+* The whole mod can now be translated to other languages.
+    - Added French translation! Cocorico :)
+
+* Added a game option to reduce CPU cycles and the memory footprint of the mod.
+    - While in game, see: Options > Mod Settings > PrepareLanding
+    - There's one option which is **disabled** by default
+    - If enabled, it skips some calculations and doesn't store some data about the world
+        - In return for less CPU cycles and less memory used, some world information are not available.
+
+* Drastically reduced the Mod memory footprint and CPU cycles.
+    - Some non critical code has been factored out.
+    - The code was doing some heavy calculation (and used some memory) for world map overlays which is still not public.
+
+## Minor Changes
+
+* Tweaked some parts of the GUI for languages that are more verbose than English.
+
+* Side note: the "God Mode" tab is not translated as it is doomed to disappear at some point.
+
+
+***
+
 # Version 0.7.0
 **Released December 22, 2017**
 **`RimWorld Version: Beta 18`**
