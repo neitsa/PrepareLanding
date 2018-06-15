@@ -256,7 +256,7 @@ namespace PrepareLanding
         /// <summary>
         ///     Tells whether the filtering should be order dependent (if true) or not (if false).
         /// </summary>
-        public bool OrderedFiltering { get; set; } = true;
+        public bool OrderedFiltering { get; set; } = false;
 
         public override bool IsInDefaultState()
         {
