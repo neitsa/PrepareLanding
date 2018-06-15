@@ -7,7 +7,7 @@ using Verse;
 
 namespace PrepareLanding.Overlays
 {
-#if TEMPERATURE_DATA || WORLD_DATA
+#if TAB_OVERLAYS
     public class WorldLayerTemperature : WorldLayer
     {
         private readonly List<Vector3> _vertices = new List<Vector3>();

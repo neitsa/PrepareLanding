@@ -21,32 +21,35 @@ namespace PrepareLanding.GameData
 
             PrepareLanding.Instance.EventHandler.WorldGeneratedOrLoaded += ExecuteOnWorldGeneratedOrLoaded;
 
+            // note: each of the xxxData below will take care of reloading its data on a new world. No need to do it here.
 #if TEMPERATURE_DATA || WORLD_DATA
-            TemperatureData = new TemperatureData(defData);
+            TemperatureData = new TemperatureData(_defData);
             WorldCharacteristics.Add(TemperatureData);
+
 #endif
 
 #if RAINFALL_DATA || WORLD_DATA
-            RainfallData = new RainfallData(defData);
+            RainfallData = new RainfallData(_defData);
             WorldCharacteristics.Add(RainfallData);
 #endif
+
 #if ELEVATION_DATA || WORLD_DATA
-            ElevationData = new ElevationData(defData);
+            ElevationData = new ElevationData(_defData);
             WorldCharacteristics.Add(ElevationData);
 #endif
         }
 
 
 #if ELEVATION_DATA || WORLD_DATA
-        public ElevationData ElevationData { get; }
+        public ElevationData ElevationData { get; private set; }
 #endif
 
 #if RAINFALL_DATA || WORLD_DATA
-        public RainfallData RainfallData { get; }
+        public RainfallData RainfallData { get; private set; }
 #endif
 
 #if TEMPERATURE_DATA || WORLD_DATA
-        public TemperatureData TemperatureData { get; }
+        public TemperatureData TemperatureData { get; private set; }
 #endif
 
         public float WorldCoverage { get; private set; }
