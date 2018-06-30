@@ -79,8 +79,9 @@ namespace PrepareLanding.Presets
                 return;
 
             LoadUsableMinMax(xTemperature, "AverageTemperature", _gameData.UserData.AverageTemperature);
-            LoadUsableMinMax(xTemperature, "SummerTemperature", _gameData.UserData.SummerTemperature);
-            LoadUsableMinMax(xTemperature, "WinterTemperature", _gameData.UserData.WinterTemperature);
+            LoadUsableMinMax(xTemperature, "MinTemperature", _gameData.UserData.MinTemperature);
+            LoadUsableMinMax(xTemperature, "MaxTemperature", _gameData.UserData.MaxTemperature);
+            LoadUsableMinMax(xTemperature, "AverageTemperature", _gameData.UserData.AverageTemperature);
             LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
             LoadUsableMinMax(xTemperature, "RainFall", _gameData.UserData.RainFall);
             _gameData.UserData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
@@ -171,8 +172,8 @@ namespace PrepareLanding.Presets
                 xFilter.Add(xTemperatureFilters);
 
                 SaveUsableMinMax(xTemperatureFilters, "AverageTemperature", _gameData.UserData.AverageTemperature);
-                SaveUsableMinMax(xTemperatureFilters, "SummerTemperature", _gameData.UserData.SummerTemperature);
-                SaveUsableMinMax(xTemperatureFilters, "WinterTemperature", _gameData.UserData.WinterTemperature);
+                SaveUsableMinMax(xTemperatureFilters, "MinTemperature", _gameData.UserData.MinTemperature);
+                SaveUsableMinMax(xTemperatureFilters, "MaxTemperature", _gameData.UserData.MaxTemperature);
                 SaveMinMaxFromRestrictedList(xTemperatureFilters, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
                 SaveUsableMinMax(xTemperatureFilters, "RainFall", _gameData.UserData.RainFall);
                 SaveThreeState(xTemperatureFilters, "AnimalsCanGrazeNow", _gameData.UserData.ChosenAnimalsCanGrazeNowState);

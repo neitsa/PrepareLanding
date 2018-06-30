@@ -388,18 +388,28 @@ namespace PrepareLanding
 
         private void DrawTemperaturesSelection()
         {
-            const float tempMin = TemperatureTuning.MinimumTemperature;
-            const float tempMax = TemperatureTuning.MaximumTemperature;
+            // min and max possible temperatures, in C/F/K (depending on user prefs).
+            // note that TemperatureTuning temps are in Celsius.
+            var tempMinUnit = GenTemperature.CelsiusTo(TemperatureTuning.MinimumTemperature, Prefs.TemperatureMode);
+            var tempMaxUnit = GenTemperature.CelsiusTo(TemperatureTuning.MaximumTemperature, Prefs.TemperatureMode);
 
-            DrawEntryHeader($"{"Temperature".Translate()} (°C) [{tempMin}, {tempMax}]",
+            DrawEntryHeader($"{"Temperature".Translate()} (°{Prefs.TemperatureMode.ToStringHuman()}) [{tempMinUnit}, {tempMaxUnit}]",
                 backgroundColor: ColorFromFilterType(typeof(TileFilterAverageTemperatures)));
 
             DrawUsableMinMaxNumericField(_gameData.UserData.AverageTemperature, "AvgTemp".Translate(),
-                tempMin, tempMax);
-            DrawUsableMinMaxNumericField(_gameData.UserData.WinterTemperature, "AvgWinterTemp".Translate(),
-                tempMin, tempMax);
-            DrawUsableMinMaxNumericField(_gameData.UserData.SummerTemperature, "AvgSummerTemp".Translate(),
-                tempMin, tempMax);
+                tempMinUnit, tempMaxUnit);
+
+            ListingStandard.GapLine();
+
+            DrawUsableMinMaxNumericField(_gameData.UserData.MinTemperature, "Minimum Temperature", //TODO: translate
+                tempMinUnit, tempMaxUnit);
+
+
+            ListingStandard.GapLine();
+
+            DrawUsableMinMaxNumericField(_gameData.UserData.MaxTemperature, "Maximum Temperature", // TODO: translate
+                tempMinUnit, tempMaxUnit);
+
         }
 
         private void DrawMostLeastCharacteristicSelection()

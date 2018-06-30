@@ -69,6 +69,7 @@
     <Compile Include="src\Core\Extensions\RectExtensions.cs" />
     <Compile Include="src\Core\Extensions\Statistics.cs" />
     <Compile Include="src\Core\Extensions\StringExtensions.cs" />
+    <Compile Include="src\Core\Extensions\TemperatureDisplayModeExtension.cs" />
     <Compile Include="src\Core\Extensions\TileExtensions.cs" />
     <Compile Include="src\Core\Extensions\TwelfthExtensions.cs" />
     <Compile Include="src\Core\Extensions\Vector3Extensions.cs" />
@@ -134,7 +135,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
-if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) k:\rimworld_debug\RimWorld_a18 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
+if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) K:\rimworld_debug\RimWorld_unstable_1 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
 if $(ConfigurationName) == Release xcopy /y $(TargetPath) $(ProjectDir)output\PrepareLanding\Assemblies</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

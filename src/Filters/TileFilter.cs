@@ -218,7 +218,20 @@ namespace PrepareLanding.Filters
         {
         }
 
-        protected abstract float TemperatureForTile(int tileId);
+        protected float AverageTemperatureForTile(int tileId)
+        {
+            return Find.WorldGrid[tileId].temperature;
+        }
+
+        protected  float MinTemperatureForTile(int tileId)
+        {
+            return GenTemperature.MinTemperatureAtTile(tileId);
+        }
+
+        protected float MaxTemperatureAtTile(int tileId)
+        {
+            return GenTemperature.MaxTemperatureAtTile(tileId);
+        }
 
         public override void Filter(List<int> inputList)
         {
@@ -245,9 +258,31 @@ namespace PrepareLanding.Filters
                 return;
             }
 
+            Func<int, float> temperatureFunc;
+            switch (AttachedProperty)
+            {
+                case nameof(UserData.AverageTemperature):
+                    temperatureFunc = AverageTemperatureForTile;
+                    break;
+
+                case nameof(UserData.MinTemperature):
+                    temperatureFunc = MinTemperatureForTile;
+                    break;
+
+                case nameof(UserData.MaxTemperature):
+                    temperatureFunc = MaxTemperatureAtTile;
+                    break;
+
+                default:
+                    Log.Error($"[PrepareLanding] Unknown attached property in TileFilterTemperatures.Filter(): {AttachedProperty}");
+                    return;
+            }
+
             foreach (var tileId in inputList)
             {
-                var tileTemp = TemperatureForTile(tileId);
+                var tileTempInC = temperatureFunc(tileId);
+
+                var tileTemp = GenTemperature.CelsiusTo(tileTempInC, Prefs.TemperatureMode);
 
                 if (temperatureItem.InRange(tileTemp))
                     _filteredTiles.Add(tileId);

@@ -35,6 +35,16 @@ namespace PrepareLanding.GameData
         public UsableMinMaxNumericItem<float> AverageTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
+        ///     Current user choices for the minimum temperature.
+        /// </summary>
+        public UsableMinMaxNumericItem<float> MinTemperature { get; } = new UsableMinMaxNumericItem<float>();
+
+        /// <summary>
+        ///     Current user choices for the maximum temperature.
+        /// </summary>
+        public UsableMinMaxNumericItem<float> MaxTemperature { get; } = new UsableMinMaxNumericItem<float>();
+
+        /// <summary>
         ///     Current user choice for the "Animal Can Graze Now" state.
         /// </summary>
         public MultiCheckboxState ChosenAnimalsCanGrazeNowState
@@ -241,19 +251,10 @@ namespace PrepareLanding.GameData
             TileFilterCoastRotation.PossibleRotationsInt, TileFilterCoastRotation.PossibleRotationsInt[0]);
 
         /// <summary>
-        ///     Current user choices for the summer temperature.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> SummerTemperature { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
         ///     Current user choices for the time zone.
         /// </summary>
         public UsableMinMaxNumericItem<int> TimeZone { get; } = new UsableMinMaxNumericItem<int>();
 
-        /// <summary>
-        ///     Current user choices for the winter temperature.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> WinterTemperature { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
         ///     Current user choice for Most / Least item
@@ -322,10 +323,10 @@ namespace PrepareLanding.GameData
             if (AverageTemperature.Use)
                 return false;
 
-            if (WinterTemperature.Use)
+            if (MinTemperature.Use)
                 return false;
 
-            if (SummerTemperature.Use)
+            if (MaxTemperature.Use)
                 return false;
 
             if (GrowingPeriod.Use)
@@ -386,8 +387,8 @@ namespace PrepareLanding.GameData
              */
 
             InitUsableMinMaxNumericItem(AverageTemperature, nameof(AverageTemperature));
-            InitUsableMinMaxNumericItem(WinterTemperature, nameof(WinterTemperature));
-            InitUsableMinMaxNumericItem(SummerTemperature, nameof(SummerTemperature));
+            InitUsableMinMaxNumericItem(MinTemperature, nameof(MinTemperature));
+            InitUsableMinMaxNumericItem(MaxTemperature, nameof(MaxTemperature));
 
             var twelfthList = Enum.GetValues(typeof(Twelfth)).Cast<Twelfth>().ToList();
             GrowingPeriod =

@@ -677,56 +677,30 @@ namespace PrepareLanding.Filters
         public override bool IsFilterActive => UserData.AverageTemperature.Use;
 
         public override string SubjectThingDef => "PLTILFILT_AverageTemperatures".Translate();
-
-        protected override float TemperatureForTile(int tileId)
-        {
-            var tile = Find.World.grid[tileId];
-            return tile.temperature;
-        }
     }
 
-    public class TileFilterWinterTemperatures : TileFilterTemperatures
+    public class TileFilterMinTemperatures : TileFilterTemperatures
     {
-        public TileFilterWinterTemperatures(UserData userData, string attachedProperty,
+        public TileFilterMinTemperatures(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override bool IsFilterActive => UserData.WinterTemperature.Use;
+        public override bool IsFilterActive => UserData.MinTemperature.Use;
 
-        public override string SubjectThingDef => "PLTILFILT_WinterTemperatures".Translate();
-
-        protected override float TemperatureForTile(int tileId)
-        {
-            var y = Find.WorldGrid.LongLatOf(tileId).y;
-
-            var celsiusTemp =
-                GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Winter.GetMiddleTwelfth(y));
-
-            return celsiusTemp;
-        }
+        public override string SubjectThingDef => "Min Temperatures";
     }
 
-    public class TileFilterSummerTemperatures : TileFilterTemperatures
+    public class TileFilterMaxTemperatures : TileFilterTemperatures
     {
-        public TileFilterSummerTemperatures(UserData userData, string attachedProperty,
+        public TileFilterMaxTemperatures(UserData userData, string attachedProperty,
             FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override bool IsFilterActive => UserData.SummerTemperature.Use;
+        public override bool IsFilterActive => UserData.MaxTemperature.Use;
 
-        public override string SubjectThingDef => "PLTILFILT_SummerTemperatures".Translate();
-
-        protected override float TemperatureForTile(int tileId)
-        {
-            var y = Find.WorldGrid.LongLatOf(tileId).y;
-
-            var celsiusTemp =
-                GenTemperature.AverageTemperatureAtTileForTwelfth(tileId, Season.Summer.GetMiddleTwelfth(y));
-
-            return celsiusTemp;
-        }
+        public override string SubjectThingDef => "Max Temperatures";
     }
 
     public class TileFilterGrowingPeriods : TileFilter

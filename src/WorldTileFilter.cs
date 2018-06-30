@@ -109,17 +109,17 @@ namespace PrepareLanding
                 {
                     nameof(_userData.AverageTemperature),
                     new TileFilterAverageTemperatures(_userData, nameof(_userData.AverageTemperature),
-                        FilterHeaviness.Heavy)
+                        FilterHeaviness.Light)
                 },
                 {
-                    nameof(_userData.WinterTemperature),
-                    new TileFilterWinterTemperatures(_userData, nameof(_userData.WinterTemperature),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.MinTemperature),
+                    new TileFilterMinTemperatures(_userData, nameof(_userData.MinTemperature),
+                        FilterHeaviness.Medium)
                 },
                 {
-                    nameof(_userData.SummerTemperature),
-                    new TileFilterSummerTemperatures(_userData, nameof(_userData.SummerTemperature),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.MaxTemperature),
+                    new TileFilterMaxTemperatures(_userData, nameof(_userData.MaxTemperature),
+                        FilterHeaviness.Medium)
                 },
                 {
                     nameof(_userData.GrowingPeriod),
