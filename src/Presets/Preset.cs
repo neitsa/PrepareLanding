@@ -81,7 +81,6 @@ namespace PrepareLanding.Presets
             LoadUsableMinMax(xTemperature, "AverageTemperature", _gameData.UserData.AverageTemperature);
             LoadUsableMinMax(xTemperature, "MinTemperature", _gameData.UserData.MinTemperature);
             LoadUsableMinMax(xTemperature, "MaxTemperature", _gameData.UserData.MaxTemperature);
-            LoadUsableMinMax(xTemperature, "AverageTemperature", _gameData.UserData.AverageTemperature);
             LoadMinMaxFromRestrictedList(xTemperature, "GrowingPeriod", _gameData.UserData.GrowingPeriod);
             LoadUsableMinMax(xTemperature, "RainFall", _gameData.UserData.RainFall);
             _gameData.UserData.ChosenAnimalsCanGrazeNowState = LoadThreeState(xTemperature, "AnimalsCanGrazeNow");
