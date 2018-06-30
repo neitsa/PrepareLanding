@@ -65,19 +65,19 @@ namespace PrepareLanding
                     new TileFilterRivers(_userData, nameof(_userData.SelectedRiverDefs), FilterHeaviness.Light)
                 },
                 {
-                    nameof(_userData.CurrentMovementTime),
-                    new TileFilterCurrentMovementTimes(_userData, nameof(_userData.CurrentMovementTime),
+                    nameof(_userData.MovementDifficulty),
+                    new TileFilterMovementDifficulty(_userData, nameof(_userData.MovementDifficulty),
                         FilterHeaviness.Heavy)
                 },
                 {
-                    nameof(_userData.WinterMovementTime),
-                    new TileFilterWinterMovementTimes(_userData, nameof(_userData.WinterMovementTime),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.Forageability),
+                    new TileFilterForageability(_userData, nameof(_userData.Forageability),
+                        FilterHeaviness.Medium)
                 },
                 {
-                    nameof(_userData.SummerMovementTime),
-                    new TileFilterSummerMovementTimes(_userData, nameof(_userData.SummerMovementTime),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.ForagedFood),
+                    new TileFilterForageableFood(_userData, nameof(_userData.ForagedFood),
+                        FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.SelectedStoneDefs),

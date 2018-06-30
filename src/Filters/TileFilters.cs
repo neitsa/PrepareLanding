@@ -358,58 +358,87 @@ namespace PrepareLanding.Filters
         }
     }
 
-    public class TileFilterCurrentMovementTimes : TileFilterMovementTime
+    public class TileFilterMovementDifficulty : TileFilter
     {
-        public TileFilterCurrentMovementTimes(UserData userData, string attachedProperty,
-            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterMovementDifficulty(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override bool IsFilterActive => UserData.CurrentMovementTime.Use;
+        public override string SubjectThingDef => "MovementDifficulty".Translate();
 
-        public override string SubjectThingDef => "PLTILFILT_CurrentMovementTimes".Translate();
+        public override bool IsFilterActive => UserData.MovementDifficulty.Use;
 
-        protected override float YearPct(int tileId)
+        public override void Filter(List<int> inputList)
         {
-            return -1;
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            foreach (var tileId in inputList)
+            {
+                var difficulty = WorldPathGrid.CalculatedMovementDifficultyAt(tileId, false) *
+                                 Find.WorldGrid.GetRoadMovementDifficultyMultiplier(tileId, -1);
+
+                if(UserData.MovementDifficulty.InRange(difficulty))
+                    FilteredTiles.Add(tileId);
+            }
         }
     }
 
-    public class TileFilterWinterMovementTimes : TileFilterMovementTime
+    public class TileFilterForageability : TileFilter
     {
-        public TileFilterWinterMovementTimes(UserData userData, string attachedProperty,
-            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterForageability(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override bool IsFilterActive => UserData.WinterMovementTime.Use;
+        public override string SubjectThingDef => "Forageability".Translate();
 
-        public override string SubjectThingDef => "PLTILFILT_WinterMovementTimes".Translate();
+        public override bool IsFilterActive => UserData.Forageability.Use;
 
-        protected override float YearPct(int tileId)
+        public override void Filter(List<int> inputList)
         {
-            var y = Find.WorldGrid.LongLatOf(tileId).y;
-            var yearPct = Season.Winter.GetMiddleYearPct(y);
-            return yearPct;
+            //Log.Message($"[PrepareLanding] Filtering TileFilterForageability ({inputList.Count} tiles in input)");
+            //Log.Message($"[PrepareLanding] Min: {UserData.Forageability.Min}; Max: {UserData.Forageability.Max}");
+            foreach (var tileId in inputList)
+            {
+                var tile = Find.WorldGrid[tileId];
+                if (tile.biome.foragedFood == null)
+                    continue;
+
+                //Log.Message($"[PL] Tile: {tileId}; forageability: {tile.biome.forageability}");
+
+                // forageability is a %age, so 25% is 0.25, we have to multiply by 100.
+                if (UserData.Forageability.InRange(tile.biome.forageability * 100f)) 
+                    FilteredTiles.Add(tileId);
+            }
         }
     }
 
-    public class TileFilterSummerMovementTimes : TileFilterMovementTime
+    public class TileFilterForageableFood : TileFilter
     {
-        public TileFilterSummerMovementTimes(UserData userData, string attachedProperty,
-            FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
+        public TileFilterForageableFood(UserData userData, string attachedProperty, FilterHeaviness heaviness) : base(userData, attachedProperty, heaviness)
         {
         }
 
-        public override bool IsFilterActive => UserData.SummerMovementTime.Use;
+        public override string SubjectThingDef => "Forageable";
 
-        public override string SubjectThingDef => "PLTILFILT_SummerMovementTimes".Translate();
+        public override bool IsFilterActive => UserData.ForagedFood != null;
 
-        protected override float YearPct(int tileId)
+        public override void Filter(List<int> inputList)
         {
-            var y = Find.WorldGrid.LongLatOf(tileId).y;
-            var yearPct = Season.Summer.GetMiddleYearPct(y);
-            return yearPct;
+            base.Filter(inputList);
+
+            if (!IsFilterActive)
+                return;
+
+            foreach (var tileId in inputList)
+            {
+                var tile = Find.WorldGrid[tileId];
+
+                if(tile.biome.foragedFood != null && tile.biome.foragedFood == UserData.ForagedFood)
+                    FilteredTiles.Add(tileId);
+            }
         }
     }
 

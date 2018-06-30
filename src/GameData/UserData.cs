@@ -130,10 +130,29 @@ namespace PrepareLanding.GameData
             }
         }
 
+        public ThingDef ForagedFood
+        {
+            get => _foragedFood;
+
+            set
+            {
+                if (value == _foragedFood)
+                    return;
+
+                _foragedFood = value;
+                OnPropertyChanged(nameof(ForagedFood));
+            }
+        }
+
         /// <summary>
-        ///     Current user choices for the current movement time.
+        ///     Current user choices for forageability.
         /// </summary>
-        public UsableMinMaxNumericItem<float> CurrentMovementTime { get; } = new UsableMinMaxNumericItem<float>();
+        public UsableMinMaxNumericItem<float> Forageability { get; } = new UsableMinMaxNumericItem<float>();
+
+        /// <summary>
+        ///     Current user choices for movement difficulty.
+        /// </summary>
+        public UsableMinMaxNumericItem<float> MovementDifficulty { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
         ///     Current user choices for the elevation.
@@ -222,11 +241,6 @@ namespace PrepareLanding.GameData
             TileFilterCoastRotation.PossibleRotationsInt, TileFilterCoastRotation.PossibleRotationsInt[0]);
 
         /// <summary>
-        ///     Current user choices for the summer movement time.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> SummerMovementTime { get; } = new UsableMinMaxNumericItem<float>();
-
-        /// <summary>
         ///     Current user choices for the summer temperature.
         /// </summary>
         public UsableMinMaxNumericItem<float> SummerTemperature { get; } = new UsableMinMaxNumericItem<float>();
@@ -235,11 +249,6 @@ namespace PrepareLanding.GameData
         ///     Current user choices for the time zone.
         /// </summary>
         public UsableMinMaxNumericItem<int> TimeZone { get; } = new UsableMinMaxNumericItem<int>();
-
-        /// <summary>
-        ///     Current user choices for the winter movement time.
-        /// </summary>
-        public UsableMinMaxNumericItem<float> WinterMovementTime { get; } = new UsableMinMaxNumericItem<float>();
 
         /// <summary>
         ///     Current user choices for the winter temperature.
@@ -295,13 +304,13 @@ namespace PrepareLanding.GameData
             if (_stoneTypesNumberOnly)
                 return false;
 
-            if (CurrentMovementTime.Use)
+            if (MovementDifficulty.Use)
                 return false;
 
-            if (SummerMovementTime.Use)
+            if (Forageability.Use)
                 return false;
 
-            if (WinterMovementTime.Use)
+            if (_foragedFood != null)
                 return false;
 
             if (Elevation.Use)
@@ -352,6 +361,7 @@ namespace PrepareLanding.GameData
             _coastalLakeTileState = MultiCheckboxState.Partial;
             CoastalRotation.Reset(false);
             _chosenAnimalsCanGrazeNowState = MultiCheckboxState.Partial;
+            _foragedFood = null;
 
             var defProps = PrepareLanding.Instance.GameData.DefData;
             SelectedRoadDefs.SetContainer(defProps.RoadDefs, nameof(SelectedRoadDefs));
@@ -363,9 +373,8 @@ namespace PrepareLanding.GameData
             StoneTypesNumber = 2;
 
             // min / max numeric fields containers
-            InitUsableMinMaxNumericItem(CurrentMovementTime, nameof(CurrentMovementTime));
-            InitUsableMinMaxNumericItem(SummerMovementTime, nameof(SummerMovementTime));
-            InitUsableMinMaxNumericItem(WinterMovementTime, nameof(WinterMovementTime));
+            InitUsableMinMaxNumericItem(MovementDifficulty, nameof(MovementDifficulty));
+            InitUsableMinMaxNumericItem(Forageability, nameof(Forageability));
             InitUsableMinMaxNumericItem(Elevation, nameof(Elevation));
             InitUsableMinMaxNumericItem(TimeZone, nameof(TimeZone));
 
@@ -469,6 +478,9 @@ namespace PrepareLanding.GameData
         ///     The currently selected hilliness state.
         /// </summary>
         private Hilliness _chosenHilliness;
+
+
+        private ThingDef _foragedFood;
 
         /// <summary>
         ///     If true, filter only tiles with only a given number of stone types.

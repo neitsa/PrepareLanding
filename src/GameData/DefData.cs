@@ -19,6 +19,8 @@ namespace PrepareLanding.GameData
         /// </summary>
         private List<BiomeDef> _biomeDefs;
 
+        private Dictionary<BiomeDef, ThingDef> _foragedFoodsPerBiome;
+
         /// <summary>
         ///     All river definitions (<see cref="RiverDef" />) from RimWorld.
         /// </summary>
@@ -62,6 +64,8 @@ namespace PrepareLanding.GameData
         /// </summary>
         public ReadOnlyCollection<BiomeDef> BiomeDefs => _biomeDefs.AsReadOnly();
 
+        public Dictionary<BiomeDef, ThingDef> ForagedFoodsPerBiome => _foragedFoodsPerBiome;
+
         /// <summary>
         ///     All "stone" definitions from RimWorld.
         /// </summary>
@@ -94,6 +98,8 @@ namespace PrepareLanding.GameData
         {
             // biome definitions list
             _biomeDefs = BuildBiomeDefs();
+
+            _foragedFoodsPerBiome = BuildForagedFoods();
 
             // road definitions list
             _roadDefs = BuildRoadDefs();
@@ -152,6 +158,28 @@ namespace PrepareLanding.GameData
             }
 
             return biomeDefsList.OrderBy(biome => biome.LabelCap).ToList();
+        }
+
+        /// <summary>
+        /// Build the list of food that can be foraged.
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<BiomeDef, ThingDef> BuildForagedFoods()
+        {
+            if (_biomeDefs == null)
+            {
+                Log.Warning("[PrepareLanding] Warning: called BuildForagedFoods() before having initialized the BiomeDefs list.");
+                BuildBiomeDefs();
+            }
+
+            var foragedFoods = new Dictionary<BiomeDef, ThingDef>();
+
+            foreach (var biomeDef in BiomeDefs)
+            {
+                foragedFoods.Add(biomeDef, biomeDef.foragedFood);
+            }
+
+            return foragedFoods;
         }
 
         /// <summary>

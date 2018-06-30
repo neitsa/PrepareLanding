@@ -49,9 +49,8 @@ namespace PrepareLanding.Presets
             _gameData.UserData.ChosenHilliness = LoadEnum<Hilliness>(xTerrain, "Hilliness");
             LoadThreeStateItemContainer(xTerrain, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
             LoadThreeStateItemContainer(xTerrain, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
-            LoadUsableMinMax(xTerrain, "CurrentMovementTime", _gameData.UserData.CurrentMovementTime);
-            LoadUsableMinMax(xTerrain, "SummerMovementTime", _gameData.UserData.SummerMovementTime);
-            LoadUsableMinMax(xTerrain, "WinterMovementTime", _gameData.UserData.WinterMovementTime);
+            LoadUsableMinMax(xTerrain, "MovementDifficulty", _gameData.UserData.MovementDifficulty);
+            LoadUsableMinMax(xTerrain, "Forageability", _gameData.UserData.Forageability);
             if (xTerrain.Element("StoneTypesNumberOnly") == null)
             {
                 LoadThreeStateItemContainerOrdered(xTerrain, "Stones", "Stone", _gameData.UserData.SelectedStoneDefs);
@@ -147,9 +146,8 @@ namespace PrepareLanding.Presets
                 SaveHilliness(xTerrainFilters, "Hilliness", _gameData.UserData.ChosenHilliness);
                 SaveThreeStateItemContainer(xTerrainFilters, "Roads", "Road", _gameData.UserData.SelectedRoadDefs);
                 SaveThreeStateItemContainer(xTerrainFilters, "Rivers", "River", _gameData.UserData.SelectedRiverDefs);
-                SaveUsableMinMax(xTerrainFilters, "CurrentMovementTime", _gameData.UserData.CurrentMovementTime);
-                SaveUsableMinMax(xTerrainFilters, "SummerMovementTime", _gameData.UserData.SummerMovementTime);
-                SaveUsableMinMax(xTerrainFilters, "WinterMovementTime", _gameData.UserData.WinterMovementTime);
+                SaveUsableMinMax(xTerrainFilters, "MovementDifficulty", _gameData.UserData.MovementDifficulty);
+                SaveUsableMinMax(xTerrainFilters, "Forageability", _gameData.UserData.Forageability);
                 if (_gameData.UserData.StoneTypesNumberOnly)
                 {
                     SaveBoolean(xTerrainFilters, "StoneTypesNumberOnly", _gameData.UserData.StoneTypesNumberOnly);
