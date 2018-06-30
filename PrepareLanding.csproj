@@ -31,19 +31,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>libs\0Harmony.dll</HintPath>
+      <HintPath>libs\1_unstable\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>libs\Assembly-CSharp.dll</HintPath>
+      <HintPath>libs\1_unstable\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>libs\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>libs\1_unstable\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="HugsLib">
-      <HintPath>libs\HugsLib.dll</HintPath>
+      <HintPath>libs\1_unstable\HugsLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -51,7 +51,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>libs\UnityEngine.dll</HintPath>
+      <HintPath>libs\1_unstable\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -83,6 +83,7 @@
     <Compile Include="src\Core\Gui\Window\MinimizedWindow.cs" />
     <Compile Include="src\Core\Gui\Window\TableWindow.cs" />
     <Compile Include="src\Core\Gui\World\TileHighlighter.cs" />
+    <Compile Include="src\Core\Gui\World\WorldLayerBehaviour.cs" />
     <Compile Include="src\Core\Gui\World\WorldLayerHighlightedTiles.cs" />
     <Compile Include="src\DataItems.cs" />
     <Compile Include="src\Defs\KeyBindings.cs" />

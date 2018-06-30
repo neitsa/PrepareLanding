@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using PrepareLanding.Core.Extensions;
+﻿using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Core.Gui.Window;
 using RimWorld;
 using RimWorld.Planet;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -71,7 +71,7 @@ namespace PrepareLanding
             var buttonFilterTiles = new ButtonDescriptor("PLMWBB_FilterTiles".Translate(),
                 delegate
                 {
-                    SoundDefOf.TickLow.PlayOneShotOnCamera();
+                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
 
                     // reset starting display index
                     _tileDisplayIndexStart = 0;
@@ -86,14 +86,14 @@ namespace PrepareLanding
             var buttonResetFilters = new ButtonDescriptor("PLMWBB_ResetFilters".Translate(),
                 delegate
                 {
-                    SoundDefOf.TickLow.PlayOneShotOnCamera();
+                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
                     gameData.UserData.ResetAllFields();
                 });
 
             var buttonMinimize = new ButtonDescriptor("PLMWBB_Minimize".Translate(),
                 delegate
                 {
-                    SoundDefOf.TickHigh.PlayOneShotOnCamera();
+                    SoundDefOf.Tick_High.PlayOneShotOnCamera();
                     Minimize();
                 });
 
@@ -112,7 +112,7 @@ namespace PrepareLanding
             _buttonCloseDescriptor = new ButtonDescriptor("CloseButton".Translate(),
                 delegate
                 {
-                    SoundDefOf.TickHigh.PlayOneShotOnCamera();
+                    SoundDefOf.Tick_High.PlayOneShotOnCamera();
 
                     // reset starting display index
                     _tileDisplayIndexStart = 0;

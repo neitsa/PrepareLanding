@@ -440,15 +440,15 @@ namespace PrepareLanding
 
             // get all tiles with at least one river
             var allTilesWithRivers = _allValidTileIds.FindAll(
-                tileId => Find.World.grid[tileId].VisibleRivers != null &&
-                          Find.World.grid[tileId].VisibleRivers.Count != 0);
+                tileId => Find.World.grid[tileId].Rivers != null &&
+                          Find.World.grid[tileId].Rivers.Count != 0); //TODO 1.0 check if correct
             AllTilesWithRiver = new ReadOnlyCollection<int>(allTilesWithRivers);
             FilterInfoLogger.AppendMessage(string.Format("PLFILT_TilesWithRiver".Translate(), AllTilesWithRiver.Count));
 
             // get all tiles with at least one road
             var allTilesWithRoads =
-                _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].VisibleRoads != null &&
-                                                   Find.World.grid[tileId].VisibleRoads.Count != 0);
+                _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].Roads != null &&
+                                                   Find.World.grid[tileId].Roads.Count != 0); // TODO 1.0 check if correct
 
             AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
             FilterInfoLogger.AppendMessage(string.Format("PLFILT_TilesWithRoad".Translate(), AllTilesWithRoad.Count));

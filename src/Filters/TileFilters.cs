@@ -131,7 +131,7 @@ namespace PrepareLanding.Filters
         protected override List<T> TileDefs<T>(Tile tile)
         {
             var tileRoadDefs = TileHasDef(tile)
-                ? tile.VisibleRoads.Select(roadlink => roadlink.road as T).Distinct().ToList()
+                ? tile.Roads.Select(roadlink => roadlink.road as T).Distinct().ToList()
                 : null;
 
             return tileRoadDefs;
@@ -149,7 +149,7 @@ namespace PrepareLanding.Filters
 
         public static bool TileHasRoad(Tile tile)
         {
-            return tile.VisibleRoads != null && tile.VisibleRoads.Count != 0;
+            return tile.Roads != null && tile.Roads.Count != 0;
         }
     }
 
@@ -342,7 +342,7 @@ namespace PrepareLanding.Filters
                 return null;
 
             // note: even though there are multiple rivers in a tile, only the one with the biggest degradeThreshold makes it to the playable map
-            var riverLink = tile.VisibleRivers.MaxBy(riverlink => riverlink.river.degradeThreshold);
+            var riverLink = tile.Rivers.MaxBy(riverlink => riverlink.river.degradeThreshold);
 
             return new List<T>{ riverLink.river as T };
         }
@@ -354,7 +354,7 @@ namespace PrepareLanding.Filters
 
         public static bool TileHasRiver(Tile tile)
         {
-            return tile.VisibleRivers != null && tile.VisibleRivers.Count != 0;
+            return tile.Rivers != null && tile.Rivers.Count != 0;
         }
     }
 

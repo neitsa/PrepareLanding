@@ -263,6 +263,11 @@ namespace PrepareLanding.Filters
         protected static void FilterMovementTime(int tileId, float yearPct, UsableMinMaxNumericItem<float> item,
             List<int> resultList)
         {
+            //TODO 1.0 fix this and make sure it is correct.
+            // does yearPct corresponds to ticks ???
+            // WorldPathGrid.CalculatedMovementDifficultyAt(tileId, false, (int)yearPct);
+
+            /*
             var ticks = Mathf.Min(GenDate.TicksPerHour + WorldPathGrid.CalculatedCostAt(tileId, false, yearPct),
                 Caravan_PathFollower.MaxMoveTicks);
 
@@ -277,6 +282,9 @@ namespace PrepareLanding.Filters
 
             if (item.InRange(totalHours))
                 resultList.Add(tileId);
+            */
+
+            resultList.Clear();
         }
     }
 

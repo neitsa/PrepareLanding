@@ -42,24 +42,22 @@ namespace PrepareLanding.Core.Gui
                 {
                     case MultiCheckboxState.On:
                         state = MultiCheckboxState.Partial;
-                        SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
+                        SoundDefOf.Checkbox_TurnedOn.PlayOneShotOnCamera();
                         break;
 
                     case MultiCheckboxState.Partial:
                         state = MultiCheckboxState.Off;
-                        SoundDefOf.CheckboxTurnedOff.PlayOneShotOnCamera();
+                        SoundDefOf.Checkbox_TurnedOff.PlayOneShotOnCamera();
                         break;
 
                     case MultiCheckboxState.Off:
                         state = MultiCheckboxState.On;
-                        SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
+                        SoundDefOf.Checkbox_TurnedOn.PlayOneShotOnCamera();
                         break;
                 }
 
-            var vector2 = Vector2.zero;
-            vector2.x = rect.x + rect.width - 24f;
-            vector2.y = rect.y;
-            Verse.Widgets.CheckboxMulti(vector2, state, 24f);
+            var r = new Rect(rect.x + rect.width - 24f, rect.y, 24f, 24f);
+            Verse.Widgets.CheckboxMulti(r, state);
 
             Text.Anchor = anchor;
         }
@@ -108,7 +106,7 @@ namespace PrepareLanding.Core.Gui
             butRect.width -= 24f;
             if (!selected && Verse.Widgets.ButtonInvisible(butRect))
             {
-                SoundDefOf.TickTiny.PlayOneShotOnCamera();
+                SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
                 selected = true;
             }
             var color = GUI.color;
@@ -120,9 +118,9 @@ namespace PrepareLanding.Core.Gui
             {
                 var nextState = state.NextState();
                 if ((nextState == MultiCheckboxState.Off) || (state == MultiCheckboxState.Partial))
-                    SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
+                    SoundDefOf.Checkbox_TurnedOn.PlayOneShotOnCamera();
                 else
-                    SoundDefOf.CheckboxTurnedOff.PlayOneShotOnCamera();
+                    SoundDefOf.Checkbox_TurnedOff.PlayOneShotOnCamera();
 
                 state = nextState;
             }
@@ -163,7 +161,7 @@ namespace PrepareLanding.Core.Gui
             butRect.width -= 5f;
             if (!selected && Verse.Widgets.ButtonInvisible(butRect))
             {
-                SoundDefOf.TickTiny.PlayOneShotOnCamera();
+                SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
                 selected = true;
             }
 

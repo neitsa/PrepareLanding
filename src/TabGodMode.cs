@@ -437,8 +437,8 @@ namespace PrepareLanding
             var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
             {
                 orderedStoneDefs.ReorderElements(from, to);
-                SoundDefOf.TickHigh.PlayOneShotOnCamera();
-            });
+                SoundDefOf.Tick_High.PlayOneShotOnCamera();
+            }, ReorderableDirection.Vertical);
 
             var maxNumStones = (InRect.height - ListingStandard.CurHeight - DefaultGapLineHeight -
                                 DefaultElementHeight - 15f) / DefaultElementHeight;

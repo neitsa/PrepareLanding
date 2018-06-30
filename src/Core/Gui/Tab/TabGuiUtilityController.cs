@@ -91,7 +91,7 @@ namespace PrepareLanding.Core.Gui.Tab
 
                         tab.TabRecord.selected = SelectedTab == tab;
                     return tab.TabRecord;
-                });
+                }).ToList(); //TODO 1.0 what was before (as 2nd arg to TabDrawer.DrawTabs) an enumerable is now a list; check if correct.
 
             TabDrawer.DrawTabs(inRect, tabRecordsToDraw);
         }

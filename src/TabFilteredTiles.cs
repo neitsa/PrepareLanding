@@ -219,8 +219,6 @@ namespace PrepareLanding
             var selTileId = matchingTiles[_selectedTileIndex];
             var selTile = Find.World.grid[selTileId];
 
-            ListingStandard.Label(selTile.biome.LabelCap);
-            var y = Find.WorldGrid.LongLatOf(selTileId).y;
             ListingStandard.Label(selTile.biome.description);
             ListingStandard.Gap(8f);
             ListingStandard.GapLine();
@@ -229,61 +227,72 @@ namespace PrepareLanding
                 ListingStandard.Label(selTile.biome.LabelCap + " " + "BiomeNotImplemented".Translate());
             }
             ListingStandard.LabelDouble("Terrain".Translate(), selTile.hilliness.GetLabelCap());
-            if (selTile.VisibleRoads != null)
+            if (selTile.Roads != null)
             {
-                ListingStandard.LabelDouble("Road".Translate(), GenText.ToCommaList((from roadlink in selTile.VisibleRoads
-                    select roadlink.road.label).Distinct()).CapitalizeFirst());
+                ListingStandard.LabelDouble("Road".Translate(), (from roadlink in selTile.Roads
+                                                                  select roadlink.road.label).Distinct().ToCommaList(true).CapitalizeFirst());
             }
-            if (selTile.VisibleRivers != null)
+            if (selTile.Rivers != null)
             {
-                ListingStandard.LabelDouble("River".Translate(), selTile.VisibleRivers.MaxBy((riverlink) => riverlink.river.degradeThreshold).river.LabelCap);
+                ListingStandard.LabelDouble("River".Translate(), selTile.Rivers.MaxBy(riverlink => riverlink.river.degradeThreshold).river.LabelCap);
             }
             if (!Find.World.Impassable(selTileId))
             {
-                const int num = 2500;
-                var numTicks = Mathf.Min(num + WorldPathGrid.CalculatedCostAt(selTileId, false), 120000);
-                ListingStandard.LabelDouble("MovementTimeNow".Translate(), numTicks.ToStringTicksToPeriod());
-                var numTicks2 = Mathf.Min(num + WorldPathGrid.CalculatedCostAt(selTileId, false, Season.Summer.GetMiddleYearPct(y)), 120000);
-                ListingStandard.LabelDouble("MovementTimeSummer".Translate(), numTicks2.ToStringTicksToPeriod());
-                var numTicks3 = Mathf.Min(num + WorldPathGrid.CalculatedCostAt(selTileId, false, Season.Winter.GetMiddleYearPct(y)), 120000);
-                ListingStandard.LabelDouble("MovementTimeWinter".Translate(), numTicks3.ToStringTicksToPeriod());
+                var stringBuilder = new StringBuilder();
+                var tile = selTileId;
+                const bool perceivedStatic = false;
+                var explanation = stringBuilder;
+                var rightLabel = (WorldPathGrid.CalculatedMovementDifficultyAt(tile, perceivedStatic, null, explanation) * Find.WorldGrid.GetRoadMovementDifficultyMultiplier(selTileId, -1, stringBuilder)).ToString("0.#");
+                if (WorldPathGrid.WillWinterEverAffectMovementDifficulty(selTileId) && WorldPathGrid.GetCurrentWinterMovementDifficultyOffset(selTileId, null) < 2f)
+                {
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine();
+                    stringBuilder.Append(" (");
+                    stringBuilder.Append("MovementDifficultyOffsetInWinter".Translate("+" + 2f.ToString("0.#")));
+                    stringBuilder.Append(")");
+                }
+                ListingStandard.LabelDouble("MovementDifficulty".Translate(), rightLabel, stringBuilder.ToString());
             }
             if (selTile.biome.canBuildBase)
             {
-                ListingStandard.LabelDouble("StoneTypesHere".Translate(), GenText.ToCommaList(from rt in Find.World.NaturalRockTypesIn(selTileId)
-                    select rt.label).CapitalizeFirst());
+                ListingStandard.LabelDouble("StoneTypesHere".Translate(), (from rt in Find.World.NaturalRockTypesIn(selTileId)
+                                                                            select rt.label).ToCommaList(true).CapitalizeFirst());
             }
             ListingStandard.LabelDouble("Elevation".Translate(), selTile.elevation.ToString("F0") + "m");
             ListingStandard.GapLine();
-            ListingStandard.LabelDouble("AvgTemp".Translate(), selTile.temperature.ToStringTemperature());
-            var celsiusTemp = GenTemperature.AverageTemperatureAtTileForTwelfth(selTileId, Season.Winter.GetMiddleTwelfth(y));
-            ListingStandard.LabelDouble("AvgWinterTemp".Translate(), celsiusTemp.ToStringTemperature());
-            var celsiusTemp2 = GenTemperature.AverageTemperatureAtTileForTwelfth(selTileId, Season.Summer.GetMiddleTwelfth(y));
-            ListingStandard.LabelDouble("AvgSummerTemp".Translate(), celsiusTemp2.ToStringTemperature());
+            ListingStandard.LabelDouble("AvgTemp".Translate(), GenTemperature.GetAverageTemperatureLabel(selTileId));
             ListingStandard.LabelDouble("OutdoorGrowingPeriod".Translate(), Zone_Growing.GrowingQuadrumsDescription(selTileId));
             ListingStandard.LabelDouble("Rainfall".Translate(), selTile.rainfall.ToString("F0") + "mm");
+            if (selTile.biome.foragedFood != null && selTile.biome.forageability > 0f)
+            {
+                ListingStandard.LabelDouble("Forageability".Translate(), selTile.biome.forageability.ToStringPercent() + " (" + selTile.biome.foragedFood.label + ")");
+            }
+            else
+            {
+                ListingStandard.LabelDouble("Forageability".Translate(), "0%");
+            }
             ListingStandard.LabelDouble("AnimalsCanGrazeNow".Translate(), (!VirtualPlantsUtility.EnvironmentAllowsEatingVirtualPlantsNowAt(selTileId)) ? "No".Translate() : "Yes".Translate());
             ListingStandard.GapLine();
             ListingStandard.LabelDouble("AverageDiseaseFrequency".Translate(),
                 $"{(60f / selTile.biome.diseaseMtbDays):F1} {"PerYear".Translate()}");
             ListingStandard.LabelDouble("TimeZone".Translate(), GenDate.TimeZoneAt(Find.WorldGrid.LongLatOf(selTileId).x).ToStringWithSign());
-            var stringBuilder = new StringBuilder();
+            var stringBuilder2 = new StringBuilder();
             var rot = Find.World.CoastDirectionAt(selTileId);
             if (rot.IsValid)
             {
-                stringBuilder.AppendWithComma(("HasCoast" + rot.ToString()).Translate());
+                stringBuilder2.AppendWithComma(("HasCoast" + rot).Translate());
             }
             if (Find.World.HasCaves(selTileId))
             {
-                stringBuilder.AppendWithComma("HasCaves".Translate());
+                stringBuilder2.AppendWithComma("HasCaves".Translate());
             }
-            if (stringBuilder.Length > 0)
+            if (stringBuilder2.Length > 0)
             {
-                ListingStandard.LabelDouble("SpecialFeatures".Translate(), stringBuilder.ToString().CapitalizeFirst());
+                ListingStandard.LabelDouble("SpecialFeatures".Translate(), stringBuilder2.ToString().CapitalizeFirst());
             }
             if (Prefs.DevMode)
             {
-                ListingStandard.LabelDouble("PLMWFTIL_DebugWorldTileId".Translate(), selTileId.ToString());
+                ListingStandard.LabelDouble("Debug world tile ID", selTileId.ToString());
             }
         }
     }

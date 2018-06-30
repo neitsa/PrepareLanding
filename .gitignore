@@ -36,6 +36,7 @@ __pycache__/
 *.suo
 *.user
 *.sln.docstates
+.dtbcache
 
 # Build results
 
