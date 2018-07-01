@@ -31,19 +31,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>libs\1_unstable\0Harmony.dll</HintPath>
+      <HintPath>libs\1.0\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>libs\1_unstable\Assembly-CSharp.dll</HintPath>
+      <HintPath>libs\1.0\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>libs\1_unstable\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>libs\1.0\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="HugsLib">
-      <HintPath>libs\1_unstable\HugsLib.dll</HintPath>
+      <HintPath>libs\1.0\HugsLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -51,7 +51,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>libs\1_unstable\UnityEngine.dll</HintPath>
+      <HintPath>libs\1.0\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
