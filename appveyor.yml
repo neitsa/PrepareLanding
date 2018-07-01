@@ -16,8 +16,7 @@
   branches:
     # whitelist
     only:
-      #- develop
-      - feature/rw_1
+      - develop
     # blacklist
     except:
       - gh-pages
