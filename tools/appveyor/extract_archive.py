@@ -63,7 +63,7 @@ def main(args):
         if not args.output_path.exists() or not args.output_path.is_dir():
             logger.error(
                 "Output Path: '{}' either doesn't exist or is not a directory."
-                .format(args.input_file))
+                .format(args.output_path))
             return - 1
         else:
             output_path = args.output_path
