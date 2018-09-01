@@ -1,5 +1,40 @@
 ***
 
+# Version 0.9.0
+**Released September 1, 2018**
+**`RimWorld Version: Beta 19`**
+
+# General
+
+What's New?
+===========
+
+* PrepareLanding is now compatible with Rimworld Beta 19 (0.19.6814)
+
+* New filters:
+    - Movement Difficulty.
+    - Forageability.
+    - Forageable Food.
+    - Minimum Temperature.
+    - Maximum Temperature.
+
+* The code now handles correctly the different temperature scales (Celsius, Fahrenheit, Kelvin).
+    - This works for the filters on the temperature tab and the various temperature forecasts.
+
+* The following filters were removed 
+    - **Note**: they were still working but users would have had no feedback from the game to pick the proper values.
+    - Current, Summer and Winter Movement Time (all replaced with Movement Difficulty).
+    - Summer and Winter Temperature (replaced with Min and Max temperature).
+
+* Use of the updated Harmony and HugsLib libraries.
+
+## Internal Changes
+
+* The code now correctly handles Unity Material loading and usage on the main thread.
+
+
+***
+
 # Version 0.8.0
 **Released June 15, 2018**
 **`RimWorld Version: Beta 18`**

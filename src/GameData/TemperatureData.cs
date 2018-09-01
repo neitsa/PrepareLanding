@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using PrepareLanding.Core;
 using PrepareLanding.Core.Extensions;
-using PrepareLanding.Overlays;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -19,15 +18,24 @@ namespace PrepareLanding.GameData
             Ticks = ticks;
             Hour = hour;
 
-            OutdoorTemperature = Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, Ticks);
-            OffsetFromSunCycle = GenTemperature.OffsetFromSunCycle(Ticks, TileId);
-            OffsetFromDailyRandomVariation = Find.World.tileTemperatures.OffsetFromDailyRandomVariation(TileId,
-                Ticks);
-            OffsetFromSeasonCycle = GenTemperature.OffsetFromSeasonCycle(Ticks, tileId);
+            var outdoorTemperature = Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, Ticks);
+            OutdoorTemperature = GenTemperature.CelsiusTo(outdoorTemperature, Prefs.TemperatureMode);
 
-            var tile = Find.WorldGrid[TileId];
-            DailyRandomVariation = tile.temperature -
+            var offsetFromSunCycle = GenTemperature.OffsetFromSunCycle(Ticks, TileId);
+            // this is a temperature delta, so it's not a straight Celsius to another temperature unit. We use an extension method.
+            OffsetFromSunCycle = TemperatureDisplayMode.Celsius.TempDelta(offsetFromSunCycle, Prefs.TemperatureMode);
+
+            var offsetFromDailyRandomVariation =
+                Find.World.tileTemperatures.OffsetFromDailyRandomVariation(TileId, Ticks);
+            OffsetFromDailyRandomVariation =
+                TemperatureDisplayMode.Celsius.TempDelta(offsetFromDailyRandomVariation, Prefs.TemperatureMode);
+
+            var offsetFromSeasonCycle = GenTemperature.OffsetFromSeasonCycle(Ticks, tileId);
+            OffsetFromSeasonCycle = TemperatureDisplayMode.Celsius.TempDelta(offsetFromSeasonCycle, Prefs.TemperatureMode);
+
+            var dailyRandomVariation = Find.WorldGrid[TileId].temperature -
                                    (OffsetFromSeasonCycle + OffsetFromDailyRandomVariation + OffsetFromSunCycle);
+            DailyRandomVariation = TemperatureDisplayMode.Celsius.TempDelta(dailyRandomVariation, Prefs.TemperatureMode);
         }
 
         public float DailyRandomVariation { get; }
@@ -54,7 +62,10 @@ namespace PrepareLanding.GameData
             Latitude = Find.WorldGrid.LongLatOf(tileId).y;
             Twelfth = twelfth;
 
-            AverageTemperatureForTwelfth = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
+            var averageTemperatureForTwelfth = Find.World.tileTemperatures.AverageTemperatureForTwelfth(tileId, twelfth);
+
+            AverageTemperatureForTwelfth =
+                GenTemperature.CelsiusTo(averageTemperatureForTwelfth, Prefs.TemperatureMode);
         }
 
         public float AverageTemperatureForTwelfth { get; }
@@ -76,21 +87,27 @@ namespace PrepareLanding.GameData
             for (var hour = 0; hour < GenDate.HoursPerDay; hour++)
             {
                 var hourTicks = ticks + hour * GenDate.TicksPerHour;
-                var temp = Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, hourTicks);
-                tempsForHourOfDay.Add(temp);
+                var outdoorTemperatureinCelsius = Find.World.tileTemperatures.OutdoorTemperatureAt(tileId, hourTicks);
+                var outdoorTemperature = GenTemperature.CelsiusTo(outdoorTemperatureinCelsius, Prefs.TemperatureMode);
+                tempsForHourOfDay.Add(outdoorTemperature);
             }
 
             // get min & max from list of temperatures for the day
             MinTemp = tempsForHourOfDay.Min();
             MaxTemp = tempsForHourOfDay.Max();
+            
 
             // get number of ticks for the maximum temperature
             var ticksForMaxTemp = ticks + tempsForHourOfDay.IndexOf(MaxTemp) * GenDate.TicksPerHour;
 
-            OffsetFromSeasonCycle = GenTemperature.OffsetFromSeasonCycle(ticksForMaxTemp, tileId);
+            var offsetFromSeasonCycle = GenTemperature.OffsetFromSeasonCycle(ticksForMaxTemp, tileId);
+            OffsetFromSeasonCycle =
+                TemperatureDisplayMode.Celsius.TempDelta(offsetFromSeasonCycle, Prefs.TemperatureMode);
 
-            OffsetFromDailyRandomVariation =
+            var offsetFromDailyRandomVariation =
                 Find.World.tileTemperatures.OffsetFromDailyRandomVariation(tileId, ticksForMaxTemp);
+            OffsetFromDailyRandomVariation =
+                TemperatureDisplayMode.Celsius.TempDelta(offsetFromDailyRandomVariation, Prefs.TemperatureMode);
         }
 
         public int Day { get; }
@@ -133,7 +150,7 @@ namespace PrepareLanding.GameData
 
         public override MostLeastCharacteristic Characteristic => MostLeastCharacteristic.Temperature;
 
-        public override string CharacteristicMeasureUnit => "°C";
+        public override string CharacteristicMeasureUnit => Prefs.TemperatureMode.ToStringHuman();
 
         public Texture2D TemperatureGradientTexure => CharacteristicGradientTexture;
 

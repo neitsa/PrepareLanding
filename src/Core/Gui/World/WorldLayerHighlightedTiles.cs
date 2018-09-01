@@ -1,16 +1,15 @@
-﻿using System.Collections;
+﻿using RimWorld.Planet;
+using System.Collections;
 using System.Collections.Generic;
-using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
 namespace PrepareLanding.Core.Gui.World
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class WorldLayerHighlightedTiles : WorldLayer
     {
         private readonly float _blinkTick;
-
-        private readonly Material _defaultMaterial = new Material(WorldMaterials.SelectedTile);
 
         private readonly List<Vector3> _vertices = new List<Vector3>();
 
@@ -18,38 +17,18 @@ namespace PrepareLanding.Core.Gui.World
 
         private AlphaRampDirection _alphaRampDirection;
 
-        private Color _materialColor = Color.green;
-
         /// <summary>
         ///     Layer constructor.
         /// </summary>
-        /// <remarks>It is instanced by the game engine. See constructor of the <see cref="RimWorld.Planet.WorldRenderer" /> class.</remarks>
+        /// <remarks>It is instantiated by the game engine. See constructor of the <see cref="RimWorld.Planet.WorldRenderer" /> class.</remarks>
         public WorldLayerHighlightedTiles()
         {
-            _defaultMaterial.color = TileColor;
-            var matColor = _defaultMaterial.color;
-            matColor.a = 1.0f;
-            _defaultMaterial.color = matColor;
-
             _blinkTick = PrepareLanding.Instance.TileHighlighter.BlinkTick;
 
             PrepareLanding.Instance.TileHighlighter.HighlightedTilesWorldLayer = this;
 
             PrepareLanding.Instance.GameTicks.TicksIntervalElapsed += OnTicksIntervalElapsed;
             PrepareLanding.Instance.GameTicks.UpdateInterval = _blinkTick;
-        }
-
-        /// <summary>
-        ///     Get or set the highlighted tile color.
-        /// </summary>
-        public Color TileColor
-        {
-            get => _materialColor;
-            set
-            {
-                _materialColor = value;
-                _defaultMaterial.color = _materialColor;
-            }
         }
 
         /// <summary>
@@ -74,7 +53,10 @@ namespace PrepareLanding.Core.Gui.World
                 if (tileId < 0)
                     continue;
 
-                var subMesh = GetSubMesh(_defaultMaterial);
+
+                var material = WorldLayerBehaviour.DefaultTileHighlighterMaterial;
+
+                var subMesh = GetSubMesh(material);
                 subMesh.finalized = false;
 
                 Find.World.grid.GetTileVertices(tileId, _vertices);
@@ -89,7 +71,7 @@ namespace PrepareLanding.Core.Gui.World
                         yield return null;
 
                     if (subMesh.verts.Count > 60000)
-                        subMesh = GetSubMesh(_defaultMaterial);
+                        subMesh = GetSubMesh(material);
 
                     subMesh.verts.Add(_vertices[currentIndex] + _vertices[currentIndex].normalized * 0.012f);
                     if (currentIndex < maxCount - 2)

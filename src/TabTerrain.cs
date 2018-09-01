@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PrepareLanding.Core.Extensions;
 using PrepareLanding.Core.Gui.Tab;
 using PrepareLanding.Filters;
@@ -63,7 +64,8 @@ namespace PrepareLanding
             DrawRoadTypesSelection();
             DrawRiverTypesSelection();
             NewColumn();
-            DrawMovementTime();
+            DrawMovementDifficulty();
+            DrawForageability();
             DrawElevationSelection();
             DrawTimeZoneSelection();
             NewColumn();
@@ -153,7 +155,7 @@ namespace PrepareLanding
 
             _gameData.UserData.ChosenCoastalTileState = tmpCheckState;
 
-            ListingStandard.Gap(6f);
+            ListingStandard.GapLine();
 
             /*
              * Coastal rotation
@@ -209,9 +211,9 @@ namespace PrepareLanding
              * coastal tiles (lake)
              */
 
-            ListingStandard.Gap(6f);
+            ListingStandard.GapLine();
 
-            
+
             rect = ListingStandard.GetRect(DefaultElementHeight);
             TooltipHandler.TipRegion(rect, "PLMWTT_IsCoastalTileLakeTooltip".Translate());
             tmpCheckState = _gameData.UserData.ChosenCoastalLakeTileState;
@@ -262,14 +264,90 @@ namespace PrepareLanding
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
-        private void DrawMovementTime()
+        private void DrawMovementDifficulty()
         {
-            DrawEntryHeader($"{"CaravanBaseMovementTime".Translate()} ({Find.ActiveLanguageWorker.Pluralize("PLMW_Hour".Translate())})", false,
-                backgroundColor: ColorFromFilterType(typeof(TileFilterCurrentMovementTimes)));
+            DrawEntryHeader("MovementDifficulty".Translate(), false,
+                backgroundColor: ColorFromFilterType(typeof(TileFilterMovementDifficulty)));
 
-            DrawUsableMinMaxNumericField(_gameData.UserData.CurrentMovementTime, "MovementTimeNow".Translate());
-            DrawUsableMinMaxNumericField(_gameData.UserData.SummerMovementTime, "MovementTimeSummer".Translate());
-            DrawUsableMinMaxNumericField(_gameData.UserData.WinterMovementTime, "MovementTimeWinter".Translate());
+            DrawUsableMinMaxNumericField(_gameData.UserData.MovementDifficulty, "MovementDifficulty".Translate());
+        }
+
+        private void DrawForageability()
+        {
+            DrawEntryHeader($"{"Forageability".Translate()} (%)", false,
+                backgroundColor: ColorFromFilterType(typeof(TileFilterForageability)));
+
+            DrawUsableMinMaxNumericField(_gameData.UserData.Forageability, "Forageability".Translate());
+
+            ListingStandard.GapLine();
+
+            // "Select" button
+            if (ListingStandard.ButtonText("Select Forageable Food"))
+            {
+
+                var floatMenuOptions = new List<FloatMenuOption>();
+
+                // add a dummy 'Any' fake biome type. This sets the chosen biome to null.
+                Action actionClick = delegate { _gameData.UserData.ForagedFood = null; };
+
+                // tool-tip when hovering above the 'Any' biome name on the floating menu
+                Action mouseOverAction = delegate
+                {
+                    var mousePos = Event.current.mousePosition;
+                    var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
+
+                    TooltipHandler.TipRegion(rect, "Any Food");
+                };
+                var menuOption = new FloatMenuOption("PLMW_SelectAny".Translate(), actionClick, MenuOptionPriority.Default, mouseOverAction);
+                floatMenuOptions.Add(menuOption);
+
+                var foragedFoods = _gameData.DefData.ForagedFoodsPerBiome.Values.Where(x => x != null).Distinct().ToList();
+
+                // loop through all known biomes
+                foreach (var foragedFood in foragedFoods)
+                {
+                    Log.Message($"[PL] foragedFood: label: {foragedFood.label}; labelCap: {foragedFood.LabelCap}");
+
+                    // clicking on the floating menu saves the selected biome
+                    actionClick = delegate { _gameData.UserData.ForagedFood = foragedFood; };
+                    // tool-tip when hovering above the biome name on the floating menu
+                    mouseOverAction = delegate
+                    {
+                        var mousePos = Event.current.mousePosition;
+                        var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
+
+                        TooltipHandler.TipRegion(rect, foragedFood.description);
+                    };
+
+                    //create the floating menu
+                    menuOption = new FloatMenuOption(foragedFood.LabelCap, actionClick, MenuOptionPriority.Default,
+                        mouseOverAction);
+                    // add it to the list of floating menu options
+                    floatMenuOptions.Add(menuOption);
+                }
+
+                // create the floating menu
+                var floatMenu = new FloatMenu(floatMenuOptions, "Select Forageable Food");
+
+                // add it to the window stack to display it
+                Find.WindowStack.Add(floatMenu);
+            }
+
+            var currHeightBefore = ListingStandard.CurHeight;
+
+            var rightLabel = _gameData.UserData.ForagedFood != null ? _gameData.UserData.ForagedFood.LabelCap : "Select Any";
+            ListingStandard.LabelDouble("Forageable Food: ", rightLabel);
+
+            var currHeightAfter = ListingStandard.CurHeight;
+
+            // display tool-tip over label
+            if (_gameData.UserData.ForagedFood != null)
+            {
+                var currentRect = ListingStandard.GetRect(0f);
+                currentRect.height = currHeightAfter - currHeightBefore;
+                if (!string.IsNullOrEmpty(_gameData.UserData.ForagedFood.description))
+                    TooltipHandler.TipRegion(currentRect, _gameData.UserData.ForagedFood.description);
+            }
         }
 
         private void DrawRiverTypesSelection()
@@ -478,8 +556,8 @@ namespace PrepareLanding
             {
                 //TODO find a way to raise an event to tell an observer that the list order has changed
                 selectedStoneDefs.ReorderElements(from, to);
-                SoundDefOf.TickHigh.PlayOneShotOnCamera();
-            });
+                SoundDefOf.Tick_High.PlayOneShotOnCamera();
+            }, ReorderableDirection.Vertical);
 
             var maxNumStones = (InRect.height - ListingStandard.CurHeight - DefaultGapLineHeight - DefaultElementHeight - 15f) / DefaultElementHeight;
             var maxHeight = maxNumStones * DefaultElementHeight;

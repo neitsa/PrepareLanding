@@ -1,7 +1,7 @@
-﻿using System;
+﻿using RimWorld.Planet;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
@@ -33,11 +33,6 @@ namespace PrepareLanding.Core.Gui.World
         private const float MaxDistToCameraToDisplayLabel = 60f;
 
         /// <summary>
-        ///     Default material for highlighted tiles.
-        /// </summary>
-        private readonly Material _defaultMaterial = new Material(WorldMaterials.SelectedTile);
-
-        /// <summary>
         ///     Mod filter options.
         /// </summary>
         private readonly FilterOptions _filterOptions;
@@ -47,10 +42,6 @@ namespace PrepareLanding.Core.Gui.World
         /// </summary>
         public readonly List<int> HighlightedTilesIds = new List<int>();
 
-        /// <summary>
-        ///     Default tile highlighting color.
-        /// </summary>
-        private Color _materialHighlightingColor = Color.green;
 
         /// <summary>
         ///     Tile highlighter Constructor.
@@ -59,7 +50,6 @@ namespace PrepareLanding.Core.Gui.World
         public TileHighlighter(FilterOptions filterOptions)
         {
             _filterOptions = filterOptions;
-            _defaultMaterial.color = TileHighlightingColor;
             _filterOptions.PropertyChanged += OnOptionChanged;
 
             PrepareLanding.Instance.EventHandler.WorldAboutToBeGenerated += RemoveAllTiles;
@@ -103,19 +93,6 @@ namespace PrepareLanding.Core.Gui.World
         ///     displayed instead.
         /// </summary>
         public bool ShowDebugTileId { get; set; }
-
-        /// <summary>
-        ///     Get or set the tile highlighting color.
-        /// </summary>
-        public Color TileHighlightingColor
-        {
-            get => _materialHighlightingColor;
-            set
-            {
-                _materialHighlightingColor = value;
-                _defaultMaterial.color = _materialHighlightingColor;
-            }
-        }
 
         /// <summary>
         ///     Get the position of a tile on the screen.

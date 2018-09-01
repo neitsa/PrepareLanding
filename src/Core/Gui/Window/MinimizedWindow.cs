@@ -26,7 +26,7 @@ namespace PrepareLanding.Core.Gui.Window
 
             doCloseX = false;
             doCloseButton = false;
-            closeOnEscapeKey = false;
+            //closeOnEscapeKey = false; // from 0.18
             preventCameraMotion = false;
             absorbInputAroundWindow = false;
             draggable = true;

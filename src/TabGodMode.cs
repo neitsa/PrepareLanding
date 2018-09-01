@@ -122,9 +122,9 @@ namespace PrepareLanding
 
             if (ListingStandard.ButtonText("Set Tile"))
             {
-                if (Find.WorldObjects.AnyFactionBaseAt(tileId))
+                if (Find.WorldObjects.AnySettlementBaseAtOrAdjacent(tileId))
                 {
-                    Messages.Message("You're not allowed to change a faction tile.", MessageTypeDefOf.RejectInput);
+                    Messages.Message("You're not allowed to settle on or near another settlement tile.", MessageTypeDefOf.RejectInput);
                     _gameData.GodModeData.SelectedTileId = -1;
                     return;
                 }
@@ -437,8 +437,8 @@ namespace PrepareLanding
             var reorderableGroup = ReorderableWidget.NewGroup(delegate(int from, int to)
             {
                 orderedStoneDefs.ReorderElements(from, to);
-                SoundDefOf.TickHigh.PlayOneShotOnCamera();
-            });
+                SoundDefOf.Tick_High.PlayOneShotOnCamera();
+            }, ReorderableDirection.Vertical);
 
             var maxNumStones = (InRect.height - ListingStandard.CurHeight - DefaultGapLineHeight -
                                 DefaultElementHeight - 15f) / DefaultElementHeight;

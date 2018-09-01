@@ -65,19 +65,19 @@ namespace PrepareLanding
                     new TileFilterRivers(_userData, nameof(_userData.SelectedRiverDefs), FilterHeaviness.Light)
                 },
                 {
-                    nameof(_userData.CurrentMovementTime),
-                    new TileFilterCurrentMovementTimes(_userData, nameof(_userData.CurrentMovementTime),
+                    nameof(_userData.MovementDifficulty),
+                    new TileFilterMovementDifficulty(_userData, nameof(_userData.MovementDifficulty),
                         FilterHeaviness.Heavy)
                 },
                 {
-                    nameof(_userData.WinterMovementTime),
-                    new TileFilterWinterMovementTimes(_userData, nameof(_userData.WinterMovementTime),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.Forageability),
+                    new TileFilterForageability(_userData, nameof(_userData.Forageability),
+                        FilterHeaviness.Medium)
                 },
                 {
-                    nameof(_userData.SummerMovementTime),
-                    new TileFilterSummerMovementTimes(_userData, nameof(_userData.SummerMovementTime),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.ForagedFood),
+                    new TileFilterForageableFood(_userData, nameof(_userData.ForagedFood),
+                        FilterHeaviness.Light)
                 },
                 {
                     nameof(_userData.SelectedStoneDefs),
@@ -109,17 +109,17 @@ namespace PrepareLanding
                 {
                     nameof(_userData.AverageTemperature),
                     new TileFilterAverageTemperatures(_userData, nameof(_userData.AverageTemperature),
-                        FilterHeaviness.Heavy)
+                        FilterHeaviness.Light)
                 },
                 {
-                    nameof(_userData.WinterTemperature),
-                    new TileFilterWinterTemperatures(_userData, nameof(_userData.WinterTemperature),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.MinTemperature),
+                    new TileFilterMinTemperatures(_userData, nameof(_userData.MinTemperature),
+                        FilterHeaviness.Medium)
                 },
                 {
-                    nameof(_userData.SummerTemperature),
-                    new TileFilterSummerTemperatures(_userData, nameof(_userData.SummerTemperature),
-                        FilterHeaviness.Heavy)
+                    nameof(_userData.MaxTemperature),
+                    new TileFilterMaxTemperatures(_userData, nameof(_userData.MaxTemperature),
+                        FilterHeaviness.Medium)
                 },
                 {
                     nameof(_userData.GrowingPeriod),
@@ -242,7 +242,7 @@ namespace PrepareLanding
                     if (!tile.biome.canAutoChoose)
                         return 0f;
 
-                    return tile.biome.factionBaseSelectionWeight;
+                    return tile.biome.settlementSelectionWeight;
                 }, out var tileId))
                 {
                     if (TileFinder.IsValidTileForNewSettlement(tileId))
@@ -440,15 +440,15 @@ namespace PrepareLanding
 
             // get all tiles with at least one river
             var allTilesWithRivers = _allValidTileIds.FindAll(
-                tileId => Find.World.grid[tileId].VisibleRivers != null &&
-                          Find.World.grid[tileId].VisibleRivers.Count != 0);
+                tileId => Find.World.grid[tileId].Rivers != null &&
+                          Find.World.grid[tileId].Rivers.Count != 0); //TODO 1.0 check if correct
             AllTilesWithRiver = new ReadOnlyCollection<int>(allTilesWithRivers);
             FilterInfoLogger.AppendMessage(string.Format("PLFILT_TilesWithRiver".Translate(), AllTilesWithRiver.Count));
 
             // get all tiles with at least one road
             var allTilesWithRoads =
-                _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].VisibleRoads != null &&
-                                                   Find.World.grid[tileId].VisibleRoads.Count != 0);
+                _allValidTileIds.FindAll(tileId => Find.World.grid[tileId].Roads != null &&
+                                                   Find.World.grid[tileId].Roads.Count != 0); // TODO 1.0 check if correct
 
             AllTilesWithRoad = new ReadOnlyCollection<int>(allTilesWithRoads);
             FilterInfoLogger.AppendMessage(string.Format("PLFILT_TilesWithRoad".Translate(), AllTilesWithRoad.Count));

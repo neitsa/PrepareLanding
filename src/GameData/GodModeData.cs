@@ -188,18 +188,18 @@ namespace PrepareLanding.GameData
             _rainfall = tile.rainfall;
 
             ResetSelectedRoadDefs();
-            if (tile.VisibleRoads != null)
-                foreach (var visibleRoad in tile.VisibleRoads)
+            if (tile.Roads != null)
+                foreach (var roadLink in tile.Roads)
                 {
-                    var roadDef = visibleRoad.road;
+                    var roadDef = roadLink.road;
                     SelectedRoadDefs[roadDef] = true;
                 }
 
             ResetSelectedRiverDefs();
-            if (tile.VisibleRivers != null)
-                foreach (var visibleRiver in tile.VisibleRivers)
+            if (tile.Rivers != null)
+                foreach (var riverLink in tile.Rivers)
                 {
-                    var riverDef = visibleRiver.river;
+                    var riverDef = riverLink.river;
                     SelectedRiverDefs[riverDef] = true;
                 }
 
@@ -310,13 +310,14 @@ namespace PrepareLanding.GameData
             PatchNaturalRockTypesIn.AddTileForStoneReplacement(tileId, newStonesInOrder);
         }
 
+        /*
         private void SetupTileRoads(Tile tile)
         {
             if (!tile.biome.allowRoads)
                 return;
 
-            if (tile.VisibleRoads != null)
-                tile.VisibleRoads.Clear();
+            if (tile.Rivers != null)
+                tile.Roads.Clear();
             else
                 tile.roads = new List<Tile.RoadLink>();
 
@@ -356,7 +357,7 @@ namespace PrepareLanding.GameData
 
                 tile.VisibleRivers.Add(riverLink);
             }
-        }
+        }*/
 
         public void ResetSelectedRoadDefs()
         {

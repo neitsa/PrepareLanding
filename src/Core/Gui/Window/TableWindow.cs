@@ -296,17 +296,27 @@ namespace PrepareLanding.Core.Gui.Window
         {
             DrawEntryHeader("PLTFWTW_TileSpecifications".Translate(), backgroundColor: Color.magenta);
 
+            ListingStandard.Label($"Temperature Scale: {Prefs.TemperatureMode.ToStringHuman()}",
+                tooltip: "The scale in which are displayed all temperatures on this window.");  //TODO: translate
+
             var vectorLongLat = Find.WorldGrid.LongLatOf(_tileId);
             var latitude = vectorLongLat.y;
             var longitude = vectorLongLat.x;
 
             ListingStandard.Label($"{"PLTFWTW_Date".Translate()}: {GenDate.DateReadoutStringAt(_dateTicks, vectorLongLat)}");
             ListingStandard.Label($"{"PLTFWTW_TileId".Translate()}: {_tileId}");
+
             ListingStandard.Label(
                 $"{"PLTFWTW_LatLong".Translate()}: {latitude.ToStringLatitude()} - {longitude.ToStringLongitude()}");
+
             ListingStandard.Label($"{"PLTFWTW_EquatorialDistance".Translate()}: {Find.WorldGrid.DistanceFromEquatorNormalized(_tileId)}");
-            ListingStandard.Label($"{"PLTFWTW_TileAvgTemp".Translate()}: {Find.World.grid[_tileId].temperature} °C");
-            ListingStandard.Label($"{"PLTFWTW_SeasonalShiftAmplitude".Translate()}: {GenTemperature.SeasonalShiftAmplitudeAt(_tileId)} °C");
+
+            var tileTempCelsius = Find.World.grid[_tileId].temperature;
+            ListingStandard.Label(
+                $"{"PLTFWTW_TileAvgTemp".Translate()}: {GenTemperature.CelsiusTo(tileTempCelsius, Prefs.TemperatureMode)} {Prefs.TemperatureMode.ToStringHuman()}");
+
+            var seasonalShiftAmplitudeCelsius = GenTemperature.SeasonalShiftAmplitudeAt(_tileId);
+            ListingStandard.Label($"{"PLTFWTW_SeasonalShiftAmplitude".Translate()}: {GenTemperature.CelsiusTo(seasonalShiftAmplitudeCelsius, Prefs.TemperatureMode)} {Prefs.TemperatureMode.ToStringHuman()}");
         }
 
         protected virtual void DrawEntryHeader(string entryLabel, bool useStartingGap = true,

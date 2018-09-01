@@ -9,6 +9,7 @@ namespace PrepareLanding
     /// <summary>
     ///     Main Mod class.
     /// </summary>
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class PrepareLanding : ModBase
     {
         /// <summary>
@@ -36,9 +37,6 @@ namespace PrepareLanding
 
             TileFilter = new WorldTileFilter(GameData.UserData);
 
-            // instantiate the main window now
-            MainWindow = new MainWindow(GameData);
-
             // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter(filterOptions);
         }
@@ -54,29 +52,27 @@ namespace PrepareLanding
         /// <summary>
         ///     Instance used to keep track of (or override) game ticks.
         /// </summary>
-        public GameTicks GameTicks { get; private set; }
+        public GameTicks GameTicks { get; }
 
         /// <summary>
         ///     The filtering class instance used to filter tiles on the world map.
         /// </summary>
-        public WorldTileFilter TileFilter { get; private set; }
+        public WorldTileFilter TileFilter { get; }
 
         /// <summary>
         ///     Allow highlighting filtered tiles on the world map.
         /// </summary>
-        public TileHighlighter TileHighlighter { get; private set; }
+        public TileHighlighter TileHighlighter { get; }
 
         /// <summary>
         ///     Holds various game data: some are game, user, or world specific.
         /// </summary>
-        public GameData.GameData GameData { get; private set; }
+        public GameData.GameData GameData { get; }
 
         /// <summary>
         ///     The main GUI window instance.
         /// </summary>
         public MainWindow MainWindow { get; set; }
-
-        //TODO see if this can be set to a "private set" rather than a public one
 
         /// <inheritdoc />
         public override string ModIdentifier => "PrepareLanding";

@@ -29,7 +29,6 @@ namespace PrepareLanding
             set => enabled = value;
         }
 
-
         public virtual void Start()
         {
             Log.Message("[PrepareLanding] MonoController Start");

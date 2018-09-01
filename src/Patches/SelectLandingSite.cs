@@ -50,7 +50,7 @@ namespace PrepareLanding.Patches
             var num6 = rect.xMin + 10f;
             var num7 = rect.yMin + 10f;
             Text.Font = GameFont.Small;
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Back".Translate()))
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Back".Translate()) && CanDoBack())
             {
                 if (CanDoBack())
                 {
@@ -101,6 +101,8 @@ namespace PrepareLanding.Patches
 
             #region INSERTED_CODE
 
+            /* ADDED CODE */
+
             if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Prepare Landing"))
             {
                 Log.Message("[PrepareLanding] Page button pressed!");
@@ -113,12 +115,12 @@ namespace PrepareLanding.Patches
             }
             num6 += BottomButSize.x + 10f;
 
+            /* END ADDED CODE*/
+
             #endregion INSERTED_CODE
 
-            /* end of inserted code */
 
-
-            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()))
+            if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()) && CanDoNext())
             {
                 if (CanDoNext())
                 {
