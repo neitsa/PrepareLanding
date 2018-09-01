@@ -10,9 +10,11 @@ namespace PrepareLanding.Patches
         public static event Action WorldAboutToBeGenerated = delegate { };
 
         [HarmonyPrefix]
-        public static void GenerateWorldPrefix()
+        public static bool GenerateWorldPrefix()
         {
             WorldAboutToBeGenerated?.Invoke();
+
+            return true;
         }
 
         public static event Action WorldGenerated = delegate { };
