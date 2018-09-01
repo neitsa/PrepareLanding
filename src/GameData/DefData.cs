@@ -132,7 +132,7 @@ namespace PrepareLanding.GameData
 
                 if (biomeDef.implemented)
                     currentBiomeDef = biomeDef;
-                else if (!biomeDef.implemented && allowUnimplemented)
+                else if (allowUnimplemented)
                     currentBiomeDef = biomeDef;
 
                 if (biomeDef.canBuildBase)
@@ -140,12 +140,12 @@ namespace PrepareLanding.GameData
                     if (!biomeDefsList.Contains(biomeDef))
                         currentBiomeDef = biomeDef;
                 }
-                else if (!biomeDef.canBuildBase && allowCantBuildBase)
+                else if (allowCantBuildBase)
                 {
                     if (!biomeDefsList.Contains(biomeDef))
                         currentBiomeDef = biomeDef;
                 }
-                else if (!biomeDef.canBuildBase && !allowCantBuildBase)
+                else if (!allowCantBuildBase)
                 {
                     if (biomeDefsList.Contains(biomeDef))
                         biomeDefsList.Remove(biomeDef);
