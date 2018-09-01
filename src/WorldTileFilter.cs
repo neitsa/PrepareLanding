@@ -242,7 +242,7 @@ namespace PrepareLanding
                     if (!tile.biome.canAutoChoose)
                         return 0f;
 
-                    return tile.biome.factionBaseSelectionWeight;
+                    return tile.biome.settlementSelectionWeight;
                 }, out var tileId))
                 {
                     if (TileFinder.IsValidTileForNewSettlement(tileId))
