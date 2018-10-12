@@ -238,15 +238,19 @@ namespace PrepareLanding
         {
             DrawEntryHeader("Temperature", backgroundColor: ColorLibrary.RoyalPurple);
 
+            // min and max possible temperatures, in C/F/K (depending on user preferences).
+            // note that TemperatureTuning temps are in Celsius.
+            var tempMinUnit = GenTemperature.CelsiusTo(TemperatureTuning.MinimumTemperature, Prefs.TemperatureMode);
+            var tempMaxUnit = GenTemperature.CelsiusTo(TemperatureTuning.MaximumTemperature, Prefs.TemperatureMode);
+
             var averageTemperature = _gameData.GodModeData.AverageTemperature;
             _chosenAverageTemperatureString = averageTemperature.ToString("F1", CultureInfo.InvariantCulture);
 
-            var temperatureRectSpace = ListingStandard.GetRect(DefaultElementHeight);
+            var temperatureRectSpace = ListingStandard.GetRect(DefaultElementHeight * 1.25f);
             Widgets.Label(temperatureRectSpace.LeftPart(0.8f),
-                $"Avg. Temp. (°C) [{TemperatureTuning.MinimumTemperature}, {TemperatureTuning.MaximumTemperature}]");
+                $"{"AvgTemp".Translate()} (°{Prefs.TemperatureMode.ToStringHuman()})\n[{tempMinUnit}, {tempMaxUnit}]");
             Widgets.TextFieldNumeric(temperatureRectSpace.RightPart(0.2f), ref averageTemperature,
-                ref _chosenAverageTemperatureString, TemperatureTuning.MinimumTemperature,
-                TemperatureTuning.MaximumTemperature);
+                ref _chosenAverageTemperatureString, tempMinUnit, tempMaxUnit);
 
             _gameData.GodModeData.AverageTemperature = averageTemperature;
         }
@@ -257,7 +261,7 @@ namespace PrepareLanding
 
             // min is obviously 0; max is defined in RimWorld.Planet.WorldGenStep_Terrain.RainfallFinishFallAltitude
             const float minRainfall = 0f;
-            const float maxRainfall = 5000f;
+            const float maxRainfall = 6000f;
 
             var rainFall = _gameData.GodModeData.Rainfall;
             _chosenRainfallString = rainFall.ToString("F1", CultureInfo.InvariantCulture);
