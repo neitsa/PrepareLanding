@@ -10,7 +10,7 @@
   #---------------------------------#
 
   # version format (you need to bump it when changing version)
-  version: 0.9.0-{build}-{branch}
+  version: 0.9.1-{build}-{branch}
 
   # branches
   branches:
@@ -99,7 +99,7 @@
     #
     #- cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib/releases/download/v3.1.2/HugsLib_3.1.2.zip --download_path %DOWNLOAD_FOLDER%
     #- cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
-    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_b19.7z --download_path %DOWNLOAD_FOLDER%
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_1.7z --download_path %DOWNLOAD_FOLDER%
     - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -p%DLL_ARCH_PASS% -e *.dll
     - cmd: dir %LIBS_FOLDER%
 
