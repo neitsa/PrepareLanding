@@ -11,7 +11,7 @@ namespace PrepareLanding.Patches
     ///     This class is used in replacement of the RimWorld.Page_SelectLandingSite. We patch GetFirstConfigPage() to use our
     ///     class rather than the RimWorld one.
     /// </summary>
-    public class SelectLandingSite : Page_SelectLandingSite
+    public class SelectLandingSite : Page_SelectStartingSite
     {
         public override void ExtraOnGUI()
         {
@@ -52,25 +52,22 @@ namespace PrepareLanding.Patches
             Text.Font = GameFont.Small;
             if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Back".Translate()) && CanDoBack())
             {
-                if (CanDoBack())
+                /* ADDED CODE */
+
+                #region INSERTED_CODE
+
+                // make sure the prepare landing window (or its minimized window) is closed when we go back
+                if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
                 {
-                    /* ADDED CODE */
-
-                    #region INSERTED_CODE
-
-                    // make sure the prepare landing window (or its minimized window) is closed when we go back
-                    if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
-                    {
-                        if (PrepareLanding.Instance.MainWindow != null)
-                            PrepareLanding.Instance.MainWindow.ForceClose();
-                    }
-
-                    #endregion
-
-                    /* END ADDED CODE*/
-
-                    DoBack();
+                    if (PrepareLanding.Instance.MainWindow != null)
+                        PrepareLanding.Instance.MainWindow.ForceClose();
                 }
+
+                #endregion
+
+                /* END ADDED CODE*/
+
+                DoBack();
             }
             num6 += BottomButSize.x + 10f;
             if (!TutorSystem.TutorialMode)
@@ -122,25 +119,22 @@ namespace PrepareLanding.Patches
 
             if (Widgets.ButtonText(new Rect(num6, num7, BottomButSize.x, BottomButSize.y), "Next".Translate()) && CanDoNext())
             {
-                if (CanDoNext())
+                /* ADDED CODE */
+                #region INSERTED_CODE
+
+                // make sure the prepare landing window (or its minimized window) is closed when we go to the next window / game stage
+                if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
                 {
-                    /* ADDED CODE */
-                    #region INSERTED_CODE
-
-                    // make sure the prepare landing window (or its minimized window) is closed when we go to the next window / game stage
-                    if (Find.WindowStack.IsOpen<MainWindow>() || Find.WindowStack.IsOpen<MinimizedWindow>())
-                    {
-                        if (PrepareLanding.Instance.MainWindow != null)
-                            PrepareLanding.Instance.MainWindow.ForceClose();
-                    }
-
-                    #endregion
-                    /* END ADDED CODE*/
-
-                    DoNext();
+                    if (PrepareLanding.Instance.MainWindow != null)
+                        PrepareLanding.Instance.MainWindow.ForceClose();
                 }
+
+                #endregion
+                /* END ADDED CODE*/
+
+                DoNext();
             }
-            //num6 += BottomButSize.x + 10f;
+            num6 += BottomButSize.x + 10f;
             GenUI.AbsorbClicksInRect(rect);
         }
     }
