@@ -381,10 +381,10 @@ namespace PrepareLanding
              The rainfall for a tile is set in RimWorld.Planet.WorldGenStep_Terrain.GenerateTileFor(int)
              It is calculated from the noiseRainFall which is set in RimWorld.Planet.WorldGenStep_Terrain.SetupRainfallNoise()
              So it is dependent on multiple curves ("modules" in RimWorld). The calculation there is too difficult to follow
-             statically. From the issue #33, my guess is it can't more than 6000 but this is just a wild guess.
+             statically. From the issue #33, my guess is it can't more than 10000 but this is just a wild guess.
              */
             const float rainfallMin = 0f;
-            const float rainfallMax = 6000f;
+            const float rainfallMax = 10000f;
 
             DrawEntryHeader($"{"Rainfall".Translate()} ({"PLMWT2T_RainfallMillimeters".Translate()}) [{rainfallMin}, {rainfallMax}]",
                 backgroundColor: ColorFromFilterType(typeof(TileFilterRainFalls)));
