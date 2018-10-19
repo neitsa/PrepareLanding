@@ -24,6 +24,7 @@ namespace PrepareLanding
 
         private readonly List<ButtonDescriptor> _bottomButtonsDescriptorList;
         private readonly Vector2 _bottomButtonSize = new Vector2(110f, 40f);
+        private readonly Vector2 _bottomButtonSizeLowRes = new Vector2(110f, 25f);
         private readonly List<ButtonDescriptor> _minimizedWindowButtonsDescriptorList;
 
         private readonly List<ITabGuiUtility> _tabGuiUtilities = new List<ITabGuiUtility>();
@@ -278,10 +279,24 @@ namespace PrepareLanding
         {
             var numButtons = _bottomButtonsDescriptorList.Count;
 
-            var buttonsY = windowRect.height - SpaceForBottomButtons;
+            // fix #32; bottom buttons are not visible when resolution is 1280 (w) * 720 (h).
+            // I can't do better than that without reshaping the whole GUI.
+            //Log.ErrorOnce($"[PL] Height: {UI.screenHeight}; Width {UI.screenWidth}", 0x1beef);
+            float buttonsY;
+            Vector2 bottomButtonSize;
+            if (UI.screenHeight <= 720)
+            {
+                buttonsY = windowRect.height - (SpaceForBottomButtons + 16f); ; // make buttons a little bit higher
+                bottomButtonSize = _bottomButtonSizeLowRes; // thinner buttons
+            }
+            else
+            {
+                buttonsY = windowRect.height - SpaceForBottomButtons;
+                bottomButtonSize = _bottomButtonSize;
+            }
 
-            var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, _bottomButtonSize.x,
-                _bottomButtonSize.y, GapBetweenButtons);
+            var buttonsRect = inRect.SpaceEvenlyFromCenter(buttonsY, numButtons, bottomButtonSize.x,
+                bottomButtonSize.y, GapBetweenButtons);
             if (buttonsRect.Count != numButtons)
             {
                 Log.ErrorOnce(

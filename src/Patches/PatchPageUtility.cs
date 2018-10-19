@@ -33,7 +33,7 @@ namespace PrepareLanding.Patches
                 if (currentPage == null)
                     break;
 
-                if (currentPage.GetType() == typeof(Page_SelectLandingSite))
+                if (currentPage.GetType() == typeof(Page_SelectStartingSite))
                 {
                     Log.Message("[PrepareLanding] [postfix] Found Page_SelectLandingSite.");
                     foundRequiredPage = true;
