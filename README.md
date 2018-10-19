@@ -1,7 +1,7 @@
 | Type  | Value |
 | :---: | :---: |
 | Build Status  | [![Build status](https://ci.appveyor.com/api/projects/status/0t0v36hpor8l68l5?svg=true)](https://ci.appveyor.com/project/neitsa/preparelanding) |
-| RimWorld Version | ![RimWorld Version Beta 19](https://img.shields.io/badge/RimWorld-Beta%2019-brightgreen.svg) |
+| RimWorld Version | ![RimWorld Version 1.0 Stable](https://img.shields.io/badge/RimWorld%201.0%20Stable-brightgreen.svg) |
 
 PrepareLanding
 ==============
@@ -10,14 +10,14 @@ PrepareLanding
 
 As of version 0.5 you can also change some of the tiles characteristics (a.k.a `God Mode`).
 
-Current RimWorld version supported: ![RimWorld Version Beta 19](https://img.shields.io/badge/RimWorld-Beta%2019-brightgreen.svg)
+Current RimWorld version supported: ![RimWorld Version 1.0 Stable](https://img.shields.io/badge/RimWorld%201.0%20Stable-brightgreen.svg)
 
 Installation
 ------------
 
 [Download Here](https://github.com/neitsa/PrepareLanding/releases/latest) on Github.
-Releases deemed stable are numbered and without any suffix (e.g. `0.9.0`).
-Development releases are postfixed with `develop` (e.g. `PrepareLanding-0.8.9-develop`).
+Releases deemed stable are numbered and without any suffix (e.g. `0.9.2`).
+Development releases are postfixed with `develop` (e.g. `PrepareLanding-0.9.1-develop`).
 
 Documentation
 -------------
