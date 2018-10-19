@@ -1,3 +1,29 @@
+# Preview 0.9.2
+**Released October 19, 2018**
+**`RimWorld Version: 1.0`**
+
+# General
+
+What's New?
+===========
+
+* PrepareLanding is now compatible with Rimworld 1.0 (1.0.6864.30166)
+
+* Fixed hard limit on rainfall filter (bug #33 - reported by @serenewaffles)
+    - Max value is now 10000 mm.
+
+* Fixed bottom buttons not visible on low resolution <= 1280 * 720 (bug #32 - reported by Bernie Laplante)
+
+* Fixed god mode Window temperature mode
+    - It now follows user preference for temperature (Celsius / Fahrenheit / Kelvin)
+
+* Use of the updated Harmony and HugsLib libraries.
+
+## Internal Changes
+
+* Added `Manifest.xml` for ModManager support.
+
+
 ***
 
 # Version 0.9.0
