@@ -4,7 +4,13 @@
 	<KeyBindingDef>
 		<category>PrepareLandingShortcuts</category>
 		<defName>CoordinatesWindow</defName>
-		<label>Display or hide coordinates Window (Ctrl)</label>
+		<label>Display or hide coordinates Window (+ Ctrl)</label>
 		<defaultKeyCodeA>M</defaultKeyCodeA>
+	</KeyBindingDef>
+	<KeyBindingDef>
+		<category>PrepareLandingShortcuts</category>
+		<defName>PrepareLandingWindow</defName>
+		<label>Display Main Window on World Map (+ Ctrl)</label>
+		<defaultKeyCodeA>P</defaultKeyCodeA>
 	</KeyBindingDef>
 </Defs>

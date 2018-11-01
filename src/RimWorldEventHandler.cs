@@ -142,6 +142,20 @@ namespace PrepareLanding
                     Find.WindowStack.Add(coordinatesWindows);
                 }
             }
+
+            // main window
+            if (KeyBindings.PrepareLandingWindow.JustPressed && KeysUtils.IsControlPressedAndHeld)
+            {
+                // don't add a new window if the window is already there; if it's not create a new one.
+                if (PrepareLanding.Instance.MainWindow == null)
+                    PrepareLanding.Instance.MainWindow = new MainWindow(PrepareLanding.Instance.GameData);
+
+                if (!Find.WindowStack.IsOpen(PrepareLanding.Instance.MainWindow))
+                {
+                    Find.WindowStack.Add(PrepareLanding.Instance.MainWindow);
+                }
+            }
+
         }
     }
 }

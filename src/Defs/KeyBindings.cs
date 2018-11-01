@@ -8,6 +8,8 @@ namespace PrepareLanding.Defs
     public static class KeyBindings
     {
         public static KeyBindingDef CoordinatesWindow;
+
+        public static KeyBindingDef PrepareLandingWindow; // only when going to the world map from the game
     }
 
     public static class KeysUtils
