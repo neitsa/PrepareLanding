@@ -12,8 +12,7 @@ namespace PrepareLanding.Defs
     {
         public override void Activate()
         {
-
-            // default behavior
+            // default behavior (go to the world map)
             base.Activate();
 
             // do not show the main window if in tutorial mode
@@ -23,6 +22,10 @@ namespace PrepareLanding.Defs
                     "[PrepareLanding] MainButtonWorkerToggleWorld: Tutorial mode detected: not showing main window.");
                 return;
             }
+
+            // don't add a new window if the window is already there; if it's not create a new one.
+            if (PrepareLanding.Instance.MainWindow == null)
+                PrepareLanding.Instance.MainWindow = new MainWindow(PrepareLanding.Instance.GameData);
 
             // show the main window, minimized.
             PrepareLanding.Instance.MainWindow.Show(true);

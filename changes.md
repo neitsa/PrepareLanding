@@ -1,4 +1,29 @@
-# Preview 0.9.2
+# Version 0.9.3
+**Released November 1, 2018**
+**`RimWorld Version: 1.0`**
+
+# General
+
+What's New?
+===========
+
+* Added clickable list of tiles for world records (see "info" tab on the main Prepare Landing window).
+
+* Added a shortcut (`CTRL+P`) to force the display of the main windows on the world map.
+    - shortcut is configurable in the `options` > `keyboard configuration` > `Prepare Landing` menu.
+
+* Fixed NRE when going to the world map if no previous instance of Prepare Landing Main window had been already 
+ instantiated.
+
+* Fixed hard limit on rainfall for GodMode (follow-up of bug #33)
+    - Max value is now 7000 mm.
+
+* Fixed typo for in ModManager XML.
+
+
+***
+
+# Version 0.9.2
 **Released October 19, 2018**
 **`RimWorld Version: 1.0`**
 

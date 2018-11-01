@@ -261,7 +261,7 @@ namespace PrepareLanding
 
             // min is obviously 0; max is defined in RimWorld.Planet.WorldGenStep_Terrain.RainfallFinishFallAltitude
             const float minRainfall = 0f;
-            const float maxRainfall = 6000f;
+            const float maxRainfall = 7000f;
 
             var rainFall = _gameData.GodModeData.Rainfall;
             _chosenRainfallString = rainFall.ToString("F1", CultureInfo.InvariantCulture);

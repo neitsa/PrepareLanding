@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 using PrepareLanding.Core.Extensions;
+using PrepareLanding.Core.Gui;
 using PrepareLanding.Core.Gui.Tab;
 using UnityEngine;
 using Verse;
@@ -15,9 +16,9 @@ namespace PrepareLanding
         private Vector2 _scrollPosFilterInfo;
         private Vector2 _scrollPosWorldInfo;
         private Vector2 _scrollPosWorldRecords;
+        private int _worldRecordSelectedTileIndex = -1;
 
         private string _worldInfo;
-        private string _worldRecords;
 
         public TabInfo(GameData.GameData gameData, float columnSizePercent = 0.25f) :
             base(columnSizePercent)
@@ -52,8 +53,6 @@ namespace PrepareLanding
 
         private string WorldInfo => _worldInfo ?? (_worldInfo = BuildWorldInfo());
 
-        private string WolrdRecords => _worldRecords ?? (_worldRecords = BuildWorldRecords());
-
         private string BuildWorldInfo()
         {
             var stringBuilder = new StringBuilder();
@@ -86,45 +85,6 @@ namespace PrepareLanding
                 var count = _gameData.WorldData.NumberOfTilesByBiome[biome];
                 stringBuilder.AppendLine($"        - {"PLMWINF_NumberOfTiles".Translate()} ➠ {count}");
                 stringBuilder.AppendLine($"        - {"AverageDiseaseFrequency".Translate()} ➠ {(RimWorld.GenDate.DaysPerYear / biome.diseaseMtbDays):F1} {"PerYear".Translate()}");
-            }
-
-            return stringBuilder.ToString();
-        }
-
-        private string BuildWorldRecords()
-        {
-            /*
-             * Highest / lowest value for all characteristics.
-             */
-             var stringBuilder = new StringBuilder();
-
-            if (_gameData.WorldData.WorldCharacteristics == null || _gameData.WorldData.WorldCharacteristics.Count == 0)
-            {
-                Log.Error("[PrepareLanding] TabInfo.BuildWorldRecords: No Info");
-                return "No info";
-            }
-           
-
-            foreach (var characteristicData in _gameData.WorldData.WorldCharacteristics)
-            {
-                var characteristicName = characteristicData.CharacteristicName;
-                stringBuilder.AppendLine(characteristicName);
-
-                if (characteristicData.WorldTilesCharacteristics.Count == 0)
-                {
-                    stringBuilder.AppendLine("\tNo Info [DisableWorldData enabled]");
-                    continue;
-                }
-
-                var lowestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.First();
-                var vectorLongLat = Find.WorldGrid.LongLatOf(lowestCharacteristicKvp.Key);
-                stringBuilder.AppendLine(
-                    $"\t{"PLMWINF_WorldLowest".Translate()} {characteristicName}: {lowestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
-
-                var highestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.Last();
-                vectorLongLat = Find.WorldGrid.LongLatOf(highestCharacteristicKvp.Key);
-                stringBuilder.AppendLine(
-                    $"\t{"PLMWINF_WorldHighest".Translate()} {characteristicName}: {highestCharacteristicKvp.Value:F1} {characteristicData.CharacteristicMeasureUnit}\n\t    ➠ [tile: {highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]");
             }
 
             return stringBuilder.ToString();
@@ -171,12 +131,104 @@ namespace PrepareLanding
 
         private void DrawWorldRecord()
         {
-            var currHeight = DrawEntryHeader("PLMWINF_WorldRecords".Translate(), backgroundColor: Color.yellow);
+            DrawEntryHeader("PLMWINF_WorldRecords".Translate(), backgroundColor: Color.yellow);
 
-            var maxOuterRectHeight = currHeight - MainWindow.SpaceForBottomButtons - DefaultElementHeight;
+            if (_gameData.WorldData.WorldCharacteristics == null || _gameData.WorldData.WorldCharacteristics.Count == 0)
+            {
+                //Log.Error("[PrepareLanding] TabInfo.BuildWorldRecords: No Info");
+                return;
+            }
 
-            ListingStandard.ScrollableTextArea(maxOuterRectHeight, WolrdRecords, ref _scrollPosWorldRecords, _styleWorldInfo,
-                DefaultScrollableViewShrinkWidth);
+            // default line height
+            const float gapLineHeight = 4f;
+
+            // add a gap before the scroll view
+            ListingStandard.Gap(gapLineHeight);
+
+            /*
+             * Calculate heights
+             */
+
+            // height of the scrollable outer Rect (visible portion of the scroll view, not the 'virtual' one)
+            var maxScrollViewOuterHeight = InRect.height - ListingStandard.CurHeight - DefaultElementHeight;
+
+            // height of the 'virtual' portion of the scroll view
+            var numElements = _gameData.WorldData.WorldCharacteristics.Count * 3; // 1 label + 2 elements  (highest + lowest) = 3
+            var scrollableViewHeight = (numElements * DefaultElementHeight) + (_gameData.WorldData.WorldCharacteristics.Count * gapLineHeight);
+
+            /*
+             * Scroll view
+             */
+            var innerLs = ListingStandard.BeginScrollView(maxScrollViewOuterHeight, scrollableViewHeight,
+                ref _scrollPosWorldRecords, 16f);
+
+            var selectedTileIndex = 0;
+            foreach (var characteristicData in _gameData.WorldData.WorldCharacteristics)
+            {
+                var characteristicName = characteristicData.CharacteristicName;
+                innerLs.Label(RichText.Bold(RichText.Color($"{characteristicName}:", Color.cyan)));
+
+                // there might be no characteristics
+                if (characteristicData.WorldTilesCharacteristics.Count == 0)
+                {
+                    innerLs.Label("No Info [DisableWorldData enabled]");
+                    continue;
+                }
+
+                /*
+                 *   lowest
+                 */
+
+                var lowestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.First();
+
+                // we need to follow user preference for temperature.
+                var value = characteristicData.Characteristic == MostLeastCharacteristic.Temperature ? 
+                    GenTemperature.CelsiusTo(lowestCharacteristicKvp.Value, Prefs.TemperatureMode) : lowestCharacteristicKvp.Value;
+
+                var vectorLongLat = Find.WorldGrid.LongLatOf(lowestCharacteristicKvp.Key);
+                var textLowest = $"{"PLMWINF_WorldLowest".Translate()} {characteristicName}: {value:F1} {characteristicData.CharacteristicMeasureUnit} [{lowestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]";
+
+                var labelRect = innerLs.GetRect(DefaultElementHeight);
+                var selected = selectedTileIndex == _worldRecordSelectedTileIndex;
+                if (Core.Gui.Widgets.LabelSelectable(labelRect, textLowest, ref selected, TextAnchor.MiddleLeft))
+                {
+                    // go to the location of the selected tile
+                    _worldRecordSelectedTileIndex = selectedTileIndex;
+                    Find.WorldInterface.SelectedTile = lowestCharacteristicKvp.Key;
+                    Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
+                }
+
+                selectedTileIndex++;
+
+                /*
+                 *   highest
+                 */
+
+                var highestCharacteristicKvp = characteristicData.WorldTilesCharacteristics.Last();
+                // we need to follow user preference for temperature.
+                value = characteristicData.Characteristic == MostLeastCharacteristic.Temperature ?
+                    GenTemperature.CelsiusTo(highestCharacteristicKvp.Value, Prefs.TemperatureMode) : highestCharacteristicKvp.Value;
+
+                vectorLongLat = Find.WorldGrid.LongLatOf(highestCharacteristicKvp.Key);
+                var textHighest = $"{"PLMWINF_WorldHighest".Translate()} {characteristicName}: {value:F1} {characteristicData.CharacteristicMeasureUnit} [{highestCharacteristicKvp.Key}; {vectorLongLat.y.ToStringLatitude()} - {vectorLongLat.x.ToStringLongitude()}]";
+
+                labelRect = innerLs.GetRect(DefaultElementHeight);
+                selected = selectedTileIndex == _worldRecordSelectedTileIndex;
+                if (Core.Gui.Widgets.LabelSelectable(labelRect, textHighest, ref selected, TextAnchor.MiddleLeft))
+                {
+                    // go to the location of the selected tile
+                    _worldRecordSelectedTileIndex = selectedTileIndex;
+                    Find.WorldInterface.SelectedTile = highestCharacteristicKvp.Key;
+                    Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
+                }
+
+                selectedTileIndex++;
+
+                // add a thin line between each label
+                innerLs.GapLine(gapLineHeight);
+            }
+
+            ListingStandard.EndScrollView(innerLs);
         }
 
         /// <summary>
@@ -185,7 +237,6 @@ namespace PrepareLanding
         private void RebuildWorldInfo()
         {
             _worldInfo = BuildWorldInfo();
-            _worldRecords = BuildWorldRecords();
         }
     }
 }
