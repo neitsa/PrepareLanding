@@ -108,6 +108,7 @@
     <Compile Include="src\Overlays\Overlay.cs" />
     <Compile Include="src\Overlays\TemperatureOverlay.cs" />
     <Compile Include="src\Overlays\WorldLayerTemperature.cs" />
+    <Compile Include="src\Patches\CreateWorldParams.cs" />
     <Compile Include="src\Patches\PatchGenerateGridIntoWorld.cs" />
     <Compile Include="src\Patches\PatchGenerateWorld.cs" />
     <Compile Include="src\Patches\PatchNaturalRockTypesIn.cs" />

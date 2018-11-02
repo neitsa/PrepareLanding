@@ -20,8 +20,14 @@ namespace PrepareLanding
 
             DisableWorldData = _settingsPack.GetHandle("DisableWorldData", "PLGOPT_DisableWorldDataTitle".Translate(),
                 "PLGOPT_DisableWorldDataDescription".Translate(), false);
+
+            DisablePreciseWorldGenPercentage = _settingsPack.GetHandle("DisablePreciseWorldGenPercentage",
+                "Disable Precise World Gen. %",
+                "Disable Precise World Generation Percentage on the Create World parameter page.", false);
         }
 
         public SettingHandle<bool> DisableWorldData { get; private set; }
+
+        public SettingHandle<bool> DisablePreciseWorldGenPercentage { get; private set; }
     }
 }
