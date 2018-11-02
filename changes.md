@@ -1,3 +1,24 @@
+# Version 0.9.4
+**Released November 2, 2018**
+**`RimWorld Version: 1.0`**
+
+# General
+
+What's New?
+===========
+
+* Integrate `Precise World Generation Percentage` in Prepare Landing. This allows users to fine tune (between 1 and 
+100%) the world generation percentage in the Create World page.
+    - If you don't like this feature you can easily disable it. For this, go to:
+        - `Options` > `Mod Settings` > `Prepare Landing` and then check `Disable Precise World Gen. %`.
+    - Be wary that worlds generated with 3% or below coverage might not have settleable tiles.
+
+* Fixed RimWorld minor version in ModManager XML.
+
+
+***
+
+
 # Version 0.9.3
 **Released November 1, 2018**
 **`RimWorld Version: 1.0`**
