@@ -260,7 +260,7 @@ namespace PrepareLanding
             // note: RimWorld logs an error when .GetLabelCap() is used on Hilliness.Undefined
             var rightLabel = _gameData.UserData.ChosenHilliness != Hilliness.Undefined
                 ? _gameData.UserData.ChosenHilliness.GetLabelCap()
-                : "PLMW_SelectAny".Translate();
+                : (string)"PLMW_SelectAny".Translate();
             ListingStandard.LabelDouble($"{"Terrain".Translate()}:", rightLabel);
         }
 
@@ -335,7 +335,7 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _gameData.UserData.ForagedFood != null ? _gameData.UserData.ForagedFood.LabelCap : "Select Any";
+            var rightLabel = _gameData.UserData.ForagedFood != null ? (string)_gameData.UserData.ForagedFood.LabelCap : "Select Any";
             ListingStandard.LabelDouble("Forageable Food: ", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;

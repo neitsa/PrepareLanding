@@ -172,8 +172,9 @@ namespace PrepareLanding.Patches
             LongEventHandler.QueueLongEvent(delegate
             {
                 Find.GameInitData.ResetWorldRelatedMapInitData();
+                //TODO: add OverallPopulation to filters
                 Current.Game.World =
-                    WorldGenerator.GenerateWorld(_planetCoverage, _seedString, _rainfall, _temperature);
+                    WorldGenerator.GenerateWorld(_planetCoverage, _seedString, _rainfall, _temperature, OverallPopulation.Normal);
                 LongEventHandler.ExecuteWhenFinished(delegate
                 {
                     if (next != null) Find.WindowStack.Add(next);
