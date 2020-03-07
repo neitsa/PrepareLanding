@@ -13,7 +13,6 @@ tools/*.exe
 
 # ignore required project dependencies
 libs/*
-libs/*
 !libs/*.md
 # ==============================================================================
 # Python / JetBrains PyCharm
