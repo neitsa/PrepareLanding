@@ -3,10 +3,14 @@
 	<name>Prepare Landing</name>
 	<author>neitsa</author>
 	<url>https://github.com/neitsa/PrepareLanding</url>
-	<targetVersion>1.0.2059</targetVersion>
+    <supportedVersions>
+      <li>1.0</li>
+      <li>1.1</li>
+    </supportedVersions>
+   <packageId>neitsa.preparelanding</packageId>
 	<description>Prepare your landing by picking the right tile on the world map!
-You can also change tile characteristics to your liking.	
+You can also change tile characteristics to your liking.
 
-[Version 0.9.4.0]
+[Version 1.0.0.0]
 	</description>
 </ModMetaData>
