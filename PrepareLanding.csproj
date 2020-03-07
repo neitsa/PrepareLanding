@@ -112,6 +112,7 @@
     <Compile Include="src\Patches\PatchGenerateGridIntoWorld.cs" />
     <Compile Include="src\Patches\PatchGenerateWorld.cs" />
     <Compile Include="src\Patches\PatchNaturalRockTypesIn.cs" />
+    <Compile Include="src\Patches\PatchPageCreateWorldParams.cs" />
     <Compile Include="src\Patches\PatchPageUtility.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
     <Compile Include="src\Patches\SelectLandingSite.cs" />

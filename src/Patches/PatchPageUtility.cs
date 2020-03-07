@@ -37,11 +37,13 @@ namespace PrepareLanding.Patches
             };
 
             // if precise world generation is not disabled, then we'll patch Page_CreateWorldParams with our own class.
+            /*
             if (!PrepareLanding.Instance.GameOptions.DisablePreciseWorldGenPercentage)
             {
                 dictPageTypes.Add(typeof(Page_CreateWorldParams), new CreateWorldParams());
                 dictFoundPagesTypes.Add(typeof(Page_CreateWorldParams), false);
             }
+            */
 
             var page = __result;
             while (true)
