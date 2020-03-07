@@ -31,6 +31,8 @@ namespace PrepareLanding.Patches
 
         private OverallTemperature _temperature;
 
+        private OverallPopulation _population;
+
         public override string PageTitle => "CreateWorld".Translate();
 
         public override void PreOpen()
@@ -83,6 +85,11 @@ namespace PrepareLanding.Patches
             }
 
             num += 40f;
+
+            /*
+             * Our own planet coverage
+             */
+
             Text.Font = GameFont.Tiny;
             var textAnchorBackup = Text.Anchor;
             Text.Anchor = TextAnchor.MiddleCenter;
@@ -94,24 +101,34 @@ namespace PrepareLanding.Patches
             Widgets.Label(new Rect(0f, num, 200f, 30f), $"{"PlanetCoverage".Translate()} [1,100]%");
             var rect4 = new Rect(200f, num, 200f, 30f);
 
-            //
             TextFieldNumericCoverage(rect4.LeftHalf());
             ButtonCoverage(rect4.RightHalf());
-            //
+
+            // end of specific private code
 
             TooltipHandler.TipRegion(new Rect(0f, num, rect4.xMax, rect4.height), "PlanetCoverageTip".Translate());
+
             num += 40f;
             Widgets.Label(new Rect(0f, num, 200f, 30f), "PlanetRainfall".Translate());
             var rect5 = new Rect(200f, num, 200f, 30f);
             _rainfall = (OverallRainfall) Mathf.RoundToInt(Widgets.HorizontalSlider(rect5, (float) _rainfall, 0f,
                 OverallRainfallUtility.EnumValuesCount - 1, true, "PlanetRainfall_Normal".Translate(),
                 "PlanetRainfall_Low".Translate(), "PlanetRainfall_High".Translate(), 1f));
+
             num += 40f;
             Widgets.Label(new Rect(0f, num, 200f, 30f), "PlanetTemperature".Translate());
             var rect6 = new Rect(200f, num, 200f, 30f);
             _temperature = (OverallTemperature) Mathf.RoundToInt(Widgets.HorizontalSlider(rect6, (float) _temperature,
                 0f, OverallTemperatureUtility.EnumValuesCount - 1, true, "PlanetTemperature_Normal".Translate(),
                 "PlanetTemperature_Low".Translate(), "PlanetTemperature_High".Translate(), 1f));
+
+            num += 40f;
+            Widgets.Label(new Rect(0f, num, 200f, 30f), "PlanetPopulation".Translate());
+            var rect7 = new Rect(200f, num, 200f, 30f);
+            _population = (OverallPopulation)Mathf.RoundToInt(Widgets.HorizontalSlider(rect7, (float)_population, 0f, 
+                (float)(OverallPopulationUtility.EnumValuesCount - 1), true, "PlanetPopulation_Normal".Translate(), 
+                "PlanetPopulation_Low".Translate(), "PlanetPopulation_High".Translate(), 1f));
+
             GUI.EndGroup();
             DoBottomButtons(rect, "WorldGenerate".Translate(), "Reset".Translate(), Reset);
         }
@@ -172,9 +189,9 @@ namespace PrepareLanding.Patches
             LongEventHandler.QueueLongEvent(delegate
             {
                 Find.GameInitData.ResetWorldRelatedMapInitData();
-                //TODO: add OverallPopulation to filters
+
                 Current.Game.World =
-                    WorldGenerator.GenerateWorld(_planetCoverage, _seedString, _rainfall, _temperature, OverallPopulation.Normal);
+                    WorldGenerator.GenerateWorld(_planetCoverage, _seedString, _rainfall, _temperature, _population);
                 LongEventHandler.ExecuteWhenFinished(delegate
                 {
                     if (next != null) Find.WindowStack.Add(next);
