@@ -26,21 +26,25 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>output\PrepareLanding\1.1\Assemblies\</OutputPath>
     <DefineConstants>TRACE;WORLD_DATA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.0.0.8, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Lib.Harmony.2.0.0.8\lib\net472\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>libs\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="HugsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\UnlimitedHugs.Rimworld.HugsLib.7.1.0\lib\net472\HugsLib.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,18 +53,23 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>libs\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>libs\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>libs\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>libs\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -146,8 +155,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
-if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) K:\rimworld_debug\RimWorld_11 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
-if $(ConfigurationName) == Release xcopy /F /L /y $(TargetPath) $(ProjectDir)output\PrepareLanding\1.1\Assemblies\</PostBuildEvent>
+if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) K:\rimworld_debug\RimWorld_11 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
