@@ -147,7 +147,7 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
 if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) K:\rimworld_debug\RimWorld_11 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb
-if $(ConfigurationName) == Release xcopy /y $(TargetPath) $(ProjectDir)output\PrepareLanding\Assemblies</PostBuildEvent>
+if $(ConfigurationName) == Release xcopy /y $(TargetPath) $(ProjectDir)output\PrepareLanding\1.1\Assemblies</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

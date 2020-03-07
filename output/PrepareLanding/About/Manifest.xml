@@ -2,12 +2,6 @@
 <Manifest>
     <identifier>PrepareLanding</identifier>
     <version>1.0.0.0</version>
-    <dependencies>
-        <li>HugsLib</li>
-    </dependencies>
-    <loadAfter>
-        <li>HugsLib</li>
-    </loadAfter>
     <manifestUri>https://raw.githubusercontent.com/neitsa/PrepareLanding/develop/output/PrepareLanding/About/Manifest.xml</manifestUri>
     <downloadUri>https://github.com/neitsa/PrepareLanding/releases/latest</downloadUri>
 </Manifest>
