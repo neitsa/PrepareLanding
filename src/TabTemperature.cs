@@ -128,7 +128,7 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _gameData.UserData.WorldFeature != null ? _gameData.UserData.WorldFeature.name : "PLMW_SelectAny".Translate();
+            var rightLabel = _gameData.UserData.WorldFeature != null ? _gameData.UserData.WorldFeature.name : (string)"PLMW_SelectAny".Translate();
             ListingStandard.LabelDouble($"{"PLMWT2T_WorldFeature".Translate()}:", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;

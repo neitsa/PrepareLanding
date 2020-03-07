@@ -34,7 +34,7 @@ namespace PrepareLanding
                 }
 
                 var tab = PrepareLanding.Instance.MainWindow.TabController.TabById("WorldInfo");
-                var tabName = tab == null ? "PLMWINF_WorldInfo".Translate() : tab.Name;
+                var tabName = tab == null ? (string)"PLMWINF_WorldInfo".Translate() : tab.Name;
                 var shortMessage = shortRimWorldMessage.NullOrEmpty() ? "" : $": {shortRimWorldMessage}";
                 Messages.Message(
                     $"[PrepareLanding] {string.Format("PLFILIL_FilterErrorOccurred".Translate(), shortMessage, tabName)}",

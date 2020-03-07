@@ -22,7 +22,7 @@ namespace PrepareLanding.Core.Gui.Window
             if (windowLabel.NullOrEmpty())
                 WindowLabel = !_parentWindow.optionalTitle.NullOrEmpty()
                     ? _parentWindow.optionalTitle
-                    : "PLMWMINW_MinmizedWindow".Translate();
+                    : (string)"PLMWMINW_MinmizedWindow".Translate();
 
             doCloseX = false;
             doCloseButton = false;
