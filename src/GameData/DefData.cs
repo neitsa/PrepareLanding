@@ -157,7 +157,7 @@ namespace PrepareLanding.GameData
                     biomeDefsList.Add(currentBiomeDef);
             }
 
-            return biomeDefsList.OrderBy(biome => biome.LabelCap).ToList();
+            return biomeDefsList.OrderBy(biome => biome.LabelCap.Resolve()).ToList();
         }
 
         /// <summary>

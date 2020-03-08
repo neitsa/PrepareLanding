@@ -219,7 +219,7 @@ namespace PrepareLanding
 
             var currHeightBefore = ListingStandard.CurHeight;
 
-            var rightLabel = _gameData.GodModeData.Biome != null ? _gameData.GodModeData.Biome.LabelCap : "Any";
+            var rightLabel = _gameData.GodModeData.Biome != null ? (string)_gameData.GodModeData.Biome.LabelCap : "Any";
             ListingStandard.LabelDouble("Biome:", rightLabel);
 
             var currHeightAfter = ListingStandard.CurHeight;
