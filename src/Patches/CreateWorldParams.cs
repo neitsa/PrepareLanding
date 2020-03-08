@@ -65,6 +65,7 @@ namespace PrepareLanding.Patches
             _intCoverage = Prefs.DevMode && UnityData.isEditor ? 5 : 30;
             _rainfall = OverallRainfall.Normal;
             _temperature = OverallTemperature.Normal;
+            _population = OverallPopulation.Normal;
         }
 
         public override void DoWindowContents(Rect rect)
