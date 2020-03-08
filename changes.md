@@ -1,3 +1,34 @@
+# Version 1.0.1
+**Released March 8, 2020**
+**`RimWorld Version: 1.1 (and 1.0)`**
+
+# General
+
+What's New?
+===========
+
+* Fix overall population generated with a minimum value [issue #37].
+    - overall population is now generated with its default value.
+
+***
+
+
+# Version 1.0.0
+**Released March 7, 2020**
+**`RimWorld Version: 1.1 (and 1.0)`**
+
+# General
+
+What's New?
+===========
+
+* Updated for Rimworld 1.1 (no other additions).
+    - The mod has the required assemblies to be compatible with Rimworld 1.0.
+    - Many thanks to @JonathanTroyer for the PR #36 which basically fixed a lot of things!
+
+
+***
+
 # Version 0.9.4
 **Released November 2, 2018**
 **`RimWorld Version: 1.0`**
