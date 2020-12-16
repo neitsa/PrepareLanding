@@ -77,8 +77,14 @@ namespace PrepareLanding
         /// <summary>Gets whether the tab can be draw or not.</summary>
         public override bool CanBeDrawn { get; set; } = true;
 
+        /// <summary>
+        /// Which tile is currently selected in the filtered tile list. Valid for the filtered tile and the minimized window.
+        /// </summary>
         public int SelectedTileIndex { get; set; } = -1;
 
+        /// <summary>
+        /// Tile index which starts the display (the selected tile is always equal or greater to this number).
+        /// </summary>
         public int TileDisplayIndexStart { get; set; }
 
         /// <summary>Draw the content of the tab.</summary>
@@ -125,7 +131,7 @@ namespace PrepareLanding
             }
 
             var buttonsRectSpace = ListingStandard.GetRect(30f);
-            var splittedRect = buttonsRectSpace.SplitRectWidthEvenly(_minimizedWindowButtonsDescriptorList.Count);
+            var splitRect = buttonsRectSpace.SplitRectWidthEvenly(_minimizedWindowButtonsDescriptorList.Count);
 
             for (var i = 0; i < _minimizedWindowButtonsDescriptorList.Count; i++)
             {
@@ -133,12 +139,12 @@ namespace PrepareLanding
                 var buttonDescriptor = _minimizedWindowButtonsDescriptorList[i];
 
                 // display button; if clicked: call the related action
-                if (Widgets.ButtonText(splittedRect[i], buttonDescriptor.Label))
+                if (Widgets.ButtonText(splitRect[i], buttonDescriptor.Label))
                     buttonDescriptor.Action();
 
                 // display tool-tip (if any)
                 if (!string.IsNullOrEmpty(buttonDescriptor.ToolTip))
-                    TooltipHandler.TipRegion(splittedRect[i], buttonDescriptor.ToolTip);
+                    TooltipHandler.TipRegion(splitRect[i], buttonDescriptor.ToolTip);
             }
 
             /*
