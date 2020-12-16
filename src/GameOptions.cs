@@ -1,4 +1,5 @@
 ﻿using HugsLib.Settings;
+using UnityEngine;
 using Verse;
 
 namespace PrepareLanding
@@ -23,11 +24,22 @@ namespace PrepareLanding
 
             DisablePreciseWorldGenPercentage = _settingsPack.GetHandle("DisablePreciseWorldGenPercentage",
                 "Disable Precise World Gen. %",
-                "Disable Precise World Generation Percentage on the Create World parameter page.", false);
+                "Disable Precise World Generation Percentage on the Create World parameter page.", true);
+
+            PrepareLandingHotKey = _settingsPack.GetHandle("HotKey",
+                "PrepareLanding Hotkey",
+                "Hotkey for Prepare Landing Main Window",
+                KeyCode.F12,
+                null,
+                "Hotkey_");
+
         }
 
         public SettingHandle<bool> DisableWorldData { get; private set; }
 
         public SettingHandle<bool> DisablePreciseWorldGenPercentage { get; private set; }
+
+        public SettingHandle<KeyCode> PrepareLandingHotKey { get; private set; }
+
     }
 }
