@@ -31,11 +31,9 @@ namespace PrepareLanding
 
         private Vector2 _scrollPosMatchingTiles;
 
-        private int _selectedTileIndex;
-
-        private int _tileDisplayIndexStart;
-
         private readonly ButtonDescriptor _buttonCloseDescriptor;
+
+        private readonly TabFilteredTiles _tabFilteredTiles;
 
         public MainWindow(GameData.GameData gameData)
         {
@@ -48,10 +46,12 @@ namespace PrepareLanding
             /* 
              * GUI utilities (tabs)
              */
+            _tabFilteredTiles = new TabFilteredTiles(0.48f);
+
             _tabGuiUtilities.Clear();
             _tabGuiUtilities.Add(new TabTerrain(gameData, 0.30f));
             _tabGuiUtilities.Add(new TabTemperature(gameData, 0.30f));
-            _tabGuiUtilities.Add(new TabFilteredTiles(0.48f));
+            _tabGuiUtilities.Add(_tabFilteredTiles);
             _tabGuiUtilities.Add(new TabInfo(gameData, 0.48f));
             _tabGuiUtilities.Add(new TabOptions(gameData, 0.35f));
             _tabGuiUtilities.Add(new TabLoadSave(gameData, 0.48f));
@@ -75,10 +75,10 @@ namespace PrepareLanding
                     SoundDefOf.Tick_Low.PlayOneShotOnCamera();
 
                     // reset starting display index
-                    _tileDisplayIndexStart = 0;
+                    _tabFilteredTiles.TileDisplayIndexStart = 0;
 
                     // reset selected index
-                    _selectedTileIndex = -1;
+                    _tabFilteredTiles.SelectedTileIndex = -1;
 
                     // do the tile filtering
                     PrepareLanding.Instance.TileFilter.Filter();
@@ -116,10 +116,10 @@ namespace PrepareLanding
                     SoundDefOf.Tick_High.PlayOneShotOnCamera();
 
                     // reset starting display index
-                    _tileDisplayIndexStart = 0;
+                    _tabFilteredTiles.TileDisplayIndexStart = 0;
 
                     // reset selected index
-                    _selectedTileIndex = -1;
+                    _tabFilteredTiles.SelectedTileIndex = -1;
 
                     ForceClose();
                 }, displayState: DisplayState.Entry | DisplayState.MapInitializing);
@@ -141,13 +141,13 @@ namespace PrepareLanding
             var buttonListStart = new ButtonDescriptor("<<", delegate
             {
                 // reset starting display index
-                _tileDisplayIndexStart = 0;
+                _tabFilteredTiles.TileDisplayIndexStart = 0;
             }, "PLMWFTIL_GoToStartOfTileList".Translate());
 
             var buttonPreviousPage = new ButtonDescriptor("<", delegate
             {
-                if (_tileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
-                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
+                if (_tabFilteredTiles.TileDisplayIndexStart >= MaxDisplayedTileWhenMinimized)
+                    _tabFilteredTiles.TileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 else
                     Messages.Message("PLMWFTIL_ReachedListStart".Translate(), MessageTypeDefOf.RejectInput);
             }, "PLMWFTIL_GoToPreviousListPage".Translate());
@@ -155,12 +155,12 @@ namespace PrepareLanding
             var buttonNextPage = new ButtonDescriptor(">", delegate
             {
                 var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
-                _tileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
-                if (_tileDisplayIndexStart > matchingTilesCount)
+                _tabFilteredTiles.TileDisplayIndexStart += MaxDisplayedTileWhenMinimized;
+                if (_tabFilteredTiles.TileDisplayIndexStart > matchingTilesCount)
                 {
                     Messages.Message($"{"PLMWFTIL_NoMoreTilesAvailable".Translate()} {matchingTilesCount}).",
                         MessageTypeDefOf.RejectInput);
-                    _tileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
+                    _tabFilteredTiles.TileDisplayIndexStart -= MaxDisplayedTileWhenMinimized;
                 }
             }, "PLMWFTIL_GoToNextListPage".Translate());
 
@@ -168,11 +168,11 @@ namespace PrepareLanding
             {
                 var matchingTilesCount = PrepareLanding.Instance.TileFilter.AllMatchingTiles.Count;
                 var tileDisplayIndexStart = matchingTilesCount - matchingTilesCount % MaxDisplayedTileWhenMinimized;
-                if (tileDisplayIndexStart == _tileDisplayIndexStart)
+                if (tileDisplayIndexStart == _tabFilteredTiles.TileDisplayIndexStart)
                     Messages.Message($"{"PLMWFTIL_NoMoreTilesAvailable".Translate()} {matchingTilesCount}).",
                         MessageTypeDefOf.RejectInput);
 
-                _tileDisplayIndexStart = tileDisplayIndexStart;
+                _tabFilteredTiles.TileDisplayIndexStart = tileDisplayIndexStart;
             }, "PLMWFTIL_GoToEndOfList".Translate());
 
             _minimizedWindowButtonsDescriptorList =
@@ -343,10 +343,10 @@ namespace PrepareLanding
                 PrepareLanding.Instance.TileFilter.ClearMatchingTiles();
 
                 // reset starting display index
-                _tileDisplayIndexStart = 0;
+                _tabFilteredTiles.TileDisplayIndexStart = 0;
 
                 // reset selected index
-                _selectedTileIndex = -1;
+                _tabFilteredTiles.SelectedTileIndex = -1;
 
                 // don't go further as there are no tile content to draw
                 return;
@@ -374,13 +374,13 @@ namespace PrepareLanding
              */
 
             // number of elements (tiles) to display
-            var itemsToDisplay = Math.Min(matchingTilesCount - _tileDisplayIndexStart, MaxDisplayedTileWhenMinimized);
+            var itemsToDisplay = Math.Min(matchingTilesCount - _tabFilteredTiles.TileDisplayIndexStart, MaxDisplayedTileWhenMinimized);
 
             // label to display where we actually are in the tile list
             GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
             var heightBefore = listingStandard.StartCaptureHeight();
             listingStandard.Label(
-                $"{_tileDisplayIndexStart}: {_tileDisplayIndexStart + itemsToDisplay - 1} / {matchingTilesCount - 1}",
+                $"{_tabFilteredTiles.TileDisplayIndexStart}: {_tabFilteredTiles.TileDisplayIndexStart + itemsToDisplay - 1} / {matchingTilesCount - 1}",
                 elementHeight);
             GenUI.ResetLabelAlign();
             var counterLabelRect = listingStandard.EndCaptureHeight(heightBefore);
@@ -411,8 +411,8 @@ namespace PrepareLanding
             var innerLs = listingStandard.BeginScrollView(maxScrollViewOuterHeight, scrollableViewHeight,
                 ref _scrollPosMatchingTiles, 16f);
 
-            var endIndex = _tileDisplayIndexStart + itemsToDisplay;
-            for (var i = _tileDisplayIndexStart; i < endIndex; i++)
+            var endIndex = _tabFilteredTiles.TileDisplayIndexStart + itemsToDisplay;
+            for (var i = _tabFilteredTiles.TileDisplayIndexStart; i < endIndex; i++)
             {
                 var selectedTileId = matchingTiles[i];
 
@@ -422,11 +422,16 @@ namespace PrepareLanding
 
                 // display the label
                 var labelRect = innerLs.GetRect(elementHeight);
-                var selected = i == _selectedTileIndex;
+
+                // get the Tab
+                if (!(TabController.TabById("FilteredTiles") is TabFilteredTiles tab))
+                    return;
+
+                var selected = i == tab.SelectedTileIndex;
                 if (Core.Gui.Widgets.LabelSelectable(labelRect, labelText, ref selected, TextAnchor.MiddleCenter))
                 {
                     // go to the location of the selected tile
-                    _selectedTileIndex = i;
+                    tab.SelectedTileIndex = i;
                     Find.WorldInterface.SelectedTile = selectedTileId;
                     Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
                 }

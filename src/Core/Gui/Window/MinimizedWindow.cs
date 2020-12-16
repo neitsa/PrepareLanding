@@ -137,5 +137,15 @@ namespace PrepareLanding.Core.Gui.Window
 
             base.WindowOnGUI();
         }
+
+        public override void WindowUpdate()
+        {
+            base.WindowUpdate();
+
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                Log.Message("[PL] F11 pressed on minimized window !!!");
+            }
+        }
     }
 }
