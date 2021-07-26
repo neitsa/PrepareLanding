@@ -236,4 +236,4 @@
     # Github
     - provider: GitHubPullRequest
       auth_token:
-        secure: "mHZOsSTuQSkkUdQF203SlLWtLQ8I81VccUex5mBluPJIuUn0FTIYerDfM6h6GfWp"
+        secure: "kiguKmXnnra86ku0D8E9RwfTa+dCSik5nrr3UVTwKt3QpqUkDRlEnU/obwi7c59u"
