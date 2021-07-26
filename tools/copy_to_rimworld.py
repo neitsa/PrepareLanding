@@ -75,7 +75,7 @@ def main(args):
             if e.errno != errno.EEXIST:
                 print("Couldn't create directory '{}'.".format(mod_dir), file=sys.stderr)
                 return -1
-        
+
 
     # check that we have an output dir
     if args.output_dir:
@@ -89,8 +89,8 @@ def main(args):
             file_types.append('*.mdb')
 
         # e.g: <my_repo>\output\PrepareLanding\Assemblies
-        output_dir = pathlib.Path(args.output_dir).joinpath(MOD_ASSEMBLIES)
-        # make sur there's an 'Assemblies' dir in output dir
+        output_dir = pathlib.Path(args.output_dir).joinpath(f'{args.rimworld_ver}\\{MOD_ASSEMBLIES}')
+        # make sure there's an 'Assemblies' dir in output dir
         if not dir_exists(output_dir):
             print("Wasn't able to find the following directory: {}"
                   .format(output_dir), file=sys.stderr)
@@ -119,7 +119,7 @@ def main(args):
     try:
         shutil.rmtree(str(mod_dir))
     except Exception as err:
-        print("An error occured while trying to remove the following "
+        print("An error occurred while trying to remove the following "
               "directory:\n\t{}\nThe error was:\n\t{}".format(mod_dir, err),
               file=sys.stderr)
         return -1
@@ -133,7 +133,7 @@ def main(args):
             print("Copied:\n\t- from: '{}'\n\t- to '{}'"
                   .format(src_dir, mod_dir))
     except Exception as err:
-        print("An error occured while trying to copy a directory.\n"
+        print("An error occurred while trying to copy a directory.\n"
               "src dir: {}\n"
               "dst dir: {}\n"
               "The error was:{}".format(src_dir, mod_dir, err), file=sys.stderr)
@@ -155,6 +155,10 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         'rimworld_dir', action="store",
         help="Full path to RimWorld game folder.")
+
+    arg_parser.add_argument(
+        'rimworld_ver', action="store",
+        help="Rimworld version (e.g. '1.2').")
 
     # output dir and target_dir might be the same, so this one is optional
     arg_parser.add_argument(

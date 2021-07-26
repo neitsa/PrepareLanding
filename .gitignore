@@ -2,18 +2,34 @@
 # Project specific
 # ==============================================================================
 
-#ignore binaries in output mod folder
+# Ignore binaries in output mod folder
+
 output/PrepareLanding/Assemblies/*.dll
 output/PrepareLanding/Assemblies/*.pdb
 output/PrepareLanding/Assemblies/*.mdb
 
+# Ignore binaries for specific versions
+
+output/PrepareLanding/1.1/Assemblies/*.dll
+output/PrepareLanding/1.1/Assemblies/*.pdb
+output/PrepareLanding/1.1/Assemblies/*.mdb
+output/PrepareLanding/1.2/Assemblies/*.dll
+output/PrepareLanding/1.2/Assemblies/*.pdb
+output/PrepareLanding/1.2/Assemblies/*.mdb
+output/PrepareLanding/1.3/Assemblies/*.dll
+output/PrepareLanding/1.3/Assemblies/*.pdb
+output/PrepareLanding/1.3/Assemblies/*.mdb
+
 # Ignore specific tools (pdb2mdb)
+
 tools/*.dll
 tools/*.exe
 
 # ignore required project dependencies
+
 libs/*
 !libs/*.md
+
 # ==============================================================================
 # Python / JetBrains PyCharm
 # ==============================================================================

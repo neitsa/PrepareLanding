@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Reflection;
+using System.Text;
 using PrepareLanding.Defs;
 using PrepareLanding.Patches;
 using UnityEngine;
 using Verse;
+using HarmonyLib;
+using RimWorld;
 
 namespace PrepareLanding
 {
@@ -22,6 +26,7 @@ namespace PrepareLanding
 
         /// <summary>
         ///     Classes can register to this event to be called when definitions (Defs) have been loaded.
+        ///     Note that game settings are loaded alongside Defs!
         /// </summary>
         public event Action DefsLoaded = delegate { };
 
@@ -94,6 +99,47 @@ namespace PrepareLanding
         {
             Log.Message("[PrepareLanding] OnDefsLoaded");
             DefsLoaded?.Invoke();
+
+            //
+            // Try to patch Page_CreateWorldParams.CanDoNext
+            // we need to do it here because the settings are only loaded at that time, and we need to check the
+            // setting if we patch it or not. The verification is done in the patching method itself, not here.
+            //
+
+            var harmony = new Harmony("com.neitsa.preparelanding");
+            var canDoNextOriginalMethod = typeof(Page_CreateWorldParams).GetMethod("CanDoNext", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (canDoNextOriginalMethod == null) {
+                Log.Message("[PrepareLanding] Could not find Page_CreateWorldParams.CanDoNext.");
+                return;
+            }
+            var patches = Harmony.GetPatchInfo(canDoNextOriginalMethod);
+            if (patches is null) {
+                // method is not patched!
+                Log.Message("[PrepareLanding] Manual Patching: Page_CreateWorldParams_CanDoNext");
+                var prefix = typeof(PatchCreateWorldParams).GetMethod("Page_CreateWorldParams_CanDoNext", BindingFlags.NonPublic | BindingFlags.Static);
+                if (prefix is null) {
+                    Log.Message("[PrepareLanding] Could not find PatchCreateWorldParams.Page_CreateWorldParams_CanDoNext prefix.");
+                    return;
+                }
+                var replacementMethod = harmony.Patch(canDoNextOriginalMethod, new HarmonyMethod(prefix));
+                Log.Message($"[PrepareLanding] PatchCreateWorldParams.Page_CreateWorldParams_CanDoNext - patch done: {!(replacementMethod is null)}");
+            }
+            else {
+                // method is patched with a prefix... We can't add our own. Just log and bail out.
+                Log.Message("[PrepareLanding] Page_CreateWorldParams.CanDoNext is already patched. Can't instantiate PreciseWorldGeneration...");
+                StringBuilder sb = new StringBuilder();
+                foreach (var patchesPrefix in patches.Prefixes)
+                {
+                    sb.Append($"index: {patchesPrefix.index}; ");
+                    sb.Append($"owner: {patchesPrefix.owner}; ");
+                    sb.Append($"patch method: {patchesPrefix.PatchMethod}; ");
+                    sb.Append($"priority: {patchesPrefix.priority}; ");
+                    sb.Append($"before: {patchesPrefix.before}; ");
+                    sb.Append($"after: {patchesPrefix.after}");
+                    sb.Append("\n----\n");
+                }
+                Log.Message(sb.ToString());
+            }
         }
 
         /// <summary>

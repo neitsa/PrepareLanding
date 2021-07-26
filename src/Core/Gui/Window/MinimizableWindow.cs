@@ -69,7 +69,7 @@ namespace PrepareLanding.Core.Gui.Window
             if (Find.WindowStack.IsOpen(GetType())) //note: this.getType()
             {
                 // getting here means the window is closed (not visible, hence it shouldn't be on the window stack) but it's still on the window stack...
-                Log.Error("[PrepareLAnding] The main window is closed but it's still on the window stack...");
+                Log.Error("[PrepareLanding] The main window is closed but it's still on the window stack...");
                 return;
             }
 

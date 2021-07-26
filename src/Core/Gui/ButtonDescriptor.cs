@@ -95,7 +95,7 @@ namespace PrepareLanding.Core.Gui
             _floatMenu = new FloatMenu(_floatMenuOptions, title, needSelection);
         }
 
-        public void AddFloatMenuOption(string label, Action actionClick, Action actionMouseOver, MenuOptionPriority menuOptionPriority = MenuOptionPriority.Default)
+        public void AddFloatMenuOption(string label, Action actionClick, Action<Rect> actionMouseOver, MenuOptionPriority menuOptionPriority = MenuOptionPriority.Default)
         {
             if(_floatMenuOptions == null)
                 _floatMenuOptions = new List<FloatMenuOption>();

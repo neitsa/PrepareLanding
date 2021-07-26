@@ -6,7 +6,7 @@ namespace PrepareLanding.Defs
 
     /// <summary>
     /// This class is called from a definition file when clicking the "World" button on the bottom menu bar while playing
-    /// (see "PrepareLanding/Defs/Misc/MainButtonDefs/MainButtons.xml").
+    /// (see "\PrepareLanding\Patches\MainButtonDef_Patch.xml").
     /// </summary>
     public class MainButtonWorkerToggleWorld : MainButtonWorker_ToggleWorld
     {

@@ -17,7 +17,7 @@ namespace PrepareLanding
         /// </summary>
         public PrepareLanding()
         {
-            Logger.Message("In constructor.");
+            Logger.Message("Enter constructor.");
             if (Instance == null)
                 Instance = this;
 
@@ -39,6 +39,8 @@ namespace PrepareLanding
 
             // instantiate the tile highlighter
             TileHighlighter = new TileHighlighter(filterOptions);
+
+            Logger.Message("Exit constructor.");
         }
 
         /// <summary>

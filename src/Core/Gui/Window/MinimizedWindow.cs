@@ -22,7 +22,7 @@ namespace PrepareLanding.Core.Gui.Window
             if (windowLabel.NullOrEmpty())
                 WindowLabel = !_parentWindow.optionalTitle.NullOrEmpty()
                     ? _parentWindow.optionalTitle
-                    : (string)"PLMWMINW_MinmizedWindow".Translate();
+                    : (string) "PLMWMINW_MinmizedWindow".Translate();
 
             doCloseX = false;
             doCloseButton = false;
@@ -136,6 +136,52 @@ namespace PrepareLanding.Core.Gui.Window
             }
 
             base.WindowOnGUI();
+        }
+
+        public override void WindowUpdate()
+        {
+            base.WindowUpdate();
+
+            /*
+             * Use F (up) and V (down) keys to navigate the list of items in the filtered list.
+             */
+
+            if (!Input.GetKeyDown(KeyCode.F) && !Input.GetKeyDown(KeyCode.V)) return;
+
+            var matchingTiles = PrepareLanding.Instance.TileFilter.AllMatchingTiles;
+            var matchingTilesCount = matchingTiles.Count;
+            if (matchingTilesCount == 0)
+                return;
+
+            var mainWindow = _parentWindow as MainWindow;
+
+            if (!(mainWindow?.TabController.TabById("FilteredTiles") is TabFilteredTiles tabFilteredTiles))
+                return;
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                // Log.Message("[PL] PageUp pressed on minimized window !!!");
+
+                tabFilteredTiles.SelectedTileIndex--;
+                if (tabFilteredTiles.SelectedTileIndex < 0)
+                    tabFilteredTiles.SelectedTileIndex = 0;
+
+            }
+            else if (Input.GetKeyDown(KeyCode.V))
+            {
+                // Log.Message("[PL] PageDown pressed on minimized window !!!");
+
+                tabFilteredTiles.SelectedTileIndex++;
+                if (tabFilteredTiles.SelectedTileIndex >= matchingTilesCount)
+                    tabFilteredTiles.SelectedTileIndex = matchingTilesCount - 1;
+
+            }
+
+            // note: changing the selected tile in the TabFilteredTiles doesn't help to actually select it...
+            //  as the GUI awaits for a mouse click. So the only option is to actually jump to the tile from here.
+            Find.WorldInterface.SelectedTile = matchingTiles[tabFilteredTiles.SelectedTileIndex];
+            Find.WorldCameraDriver.JumpTo(Find.WorldGrid.GetTileCenter(Find.WorldInterface.SelectedTile));
+
         }
     }
 }

@@ -1,3 +1,47 @@
+# Version 1.2.1
+**Released July 26, 2021**
+**`RimWorld Version: 1.3`**
+
+# General
+
+What's New?
+===========
+
+* Fix last possible conflict problem with other mods (bug #41 - reported by @Skellitor301).
+    - There should not be any conflicts as of now.
+
+***
+
+
+# Version 1.2.0
+**Released July 21, 2021**
+**`RimWorld Version: 1.3`**
+
+# General
+
+What's New?
+===========
+
+* RimWorld v1.3 (Ideology) compatibility.
+    
+* Fix: inverted logical OR and AND filters.
+
+***
+
+# Version 1.1.0
+**Released December 16, 2020**
+**`RimWorld Version: 1.2`**
+
+# General
+
+What's New?
+===========
+
+* RimWorld v1.2 (Royalty) compatibility.
+    - Many thanks to @JonathanTroyer for the patch!
+    
+***
+
 # Version 1.0.1
 **Released March 8, 2020**
 **`RimWorld Version: 1.1 (and 1.0)`**

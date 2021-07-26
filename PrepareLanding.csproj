@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\PrepareLanding\1.1\Assemblies\</OutputPath>
+    <OutputPath>output\PrepareLanding\1.3\Assemblies\</OutputPath>
     <DefineConstants>TRACE;WORLD_DATA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -34,16 +34,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.0.8, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lib.Harmony.2.0.0.8\lib\net472\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>libs\1.3\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>libs\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="HugsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\UnlimitedHugs.Rimworld.HugsLib.7.1.0\lib\net472\HugsLib.dll</HintPath>
+    <Reference Include="HugsLib">
+      <HintPath>libs\1.3\HugsLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -51,24 +47,32 @@
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="Assembly-CSharp">
+      <HintPath>libs\1.3\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>libs\1.3\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>libs\UnityEngine.dll</HintPath>
+      <HintPath>libs\1.3\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>libs\1.3\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>libs\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>libs\1.3\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>libs\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>libs\1.3\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>libs\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>libs\1.3\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -125,13 +129,13 @@
     <Compile Include="src\Overlays\Overlay.cs" />
     <Compile Include="src\Overlays\TemperatureOverlay.cs" />
     <Compile Include="src\Overlays\WorldLayerTemperature.cs" />
-    <Compile Include="src\Patches\CreateWorldParams.cs" />
+    <Compile Include="src\Patches\PagePreciseWorldGeneration.cs" />
+    <Compile Include="src\Patches\PatchCreateWorldParams.cs" />
     <Compile Include="src\Patches\PatchGenerateGridIntoWorld.cs" />
     <Compile Include="src\Patches\PatchGenerateWorld.cs" />
     <Compile Include="src\Patches\PatchNaturalRockTypesIn.cs" />
-    <Compile Include="src\Patches\PatchPageUtility.cs" />
     <Compile Include="src\Patches\PatchWorldInterface.cs" />
-    <Compile Include="src\Patches\SelectLandingSite.cs" />
+    <Compile Include="src\Patches\PatchWorldUpdate.cs" />
     <Compile Include="src\PrepareLanding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Presets\Preset.cs" />
@@ -155,7 +159,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug python $(ProjectDir)tools\pdb2mdb.py $(TargetPath)
-if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) K:\rimworld_debug\RimWorld_11 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb</PostBuildEvent>
+if $(ConfigurationName) == Debug python $(ProjectDir)tools\copy_to_rimworld.py $(TargetDir) K:\rimworld_debug\RimWorld_13 1.3 --output_dir $(ProjectDir)output\$(TargetName) --pdb --mdb</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

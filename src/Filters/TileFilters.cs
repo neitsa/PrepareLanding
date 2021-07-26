@@ -112,11 +112,11 @@ namespace PrepareLanding.Filters
 
             switch (UserData.SelectedRoadDefs.FilterBooleanState)
             {
-                case FilterBoolean.AndFiltering:
-                    FilterAnd(inputList, UserData.SelectedRoadDefs);
-                    break;
                 case FilterBoolean.OrFiltering:
-                    FilterOr(inputList, UserData.SelectedRoadDefs, UserData.SelectedRoadDefs.OffPartialNoSelect);
+                    FilterOr(inputList, UserData.SelectedRoadDefs);
+                    break;
+                case FilterBoolean.AndFiltering:
+                    FilterAnd(inputList, UserData.SelectedRoadDefs, UserData.SelectedRoadDefs.OffPartialNoSelect);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -321,10 +321,10 @@ namespace PrepareLanding.Filters
             switch (UserData.SelectedRiverDefs.FilterBooleanState)
             {
                 case FilterBoolean.AndFiltering:
-                    FilterAnd(inputList, UserData.SelectedRiverDefs);
+                    FilterOr(inputList, UserData.SelectedRiverDefs);
                     break;
                 case FilterBoolean.OrFiltering:
-                    FilterOr(inputList, UserData.SelectedRiverDefs, UserData.SelectedRiverDefs.OffPartialNoSelect);
+                    FilterAnd(inputList, UserData.SelectedRiverDefs, UserData.SelectedRiverDefs.OffPartialNoSelect);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

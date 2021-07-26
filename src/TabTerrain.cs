@@ -88,7 +88,7 @@ namespace PrepareLanding
                 // add a dummy 'Any' fake biome type. This sets the chosen biome to null.
                 Action actionClick = delegate { _gameData.UserData.ChosenBiome = null; };
                 // tool-tip when hovering above the 'Any' biome name on the floating menu
-                Action mouseOverAction = delegate
+                Action<Rect> mouseOverAction = delegate
                 {
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
@@ -180,7 +180,7 @@ namespace PrepareLanding
                     }
 
                     // tool-tip when hovering above the rotation name on the floating menu
-                    void MouseOverAction()
+                    void MouseOverAction(Rect r)
                     {
                         var mousePos = Event.current.mousePosition;
                         rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
@@ -291,7 +291,7 @@ namespace PrepareLanding
                 Action actionClick = delegate { _gameData.UserData.ForagedFood = null; };
 
                 // tool-tip when hovering above the 'Any' biome name on the floating menu
-                Action mouseOverAction = delegate
+                Action<Rect> mouseOverAction = delegate
                 {
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);
