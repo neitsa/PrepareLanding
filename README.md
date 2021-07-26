@@ -10,7 +10,7 @@ PrepareLanding
 
 As of version 0.5 you can also change some of the tiles characteristics (a.k.a `God Mode`).
 
-Current RimWorld version supported: ![RimWorld Version 1.3](https://img.shields.io/badge/RimWorld%201.1-brightgreen.svg)
+Current RimWorld version supported: ![RimWorld Version 1.3](https://img.shields.io/badge/RimWorld%201.3-brightgreen.svg)
 
 Installation
 ------------
