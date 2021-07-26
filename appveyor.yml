@@ -185,7 +185,7 @@
       release: PrepareLanding-$(appveyor_build_version)
       # auth token to push on github
       auth_token:
-        secure: "mHZOsSTuQSkkUdQF203SlLWtLQ8I81VccUex5mBluPJIuUn0FTIYerDfM6h6GfWp"
+        secure: "qiSHK3OrlKBVuX0BlmwDZZGtbJC8qlCLg/S/nIQXRIRfPFUrOlixhvK2ck09cX4A"
       # is it a draft release?
       draft: false
       # is a a pre-release?
@@ -236,4 +236,4 @@
     # Github
     - provider: GitHubPullRequest
       auth_token:
-        secure: "kiguKmXnnra86ku0D8E9RwfTa+dCSik5nrr3UVTwKt3QpqUkDRlEnU/obwi7c59u"
+        secure: qiSHK3OrlKBVuX0BlmwDZZGtbJC8qlCLg/S/nIQXRIRfPFUrOlixhvK2ck09cX4A
