@@ -1,3 +1,18 @@
+# Version 1.2.1
+**Released July 26, 2021**
+**`RimWorld Version: 1.3`**
+
+# General
+
+What's New?
+===========
+
+* Fix last possible conflict problem with other mods (bug #41 - reported by @Skellitor301).
+    - There should not be any conflicts as of now.
+
+***
+
+
 # Version 1.2.0
 **Released July 21, 2021**
 **`RimWorld Version: 1.3`**
