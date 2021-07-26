@@ -88,6 +88,7 @@
     - cmd: mkdir %ARTIFACTS_FOLDER%
     # location of the dependencies required to build the projet
     - cmd: set LIBS_FOLDER=%APPVEYOR_BUILD_FOLDER%\libs\1.3
+    - cmd: mkdir %LIBS_FOLDER%
     # location of the mod files (everything that represents the mod, including binaries)
     - cmd: set OUTPUT_FOLDER=%APPVEYOR_BUILD_FOLDER%\output\PrepareLanding
     # location of the mod file binaries
