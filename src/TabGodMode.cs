@@ -178,8 +178,10 @@ namespace PrepareLanding
 
                 // add a dummy 'Any' fake biome type. This sets the chosen biome to null.
                 Action actionClick = delegate { _gameData.GodModeData.Biome = null; };
+
                 // tool-tip when hovering above the 'Any' biome name on the floating menu
-                Action mouseOverAction = delegate
+                // TODO: check passed rect
+                Action<Rect> mouseOverAction = delegate
                 {
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);

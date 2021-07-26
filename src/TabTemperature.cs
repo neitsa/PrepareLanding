@@ -84,7 +84,7 @@ namespace PrepareLanding
                 // add a dummy 'Any' fake feature type. This sets the chosen feature to null.
                 Action actionClick = delegate { _gameData.UserData.WorldFeature = null; };
                 // tool-tip when hovering above the 'Any' feature name on the floating menu
-                void MouseOverAction()
+                void MouseOverAction(Rect r)
                 {
                     var mousePos = Event.current.mousePosition;
                     var rect = new Rect(mousePos.x, mousePos.y, DefaultElementHeight, DefaultElementHeight);

@@ -53,7 +53,7 @@ namespace PrepareLanding.Filters
             throw new NotImplementedException();
         }
 
-        protected void FilterAnd<T>(IEnumerable<int> inputList, ThreeStateItemContainer<T> container) where T: Def
+        protected void FilterOr<T>(IEnumerable<int> inputList, ThreeStateItemContainer<T> container) where T: Def
         {
             // get a list of Defs that *must not* be present
             var selectedDefOff = (from entry in container
@@ -121,7 +121,7 @@ namespace PrepareLanding.Filters
             }
         }
 
-        protected void FilterOr<T>(IEnumerable<int> inputList, ThreeStateItemContainer<T> container, bool offNoSelect) where T : Def
+        protected void FilterAnd<T>(IEnumerable<int> inputList, ThreeStateItemContainer<T> container, bool offNoSelect) where T : Def
         {
             // foreach each tile in the input list
             foreach (var tileId in inputList)
