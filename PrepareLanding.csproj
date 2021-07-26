@@ -35,11 +35,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>packages\Harmony.2.1.0.0\net472\0Harmony.dll</HintPath>
+      <HintPath>libs\1.3\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="HugsLib">
-      <HintPath>packages\HugsLib\v1.3\Assemblies\HugsLib.dll</HintPath>
+      <HintPath>libs\1.3\HugsLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
