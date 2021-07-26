@@ -29,7 +29,7 @@ namespace PrepareLanding
             PrepareLandingHotKey = _settingsPack.GetHandle("HotKey",
                 "PrepareLanding Hotkey",
                 "Hotkey for Prepare Landing Main Window",
-                KeyCode.F12,
+                KeyCode.P, // this gets overriden by the settings.
                 null,
                 "Hotkey_");
 

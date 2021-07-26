@@ -1,34 +1,40 @@
-﻿using HarmonyLib;
+﻿using System.Collections.Generic;
+using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
 namespace PrepareLanding.Patches
 {
-    [HarmonyPatch(typeof(Page_CreateWorldParams), "CanDoNext")]
     class PatchCreateWorldParams
     {
-        [HarmonyPrefix]
+        // note: this method is retrieved through Reflection. Check RimworldEventHandler.OnDefsLoaded().
+
         static bool Page_CreateWorldParams_CanDoNext(ref Page_CreateWorldParams __instance, ref bool __result)
         {
             // don't use Precise World Generation if the settings tells to do so.
-            if (PrepareLanding.Instance.GameOptions.DisablePreciseWorldGenPercentage.Value)
+            if (PrepareLanding.Instance.GameOptions.DisablePreciseWorldGenPercentage.Value) {
+                Log.Message("[PrepareLanding] Precise World Generation - skipping due to mod settings.");
                 return true;
+            }
 
             /*
              * Call next page for precise world generation.
              */
-            Log.Message("[PrepareLanding] Precise World Generation - If you have trouble generating the world, disable PreciseWorldGeneration in PrepareLanding mod settings.");
+            Log.Message("[PrepareLanding] Precise World Generation - If you are having trouble generating the world, disable PreciseWorldGeneration in PrepareLanding mod settings.");
 
             // grab all needed fields from the Page_CreateWorldParams instance.
-            var seedString = Traverse.Create(__instance).Field("seedString").GetValue<string>();
             var planetCoverage = Traverse.Create(__instance).Field("planetCoverage").GetValue<float>();
+            var seedString = Traverse.Create(__instance).Field("seedString").GetValue<string>();
             var rainfall = Traverse.Create(__instance).Field("rainfall").GetValue<OverallRainfall>();
             var temperature = Traverse.Create(__instance).Field("temperature").GetValue<OverallTemperature>();
             var population = Traverse.Create(__instance).Field("population").GetValue<OverallPopulation>();
-            
+            var factionCounts = Traverse.Create(__instance).Field("factionCounts")
+                .GetValue<Dictionary<FactionDef, int>>();
+
+
             // new page
-            var p = new PagePreciseWorldGeneration(planetCoverage, seedString, rainfall, temperature, population);
+            var p = new PagePreciseWorldGeneration(planetCoverage, seedString, rainfall, temperature, population, factionCounts);
 
             // set up correct prev and next.
             var originalNextPage = Traverse.Create(__instance).Field("next").GetValue<Page>();
