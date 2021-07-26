@@ -87,11 +87,11 @@
     - cmd: set ARTIFACTS_FOLDER=%APPVEYOR_BUILD_FOLDER%\artifacts
     - cmd: mkdir %ARTIFACTS_FOLDER%
     # location of the dependencies required to build the projet
-    - cmd: set LIBS_FOLDER=%APPVEYOR_BUILD_FOLDER%\libs
+    - cmd: set LIBS_FOLDER=%APPVEYOR_BUILD_FOLDER%\libs\1.3
     # location of the mod files (everything that represents the mod, including binaries)
     - cmd: set OUTPUT_FOLDER=%APPVEYOR_BUILD_FOLDER%\output\PrepareLanding
     # location of the mod file binaries
-    - cmd: set OUTPUT_ASSEMBLY_FOLDER=%APPVEYOR_BUILD_FOLDER%\output\PrepareLanding\1.1\Assemblies
+    - cmd: set OUTPUT_ASSEMBLY_FOLDER=%APPVEYOR_BUILD_FOLDER%\output\PrepareLanding\1.3\Assemblies
     # location of the python scripts used to prepare the build
     - cmd: set PYTHON_SCRIPTS_FOLDER=%APPVEYOR_BUILD_FOLDER%\tools\appveyor
 
@@ -103,8 +103,8 @@
     #
     #- cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u https://github.com/UnlimitedHugs/RimworldHugsLib/releases/download/v3.1.2/HugsLib_3.1.2.zip --download_path %DOWNLOAD_FOLDER%
     #- cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
-    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_11.7z --download_path %DOWNLOAD_FOLDER%
-    - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -p%DLL_ARCH_PASS% -e *.dll
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\download_dependencies.py -u http://tzcorporation.com/rimworld/build/rimworld_13.7z --download_path %DOWNLOAD_FOLDER%
+    - cmd: python %PYTHON_SCRIPTS_FOLDER%\extract_archive.py %DOWNLOAD_FOLDER% -o %LIBS_FOLDER% -x e -e *.dll
     - cmd: dir %LIBS_FOLDER%
 
     - cmd: echo Ending install
