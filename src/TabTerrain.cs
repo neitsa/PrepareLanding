@@ -557,7 +557,7 @@ namespace PrepareLanding
                 //TODO find a way to raise an event to tell an observer that the list order has changed
                 selectedStoneDefs.ReorderElements(from, to);
                 SoundDefOf.Tick_High.PlayOneShotOnCamera();
-            }, ReorderableDirection.Vertical);
+            }, ReorderableDirection.Vertical, InRect);
 
             var maxNumStones = (InRect.height - ListingStandard.CurHeight - DefaultGapLineHeight - DefaultElementHeight - 15f) / DefaultElementHeight;
             var maxHeight = maxNumStones * DefaultElementHeight;

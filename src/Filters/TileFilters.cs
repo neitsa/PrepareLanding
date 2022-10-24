@@ -320,10 +320,10 @@ namespace PrepareLanding.Filters
 
             switch (UserData.SelectedRiverDefs.FilterBooleanState)
             {
-                case FilterBoolean.AndFiltering:
+                case FilterBoolean.OrFiltering:
                     FilterOr(inputList, UserData.SelectedRiverDefs);
                     break;
-                case FilterBoolean.OrFiltering:
+                case FilterBoolean.AndFiltering:
                     FilterAnd(inputList, UserData.SelectedRiverDefs, UserData.SelectedRiverDefs.OffPartialNoSelect);
                     break;
                 default:
