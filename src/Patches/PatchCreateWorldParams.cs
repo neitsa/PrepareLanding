@@ -29,12 +29,12 @@ namespace PrepareLanding.Patches
             var rainfall = Traverse.Create(__instance).Field("rainfall").GetValue<OverallRainfall>();
             var temperature = Traverse.Create(__instance).Field("temperature").GetValue<OverallTemperature>();
             var population = Traverse.Create(__instance).Field("population").GetValue<OverallPopulation>();
-            var factionCounts = Traverse.Create(__instance).Field("factionCounts")
-                .GetValue<Dictionary<FactionDef, int>>();
+            var factions = Traverse.Create(__instance).Field("factions").GetValue<List<FactionDef>>();
+            var pollution = Traverse.Create(__instance).Field("pollution").GetValue<float>();
 
 
             // new page
-            var p = new PagePreciseWorldGeneration(planetCoverage, seedString, rainfall, temperature, population, factionCounts);
+            var p = new PagePreciseWorldGeneration(planetCoverage, seedString, rainfall, temperature, population, factions, pollution);
 
             // set up correct prev and next.
             var originalNextPage = Traverse.Create(__instance).Field("next").GetValue<Page>();

@@ -444,7 +444,7 @@ namespace PrepareLanding
             {
                 orderedStoneDefs.ReorderElements(from, to);
                 SoundDefOf.Tick_High.PlayOneShotOnCamera();
-            }, ReorderableDirection.Vertical);
+            }, ReorderableDirection.Vertical,InRect);
 
             var maxNumStones = (InRect.height - ListingStandard.CurHeight - DefaultGapLineHeight -
                                 DefaultElementHeight - 15f) / DefaultElementHeight;
