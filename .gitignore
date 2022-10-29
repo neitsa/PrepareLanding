@@ -19,6 +19,9 @@ output/PrepareLanding/1.2/Assemblies/*.mdb
 output/PrepareLanding/1.3/Assemblies/*.dll
 output/PrepareLanding/1.3/Assemblies/*.pdb
 output/PrepareLanding/1.3/Assemblies/*.mdb
+output/PrepareLanding/1.4/Assemblies/*.dll
+output/PrepareLanding/1.4/Assemblies/*.pdb
+output/PrepareLanding/1.4/Assemblies/*.mdb
 
 # Ignore specific tools (pdb2mdb)
 
@@ -29,6 +32,9 @@ tools/*.exe
 
 libs/*
 !libs/*.md
+
+# ignore backup files
+*.bak
 
 # ==============================================================================
 # Python / JetBrains PyCharm
