@@ -1,86 +1,104 @@
-# Version 1.2.1
+# Change Log
+
+## Version 1.4.0
+
+**Released October 29, 2022**
+**`RimWorld Version: 1.4`**
+
+### What's New?
+
+* Compatibility with Rimworld version 1.4 (PR #47 - by @Nucleoprotein).
+    - Add support for Rimworld version 1.4.
+    - Fix inverted AND / OR filtering.
+
+* Korean translation of the mod (PR #42 - by @isty2e)
+
+Once again many thanks to @Nucleoprotein and @isty2e without whom this release wouldn't have been possible.
+
+Note: the mod is now in version 1.4 to indicate compatibility with Rimworld version. There was no version 1.3.
+
+
+---
+
+
+## Version 1.2.1
+
 **Released July 26, 2021**
 **`RimWorld Version: 1.3`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * Fix last possible conflict problem with other mods (bug #41 - reported by @Skellitor301).
     - There should not be any conflicts as of now.
 
-***
+
+---
 
 
-# Version 1.2.0
+## Version 1.2.0
+
 **Released July 21, 2021**
 **`RimWorld Version: 1.3`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * RimWorld v1.3 (Ideology) compatibility.
     
 * Fix: inverted logical OR and AND filters.
 
-***
 
-# Version 1.1.0
+---
+
+
+## Version 1.1.0
+
 **Released December 16, 2020**
 **`RimWorld Version: 1.2`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * RimWorld v1.2 (Royalty) compatibility.
     - Many thanks to @JonathanTroyer for the patch!
-    
-***
 
-# Version 1.0.1
+    
+---
+
+
+## Version 1.0.1
+
 **Released March 8, 2020**
 **`RimWorld Version: 1.1 (and 1.0)`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * Fix overall population generated with a minimum value [issue #37].
     - overall population is now generated with its default value.
 
-***
+
+---
 
 
-# Version 1.0.0
+## Version 1.0.0
+
 **Released March 7, 2020**
 **`RimWorld Version: 1.1 (and 1.0)`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * Updated for Rimworld 1.1 (no other additions).
     - The mod has the required assemblies to be compatible with Rimworld 1.0.
     - Many thanks to @JonathanTroyer for the PR #36 which basically fixed a lot of things!
 
 
-***
+---
 
-# Version 0.9.4
+
+## Version 0.9.4
+
 **Released November 2, 2018**
 **`RimWorld Version: 1.0`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * Integrate `Precise World Generation Percentage` in Prepare Landing. This allows users to fine tune (between 1 and 
 100%) the world generation percentage in the Create World page.
@@ -91,17 +109,14 @@ What's New?
 * Fixed RimWorld minor version in ModManager XML.
 
 
-***
+---
 
+## Version 0.9.3
 
-# Version 0.9.3
 **Released November 1, 2018**
 **`RimWorld Version: 1.0`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * Added clickable list of tiles for world records (see "info" tab on the main Prepare Landing window).
 
@@ -117,16 +132,15 @@ What's New?
 * Fixed typo for in ModManager XML.
 
 
-***
+---
 
-# Version 0.9.2
+
+## Version 0.9.2
+
 **Released October 19, 2018**
 **`RimWorld Version: 1.0`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * PrepareLanding is now compatible with Rimworld 1.0 (1.0.6864.30166)
 
@@ -140,21 +154,20 @@ What's New?
 
 * Use of the updated Harmony and HugsLib libraries.
 
-## Internal Changes
+#### Internal Changes
 
 * Added `Manifest.xml` for ModManager support.
 
 
-***
+---
 
-# Version 0.9.0
+
+## Version 0.9.0
+
 **Released September 1, 2018**
 **`RimWorld Version: Beta 19`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * PrepareLanding is now compatible with Rimworld Beta 19 (0.19.6814)
 
@@ -175,21 +188,20 @@ What's New?
 
 * Use of the updated Harmony and HugsLib libraries.
 
-## Internal Changes
+#### Internal Changes
 
 * The code now correctly handles Unity Material loading and usage on the main thread.
 
 
-***
+---
 
-# Version 0.8.0
+
+## Version 0.8.0
+
 **Released June 15, 2018**
 **`RimWorld Version: Beta 18`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * The whole mod can now be translated to other languages.
     - Added French translation! Cocorico :)
@@ -204,27 +216,24 @@ What's New?
     - Some non critical code has been factored out.
     - The code was doing some heavy calculation (and used some memory) for world map overlays which is still not public.
 
-## Minor Changes
+#### Minor Changes
 
 * Tweaked some parts of the GUI for languages that are more verbose than English.
 
 * Side note: the "God Mode" tab is not translated as it is doomed to disappear at some point.
 
 
-***
+---
 
-# Version 0.7.0
+
+## Version 0.7.0
+
 **Released December 22, 2017**
 **`RimWorld Version: Beta 18`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 This version has more changes than I thought I would implement...
-
-## TL;DR
 
 * New filters:
     - Caves
@@ -261,7 +270,7 @@ This version has more changes than I thought I would implement...
     - Allows to go to a tile by its ID or coordinates.
     - Add buttons with the main point of interests (North Pole, South Pole, etc.)
 
-## Minor Changes
+#### Minor Changes
 
 * Each filter header is now colored (default to magenta)
 
@@ -297,7 +306,7 @@ This version has more changes than I thought I would implement...
 
 * Updated filtered tile description (in "Filtered Tiles" tab) to be in synch. with B18.
 
-## Internal Changes
+#### Internal Changes
 
 * Upgrade automatic builder to VS 2017 \o/
 * Add a new internal container for three state items
@@ -307,17 +316,16 @@ This version has more changes than I thought I would implement...
     - It now allows other mods to patch the same function.
 * Major Code cleanup
 
-***
+
+---
 
 
-# Version 0.6.0
+## Version 0.6.0
+
 **Released November 18, 2017**
 **`RimWorld Version: Beta 18`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * Fixed code for Beta 18 support.
 * Added a new filter:
@@ -325,16 +333,13 @@ What's New?
         - A Lake is at most 18 tiles surrounded by land. More than that is considered a sea / ocean.
     - The previous behavior is now "Coastal Tile (sea)".
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * None
 
-Future Plans
-============
+### Future Plans
 
 TODO for next release (v0.6.1 or v0.7)
 
@@ -344,28 +349,24 @@ TODO for next release (v0.6.1 or v0.7)
     - Add possibility to filter only tiles in a named location on the world map
 
 
-***
+---
 
 
-# Version 0.5.1
+## Version 0.5.1
+
 **Released September 16, 2017**
 **`RimWorld Version: Alpha 17b`**
 
 **HotFix Release for v0.5**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 * Fixed a nasty bug when loading a save and clicking on the "world" button.
 * Fixed a rare bug condition related to loading a new world.
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * bug when loading a save and going directly to the world
     - The problem was related to events that didn't tell the mod that the world was generated.
@@ -381,17 +382,15 @@ Fixed Issues
     * --> Reworked completely the way rimworld events (e.g. World loaded or World Generated) are handled in the mod.
 
 
-***
+---
 
 
-# Version 0.5.0
+## Version 0.5.0
+
 **Released September 02, 2017**
 **`RimWorld Version: Alpha 17b`**
 
-# General
-
-What's New?
-===========
+### What's New?
 
 The [online manual](https://neitsa.github.io/games/rimworld/preparelanding/) has been rewritten to account for the latest changes.
 
@@ -419,19 +418,16 @@ The [online manual](https://neitsa.github.io/games/rimworld/preparelanding/) has
         - It is less laggy and less demanding on smaller computers
     - Code and data for drawing map overlays is implemented (but not activated yet)
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * Add filtering on most / least (max / min) tile features [issue #10: requested by Barky, Zapleek]
 * Rework the tile Highlighter [issue #11]
 * Add must/must not have road/river" regardless of type. [issue #15: request by WorkingClassHero]
 * Long list of rivers breaks the GUI layout [issue #17: request by elwooha6]
 
-Future Plans
-============
+### Future Plans
 
 * Check if possible to actually set the tile properties according to user choices [issue #8]
     - 6 feature planned on 8 have been implemented (see God Mode)
@@ -439,28 +435,24 @@ Future Plans
     - Code & data are there but it is too slow at the moment to be released.
 
 
-***
+---
 
 
-# General
+## Version 0.4.3
 
-# Version 0.4.3
 **Released August 03, 2017**
 **`RimWorld Version: Alpha 17b`**
 
-What's New?
-===========
+### What's New?
 
 * Still building upon [v0.4 release](https://github.com/neitsa/PrepareLanding/releases/tag/v0.4).
 * Fix a GUI layout problem when more than 5 stone types are present (issue #6).
 * Fix a problem when loading a preset where some states where not correctly set (issue #7).
 * The filters are not reset to their default state when going to a new world (they keep their previous state). (issue #9)
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * Having more stone types than the vanilla game breaks the GUI layout. [issue #6: request by Oblitus]
     - tested & fixed using Cupro's Stones mod.
@@ -468,8 +460,7 @@ Fixed Issues
     - the code used the default state of the MultiCheckState enum, which is ON by default...
 * Do not reset filters when returning from map to map generation settings [issue #9: request by Oblitus]
 
-Future Plans
-============
+### Future Plans
 
 * Check if possible to actually set the tile properties according to user choices [issue #8]
 * Add filtering on most / least (max / min) tile features [issue #10]
@@ -477,44 +468,38 @@ Future Plans
 * Add world map overlays for various features (temperature, rainfall, etc.) [issue #12]
 
 
-***
+---
 
 
-# General
+## Version 0.4.2
 
-# Version 0.4.2
 **Released August 01, 2017**
 **`RimWorld Version: Alpha 17b`**
 
-What's New?
-===========
+### What's New?
 
 * Still building upon [v0.4 release](https://github.com/neitsa/PrepareLanding/releases/tag/v0.4).
 * Fix a NRE while in play state and the main window is shown.
 * Use a xpath patch rather than a new Def to show the main window when clicking the "World" button while playing.
 * Catch a possible (rare) error condition while copying template presets to user folder.
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * Fix a NRE while in play state and the main window is shown: the number of buttons to show was miscalculated.
 * Catch a possible (rare) error condition while copying template presets to user folder: If the mod was removed, some preset files were changed and finally the mod re-installed, this error could arise, rendering the mod useless as this error was triggered
 
 
-***
+---
 
 
-# General
+## Version 0.4.0
 
-# Version 0.4.0
 **Released July 30, 2017**
 **`RimWorld Version: Alpha 17b`**
 
-What's New?
-===========
+### What's New?
 
 * **Main feature** of this version: Ability to load & save filters and options.
 * Added a new filter: filter on two or three type of stones (whatever they are).
@@ -524,11 +509,9 @@ What's New?
 * Fix misleading error messages.
 * Fix the "reset filters" which didn't reset properly all filters.
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * Add "only two stone types" filter [issue #1:  request by Oblitus]
 * World info tab: filter logging text box doesn't grow [issue #2: request by Sixdd]
@@ -536,102 +519,86 @@ Fixed Issues
 * Add filter presets (load / save) [issue #4: request by aza9999, neitsa]
 
 
-***
+---
 
 
-# General
+## Version 0.3.1
 
-# Version 0.3.1
 **Released July 22, 2017**
 **`RimWorld Version: Alpha 17b`**
 
-What's New?
-===========
+### What's New?
 
 * Fixed a problem with the "Allow Selection of Impassable Tiles" option in the options tab.
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * Fixed a problem with the "Allow Selection of Impassable Tiles" option in the options tab.
 
-Internal
----------
+#### Internal
 
 * Made the options class inherits from INotifyPropertyChanged.
 
 
-***
+---
 
 
-# General
+## Version 0.3
 
-# Version 0.3
 **Released July 21, 2017**
 **`RimWorld Version: Alpha 17b`**
 
-What's New?
-===========
+### What's New?
 
 * First release will all base ideas implemented!
 * Still no manual (in the making)
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * First public release, so no fixed issues (but they were a lot of them before :p)
 
 
-***
+---
 
 
-# General
+## Version 0.2
 
-# Version 0.2
 **[Private build] Released July 2017**
 **`RimWorld Version: Alpha 17b`**
 
-What's New?
-===========
+### What's New?
 
 * First release will all base ideas implemented!
 * GUI implemented with all filters
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+
+#### Fixed Issues
 
 * Still in the making, so a lot of bugs were fixed & the code was rapidly moving...
 
 
-***
+---
 
 
-# General
+## Version 0.1
 
-# Version 0.1
 **[Private build] May 2017**
 **`RimWorld Version: Alpha 17`**
 
-What's New?
-===========
+### What's New?
 
 * Most of the time was dedicated to reading the core game code.
 * Base ideas with some filters; no gui
 * Filtered tiles are output on the log file...
 
-Detailed Changelog
-==================
+### Detailed Changelog
 
-Fixed Issues
-------------
+#### Fixed Issues
 
 * Still in the making, the code was rapidly moving...
